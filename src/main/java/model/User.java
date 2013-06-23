@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.type.BigIntegerType;
+import java.math.BigInteger;
 
 /**
  * Testing comment
@@ -23,23 +23,23 @@ public class User implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private BigIntegerType id;
-    private BigIntegerType teamId;
+    private BigInteger id;
+    private BigInteger teamId;
     private String firstName, lastName, email;
 
-    public BigIntegerType getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(BigIntegerType id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
     
-    public BigIntegerType getTeamId() {
+    public BigInteger getTeamId() {
         return teamId;
     }
 
-    public void setTeamId(BigIntegerType teamId) {
+    public void setTeamId(BigInteger teamId) {
         this.teamId = teamId;
     }
 
