@@ -12,6 +12,7 @@
     </head>
     <body>
         <% 
+	    System.out.println("Code called");
             Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
             hibernateSession.beginTransaction();
             
@@ -19,6 +20,8 @@
             user.setEmail("lala@smu.edu.sg");
             user.setFirstName("La");
             user.setLastName("La");
+	    
+	    System.out.println("User object: " + user.toString());
             
             hibernateSession.save(user);
             hibernateSession.getTransaction().commit();
