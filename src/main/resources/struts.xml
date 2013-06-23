@@ -18,7 +18,7 @@
             <exception-mapping exception="java.lang.Exception" result="error"/>
         </global-exception-mappings>
         
-        <action name="test" class="com.thunderbolt.is480.userAction.TestAction" method="execute">
+        <action name="test" class="userAction.TestAction" method="execute">
             <result name="success">/Test.jsp</result>
         </action>
     </package>
