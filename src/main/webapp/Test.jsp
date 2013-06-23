@@ -1,5 +1,9 @@
 
 
+<%@page import="org.hibernate.Session"%>
+<%@page import="util.HibernateUtil"%>
+<%@page import="util.HibernateUtil"%>
+<%@page import="model.User"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
     <head>
@@ -7,6 +11,18 @@
         <title>Test</title>
     </head>
     <body>
+        <% 
+            Session hibernateSession = HibernateUtil.getSessionFactory().openSession();
+            hibernateSession.beginTransaction();
+            
+            User user = new User();
+            user.setEmail("lala@smu.edu.sg");
+            user.setFirstName("La");
+            user.setLastName("La");
+            
+            hibernateSession.save(user);
+            hibernateSession.getTransaction().commit();
+        %>
         <p>Success!!</p>
     </body>
 </html>
