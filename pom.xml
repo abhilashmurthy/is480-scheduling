@@ -9,21 +9,17 @@
 
     <name>is480-scheduling1</name>
     <url>http://maven.apache.org</url>
-    
-  <repositories>
-    <repository>
-      <id>JBoss repository</id>
-      <url>http://repository.jboss.com/maven2/</url>
-    </repository>
-  </repositories>
 
     <dependencies>
+        
+        <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+        
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
@@ -32,11 +28,11 @@
         </dependency>
         
         <!-- JUnit -->
-       <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>3.8.1</version>
-                <scope>test</scope>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
         </dependency>
     
         <!-- Hibernate -->
@@ -46,12 +42,12 @@
             <version>4.2.2.Final</version>
         </dependency>
 	
-	<!-- MySQL JDBC Connector -->
-	<dependency>
-	    <groupId>mysql</groupId>
-	    <artifactId>mysql-connector-java</artifactId>
-	    <version>5.1.25</version>
-	</dependency>
+        <!-- MySQL JDBC Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.25</version>
+        </dependency>
     
         <!-- Struts2 -->
         <dependency>
@@ -60,60 +56,18 @@
             <version>2.3.14.3</version>
         </dependency>
         
-        <!-- Struts2 jUnit Plugin -->
+        <!-- Logging -->
         <dependency>
-            <groupId>org.apache.struts</groupId>
-            <artifactId>struts2-junit-plugin</artifactId>
-            <version>2.3.14.3</version>
-        </dependency>
-        
-        <!-- Hibernate library dependecy start -->
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-        </dependency>
- 
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
- 
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-        </dependency>
- 
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>2.2</version>
-        </dependency>
-        
-	<dependency>
-		<groupId>antlr</groupId>
-		<artifactId>antlr</artifactId>
-		<version>2.7.7</version>
-	</dependency>
-        
-        <!-- Hibernate library dependecy end -->
- 
-        <!-- JTA -->
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.1</version>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.0.13</version>
         </dependency>
             
-        <!-- Catalina -->
-        <!--        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>catalina</artifactId>
-            <version>6.0.37</version>
-        </dependency>-->
-            
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.13</version>
+        </dependency>            
     
     </dependencies>
 

@@ -24,7 +24,7 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
-    private BigInteger teamId;
+    private BigInteger team_Id;
     private String firstName, lastName, email;
 
     public BigInteger getId() {
@@ -35,12 +35,12 @@ public class User implements Serializable {
         this.id = id;
     }
     
-    public BigInteger getTeamId() {
-        return teamId;
+    public BigInteger getTeam_Id() {
+        return team_Id;
     }
 
     public void setTeamId(BigInteger teamId) {
-        this.teamId = teamId;
+        this.team_Id = team_Id;
     }
 
     public String getFirstName() {

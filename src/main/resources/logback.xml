@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[%d{HH:mm:ss.SSS}]  [%-5level] %logger{0} - %msg%n</Pattern>
+        </layout>
+    </appender>
+    
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${user.home}/Desktop/thunderbolt.log</file>
+    
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${user.home}/Desktop/thunderbolt.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>15</maxHistory>
+    </rollingPolicy>
+
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>3MB</maxFileSize>
+    </triggeringPolicy>
+    
+    <encoder>
+      <pattern>[%date{dd MMM HH:mm:ss.SSS}]  [%-5level] %logger{26} - %msg%n</pattern>
+    </encoder>
+    
+  </appender>
+  
+    <logger name="jspLogger" level="INFO"/>
+
+    <root level="DEBUG">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

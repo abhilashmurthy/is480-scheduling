@@ -4,17 +4,59 @@
  */
 package model.dao;
 
+import java.math.BigInteger;
+import java.util.List;
 import model.User;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import util.HibernateUtil;
 
 /**
  *
  * @author ABHILASHM.2010
  */
-public interface UserDao {
- 
-	void save(User user);
-	void update(User user);
-	void delete(User user);
-	User findByUserId(String userId);
- 
+public class UserDao {
+    
+    static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+
+    static Session session;
+
+    static {
+        logger.info("UserDao called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+    }
+
+    public static void save(User user) {
+        session.save(user);
+        session.getTransaction().commit();
+        logger.info("Added user " + user.getEmail());
+    }
+
+    public static void update(User user) {
+        session.update(user);
+        session.getTransaction().commit();
+        logger.info("Updated user " + user.getEmail());
+    }
+
+    public static void delete(User user) {
+        session.delete(user);
+        session.getTransaction().commit();
+        logger.info("Deleted user " + user.getEmail());
+    }
+
+    public static User findByUserId(int id) {
+        BigInteger bigIntId = BigInteger.valueOf(id);
+        Query query = session.createQuery("from user where id = :id ");
+        query.setParameter("id", bigIntId);
+        List list = query.list();
+        session.getTransaction().commit();
+        return (User) list.get(0);
+    }
 }

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 23, 2013 at 12:33 PM
+-- Generation Time: Jun 23, 2013 at 04:50 PM
 -- Server version: 5.5.16
 -- PHP Version: 5.3.8
 
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `schedule` (
   `endDate` date NOT NULL,
   `term_id` bigint(10) unsigned NOT NULL,
   PRIMARY KEY (`milestone`,`term_id`),
-  KEY `term_id` (`term_id`)
+  UNIQUE KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -93,10 +93,10 @@ CREATE TABLE IF NOT EXISTS `user` (
   `firstName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `teamId` bigint(10) unsigned DEFAULT NULL,
+  `team_id` bigint(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `teamId` (`teamId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  UNIQUE KEY `team_id` (`team_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
 
 -- --------------------------------------------------------
 
@@ -132,7 +132,7 @@ ALTER TABLE `time_slot`
 -- Constraints for table `user`
 --
 ALTER TABLE `user`
-  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`teamId`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `user_role`
