@@ -1,34 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="true">
+<configuration debug="false">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%d{HH:mm:ss.SSS}]  [%-5level] %logger{0} - %msg%n</Pattern>
+            <Pattern>[%d{HH:mm:ss.SSS}]  [%-5level]  %logger{26} -  %msg%n</Pattern>
         </layout>
+        
+<!--        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>
+                    if (logger.startsWith("org.") 
+                        || logger.startsWith("com.")
+                        || logger.startsWith("ch.")
+                        || logger.startsWith("c."))
+                    return false;
+                    else 
+                    return true;
+                </expression>
+            </evaluator>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>-->
+        
     </appender>
     
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${user.home}/Desktop/thunderbolt.log</file>
-    
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${user.home}/Desktop/thunderbolt.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>15</maxHistory>
-    </rollingPolicy>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${user.home}/Desktop/thunderbolt.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${user.home}/Desktop/thunderbolt.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>15</maxHistory>
+        </rollingPolicy>
 
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <maxFileSize>3MB</maxFileSize>
-    </triggeringPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>3MB</maxFileSize>
+        </triggeringPolicy>
     
-    <encoder>
-      <pattern>[%date{dd MMM HH:mm:ss.SSS}]  [%-5level] %logger{26} - %msg%n</pattern>
-    </encoder>
+        <encoder>
+            <pattern>[%date{dd MMM HH:mm:ss.SSS}]  [%-5level]  %logger{26} -  %msg%n</pattern>
+        </encoder>
     
-  </appender>
+<!--        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>
+                    if (logger.startsWith("org.") 
+                        || logger.startsWith("com.")
+                        || logger.startsWith("ch.")
+                        || logger.startsWith("c."))
+                    return false;
+                    else
+                    return true;
+                </expression>
+            </evaluator>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>-->
+        
+    
+    </appender>
   
     <logger name="jspLogger" level="INFO"/>
-
-    <root level="DEBUG">
+    <logger name="org" level="OFF"/>
+    <logger name="com" level="OFF"/>
+ 
+    <root level="INFO">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>
+    
 </configuration>
