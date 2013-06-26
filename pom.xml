@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.thunderbolt</groupId>
-    <artifactId>is480-scheduling1</artifactId>
+    <artifactId>is480-scheduling</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <name>is480-scheduling1</name>
+    <name>IS480 Scheduling</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>
