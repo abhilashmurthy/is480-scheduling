@@ -60,8 +60,8 @@
     </appender>
   
     <logger name="jspLogger" level="INFO"/>
-    <logger name="org" level="OFF"/>
-    <logger name="com" level="OFF"/>
+<!--    <logger name="org" level="OFF"/>
+    <logger name="com" level="OFF"/>-->
  
     <root level="INFO">
         <appender-ref ref="FILE" />

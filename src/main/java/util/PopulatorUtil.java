@@ -39,6 +39,8 @@ public class PopulatorUtil {
     public static void main(String[] args) {
         PopulatorUtil p = new PopulatorUtil();
         p.init();
+        p.populateTerms();
+        p.populate();
     }
 
     public void init() {
@@ -62,7 +64,7 @@ public class PopulatorUtil {
         };
         for(Object[] term : terms) {
             Term newTerm = new Term();
-            newTerm.setYear((Date)term[0]);
+            newTerm.setYear((Date) term[0]);
             newTerm.setTerm((Integer) term[1]);
             TermDAO.save(newTerm);
         }
@@ -87,15 +89,6 @@ public class PopulatorUtil {
             }
             String client = cells.get(5).ownText();
             
-            //Storing the teams
-            Team team = new Team();
-            team.setTeamName(teamName);
-            team.setTermId(3); //HARDCODED
-            team.setSupervisor(supervisor);
-            team.setReviewer1(reviewers[0].trim());
-            team.setReviewer2(reviewers[1].trim());
-            TeamDAO.save(team);
-            
             //Storing the users
             User supervisorUser = new User();
             supervisorUser.setFirstName(supervisor.split(" ")[0]);
@@ -115,6 +108,18 @@ public class PopulatorUtil {
             reviewer2User.setEmail(reviewers[1].replaceAll(" ", "") + "@smu.edu.sg");
             UserDAO.save(reviewer2User);
             
+            //Storing the teams
+            Team team = new Team();
+            team.setTeamName(teamName);
+            Term term = new Term();
+            term.setYear(new Date(2013, 1, 1));
+            term.setTerm(1);
+            team.setTerm(term);
+            team.setSupervisor(supervisorUser);
+            team.setReviewer1(reviewer1User);
+            team.setReviewer2(reviewer2User);
+            TeamDAO.save(team);
+            
             for (String member : memberList) {
                 User memberUser = new User();
                 memberUser.setFirstName(member.split(" ")[0]);
@@ -124,6 +129,5 @@ public class PopulatorUtil {
                 UserDAO.save(memberUser);
             }
         }
-        
     }
 }
