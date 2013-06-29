@@ -25,28 +25,19 @@ public class Timeslot implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
-    private SchedulePk id;
-    @Column(name = "startDate")
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
+    private TimeslotPk id;
     @Column(name = "endDate")
     @Temporal(TemporalType.DATE)
     private Date endDate;
+    @Column(name = "team_id")
+    private int teamId;
 
-    public SchedulePk getId() {
+    public TimeslotPk getId() {
         return id;
     }
 
-    public void setId(SchedulePk id) {
+    public void setId(TimeslotPk id) {
         this.id = id;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
     }
 
     public Date getEndDate() {
@@ -55,5 +46,13 @@ public class Timeslot implements Serializable {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }    
+    }
+
+    public int getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
+    }
 }
