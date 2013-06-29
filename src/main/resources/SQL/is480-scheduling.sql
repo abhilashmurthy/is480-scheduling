@@ -1,20 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.5
+-- version 3.5.7
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 23, 2013 at 04:50 PM
--- Server version: 5.5.16
--- PHP Version: 5.3.8
+-- Generation Time: Jun 29, 2013 at 12:30 PM
+-- Server version: 5.5.29
+-- PHP Version: 5.4.10
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
 
 --
 -- Database: `is480-scheduling`
@@ -26,13 +20,13 @@ SET time_zone = "+00:00";
 -- Table structure for table `schedule`
 --
 
-CREATE TABLE IF NOT EXISTS `schedule` (
-  `milestone` varchar(50) NOT NULL COMMENT 'Refers to Acceptance/Midterm/Final',
-  `startDate` date NOT NULL,
-  `endDate` date NOT NULL,
-  `term_id` bigint(10) unsigned NOT NULL,
+CREATE TABLE `schedule` (
+  `milestone` varchar(50) NOT NULL,
+  `term_id` int(11) NOT NULL,
+  `startDate` datetime NOT NULL,
+  `endDate` datetime NOT NULL,
   PRIMARY KEY (`milestone`,`term_id`),
-  UNIQUE KEY `term_id` (`term_id`)
+  KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -41,14 +35,15 @@ CREATE TABLE IF NOT EXISTS `schedule` (
 -- Table structure for table `team`
 --
 
-CREATE TABLE IF NOT EXISTS `team` (
-  `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `team` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `term_id` bigint(10) unsigned NOT NULL,
-  `reviewer_1` bigint(10) unsigned DEFAULT NULL,
-  `reviewer_2` bigint(10) unsigned DEFAULT NULL,
-  `supervisor` bigint(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `term_id` int(11) DEFAULT NULL,
+  `reviewer1` int(11) DEFAULT NULL,
+  `reviewer2` int(11) DEFAULT NULL,
+  `supervisor` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `term_id_fk` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -57,10 +52,10 @@ CREATE TABLE IF NOT EXISTS `team` (
 -- Table structure for table `term`
 --
 
-CREATE TABLE IF NOT EXISTS `term` (
-  `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT,
-  `year` year(4) DEFAULT NULL,
-  `term` smallint(1) DEFAULT NULL,
+CREATE TABLE `term` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `year` date NOT NULL,
+  `term` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -70,16 +65,31 @@ CREATE TABLE IF NOT EXISTS `term` (
 -- Table structure for table `time_slot`
 --
 
-CREATE TABLE IF NOT EXISTS `time_slot` (
-  `term_id` bigint(10) unsigned NOT NULL,
-  `startDate` datetime NOT NULL,
-  `endDate` datetime NOT NULL,
-  `team_id` bigint(20) NOT NULL,
+CREATE TABLE `time_slot` (
+  `term_id` int(11) NOT NULL,
   `milestone` varchar(50) NOT NULL,
-  PRIMARY KEY (`term_id`,`startDate`,`milestone`),
-  UNIQUE KEY `term_id` (`term_id`),
-  UNIQUE KEY `milestone` (`milestone`),
+  `startTime` datetime NOT NULL,
+  `endTime` datetime NOT NULL,
+  `team_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`term_id`,`milestone`,`startTime`),
+  KEY `team_id` (`team_id`),
   KEY `FK_schedule` (`milestone`,`term_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `time_slot_status`
+--
+
+CREATE TABLE `time_slot_status` (
+  `term_id` int(11) NOT NULL,
+  `milestone` varchar(50) NOT NULL,
+  `startTime` datetime NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `status` int(11) NOT NULL,
+  PRIMARY KEY (`term_id`,`milestone`,`startTime`,`user_id`),
+  KEY `FK_time_slot` (`milestone`,`term_id`,`startTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -88,15 +98,15 @@ CREATE TABLE IF NOT EXISTS `time_slot` (
 -- Table structure for table `user`
 --
 
-CREATE TABLE IF NOT EXISTS `user` (
-  `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `team_id` bigint(10) unsigned DEFAULT NULL,
+  `team_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `team_id` (`team_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+  KEY `team_id` (`team_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -104,12 +114,12 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Table structure for table `user_role`
 --
 
-CREATE TABLE IF NOT EXISTS `user_role` (
-  `userId` bigint(10) unsigned NOT NULL,
-  `term_id` bigint(10) unsigned NOT NULL,
+CREATE TABLE `user_role` (
+  `user_id` int(11) NOT NULL,
+  `term_id` int(11) NOT NULL,
   `role` varchar(50) NOT NULL,
-  UNIQUE KEY `term_id` (`term_id`),
-  KEY `userId` (`userId`)
+  PRIMARY KEY (`user_id`,`term_id`,`role`),
+  KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -123,24 +133,33 @@ ALTER TABLE `schedule`
   ADD CONSTRAINT `schedule_ibfk_1` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `team`
+--
+ALTER TABLE `team`
+  ADD CONSTRAINT `team_ibfk_1` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
 -- Constraints for table `time_slot`
 --
 ALTER TABLE `time_slot`
-  ADD CONSTRAINT `FK_schedule` FOREIGN KEY (`milestone`, `term_id`) REFERENCES `schedule` (`milestone`, `term_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_schedule` FOREIGN KEY (`milestone`, `term_id`) REFERENCES `schedule` (`milestone`, `term_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `time_slot_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `time_slot_status`
+--
+ALTER TABLE `time_slot_status`
+  ADD CONSTRAINT `FK_time_slot` FOREIGN KEY (`milestone`, `term_id`, `startTime`) REFERENCES `time_slot` (`milestone`, `term_id`, `startTime`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `user`
 --
 ALTER TABLE `user`
-  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `user_role`
 --
 ALTER TABLE `user_role`
-  ADD CONSTRAINT `user_role_ibfk_2` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+  ADD CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `user_role_ibfk_2` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
