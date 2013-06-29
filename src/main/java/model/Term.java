@@ -17,63 +17,43 @@ import javax.persistence.Table;
  * @author Prakhar
  */
 @Entity
-@Table(name = "user")
-public class User implements Serializable {
+@Table(name="term")
+public class Term implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private int id;
-    @Column(name = "team_id")
-    private int teamId;
-    @Column(name = "firstName")
-    private String firstName;
-    @Column(name = "lastName")
-    private String lastName;
-    @Column(name = "email")
-    private String email;
-            
+    @Column(name = "year")
+    private String year;
+    @Column(name = "term")
+    private String term;
+    
     public int getId() {
         return id;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
-    
-    public int getTeamId() {
-        return teamId;
+
+    public String getYear() {
+        return year;
     }
-    
-    public void setTeamId(int teamId) {
-        this.teamId = teamId;
+
+    public void setYear(String year) {
+        this.year = year;
     }
-    
-    public String getFirstName() {
-        return firstName;
+
+    public String getTerm() {
+        return term;
     }
-    
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+
+    public void setTerm(String term) {
+        this.term = term;
     }
-    
-    public String getLastName() {
-        return lastName;
-    }
-    
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -84,10 +64,10 @@ public class User implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof User)) {
+        if (!(object instanceof Term)) {
             return false;
         }
-        User other = (User) object;
+        Term other = (Term) object;
         if (this.id != other.id) {
             return false;
         }
@@ -96,7 +76,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "model.User[ id=" + id + " ]";
+        return "model.Term[ id=" + id + " ]";
     }
     
 }
