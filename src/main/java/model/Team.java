@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -25,16 +26,21 @@ public class Team implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private int id;
+    
     @Column(name = "name")
     private String teamName;
-    @Column(name = "term_id")
-    private String termId;
-    @Column(name = "reviewer1")
-    private String reviewer1;
-    @Column(name = "reviewer2")
-    private String reviewer2;
-    @Column(name = "supervisor")
-    private String supervisor;
+    
+    @OneToOne(mappedBy="term_id")
+    private Term term;
+
+	@OneToOne(mappedBy="reviewer1")
+    private User reviewer1;
+
+	@OneToOne(mappedBy="reviewer2")
+    private User reviewer2;
+    
+    @OneToOne(mappedBy="supervisor")
+    private User supervisor;
     
     public int getId() {
         return id;
@@ -51,38 +57,38 @@ public class Team implements Serializable {
     public void setTeamName(String teamName) {
         this.teamName = teamName;
     }
+    
+    public Term getTerm() {
+		return term;
+	}
 
-    public String getTermId() {
-        return termId;
-    }
+	public void setTerm(Term term) {
+		this.term = term;
+	}
 
-    public void setTermId(String termId) {
-        this.termId = termId;
-    }
+    public User getReviewer1() {
+		return reviewer1;
+	}
 
-    public String getReviewer1() {
-        return reviewer1;
-    }
+	public void setReviewer1(User reviewer1) {
+		this.reviewer1 = reviewer1;
+	}
 
-    public void setReviewer1(String reviewer1) {
-        this.reviewer1 = reviewer1;
-    }
+	public User getReviewer2() {
+		return reviewer2;
+	}
 
-    public String getReviewer2() {
-        return reviewer2;
-    }
+	public void setReviewer2(User reviewer2) {
+		this.reviewer2 = reviewer2;
+	}
 
-    public void setReviewer2(String reviewer2) {
-        this.reviewer2 = reviewer2;
-    }
+	public User getSupervisor() {
+		return supervisor;
+	}
 
-    public String getSupervisor() {
-        return supervisor;
-    }
-
-    public void setSupervisor(String supervisor) {
-        this.supervisor = supervisor;
-    }
+	public void setSupervisor(User supervisor) {
+		this.supervisor = supervisor;
+	}
     
     @Override
     public int hashCode() {
