@@ -14,22 +14,9 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-        <title>Test</title>
+        <title>Test2</title>
     </head>
     <body>
-        <%
-	    logger.info("Code called");
-            
-            User user = new User();
-            user.setEmail("lala@smu.edu.sg");
-            user.setFirstName("La");
-            user.setLastName("La");
-	    
-	    logger.info("User object: " + user.toString());
-            
-            UserDAO.save(user);
-            
-        %>
         <p>Success!!</p>
     </body>
 </html>

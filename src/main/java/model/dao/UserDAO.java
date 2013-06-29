@@ -20,14 +20,14 @@ import util.HibernateUtil;
  *
  * @author ABHILASHM.2010
  */
-public class UserDao {
+public class UserDAO {
     
-    static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+    static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
     static Session session;
 
     static {
-        logger.info("UserDao called");
+        logger.info("UserDAO called");
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         session = sessionFactory.openSession();
         session.beginTransaction();

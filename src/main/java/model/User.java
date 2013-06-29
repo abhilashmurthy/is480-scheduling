@@ -5,6 +5,8 @@
 package model;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,7 +26,8 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
-    private BigInteger team_Id;
+    @Column(name="team_id")
+    private BigInteger teamId;
     private String firstName, lastName, email;
 
     public BigInteger getId() {
@@ -35,12 +38,12 @@ public class User implements Serializable {
         this.id = id;
     }
     
-    public BigInteger getTeam_Id() {
-        return team_Id;
+    public BigInteger getTeamId() {
+        return teamId;
     }
 
     public void setTeamId(BigInteger teamId) {
-        this.team_Id = team_Id;
+        this.teamId = teamId;
     }
 
     public String getFirstName() {
