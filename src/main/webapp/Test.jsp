@@ -27,7 +27,7 @@
 	    
 	    logger.info("User object: " + user.toString());
             
-            UserDao.save(user);
+            UserDAO.save(user);
             
         %>
         <p>Success!!</p>
