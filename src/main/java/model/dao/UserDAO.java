@@ -55,7 +55,7 @@ public class UserDAO {
         BigInteger bigIntId = BigInteger.valueOf(id);
         Query query = session.createQuery("from user where id = :id ");
         query.setParameter("id", bigIntId);
-        List list = query.list();
+        List<User> list = (List<User>) query.list();
         session.getTransaction().commit();
         return (User) list.get(0);
     }
