@@ -17,7 +17,7 @@ import javax.persistence.Table;
  * @author Prakhar
  */
 @Entity
-@Table(name = "TimeSlotStatus")
+@Table(name = "time_slot_status")
 public class TimeslotStatus implements Serializable {
     private static final long serialVersionUID = 1L;
     
