@@ -26,32 +26,41 @@ public class UserDAO {
 
     static Session session;
 
-    static {
+    public static void save(User user) {
         logger.info("UserDAO called");
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         session = sessionFactory.openSession();
         session.beginTransaction();
-    }
-
-    public static void save(User user) {
         session.save(user);
         session.getTransaction().commit();
         logger.info("Added user " + user.getEmail());
     }
 
     public static void update(User user) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
         session.update(user);
         session.getTransaction().commit();
         logger.info("Updated user " + user.getEmail());
     }
 
     public static void delete(User user) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
         session.delete(user);
         session.getTransaction().commit();
         logger.info("Deleted user " + user.getEmail());
     }
 
     public static User findByUserId(int id) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
         Query query = session.createQuery("from user where id = :id ");
         query.setParameter("id", bigIntId);

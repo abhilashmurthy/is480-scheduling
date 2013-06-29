@@ -7,9 +7,7 @@ package model.dao;
 import java.math.BigInteger;
 import java.util.List;
 import model.Team;
-import model.Term;
 import model.User;
-import static model.dao.UserDAO.session;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -29,39 +27,46 @@ public class TeamDAO {
 
     static Session session;
 
-    static {
+    public static void save(Team team) {
         logger.info("UserDAO called");
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         session = sessionFactory.openSession();
         session.beginTransaction();
-    }
-
-    public static void save(Team team) {
         session.save(team);
         session.getTransaction().commit();
-        logger.info("Added team " + team.toString());
+        logger.info("Added team " + team.getId());
     }
 
     public static void update(Team team) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
         session.update(team);
         session.getTransaction().commit();
-        logger.info("Added team " + team.toString());
+        logger.info("Updated team " + team.getId());
     }
 
     public static void delete(Team team) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
         session.delete(team);
         session.getTransaction().commit();
-        logger.info("Added team " + team.toString());
+        logger.info("Deleted team " + team.getId());
     }
-    
-    public static BigInteger getIdByName(String teamName) {
-        Query query = session.createQuery("from team where name = :name ");
-        query.setParameter("name", teamName);
-        List list = query.list();
+
+    public static User findByUserId(int id) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+        BigInteger bigIntId = BigInteger.valueOf(id);
+        Query query = session.createQuery("from team where id = :id ");
+        query.setParameter("id", bigIntId);
+        List<User> list = (List<User>) query.list();
         session.getTransaction().commit();
-        logger.info("Returned team");
-        Team team = (Team) list.get(0);
-        return team.getId();
+        return (User) list.get(0);
     }
-    
 }

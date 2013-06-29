@@ -1,3 +1,6 @@
+<%@page import="model.dao.TermDAO"%>
+<%@page import="java.sql.Date"%>
+<%@page import="model.Term"%>
 <%@page import="model.dao.UserDAO"%>
 <%@page import="org.hibernate.Session"%>
 <%@page import="util.HibernateUtil"%>
@@ -24,10 +27,18 @@
             user.setEmail("lala@smu.edu.sg");
             user.setFirstName("La");
             user.setLastName("La");
+            
+            UserDAO.save(user);
+            
+            Term term = new Term();
+            term.setYear(new Date(2013, 1, 1));
+            term.setTerm(1);
+            TermDAO.save(term);
 	    
 	    logger.info("User object: " + user.toString());
             
-            UserDAO.save(user);
+            
+            
             
         %>
         <p>Success!!</p>

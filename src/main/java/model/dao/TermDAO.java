@@ -27,28 +27,46 @@ public class TermDAO {
 
     static Session session;
 
-    static {
+    public static void save(Term term) {
         logger.info("UserDAO called");
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         session = sessionFactory.openSession();
         session.beginTransaction();
-    }
-
-    public static void save(Term term) {
         session.save(term);
         session.getTransaction().commit();
-        logger.info("Added term " + term.getYear().toString() + ", " + term.getTerm());
+        logger.info("Added term " + term.getId());
     }
 
     public static void update(Term term) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
         session.update(term);
         session.getTransaction().commit();
-        logger.info("Updated term " + term.getYear().toString() + ", " + term.getTerm());
+        logger.info("Updated term " + term.getId());
     }
 
     public static void delete(Term term) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
         session.delete(term);
         session.getTransaction().commit();
-        logger.info("Deleted term " + term.getYear().toString() + ", " + term.getTerm());
+        logger.info("Deleted term " + term.getId());
+    }
+
+    public static User findByUserId(int id) {
+        logger.info("UserDAO called");
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+        BigInteger bigIntId = BigInteger.valueOf(id);
+        Query query = session.createQuery("from term where id = :id ");
+        query.setParameter("id", bigIntId);
+        List<User> list = (List<User>) query.list();
+        session.getTransaction().commit();
+        return (User) list.get(0);
     }
 }
