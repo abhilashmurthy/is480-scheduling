@@ -25,11 +25,7 @@ public class Schedule implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
-    @Column(name = "term_id")
-    private int termId;
-    @Id
-    @Column(name = "milestone")
-    private String milestone;
+    private SchedulePk id;
     @Column(name = "startDate")
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -37,20 +33,12 @@ public class Schedule implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    public int getTermId() {
-        return termId;
+    public SchedulePk getId() {
+        return id;
     }
 
-    public void setTermId(int termId) {
-        this.termId = termId;
-    }
-
-    public String getMilestone() {
-        return milestone;
-    }
-
-    public void setMilestone(String milestone) {
-        this.milestone = milestone;
+    public void setId(SchedulePk id) {
+        this.id = id;
     }
 
     public Date getStartDate() {
@@ -67,31 +55,5 @@ public class Schedule implements Serializable {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-    
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (int) termId;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Schedule)) {
-            return false;
-        }
-        Schedule other = (Schedule) object;
-        if (this.termId != other.termId) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "model.Schedule[ id=" + termId + " ]";
-    }
-    
+    }    
 }
