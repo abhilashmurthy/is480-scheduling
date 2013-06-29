@@ -20,24 +20,27 @@ import javax.persistence.TemporalType;
  * @author Prakhar
  */
 @Embeddable
-public class TimeslotPk implements Serializable {
+public class TimeslotStatusPk implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Column(name = "term_id")
     private int termId;
+    @Column(name = "milestone")
+    private String milestone;
     @Column(name = "startTime")
     @Temporal(TemporalType.DATE)
     private Date startTime;
-    @Column(name = "milestone")
-    private String milestone;
+    @Column(name = "user_id")
+    private int userId;
 
-    public TimeslotPk() {
+    public TimeslotStatusPk() {
     }
     
-    public TimeslotPk(int termId, Date startDate, String milestone) {
+    public TimeslotStatusPk(int termId, String milestone, Date startTime, int userId) {
         this.termId = termId;
-        this.startTime = startDate;
         this.milestone = milestone;
+        this.startTime = startTime;
+        this.userId = userId;
     }
     
     public int getTermId() {
@@ -48,14 +51,6 @@ public class TimeslotPk implements Serializable {
         this.termId = termId;
     }
 
-    public Date getStartDate() {
-        return startTime;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startTime = startDate;
-    }
-
     public String getMilestone() {
         return milestone;
     }
@@ -64,17 +59,33 @@ public class TimeslotPk implements Serializable {
         this.milestone = milestone;
     }
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    
     @Override
     public int hashCode() {
-        return (int) milestone.hashCode() + (int) startTime.hashCode() + termId;
+       return (int) milestone.hashCode() + (int) startTime.hashCode() + termId + userId;
     }
 
     @Override
     public boolean equals(Object object) {
         if (object == this) return true;
-        if (!(object instanceof TimeslotPk)) return false;
+        if (!(object instanceof TimeslotStatusPk)) return false;
         if (object == null) return false;
-        TimeslotPk pk = (TimeslotPk) object;
-        return pk.termId == termId && pk.milestone.equals(milestone) && pk.startTime.equals(startTime);
+        TimeslotStatusPk pk = (TimeslotStatusPk) object;
+        return pk.termId == termId && pk.milestone.equals(milestone) && pk.startTime.equals(startTime) && pk.userId == userId;
     }
 }

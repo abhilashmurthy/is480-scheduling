@@ -26,9 +26,9 @@ public class Timeslot implements Serializable {
     
     @Id
     private TimeslotPk id;
-    @Column(name = "endDate")
+    @Column(name = "endTime")
     @Temporal(TemporalType.DATE)
-    private Date endDate;
+    private Date endTime;
     @Column(name = "team_id")
     private int teamId;
 
@@ -41,11 +41,11 @@ public class Timeslot implements Serializable {
     }
 
     public Date getEndDate() {
-        return endDate;
+        return endTime;
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+        this.endTime = endDate;
     }
 
     public int getTeamId() {
