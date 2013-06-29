@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -24,30 +25,30 @@ public class TimeslotStatusPk implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Column(name = "term_id")
-    private int termId;
+    private BigInteger termId;
     @Column(name = "milestone")
     private String milestone;
     @Column(name = "startTime")
     @Temporal(TemporalType.DATE)
     private Date startTime;
     @Column(name = "user_id")
-    private int userId;
+    private BigInteger userId;
 
     public TimeslotStatusPk() {
     }
     
-    public TimeslotStatusPk(int termId, String milestone, Date startTime, int userId) {
+    public TimeslotStatusPk(BigInteger termId, String milestone, Date startTime, BigInteger userId) {
         this.termId = termId;
         this.milestone = milestone;
         this.startTime = startTime;
         this.userId = userId;
     }
     
-    public int getTermId() {
+    public BigInteger getTermId() {
         return termId;
     }
 
-    public void setTermId(int termId) {
+    public void setTermId(BigInteger termId) {
         this.termId = termId;
     }
 
@@ -67,17 +68,17 @@ public class TimeslotStatusPk implements Serializable {
         this.startTime = startTime;
     }
 
-    public int getUserId() {
+    public BigInteger getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(BigInteger userId) {
         this.userId = userId;
     }
     
     @Override
     public int hashCode() {
-       return (int) milestone.hashCode() + (int) startTime.hashCode() + termId + userId;
+       return (int) milestone.hashCode() + (int) startTime.hashCode() + termId.intValue() + userId.intValue();
     }
 
     @Override

@@ -54,7 +54,7 @@ public class TeamDAO {
         logger.info("Added team " + team.toString());
     }
     
-    public static int getIdByName(String teamName) {
+    public static BigInteger getIdByName(String teamName) {
         Query query = session.createQuery("from team where name = :name ");
         query.setParameter("name", teamName);
         List list = query.list();

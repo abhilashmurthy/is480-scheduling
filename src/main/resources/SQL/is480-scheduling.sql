@@ -22,7 +22,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `schedule` (
   `milestone` varchar(50) NOT NULL,
-  `term_id` int(11) NOT NULL,
+  `term_id` bigint(11) NOT NULL,
   `startDate` datetime NOT NULL,
   `endDate` datetime NOT NULL,
   PRIMARY KEY (`milestone`,`term_id`),
@@ -36,12 +36,12 @@ CREATE TABLE `schedule` (
 --
 
 CREATE TABLE `team` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `term_id` int(11) DEFAULT NULL,
-  `reviewer1` int(11) DEFAULT NULL,
-  `reviewer2` int(11) DEFAULT NULL,
-  `supervisor` int(11) DEFAULT NULL,
+  `term_id` bigint(11) DEFAULT NULL,
+  `reviewer1` bigint(11) DEFAULT NULL,
+  `reviewer2` bigint(11) DEFAULT NULL,
+  `supervisor` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `term_id_fk` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
@@ -53,9 +53,9 @@ CREATE TABLE `team` (
 --
 
 CREATE TABLE `term` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `year` date NOT NULL,
-  `term` int(11) NOT NULL,
+  `term` bigint(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -66,11 +66,11 @@ CREATE TABLE `term` (
 --
 
 CREATE TABLE `time_slot` (
-  `term_id` int(11) NOT NULL,
+  `term_id` bigint(11) NOT NULL,
   `milestone` varchar(50) NOT NULL,
   `startTime` datetime NOT NULL,
   `endTime` datetime NOT NULL,
-  `team_id` int(11) DEFAULT NULL,
+  `team_id` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`term_id`,`milestone`,`startTime`),
   KEY `team_id` (`team_id`),
   KEY `FK_schedule` (`milestone`,`term_id`)
@@ -83,11 +83,11 @@ CREATE TABLE `time_slot` (
 --
 
 CREATE TABLE `time_slot_status` (
-  `term_id` int(11) NOT NULL,
+  `term_id` bigint(11) NOT NULL,
   `milestone` varchar(50) NOT NULL,
   `startTime` datetime NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
+  `user_id` bigint(11) NOT NULL,
+  `status` bigint(11) NOT NULL,
   PRIMARY KEY (`term_id`,`milestone`,`startTime`,`user_id`),
   KEY `FK_time_slot` (`milestone`,`term_id`,`startTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -99,11 +99,11 @@ CREATE TABLE `time_slot_status` (
 --
 
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `team_id` int(11) DEFAULT NULL,
+  `team_id` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `team_id` (`team_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
@@ -115,50 +115,50 @@ CREATE TABLE `user` (
 --
 
 CREATE TABLE `user_role` (
-  `user_id` int(11) NOT NULL,
-  `term_id` int(11) NOT NULL,
+  `user_id` bigint(11) NOT NULL,
+  `term_id` bigint(11) NOT NULL,
   `role` varchar(50) NOT NULL,
   PRIMARY KEY (`user_id`,`term_id`,`role`),
   KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Constraints for dumped tables
+-- Constrabigints for dumped tables
 --
 
 --
--- Constraints for table `schedule`
+-- Constrabigints for table `schedule`
 --
 ALTER TABLE `schedule`
   ADD CONSTRAINT `schedule_ibfk_1` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `team`
+-- Constrabigints for table `team`
 --
 ALTER TABLE `team`
   ADD CONSTRAINT `team_ibfk_1` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints for table `time_slot`
+-- Constrabigints for table `time_slot`
 --
 ALTER TABLE `time_slot`
   ADD CONSTRAINT `FK_schedule` FOREIGN KEY (`milestone`, `term_id`) REFERENCES `schedule` (`milestone`, `term_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `time_slot_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints for table `time_slot_status`
+-- Constrabigints for table `time_slot_status`
 --
 ALTER TABLE `time_slot_status`
   ADD CONSTRAINT `FK_time_slot` FOREIGN KEY (`milestone`, `term_id`, `startTime`) REFERENCES `time_slot` (`milestone`, `term_id`, `startTime`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `user`
+-- Constrabigints for table `user`
 --
 ALTER TABLE `user`
   ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints for table `user_role`
+-- Constrabigints for table `user_role`
 --
 ALTER TABLE `user_role`
   ADD CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,

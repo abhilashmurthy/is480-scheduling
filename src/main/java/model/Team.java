@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +26,7 @@ public class Team implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private int id;
+    private BigInteger id;
     
     @Column(name = "name")
     private String teamName;
@@ -42,11 +43,11 @@ public class Team implements Serializable {
     @OneToOne(mappedBy="supervisor")
     private User supervisor;
     
-    public int getId() {
+    public BigInteger getId() {
         return id;
     }
     
-    public void setId(int id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
@@ -93,7 +94,7 @@ public class Team implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) id;
+        hash += id.intValue();
         return hash;
     }
 

@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
@@ -23,12 +24,12 @@ public class SchedulePk implements Serializable {
     @Column(name = "milestone")
     private String milestone;
     @Column(name = "term_id")
-    private int termId;
+    private BigInteger termId;
 
     public SchedulePk() {
     }
     
-    public SchedulePk(String milestone, int termId) {
+    public SchedulePk(String milestone, BigInteger termId) {
         this.milestone = milestone;
         this.termId = termId;
     }
@@ -41,17 +42,17 @@ public class SchedulePk implements Serializable {
         this.milestone = milestone;
     }
 
-    public int getTermId() {
+    public BigInteger getTermId() {
         return termId;
     }
 
-    public void setTermId(int termId) {
+    public void setTermId(BigInteger termId) {
         this.termId = termId;
     }
     
     @Override
     public int hashCode() {
-        return (int) milestone.hashCode() + termId;
+        return (int) milestone.hashCode() + termId.intValue();
     }
 
     @Override

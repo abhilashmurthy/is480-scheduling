@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -24,7 +25,7 @@ public class TimeslotPk implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Column(name = "term_id")
-    private int termId;
+    private BigInteger termId;
     @Column(name = "startTime")
     @Temporal(TemporalType.DATE)
     private Date startTime;
@@ -34,17 +35,17 @@ public class TimeslotPk implements Serializable {
     public TimeslotPk() {
     }
     
-    public TimeslotPk(int termId, Date startDate, String milestone) {
+    public TimeslotPk(BigInteger termId, Date startDate, String milestone) {
         this.termId = termId;
         this.startTime = startDate;
         this.milestone = milestone;
     }
     
-    public int getTermId() {
+    public BigInteger getTermId() {
         return termId;
     }
 
-    public void setTermId(int termId) {
+    public void setTermId(BigInteger termId) {
         this.termId = termId;
     }
 
@@ -66,7 +67,7 @@ public class TimeslotPk implements Serializable {
 
     @Override
     public int hashCode() {
-        return (int) milestone.hashCode() + (int) startTime.hashCode() + termId;
+        return (int) milestone.hashCode() + (int) startTime.hashCode() + termId.intValue();
     }
 
     @Override

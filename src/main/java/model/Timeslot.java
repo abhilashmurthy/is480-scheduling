@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,7 +31,7 @@ public class Timeslot implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date endTime;
     @Column(name = "team_id")
-    private int teamId;
+    private BigInteger teamId;
 
     public TimeslotPk getId() {
         return id;
@@ -48,11 +49,11 @@ public class Timeslot implements Serializable {
         this.endTime = endDate;
     }
 
-    public int getTeamId() {
+    public BigInteger getTeamId() {
         return teamId;
     }
 
-    public void setTeamId(int teamId) {
+    public void setTeamId(BigInteger teamId) {
         this.teamId = teamId;
     }
 }

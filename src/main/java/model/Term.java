@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,17 +26,17 @@ public class Term implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private int id;
+    private BigInteger id;
     @Column(name = "year")
     private Date year;
     @Column(name = "term")
     private int term;
     
-    public int getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
@@ -58,7 +59,7 @@ public class Term implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) id;
+        hash += id.intValue();
         return hash;
     }
 
