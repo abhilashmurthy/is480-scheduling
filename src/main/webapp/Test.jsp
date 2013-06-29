@@ -1,4 +1,4 @@
-<%@page import="model.dao.UserDao"%>
+<%@page import="model.dao.UserDAO"%>
 <%@page import="org.hibernate.Session"%>
 <%@page import="util.HibernateUtil"%>
 <%@page import="util.HibernateUtil"%>
