@@ -5,11 +5,17 @@
 package util;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Team;
+import model.Term;
 import model.User;
+import model.dao.TeamDAO;
+import model.dao.TermDAO;
+import model.dao.UserDAO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -46,11 +52,27 @@ public class PopulatorUtil {
             logger.error("\nException caught: " + ex.getMessage());
         }
     }
+    
+    public void populateTerms() {
+        Object[][] terms = {
+            {new Date(2012, 1, 1), 1},
+            {new Date(2012, 1, 1), 2},
+            {new Date(2013, 1, 1), 1},
+            {new Date(2013, 1, 1), 2}
+        };
+        for(Object[] term : terms) {
+            Term newTerm = new Term();
+            newTerm.setYear((Date)term[0]);
+            newTerm.setTerm((Integer) term[1]);
+            TermDAO.save(newTerm);
+        }
+    }
 
     public void populate() {
         Elements rows = term1.getElementsByTag("tr");
         rows.remove(0); //Removes header row
         for (Element row : rows) {
+            //Getting the users
             Elements cells = row.getElementsByTag("td");
             //gets team names from the first anchor tag of every 3rd cell in each row. value of the attribute "name" of that
             //achor tag is the team name
@@ -64,6 +86,43 @@ public class PopulatorUtil {
                 memberList.add(member.ownText());
             }
             String client = cells.get(5).ownText();
+            
+            //Storing the teams
+            Team team = new Team();
+            team.setTeamName(teamName);
+            team.setTermId(3); //HARDCODED
+            team.setSupervisor(supervisor);
+            team.setReviewer1(reviewers[0].trim());
+            team.setReviewer2(reviewers[1].trim());
+            TeamDAO.save(team);
+            
+            //Storing the users
+            User supervisorUser = new User();
+            supervisorUser.setFirstName(supervisor.split(" ")[0]);
+            supervisorUser.setLastName(supervisor.split(" ")[1]);
+            supervisorUser.setEmail(supervisor.replaceAll(" ", "") + "@smu.edu.sg");
+            UserDAO.save(supervisorUser);
+            
+            User reviewer1User = new User();
+            reviewer1User.setFirstName(reviewers[0].split(" ")[0]);
+            reviewer1User.setLastName(reviewers[0].split(" ")[1]);
+            reviewer1User.setEmail(reviewers[0].replaceAll(" ", "") + "@smu.edu.sg");
+            UserDAO.save(reviewer1User);
+            
+            User reviewer2User = new User();
+            reviewer2User.setFirstName(reviewers[1].split(" ")[0]);
+            reviewer2User.setLastName(reviewers[1].split(" ")[1]);
+            reviewer2User.setEmail(reviewers[1].replaceAll(" ", "") + "@smu.edu.sg");
+            UserDAO.save(reviewer2User);
+            
+            for (String member : memberList) {
+                User memberUser = new User();
+                memberUser.setFirstName(member.split(" ")[0]);
+                memberUser.setLastName(member.split(" ")[1]);
+                memberUser.setEmail(member.replaceAll(" ", "") + "@smu.edu.sg");
+                memberUser.setTeamId(TeamDAO.getIdByName(teamName));
+                UserDAO.save(memberUser);
+            }
         }
         
     }

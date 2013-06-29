@@ -28,7 +28,7 @@ public class Team implements Serializable {
     @Column(name = "name")
     private String teamName;
     @Column(name = "term_id")
-    private String termId;
+    private int termId;
     @Column(name = "reviewer1")
     private String reviewer1;
     @Column(name = "reviewer2")
@@ -52,11 +52,11 @@ public class Team implements Serializable {
         this.teamName = teamName;
     }
 
-    public String getTermId() {
+    public int getTermId() {
         return termId;
     }
 
-    public void setTermId(String termId) {
+    public void setTermId(int termId) {
         this.termId = termId;
     }
 
