@@ -22,10 +22,10 @@ public class HibernateUtil {
         try {
             // Create the SessionFactory from hibernate.cfg.xml
             Configuration configuration = new Configuration();
-            sessionFactory = configuration.configure().buildSessionFactory();
-//            serviceRegistry = new ServiceRegistryBuilder()
-//                    .applySettings(configuration.getProperties()).buildServiceRegistry();        
-//            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+            configuration.configure();
+            serviceRegistry = new ServiceRegistryBuilder()
+                    .applySettings(configuration.getProperties()).buildServiceRegistry();        
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         }
         catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
