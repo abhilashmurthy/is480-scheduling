@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,9 +27,9 @@ public class Term implements Serializable {
     @Column(name = "id")
     private int id;
     @Column(name = "year")
-    private String year;
+    private Date year;
     @Column(name = "term")
-    private String term;
+    private int term;
     
     public int getId() {
         return id;
@@ -38,19 +39,19 @@ public class Term implements Serializable {
         this.id = id;
     }
 
-    public String getYear() {
+    public Date getYear() {
         return year;
     }
 
-    public void setYear(String year) {
+    public void setYear(Date year) {
         this.year = year;
     }
 
-    public String getTerm() {
+    public int getTerm() {
         return term;
     }
 
-    public void setTerm(String term) {
+    public void setTerm(int term) {
         this.term = term;
     }
 
