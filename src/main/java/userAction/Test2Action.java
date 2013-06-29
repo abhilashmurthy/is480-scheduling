@@ -1,8 +1,5 @@
 package userAction;
 
-import model.Team;
-import model.dao.TeamDAO;
-
 import org.slf4j.LoggerFactory;
 
 import com.opensymphony.xwork2.ActionSupport;
@@ -16,13 +13,13 @@ public class Test2Action extends ActionSupport {
 	static final org.slf4j.Logger logger = LoggerFactory.getLogger(Test2Action.class);
 	
 	public String start() throws Exception {
-		Team teamObj = TeamDAO.findByUserId(teamId);
-		
-		if (teamObj != null) {
-			
-			return SUCCESS;
-		}
-		
+//		Team teamObj = TeamDAO.findByUserId(teamId);
+//		
+//		if (teamObj != null) {
+//			
+//			return SUCCESS;
+//		}
+//		
 		return ERROR;
 	}
 
