@@ -14,7 +14,4 @@ public class TestAction extends ActionSupport {
 		
 		return "success";
 	}
-	
-	
-
 }
