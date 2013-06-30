@@ -49,12 +49,12 @@ public class TimeslotPk implements Serializable {
         this.termId = termId;
     }
 
-    public Date getStartDate() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startTime = startDate;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public String getMilestone() {
