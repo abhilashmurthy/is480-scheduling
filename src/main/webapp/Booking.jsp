@@ -13,12 +13,12 @@
 	<body>
             <h2>Create Timeslot</h2>
 		<form action="/createBooking" method="post">
-                    Enter Team Id <input type="text" name="teamId"/> <br/>
-                    Enter Start Time <input type="text" name="startTime"/> <br/>
-                    Enter End Time <input type="text" name="endTime"/> <br/>
-                    Enter Term Id <input type="text" name="termId"/> <br/>
-                    Enter Milestone <input type="text" name="milestone"/> <br/>
-                    <input type="submit" value="Create"/>
+			Enter Team Id <input type="text" name="teamId"/> <br/>
+			Enter Start Time <input type="text" name="startTime"/> <br/>
+			Enter End Time <input type="text" name="endTime"/> <br/>
+			Enter Term Id <input type="text" name="termId"/> <br/>
+			Enter Milestone <input type="text" name="milestone"/> <br/>
+			<input type="submit" value="Create"/>
 		</form>
 	</body>
 </html>
