@@ -56,16 +56,16 @@ public class PopulatorUtil {
     }
     
     public void populateTerms() {
-        Object[][] terms = {
-            {new Date(2012, 1, 1), 1},
-            {new Date(2012, 1, 1), 2},
-            {new Date(2013, 1, 1), 1},
-            {new Date(2013, 1, 1), 2}
+        int[][] terms = {
+            {2012, 1},
+            {2012, 2},
+            {2013, 1},
+            {2013, 2}
         };
-        for(Object[] term : terms) {
+        for(int[] term : terms) {
             Term newTerm = new Term();
-            newTerm.setYear((Date) term[0]);
-            newTerm.setTerm((Integer) term[1]);
+            newTerm.setYear(term[0]);
+            newTerm.setTerm(term[1]);
             TermDAO.save(newTerm);
         }
     }
@@ -90,30 +90,19 @@ public class PopulatorUtil {
             String client = cells.get(5).ownText();
             
             //Storing the users
-            User supervisorUser = new User();
-            supervisorUser.setFirstName(supervisor.split(" ")[0]);
-            supervisorUser.setLastName(supervisor.split(" ")[1]);
-            supervisorUser.setEmail(supervisor.replaceAll(" ", "") + "@smu.edu.sg");
+            User supervisorUser = createUser(supervisor, null);
             UserDAO.save(supervisorUser);
             
-            User reviewer1User = new User();
-            reviewer1User.setFirstName(reviewers[0].split(" ")[0]);
-            reviewer1User.setLastName(reviewers[0].split(" ")[1]);
-            reviewer1User.setEmail(reviewers[0].replaceAll(" ", "") + "@smu.edu.sg");
+            User reviewer1User = createUser(reviewers[0], null);
             UserDAO.save(reviewer1User);
             
-            User reviewer2User = new User();
-            reviewer2User.setFirstName(reviewers[1].split(" ")[0]);
-            reviewer2User.setLastName(reviewers[1].split(" ")[1]);
-            reviewer2User.setEmail(reviewers[1].replaceAll(" ", "") + "@smu.edu.sg");
+            User reviewer2User = createUser(reviewers[1], null);
             UserDAO.save(reviewer2User);
             
             //Storing the teams
             Team team = new Team();
             team.setTeamName(teamName);
-            Term term = new Term();
-            term.setYear(new Date(2013, 1, 1));
-            term.setTerm(1);
+            Term term = TermDAO.getTerm(2013, 1);
             team.setTerm(term);
             team.setSupervisor(supervisorUser);
             team.setReviewer1(reviewer1User);
@@ -121,13 +110,22 @@ public class PopulatorUtil {
             TeamDAO.save(team);
             
             for (String member : memberList) {
-                User memberUser = new User();
-                memberUser.setFirstName(member.split(" ")[0]);
-                memberUser.setLastName(member.split(" ")[1]);
-                memberUser.setEmail(member.replaceAll(" ", "") + "@smu.edu.sg");
-//                memberUser.setTeamId(TeamDAO.getIdByName(teamName));
+                logger.info("Found member: " + member);
+                User memberUser = createUser(member, teamName);
                 UserDAO.save(memberUser);
+                logger.info("Added member? " + member);
             }
         }
+    }
+    
+    public User createUser(String name, String teamName) {
+        User user = new User();
+        String firstName = (name.split(" ").length == 1)?"X":name.split(" ")[0];
+        String lastName = (name.split(" ").length == 1)?"X":name.split(" ")[1];
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(firstName + lastName + "@smu.edu.sg");
+        if (teamName != null) user.setTeamId(TeamDAO.getTeamByName(teamName));
+        return user;
     }
 }

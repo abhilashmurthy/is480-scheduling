@@ -40,7 +40,8 @@ public class HibernateUtil {
     }
     
     public static Session getSession() {
-	return sessionFactory.getCurrentSession();
+        sessionFactory.getCurrentSession().close();
+        return sessionFactory.openSession();
     }
  
     public static void shutdown() {

@@ -5,6 +5,7 @@
 package model.dao;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.util.List;
 import model.Term;
 import model.User;
@@ -23,7 +24,7 @@ import util.HibernateUtil;
 public class TermDAO {
     
     static final Logger logger = LoggerFactory.getLogger(TermDAO.class);
-
+   
     static Session session = HibernateUtil.getSession();
 
     public static void save(Term term) {
@@ -46,11 +47,23 @@ public class TermDAO {
         session.getTransaction().commit();
         logger.info("Deleted term " + term.getId());
     }
+    
+    public static Term getTerm(int yearInt, int termInt) {
+        session.beginTransaction();
+        Date yearDate = new Date(yearInt - 1900, 1, 1);
+        Query query = session.createQuery("from Term where year = :year and term = :term")
+                .setParameter("year", yearDate)
+                .setParameter("term", termInt);
+        List<Term> list = (List<Term>) query.list();
+        session.getTransaction().commit();
+        logger.info("Returned term " + list.get(0));
+        return list.get(0);
+    }
 
     public static User findByUserId(int id) {
         session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
-        Query query = session.createQuery("from term where id = :id ");
+        Query query = session.createQuery("from Term where id = :id ");
         query.setParameter("id", bigIntId);
         List<User> list = (List<User>) query.list();
         session.getTransaction().commit();

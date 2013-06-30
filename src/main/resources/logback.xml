@@ -60,10 +60,12 @@
     </appender>
   
     <logger name="jspLogger" level="INFO"/>
+    <logger name="jspDebug" level="DEBUG"/>
+    <logger name="jspTrace" level="TRACE"/>
 <!--    <logger name="org" level="OFF"/>
     <logger name="com" level="OFF"/>-->
  
-    <root level="TRACE">
+    <root level="INFO">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>
