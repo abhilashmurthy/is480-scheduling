@@ -11,7 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -31,16 +32,20 @@ public class Team implements Serializable {
     @Column(name = "name")
     private String teamName;
     
-    @OneToOne(mappedBy="term_id")
+    @ManyToOne
+	@JoinColumn(name="term_id")
     private Term term;
 
-	@OneToOne(mappedBy="reviewer1")
+	@ManyToOne
+	@JoinColumn(name="reviewer1")
     private User reviewer1;
 
-	@OneToOne(mappedBy="reviewer2")
+	@ManyToOne
+	@JoinColumn(name="reviewer2")
     private User reviewer2;
     
-    @OneToOne(mappedBy="supervisor")
+    @ManyToOne
+	@JoinColumn(name="supervisor")
     private User supervisor;
     
     public BigInteger getId() {

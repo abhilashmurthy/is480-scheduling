@@ -21,10 +21,7 @@
         <action name="test" class="userAction.TestAction" method="execute">
             <result name="success">/Test.jsp</result>
         </action>
-        
-        <action name="test2" class="userAction.Test2Action" method="start">
-            <result name="success">/Test2.jsp</result>
-        </action>
+		
     </package>
 
     <!-- Add packages here -->

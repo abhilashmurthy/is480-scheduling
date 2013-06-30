@@ -49,7 +49,7 @@ public class TeamDAO {
     public static Team findByTeamId(int id) {
         session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
-        Query query = session.createQuery("from team where id = :id ");
+        Query query = session.createQuery("from Team where id = :id ");
         query.setParameter("id", bigIntId);
         List<Team> list = (List<Team>) query.list();
         session.getTransaction().commit();
