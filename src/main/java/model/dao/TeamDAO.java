@@ -7,7 +7,6 @@ package model.dao;
 import java.math.BigInteger;
 import java.util.List;
 import model.Team;
-import model.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -47,13 +46,13 @@ public class TeamDAO {
         logger.info("Deleted team " + team.getId());
     }
 
-    public static User findByUserId(int id) {
+    public static Team findByTeamId(int id) {
         session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
         Query query = session.createQuery("from team where id = :id ");
         query.setParameter("id", bigIntId);
-        List<User> list = (List<User>) query.list();
+        List<Team> list = (List<Team>) query.list();
         session.getTransaction().commit();
-        return (User) list.get(0);
+        return (Team) list.get(0);
     }
 }
