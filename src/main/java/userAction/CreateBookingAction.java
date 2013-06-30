@@ -35,7 +35,7 @@ public class CreateBookingAction extends ActionSupport{
 		//Retrieve the corresponding schedule object and its timeslots
 		Schedule schedule = ScheduleDAO.findByScheduleId(termId, milestone);
 		List<Timeslot> timeslots = schedule.getTimeslots();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date bookingTime = sdf.parse(startTime);
         
 		//Checking if the team already has a booking (pending/confirmed)
