@@ -29,6 +29,8 @@
     <property name="show_sql">true</property>
     
     <mapping class="model.User"></mapping>
+    <mapping class="model.Term"></mapping>
+    <mapping class="model.Team"></mapping>
     
   </session-factory>
 </hibernate-configuration>

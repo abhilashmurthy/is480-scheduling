@@ -10,7 +10,6 @@ import model.Team;
 import model.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +24,9 @@ public class TeamDAO {
     
     static final Logger logger = LoggerFactory.getLogger(TeamDAO.class);
 
-    static Session session;
+    static Session session = HibernateUtil.getSession();
 
     public static void save(Team team) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         session.save(team);
         session.getTransaction().commit();
@@ -38,9 +34,6 @@ public class TeamDAO {
     }
 
     public static void update(Team team) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         session.update(team);
         session.getTransaction().commit();
@@ -48,9 +41,6 @@ public class TeamDAO {
     }
 
     public static void delete(Team team) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         session.delete(team);
         session.getTransaction().commit();
@@ -58,9 +48,6 @@ public class TeamDAO {
     }
 
     public static User findByUserId(int id) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
         Query query = session.createQuery("from team where id = :id ");

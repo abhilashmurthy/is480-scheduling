@@ -9,7 +9,6 @@ import java.util.List;
 import model.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +23,9 @@ public class UserDAO {
     
     static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
-    static Session session;
+    static Session session = HibernateUtil.getSession();
 
     public static void save(User user) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         session.save(user);
         session.getTransaction().commit();
@@ -37,9 +33,6 @@ public class UserDAO {
     }
 
     public static void update(User user) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         session.update(user);
         session.getTransaction().commit();
@@ -47,9 +40,6 @@ public class UserDAO {
     }
 
     public static void delete(User user) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         session.delete(user);
         session.getTransaction().commit();
@@ -57,9 +47,6 @@ public class UserDAO {
     }
 
     public static User findByUserId(int id) {
-        logger.info("UserDAO called");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        session = sessionFactory.openSession();
         session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
         Query query = session.createQuery("from user where id = :id ");
