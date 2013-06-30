@@ -5,8 +5,11 @@
 package model.dao;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.util.List;
 import model.Team;
+import model.Term;
+import static model.dao.TermDAO.session;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -55,4 +58,15 @@ public class TeamDAO {
         session.getTransaction().commit();
         return (Team) list.get(0);
     }
+    
+    public static Team getTeamByName(String teamName) {
+        session.beginTransaction();
+        Query query = session.createQuery("from Team where name = :name")
+                .setParameter("name", teamName);
+        List<Team> list = (List<Team>) query.list();
+        session.getTransaction().commit();
+        logger.info("Returned team " + list.get(0));
+        return list.get(0);
+    }
+    
 }

@@ -43,9 +43,18 @@ public class Term implements Serializable {
     public Date getYear() {
         return year;
     }
+    
+    public int getIntYear() {
+        return year.getYear();
+    }
 
     public void setYear(Date year) {
         this.year = year;
+    }
+    
+    public void setYear(int year) {
+        Date yearDate = new Date(year - 1900, 1, 1);
+        this.year = yearDate;
     }
 
     public int getTerm() {

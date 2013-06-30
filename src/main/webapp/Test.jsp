@@ -29,15 +29,12 @@
             user.setLastName("La");
             
             UserDAO.save(user);
+            logger.info("User object: " + user.toString());
             
             Term term = new Term();
             term.setYear(new Date(2013, 1, 1));
             term.setTerm(1);
             TermDAO.save(term);
-	    
-	    logger.info("User object: " + user.toString());
-            
-            
             
             
         %>
