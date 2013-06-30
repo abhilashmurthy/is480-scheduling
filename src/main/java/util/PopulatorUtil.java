@@ -102,7 +102,7 @@ public class PopulatorUtil {
             //Storing the teams
             Team team = new Team();
             team.setTeamName(teamName);
-            Term term = TermDAO.getTerm(2013, 1);
+            Term term = TermDAO.findByYearAndTerm(2013, 1);
             team.setTerm(term);
             team.setSupervisor(supervisorUser);
             team.setReviewer1(reviewer1User);

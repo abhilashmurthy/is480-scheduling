@@ -48,7 +48,7 @@ public class TermDAO {
         logger.info("Deleted term " + term.getId());
     }
     
-    public static Term getTerm(int yearInt, int termInt) {
+    public static Term findByYearAndTerm(int yearInt, int termInt) {
         session.beginTransaction();
         Date yearDate = new Date(yearInt - 1900, 1, 1);
         Query query = session.createQuery("from Term where year = :year and term = :term")
@@ -60,13 +60,13 @@ public class TermDAO {
         return list.get(0);
     }
 
-    public static User findByUserId(int id) {
+    public static Term findByTermId(int id) {
         session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
         Query query = session.createQuery("from Term where id = :id ");
         query.setParameter("id", bigIntId);
-        List<User> list = (List<User>) query.list();
+        Term term = (Term) query.uniqueResult();
         session.getTransaction().commit();
-        return (User) list.get(0);
+        return term;
     }
 }
