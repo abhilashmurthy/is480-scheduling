@@ -29,7 +29,7 @@ public class TimeslotStatusPk implements Serializable {
     @Column(name = "milestone")
     private String milestone;
     @Column(name = "startTime")
-    @Temporal(TemporalType.DATE)
+//    @Temporal(TemporalType.DATE)
     private Date startTime;
     @Column(name = "user_id")
     private BigInteger userId;

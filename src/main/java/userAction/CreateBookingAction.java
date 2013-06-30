@@ -7,7 +7,7 @@ package userAction;
 import com.opensymphony.xwork2.ActionSupport;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 import model.Schedule;
 import model.Timeslot;
@@ -35,13 +35,15 @@ public class CreateBookingAction extends ActionSupport{
 		//Retrieve the corresponding schedule object and its timeslots
 		Schedule schedule = ScheduleDAO.findByScheduleId(termId, milestone);
 		List<Timeslot> timeslots = schedule.getTimeslots();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-		Date bookingTime = sdf.parse(startTime);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		java.util.Date javaDate = sdf.parse(startTime);
+		Date bookingTime = new Date(javaDate.getTime());
         
 		//Checking if the team already has a booking (pending/confirmed)
 		for (Timeslot t : timeslots) {
-			if (t.getTeamId().intValue() == teamId) {
+			if (t.getTeamId() != null && t.getTeamId().intValue() == teamId) {
 				response = "This team already has a booking.";
+				System.err.println("ERROR: " + response);
 				return "fail";
 			}
 		}
@@ -56,12 +58,12 @@ public class CreateBookingAction extends ActionSupport{
 			}
 		}
 		
-		//Check if timeslot has been found
-		if (bookingSlot == null) {
-			logger.error("Invalid details. Timeslot not found.");
-			return ERROR;
-		}
-		
+//		//Check if timeslot has been found
+//		if (bookingSlot == null) {
+//			logger.error("Invalid details. Timeslot not found.");
+//			return ERROR;
+//		}
+//		
 		//Check if the timeslot is free
 		if (bookingSlot.getTeamId() != null) { //Slot is full
 				response = "This timeslot is already taken.";
