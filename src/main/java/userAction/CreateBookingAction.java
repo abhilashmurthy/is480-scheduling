@@ -7,7 +7,7 @@ package userAction;
 import com.opensymphony.xwork2.ActionSupport;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import model.Schedule;
 import model.Timeslot;
@@ -36,8 +36,7 @@ public class CreateBookingAction extends ActionSupport{
 		Schedule schedule = ScheduleDAO.findByScheduleId(termId, milestone);
 		List<Timeslot> timeslots = schedule.getTimeslots();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		java.util.Date javaDate = sdf.parse(startTime);
-		Date bookingTime = new Date(javaDate.getTime());
+		Date bookingTime = sdf.parse(startTime);
         
 		//Checking if the team already has a booking (pending/confirmed)
 		for (Timeslot t : timeslots) {
@@ -52,6 +51,8 @@ public class CreateBookingAction extends ActionSupport{
 		Timeslot bookingSlot = null;
 		for (Timeslot t : timeslots) {
 			Date tStartTime = t.getId().getStartTime();
+			logger.debug(sdf.format(tStartTime));
+			logger.debug(sdf.format(bookingTime));
 			if (tStartTime.equals(bookingTime)) {
 				bookingSlot = t;
 				break;

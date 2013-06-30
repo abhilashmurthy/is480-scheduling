@@ -5,7 +5,7 @@
 package model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,10 +29,10 @@ public class Schedule implements Serializable {
     @Id
     private SchedulePk id;
     @Column(name = "startDate")
-//    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.DATE)
     private Date startDate;
     @Column(name = "endDate")
-//    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.DATE)
     private Date endDate;
 	@OneToMany
 	@JoinColumns({

@@ -6,7 +6,7 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.sql.Date;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
@@ -27,7 +27,7 @@ public class TimeslotPk implements Serializable {
     @Column(name = "term_id")
     private BigInteger termId;
     @Column(name = "startTime")
-//    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.DATE)
     private Date startTime;
     @Column(name = "milestone")
     private String milestone;
