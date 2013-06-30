@@ -20,24 +20,7 @@
         <title>Test</title>
     </head>
     <body>
-        <%
-	    logger.info("Code called");
-            
-            User user = new User();
-            user.setEmail("lala@smu.edu.sg");
-            user.setFirstName("La");
-            user.setLastName("La");
-            
-            UserDAO.save(user);
-            logger.info("User object: " + user.toString());
-            
-            Term term = new Term();
-            term.setYear(new Date(2013, 1, 1));
-            term.setTerm(1);
-            TermDAO.save(term);
-            
-            
-        %>
+        
         <p>Success!!</p>
     </body>
 </html>

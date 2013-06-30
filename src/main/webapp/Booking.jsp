@@ -12,7 +12,7 @@
     </head>
 	<body>
             <h2>Create Timeslot</h2>
-		<form action="/createBooking" method="post">
+		<form action="createBooking" method="post">
 			Enter Team Id <input type="text" name="teamId"/> <br/>
 			Enter Start Time <input type="text" name="startTime"/> <br/>
 			Enter End Time <input type="text" name="endTime"/> <br/>
