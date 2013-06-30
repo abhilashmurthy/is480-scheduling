@@ -31,6 +31,8 @@
     <mapping class="model.User" />
     <mapping class="model.Term" />
     <mapping class="model.Team" />
+	<mapping class="model.Schedule" />
+	<mapping class="model.Timeslot" />
     
   </session-factory>
 </hibernate-configuration>
