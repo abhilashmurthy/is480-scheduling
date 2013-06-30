@@ -4,8 +4,8 @@
  */
 package util;
 
-import model.Team;
-import model.dao.TeamDAO;
+import model.Schedule;
+import model.dao.ScheduleDAO;
 
 /**
  *
@@ -13,8 +13,8 @@ import model.dao.TeamDAO;
  */
 public class TestUtil {
 	public static void main(String[] args) {
-		Team team = TeamDAO.findByTeamId(1);
+		Schedule schedule = ScheduleDAO.findByScheduleId(1, "Acceptance");
 		
-		System.out.println("Team retrieved successfully");
+		System.out.println("Schedule retrieved successfully");
 	}
 }
