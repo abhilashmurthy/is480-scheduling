@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 29, 2013 at 12:30 PM
+-- Generation Time: Jun 30, 2013 at 10:16 AM
 -- Server version: 5.5.29
 -- PHP Version: 5.4.10
 
@@ -43,8 +43,18 @@ CREATE TABLE `team` (
   `reviewer2` bigint(11) DEFAULT NULL,
   `supervisor` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `term_id_fk` (`term_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  KEY `term_id_fk` (`term_id`),
+  KEY `reviewer1` (`reviewer1`),
+  KEY `reviewer2` (`reviewer2`),
+  KEY `supervisor` (`supervisor`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `team`
+--
+
+INSERT INTO `team` (`id`, `name`, `term_id`, `reviewer1`, `reviewer2`, `supervisor`) VALUES
+(1, 'Thunderbolt', 1, 7, 8, 6);
 
 -- --------------------------------------------------------
 
@@ -57,7 +67,15 @@ CREATE TABLE `term` (
   `year` date NOT NULL,
   `term` bigint(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `term`
+--
+
+INSERT INTO `term` (`id`, `year`, `term`) VALUES
+(1, '2013-01-01', 1),
+(2, '2013-01-01', 2);
 
 -- --------------------------------------------------------
 
@@ -87,7 +105,7 @@ CREATE TABLE `time_slot_status` (
   `milestone` varchar(50) NOT NULL,
   `startTime` datetime NOT NULL,
   `user_id` bigint(11) NOT NULL,
-  `status` bigint(11) NOT NULL,
+  `status` enum('pending','rejected','accepted') NOT NULL,
   PRIMARY KEY (`term_id`,`milestone`,`startTime`,`user_id`),
   KEY `FK_time_slot` (`milestone`,`term_id`,`startTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -105,8 +123,23 @@ CREATE TABLE `user` (
   `email` varchar(50) NOT NULL,
   `team_id` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
   KEY `team_id` (`team_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `firstName`, `lastName`, `email`, `team_id`) VALUES
+(1, 'Suresh', 'SUBRAMANIAM', 'suresh.s.2010@sis.smu.edu.sg', 1),
+(2, 'Abhilash', 'MURTHY', 'abhilashm.2010@sis.smu.edu.sg', 1),
+(3, 'Tarlochan Singh', 'GILL', 'tsgill.ps.2010@sis.smu.edu.sg', 1),
+(4, 'Prakhar', 'AGARWAL', 'prakhara.2010@sis.smu.edu.sg', 1),
+(5, 'Xuling', 'DAI', 'xuling.dai.2010@sis.smu.edu.sg', 1),
+(6, 'Richard', 'DAVIS', 'rcdavis@smu.edu.sg', NULL),
+(7, 'Youngsoo', 'KIM', 'yskim@smu.edu.sg', NULL),
+(8, 'Lai-Tee', 'CHEOK', 'laiteecheok@smu.edu.sg', NULL);
 
 -- --------------------------------------------------------
 
@@ -117,48 +150,51 @@ CREATE TABLE `user` (
 CREATE TABLE `user_role` (
   `user_id` bigint(11) NOT NULL,
   `term_id` bigint(11) NOT NULL,
-  `role` varchar(50) NOT NULL,
+  `role` enum('supervisor','reviewer','student') NOT NULL,
   PRIMARY KEY (`user_id`,`term_id`,`role`),
   KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Constrabigints for dumped tables
+-- Constraints for dumped tables
 --
 
 --
--- Constrabigints for table `schedule`
+-- Constraints for table `schedule`
 --
 ALTER TABLE `schedule`
   ADD CONSTRAINT `schedule_ibfk_1` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constrabigints for table `team`
+-- Constraints for table `team`
 --
 ALTER TABLE `team`
-  ADD CONSTRAINT `team_ibfk_1` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `team_ibfk_1` FOREIGN KEY (`term_id`) REFERENCES `term` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `team_ibfk_2` FOREIGN KEY (`reviewer1`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `team_ibfk_3` FOREIGN KEY (`reviewer2`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `team_ibfk_4` FOREIGN KEY (`supervisor`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constrabigints for table `time_slot`
+-- Constraints for table `time_slot`
 --
 ALTER TABLE `time_slot`
   ADD CONSTRAINT `FK_schedule` FOREIGN KEY (`milestone`, `term_id`) REFERENCES `schedule` (`milestone`, `term_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `time_slot_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constrabigints for table `time_slot_status`
+-- Constraints for table `time_slot_status`
 --
 ALTER TABLE `time_slot_status`
   ADD CONSTRAINT `FK_time_slot` FOREIGN KEY (`milestone`, `term_id`, `startTime`) REFERENCES `time_slot` (`milestone`, `term_id`, `startTime`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constrabigints for table `user`
+-- Constraints for table `user`
 --
 ALTER TABLE `user`
   ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constrabigints for table `user_role`
+-- Constraints for table `user_role`
 --
 ALTER TABLE `user_role`
   ADD CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
