@@ -54,9 +54,10 @@ public class TeamDAO {
         BigInteger bigIntId = BigInteger.valueOf(id);
         Query query = session.createQuery("from Team where id = :id ");
         query.setParameter("id", bigIntId);
-        List<Team> list = (List<Team>) query.list();
+		Team team = (Team) query.uniqueResult();
+		session.update(team.getMembers().get(0));
         session.getTransaction().commit();
-        return (Team) list.get(0);
+        return team;
     }
     
     public static Team getTeamByName(String teamName) {

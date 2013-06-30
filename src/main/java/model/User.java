@@ -28,11 +28,9 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private BigInteger id;
-    
-    @ManyToOne
-        @JoinColumn(name = "team_id")
-    private Team teamId;
-    
+	@ManyToOne
+	@JoinColumn(name="team_id")
+    private Team team;
     @Column(name = "firstName")
     private String firstName;
     @Column(name = "lastName")
@@ -48,12 +46,12 @@ public class User implements Serializable {
         this.id = id;
     }
     
-    public Team getTeamId() {
-        return teamId;
+    public Team getTeam() {
+        return team;
     }
     
-    public void setTeamId(Team teamId) {
-        this.teamId = teamId;
+    public void setTeam(Team team) {
+        this.team = team;
     }
     
     public String getFirstName() {
