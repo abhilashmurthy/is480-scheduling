@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 30, 2013 at 10:16 AM
+-- Generation Time: Jun 30, 2013 at 01:24 PM
 -- Server version: 5.5.29
 -- PHP Version: 5.4.10
 
@@ -28,6 +28,13 @@ CREATE TABLE `schedule` (
   PRIMARY KEY (`milestone`,`term_id`),
   KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `schedule`
+--
+
+INSERT INTO `schedule` (`milestone`, `term_id`, `startDate`, `endDate`) VALUES
+('Acceptance', 1, '2013-08-07 00:00:00', '2013-09-20 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -65,7 +72,7 @@ INSERT INTO `team` (`id`, `name`, `term_id`, `reviewer1`, `reviewer2`, `supervis
 CREATE TABLE `term` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `year` date NOT NULL,
-  `term` int(11) NOT NULL,
+  `term` bigint(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
@@ -93,6 +100,17 @@ CREATE TABLE `time_slot` (
   KEY `team_id` (`team_id`),
   KEY `FK_schedule` (`milestone`,`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `time_slot`
+--
+
+INSERT INTO `time_slot` (`term_id`, `milestone`, `startTime`, `endTime`, `team_id`) VALUES
+(1, 'Acceptance', '2013-08-07 10:00:00', '2013-08-07 11:00:00', NULL),
+(1, 'Acceptance', '2013-08-07 11:00:00', '2013-08-07 12:00:00', NULL),
+(1, 'Acceptance', '2013-08-07 12:00:00', '2013-08-07 13:00:00', NULL),
+(1, 'Acceptance', '2013-08-07 13:00:00', '2013-08-07 14:00:00', NULL),
+(1, 'Acceptance', '2013-08-07 14:00:00', '2013-08-07 15:00:00', NULL);
 
 -- --------------------------------------------------------
 
