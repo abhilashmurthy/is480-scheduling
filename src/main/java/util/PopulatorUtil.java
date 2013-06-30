@@ -125,7 +125,7 @@ public class PopulatorUtil {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(firstName + lastName + "@smu.edu.sg");
-        if (teamName != null) user.setTeamId(TeamDAO.getTeamByName(teamName));
+        if (teamName != null) user.setTeam(TeamDAO.getTeamByName(teamName));
         return user;
     }
 }

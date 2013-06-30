@@ -64,10 +64,10 @@ public class TeamDAO {
         session.beginTransaction();
         Query query = session.createQuery("from Team where name = :name")
                 .setParameter("name", teamName);
-        List<Team> list = (List<Team>) query.list();
+		Team team = (Team) query.uniqueResult();
         session.getTransaction().commit();
-        logger.info("Returned team " + list.get(0));
-        return list.get(0);
+        logger.info("Returned team " + team);
+        return team;
     }
     
 }
