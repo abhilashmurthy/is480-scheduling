@@ -6,6 +6,7 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -47,7 +49,10 @@ public class Team implements Serializable {
     @ManyToOne
 	@JoinColumn(name="supervisor")
     private User supervisor;
-    
+	
+	@OneToMany(mappedBy = "team")
+	private List<User> members;
+
     public BigInteger getId() {
         return id;
     }
@@ -94,6 +99,14 @@ public class Team implements Serializable {
 
 	public void setSupervisor(User supervisor) {
 		this.supervisor = supervisor;
+	}
+    
+	public List<User> getMembers() {
+		return members;
+	}
+
+	public void setMembers(List<User> members) {
+		this.members = members;
 	}
     
     @Override
