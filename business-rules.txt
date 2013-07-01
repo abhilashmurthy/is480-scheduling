@@ -1,0 +1,6 @@
+BUSINESS RULES
+
+** APPROVAL REQUIREMENTS **
+1. Acceptance: Supervisor
+2. Midterm: Both reviewers
+3. Final: Supervisor, First reviewer
