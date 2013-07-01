@@ -5,7 +5,7 @@
 package model.dao;
 
 import java.math.BigInteger;
-import java.util.Date;
+import java.sql.Timestamp;
 import model.Timeslot;
 import static model.dao.TimeslotDAO.session;
 import org.hibernate.Query;
@@ -25,7 +25,7 @@ public class TimeslotDAO {
 
     public static void save(Timeslot timeslot) {
         session.beginTransaction();
-        session.save(timeslot);
+        session.saveOrUpdate(timeslot);
         session.getTransaction().commit();
         logger.info("Added timeslot TermId:" + timeslot.getId().getTermId()
 				+ " Milestone: " + timeslot.getId().getMilestone()
@@ -50,7 +50,7 @@ public class TimeslotDAO {
 				+ " Start Time: " + timeslot.getId().getStartTime());
     }
 
-    public static Timeslot findByTimeslotId(int termId, String milestone, Date startTime) {
+    public static Timeslot findByTimeslotId(int termId, String milestone, Timestamp startTime) {
         session.beginTransaction();
         BigInteger bigIntTermId = BigInteger.valueOf(termId);
         Query query = session.createQuery("from Timeslot where "

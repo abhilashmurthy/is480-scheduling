@@ -6,13 +6,15 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
+import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -28,7 +30,8 @@ public class Term implements Serializable {
     @Column(name = "id")
     private BigInteger id;
     @Column(name = "year")
-    private Date year;
+//	@Temporal(TemporalType.TIMESTAMP)
+    private Timestamp year;
     @Column(name = "term")
     private int term;
     
@@ -40,7 +43,7 @@ public class Term implements Serializable {
         this.id = id;
     }
 
-    public Date getYear() {
+    public Timestamp getYear() {
         return year;
     }
     
@@ -48,12 +51,12 @@ public class Term implements Serializable {
         return year.getYear();
     }
 
-    public void setYear(Date year) {
+    public void setYear(Timestamp year) {
         this.year = year;
     }
     
     public void setYear(int year) {
-        Date yearDate = new Date(year - 1900, 1, 1);
+        Timestamp yearDate = new Timestamp(year - 1900, 1, 1, 0, 0, 0, 0);
         this.year = yearDate;
     }
 

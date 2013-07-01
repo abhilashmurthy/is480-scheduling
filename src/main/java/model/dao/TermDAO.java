@@ -5,8 +5,7 @@
 package model.dao;
 
 import java.math.BigInteger;
-import java.util.Date;
-//import java.sql.Date;
+import java.sql.Timestamp;
 import model.Term;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -49,7 +48,7 @@ public class TermDAO {
     
     public static Term findByYearAndTerm(int yearInt, int termInt) {
         session.beginTransaction();
-        Date yearDate = new Date(yearInt - 1900, 1, 1);
+        Timestamp yearDate = new Timestamp(yearInt - 1900, 1, 1, 0, 0, 0, 0);
         Query query = session.createQuery("from Term where year = :year and term = :term")
                 .setParameter("year", yearDate)
                 .setParameter("term", termInt);

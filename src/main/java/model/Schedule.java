@@ -5,7 +5,7 @@
 package model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,11 +29,11 @@ public class Schedule implements Serializable {
     @Id
     private SchedulePk id;
     @Column(name = "startDate")
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp startDate;
     @Column(name = "endDate")
-    @Temporal(TemporalType.DATE)
-    private Date endDate;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp endDate;
 	@OneToMany
 	@JoinColumns({
 		@JoinColumn(name = "milestone", referencedColumnName = "milestone"),
@@ -49,19 +49,19 @@ public class Schedule implements Serializable {
         this.id = id;
     }
 
-    public Date getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Timestamp startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }    
 	

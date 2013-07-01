@@ -6,13 +6,9 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
+import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -27,15 +23,15 @@ public class TimeslotPk implements Serializable {
     @Column(name = "term_id")
     private BigInteger termId;
     @Column(name = "startTime")
-    @Temporal(TemporalType.DATE)
-    private Date startTime;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp startTime;
     @Column(name = "milestone")
     private String milestone;
 
     public TimeslotPk() {
     }
     
-    public TimeslotPk(BigInteger termId, Date startDate, String milestone) {
+    public TimeslotPk(BigInteger termId, Timestamp startDate, String milestone) {
         this.termId = termId;
         this.startTime = startDate;
         this.milestone = milestone;
@@ -49,11 +45,11 @@ public class TimeslotPk implements Serializable {
         this.termId = termId;
     }
 
-    public Date getStartTime() {
+    public Timestamp getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
     }
 
