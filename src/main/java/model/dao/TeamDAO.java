@@ -26,7 +26,7 @@ public class TeamDAO {
 
     public static void save(Team team) {
         session.beginTransaction();
-        session.save(team);
+        session.saveOrUpdate(team);
         session.getTransaction().commit();
         logger.info("Added team " + team.getId());
     }

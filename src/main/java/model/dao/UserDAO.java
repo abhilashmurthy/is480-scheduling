@@ -27,7 +27,7 @@ public class UserDAO {
 
     public static void save(User user) {
         session.beginTransaction();
-        session.save(user);
+        session.saveOrUpdate(user);
         session.getTransaction().commit();
         logger.info("Added user " + user.getEmail());
     }

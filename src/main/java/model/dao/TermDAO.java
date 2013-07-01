@@ -27,7 +27,7 @@ public class TermDAO {
 
     public static void save(Term term) {
         session.beginTransaction();
-        session.save(term);
+        session.saveOrUpdate(term);
         session.getTransaction().commit();
         logger.info("Added term " + term.getId());
     }

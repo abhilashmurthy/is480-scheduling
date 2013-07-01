@@ -23,7 +23,7 @@ public class ScheduleDAO {
 
     public static void save(Schedule schedule) {
         session.beginTransaction();
-        session.save(schedule);
+        session.saveOrUpdate(schedule);
         session.getTransaction().commit();
         logger.info("Added schedule TermId:" + schedule.getId().getTermId()
 				+ " Milestone: " + schedule.getId().getMilestone());
