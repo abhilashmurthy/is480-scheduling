@@ -33,6 +33,7 @@
     <mapping class="model.Team" />
 	<mapping class="model.Schedule" />
 	<mapping class="model.Timeslot" />
+	<mapping class="model.TimeslotStatus" />
     
   </session-factory>
 </hibernate-configuration>
