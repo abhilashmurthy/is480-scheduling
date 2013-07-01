@@ -5,11 +5,7 @@
 package model.dao;
 
 import java.math.BigInteger;
-import java.sql.Date;
-import java.util.List;
 import model.Team;
-import model.Term;
-import static model.dao.TermDAO.session;
 import org.hibernate.Query;
 import org.hibernate.Session;
 

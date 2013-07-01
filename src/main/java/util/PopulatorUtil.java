@@ -5,11 +5,8 @@
 package util;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Team;
 import model.Term;
 import model.User;

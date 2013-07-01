@@ -5,10 +5,9 @@
 package model.dao;
 
 import java.math.BigInteger;
-import java.sql.Date;
-import java.util.List;
+import java.util.Date;
+//import java.sql.Date;
 import model.Term;
-import model.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -54,10 +53,10 @@ public class TermDAO {
         Query query = session.createQuery("from Term where year = :year and term = :term")
                 .setParameter("year", yearDate)
                 .setParameter("term", termInt);
-        List<Term> list = (List<Term>) query.list();
+        Term term = (Term) query.uniqueResult();
         session.getTransaction().commit();
-        logger.info("Returned term " + list.get(0));
-        return list.get(0);
+        logger.info("Returned term " + term);
+        return term;
     }
 
     public static Term findByTermId(int id) {

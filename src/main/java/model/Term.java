@@ -6,7 +6,7 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.sql.Date;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
