@@ -7,14 +7,10 @@ package model;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import util.Status;
 
-enum Status {
-	PENDING, ACCEPTED, REJECTED
-}
 /**
  *
  * @author Prakhar
@@ -26,8 +22,8 @@ public class TimeslotStatus implements Serializable {
     
     @Id
     private TimeslotStatusPk id;
-    @Column(name = "status")
-    private int status;
+    @Column(name = "status", length = 50)
+    private Status status;
 
     public TimeslotStatusPk getId() {
         return id;
@@ -37,11 +33,11 @@ public class TimeslotStatus implements Serializable {
         this.id = id;
     }
 
-    public int getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 }

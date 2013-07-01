@@ -10,11 +10,17 @@ import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
 import java.util.List;
 import model.Schedule;
+import model.Team;
 import model.Timeslot;
+import model.TimeslotStatus;
+import model.TimeslotStatusPk;
 import model.dao.ScheduleDAO;
+import model.dao.TeamDAO;
 import model.dao.TimeslotDAO;
+import model.dao.TimeslotStatusDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.Status;
 /**
  *
  * @author Prakhar
@@ -75,6 +81,27 @@ public class CreateBookingAction extends ActionSupport{
 		BigInteger bigIntTeamId = BigInteger.valueOf(teamId);
 		bookingSlot.setTeamId(bigIntTeamId);
 		TimeslotDAO.save(bookingSlot);
+		
+		//Create timeslot status entries based on milestone
+		String bookingMilestone = bookingSlot.getId().getMilestone();
+		if (bookingMilestone.equalsIgnoreCase("acceptance")) {
+			Team team = TeamDAO.findByTeamId(teamId);
+			TimeslotStatusPk supervisorStatusPk = new TimeslotStatusPk(
+					bookingSlot.getId().getTermId(),
+					bookingSlot.getId().getMilestone(),
+					bookingSlot.getId().getStartTime(),
+					team.getSupervisor().getId());
+			TimeslotStatus supervisorStatus = new TimeslotStatus();
+			supervisorStatus.setId(supervisorStatusPk);
+			supervisorStatus.setStatus(Status.PENDING);
+			TimeslotStatusDAO.save(supervisorStatus);
+		} else if (bookingMilestone.equalsIgnoreCase("midterm")) {
+			//TODO Pending
+		} else if (bookingMilestone.equalsIgnoreCase("final")) {
+			//TODO Pending
+		} else {
+			//TODO Pending
+		}
 		
 		return SUCCESS;
     }
