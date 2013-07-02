@@ -3,9 +3,10 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 30, 2013 at 01:24 PM
+-- Generation Time: Jul 02, 2013 at 02:35 PM
 -- Server version: 5.5.29
 -- PHP Version: 5.4.10
+-- DB Version: 1
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -123,7 +124,7 @@ CREATE TABLE `time_slot_status` (
   `milestone` varchar(50) NOT NULL,
   `startTime` datetime NOT NULL,
   `user_id` bigint(11) NOT NULL,
-  `status` enum('pending','rejected','accepted') NOT NULL,
+  `status` int(11) NOT NULL COMMENT 'Enum column storing PENDING, ACCEPTED, REJECTED',
   PRIMARY KEY (`term_id`,`milestone`,`startTime`,`user_id`),
   KEY `FK_time_slot` (`milestone`,`term_id`,`startTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -168,7 +169,7 @@ INSERT INTO `user` (`id`, `firstName`, `lastName`, `email`, `team_id`) VALUES
 CREATE TABLE `user_role` (
   `user_id` bigint(11) NOT NULL,
   `term_id` bigint(11) NOT NULL,
-  `role` enum('supervisor','reviewer','student') NOT NULL,
+  `role` int(11) NOT NULL COMMENT 'Enum column storing SUPERVISOR, REVIEWER, STUDENT, TA',
   PRIMARY KEY (`user_id`,`term_id`,`role`),
   KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
