@@ -36,7 +36,7 @@ public class Timeslot implements Serializable {
 	@ManyToOne
 	@JoinColumns({
 		@JoinColumn(name = "milestone", referencedColumnName = "milestone", insertable=false, updatable=false),
-		@JoinColumn(name = "term_id", referencedColumnName = "term_id", insertable=false, updatable=false),
+		@JoinColumn(name = "term_id", referencedColumnName = "term_id", insertable=false, updatable=false)
 	})
 	private Schedule schedule;
 
