@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HibernateUtil;
+import util.Milestone;
 
 /**
  *
@@ -50,7 +51,7 @@ public class TimeslotDAO {
 				+ " Start Time: " + timeslot.getId().getStartTime());
     }
 
-    public static Timeslot findByTimeslotId(int termId, String milestone, Timestamp startTime) {
+    public static Timeslot findByTimeslotId(int termId, Milestone milestone, Timestamp startTime) {
         session.beginTransaction();
         BigInteger bigIntTermId = BigInteger.valueOf(termId);
         Query query = session.createQuery("from Timeslot where "

@@ -9,8 +9,11 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import util.Milestone;
 
 /**
  *
@@ -23,7 +26,8 @@ public class TimeslotStatusPk implements Serializable {
     @Column(name = "term_id")
     private BigInteger termId;
     @Column(name = "milestone")
-    private String milestone;
+	@Enumerated(EnumType.STRING)
+    private Milestone milestone;
     @Column(name = "startTime")
 //    @Temporal(TemporalType.TIMESTAMP)
     private Timestamp startTime;
@@ -33,7 +37,7 @@ public class TimeslotStatusPk implements Serializable {
     public TimeslotStatusPk() {
     }
     
-    public TimeslotStatusPk(BigInteger termId, String milestone, Timestamp startTime, BigInteger userId) {
+    public TimeslotStatusPk(BigInteger termId, Milestone milestone, Timestamp startTime, BigInteger userId) {
         this.termId = termId;
         this.milestone = milestone;
         this.startTime = startTime;
@@ -48,11 +52,11 @@ public class TimeslotStatusPk implements Serializable {
         this.termId = termId;
     }
 
-    public String getMilestone() {
+    public Milestone getMilestone() {
         return milestone;
     }
 
-    public void setMilestone(String milestone) {
+    public void setMilestone(Milestone milestone) {
         this.milestone = milestone;
     }
 

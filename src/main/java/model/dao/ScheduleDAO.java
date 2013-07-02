@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HibernateUtil;
+import util.Milestone;
 
 /**
  *
@@ -45,7 +46,7 @@ public class ScheduleDAO {
 				+ " Milestone: " + schedule.getId().getMilestone());
     }
 
-    public static Schedule findByScheduleId(int termId, String milestone) {
+    public static Schedule findByScheduleId(int termId, Milestone milestone) {
         session.beginTransaction();
         BigInteger bigIntTermId = BigInteger.valueOf(termId);
         Query query = session.createQuery("from Schedule where "

@@ -8,10 +8,9 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import util.Milestone;
 
 /**
  *
@@ -22,23 +21,24 @@ public class SchedulePk implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Column(name = "milestone")
-    private String milestone;
+	@Enumerated(EnumType.STRING)
+    private Milestone milestone;
     @Column(name = "term_id")
     private BigInteger termId;
 
     public SchedulePk() {
     }
     
-    public SchedulePk(String milestone, BigInteger termId) {
+    public SchedulePk(Milestone milestone, BigInteger termId) {
         this.milestone = milestone;
         this.termId = termId;
     }
     
-    public String getMilestone() {
+    public Milestone getMilestone() {
         return milestone;
     }
 
-    public void setMilestone(String milestone) {
+    public void setMilestone(Milestone milestone) {
         this.milestone = milestone;
     }
 

@@ -20,6 +20,7 @@ import model.dao.TimeslotDAO;
 import model.dao.TimeslotStatusDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.Milestone;
 import util.Status;
 /**
  *
@@ -39,7 +40,12 @@ public class CreateBookingAction extends ActionSupport{
     @Override
     public String execute() throws Exception {
 		//Retrieve the corresponding schedule object and its timeslots
-		Schedule schedule = ScheduleDAO.findByScheduleId(termId, milestone);
+		Milestone enumMilestone = (milestone.equalsIgnoreCase("acceptance"))
+				? Milestone.ACCEPTANCE
+				: (milestone.equalsIgnoreCase("midterm"))
+				? Milestone.MIDTERM
+				: Milestone.FINAL ;
+		Schedule schedule = ScheduleDAO.findByScheduleId(termId, enumMilestone);
 		List<Timeslot> timeslots = schedule.getTimeslots();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Timestamp bookingTime = Timestamp.valueOf(startTime);
@@ -83,8 +89,8 @@ public class CreateBookingAction extends ActionSupport{
 		TimeslotDAO.save(bookingSlot);
 		
 		//Create timeslot status entries based on milestone
-		String bookingMilestone = bookingSlot.getId().getMilestone();
-		if (bookingMilestone.equalsIgnoreCase("acceptance")) {
+		Milestone bookingMilestone = bookingSlot.getId().getMilestone();
+		if (bookingMilestone.equals(Milestone.ACCEPTANCE)) {
 			Team team = TeamDAO.findByTeamId(teamId);
 			TimeslotStatusPk supervisorStatusPk = new TimeslotStatusPk(
 					bookingSlot.getId().getTermId(),
@@ -95,9 +101,9 @@ public class CreateBookingAction extends ActionSupport{
 			supervisorStatus.setId(supervisorStatusPk);
 			supervisorStatus.setStatus(Status.PENDING);
 			TimeslotStatusDAO.save(supervisorStatus);
-		} else if (bookingMilestone.equalsIgnoreCase("midterm")) {
+		} else if (bookingMilestone.equals(Milestone.MIDTERM)) {
 			//TODO Pending
-		} else if (bookingMilestone.equalsIgnoreCase("final")) {
+		} else if (bookingMilestone.equals(Milestone.FINAL)) {
 			//TODO Pending
 		} else {
 			//TODO Pending

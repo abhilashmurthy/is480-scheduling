@@ -3,10 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 02, 2013 at 02:35 PM
+-- Generation Time: Jun 30, 2013 at 01:24 PM
 -- Server version: 5.5.29
 -- PHP Version: 5.4.10
--- DB Version: 1
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -22,7 +21,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `schedule` (
-  `milestone` varchar(50) NOT NULL,
+  `milestone` varchar(50) NOT NULL COMMENT 'Enum column storing ACCEPTANCE, MIDTERM, FINAL',
   `term_id` bigint(11) NOT NULL,
   `startDate` datetime NOT NULL,
   `endDate` datetime NOT NULL,
@@ -35,7 +34,7 @@ CREATE TABLE `schedule` (
 --
 
 INSERT INTO `schedule` (`milestone`, `term_id`, `startDate`, `endDate`) VALUES
-('Acceptance', 1, '2013-08-07 00:00:00', '2013-09-20 00:00:00');
+('ACCEPTANCE', 1, '2013-08-07 00:00:00', '2013-09-20 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -93,7 +92,7 @@ INSERT INTO `term` (`id`, `year`, `term`) VALUES
 
 CREATE TABLE `time_slot` (
   `term_id` bigint(11) NOT NULL,
-  `milestone` varchar(50) NOT NULL,
+  `milestone` varchar(50) NOT NULL COMMENT 'Enum column storing ACCEPTANCE, MIDTERM, FINAL',
   `startTime` datetime NOT NULL,
   `endTime` datetime NOT NULL,
   `team_id` bigint(11) DEFAULT NULL,
@@ -107,11 +106,11 @@ CREATE TABLE `time_slot` (
 --
 
 INSERT INTO `time_slot` (`term_id`, `milestone`, `startTime`, `endTime`, `team_id`) VALUES
-(1, 'Acceptance', '2013-08-07 10:00:00', '2013-08-07 11:00:00', NULL),
-(1, 'Acceptance', '2013-08-07 11:00:00', '2013-08-07 12:00:00', NULL),
-(1, 'Acceptance', '2013-08-07 12:00:00', '2013-08-07 13:00:00', NULL),
-(1, 'Acceptance', '2013-08-07 13:00:00', '2013-08-07 14:00:00', NULL),
-(1, 'Acceptance', '2013-08-07 14:00:00', '2013-08-07 15:00:00', NULL);
+(1, 'ACCEPTANCE', '2013-08-07 10:00:00', '2013-08-07 11:00:00', NULL),
+(1, 'ACCEPTANCE', '2013-08-07 11:00:00', '2013-08-07 12:00:00', NULL),
+(1, 'ACCEPTANCE', '2013-08-07 12:00:00', '2013-08-07 13:00:00', NULL),
+(1, 'ACCEPTANCE', '2013-08-07 13:00:00', '2013-08-07 14:00:00', NULL),
+(1, 'ACCEPTANCE', '2013-08-07 14:00:00', '2013-08-07 15:00:00', NULL);
 
 -- --------------------------------------------------------
 
@@ -121,10 +120,10 @@ INSERT INTO `time_slot` (`term_id`, `milestone`, `startTime`, `endTime`, `team_i
 
 CREATE TABLE `time_slot_status` (
   `term_id` bigint(11) NOT NULL,
-  `milestone` varchar(50) NOT NULL,
+  `milestone` varchar(50) NOT NULL COMMENT 'Enum column storing ACCEPTANCE, MIDTERM, FINAL',
   `startTime` datetime NOT NULL,
   `user_id` bigint(11) NOT NULL,
-  `status` int(11) NOT NULL COMMENT 'Enum column storing PENDING, ACCEPTED, REJECTED',
+  `status` varchar(50) NOT NULL COMMENT 'Enum column storing PENDING, ACCEPTED, REJECTED',
   PRIMARY KEY (`term_id`,`milestone`,`startTime`,`user_id`),
   KEY `FK_time_slot` (`milestone`,`term_id`,`startTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -169,7 +168,7 @@ INSERT INTO `user` (`id`, `firstName`, `lastName`, `email`, `team_id`) VALUES
 CREATE TABLE `user_role` (
   `user_id` bigint(11) NOT NULL,
   `term_id` bigint(11) NOT NULL,
-  `role` int(11) NOT NULL COMMENT 'Enum column storing SUPERVISOR, REVIEWER, STUDENT, TA',
+  `role` varchar(50) NOT NULL  COMMENT 'Enum column storing SUPERVISOR, REVIEWER, STUDENT, TA',
   PRIMARY KEY (`user_id`,`term_id`,`role`),
   KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
