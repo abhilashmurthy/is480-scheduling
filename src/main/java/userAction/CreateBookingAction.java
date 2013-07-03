@@ -8,12 +8,14 @@ import com.opensymphony.xwork2.ActionSupport;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import model.Schedule;
 import model.Team;
 import model.Timeslot;
 import model.TimeslotStatus;
 import model.TimeslotStatusPk;
+import model.User;
 import model.dao.ScheduleDAO;
 import model.dao.TeamDAO;
 import model.dao.TimeslotDAO;
@@ -90,23 +92,30 @@ public class CreateBookingAction extends ActionSupport{
 		
 		//Create timeslot status entries based on milestone
 		Milestone bookingMilestone = bookingSlot.getId().getMilestone();
+		Team team = TeamDAO.findByTeamId(teamId);
+		List<User> confirmationUsers = new ArrayList<User>();
 		if (bookingMilestone.equals(Milestone.ACCEPTANCE)) {
-			Team team = TeamDAO.findByTeamId(teamId);
-			TimeslotStatusPk supervisorStatusPk = new TimeslotStatusPk(
+			confirmationUsers.add(team.getSupervisor());
+		} else if (bookingMilestone.equals(Milestone.MIDTERM)) {
+			confirmationUsers.add(team.getReviewer1());
+			confirmationUsers.add(team.getReviewer2());
+		} else if (bookingMilestone.equals(Milestone.FINAL)) {
+			confirmationUsers.add(team.getSupervisor());
+			confirmationUsers.add(team.getReviewer1());
+		} else {
+			//TODO Pending
+		}
+		
+		for (User u : confirmationUsers) {
+			TimeslotStatusPk statusPk = new TimeslotStatusPk(
 					bookingSlot.getId().getTermId(),
 					bookingSlot.getId().getMilestone(),
 					bookingSlot.getId().getStartTime(),
-					team.getSupervisor().getId());
-			TimeslotStatus supervisorStatus = new TimeslotStatus();
-			supervisorStatus.setId(supervisorStatusPk);
-			supervisorStatus.setStatus(Status.PENDING);
-			TimeslotStatusDAO.save(supervisorStatus);
-		} else if (bookingMilestone.equals(Milestone.MIDTERM)) {
-			//TODO Pending
-		} else if (bookingMilestone.equals(Milestone.FINAL)) {
-			//TODO Pending
-		} else {
-			//TODO Pending
+					u.getId());
+			TimeslotStatus status = new TimeslotStatus();
+			status.setId(statusPk);
+			status.setStatus(Status.PENDING);
+			TimeslotStatusDAO.save(status);
 		}
 		
 		return SUCCESS;
