@@ -65,4 +65,24 @@ public class TimeslotDAO {
         session.getTransaction().commit();
         return timeslot;
     }
+    
+    public static Timeslot findByDate(Timestamp startTime){
+        session.beginTransaction();
+        Query query = session.createQuery("from Timeslot where "
+				+ "id.startTime = :startTime");
+		query.setParameter("startTime", startTime);
+        Timeslot timeslot = (Timeslot) query.uniqueResult();
+        session.getTransaction().commit();
+        return timeslot;
+    }
+    
+    public static Timeslot findTimeSlotByTeam(int teamId2){
+        session.beginTransaction();
+        BigInteger bigIntId = BigInteger.valueOf(teamId2);
+        Query query = session.createQuery("from Timeslot where " + "teamId = :teamId1");
+        query.setParameter("teamId1", bigIntId);
+        Timeslot ts = (Timeslot) query.uniqueResult();
+        session.getTransaction().commit();
+        return ts;
+    }
 }

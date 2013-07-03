@@ -28,6 +28,7 @@
 						<ul class="nav">
 							<li class="active"><a href="Index.jsp">Home</a></li>
 							<li><a href="Booking.jsp">Create Booking</a></li>
+                                                        <li><a href="AcceptReject.jsp">Accept/Reject Booking</a></li>
 						</ul>
 					</div><!--/.nav-collapse -->
 				</div>

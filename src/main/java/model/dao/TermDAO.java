@@ -61,7 +61,7 @@ public class TermDAO {
     public static Term findByTermId(int id) {
         session.beginTransaction();
         BigInteger bigIntId = BigInteger.valueOf(id);
-        Query query = session.createQuery("from Term where id = :id ");
+        Query query = session.createQuery("from Term where id = :term_id ");
         query.setParameter("id", bigIntId);
         Term term = (Term) query.uniqueResult();
         session.getTransaction().commit();
