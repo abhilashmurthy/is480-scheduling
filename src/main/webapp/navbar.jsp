@@ -13,18 +13,6 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <div class="btn-group userbox">
-                <button class="btn btn-inverse"><%= user.getTeam().getTeamName() %></button>
-                <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                    <li class="disabled"><a tabindex="-1" href="#">Manage settings</a></li>
-                    <li><a id="logoutLink" tabindex="-1" href="#">Logout</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="container">
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -37,9 +25,10 @@
                     <li id="navBooking"><a href="Booking.jsp">Create Booking</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
+            
             <div class="btn-group userbox">
-                <button class="btn btn-inverse"><%= user.getFirstName() + " " + user.getLastName()%></button>
-                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                <button class="btn btn-inverse"><%= user.getFirstName() + " " + user.getLastName() + " of Team " + user.getTeam().getTeamName() + "" %></button>
+                <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
