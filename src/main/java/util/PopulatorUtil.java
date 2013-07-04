@@ -121,8 +121,8 @@ public class PopulatorUtil {
         String lastName = (name.split(" ").length == 1)?"X":name.split(" ")[1];
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setEmail(firstName + lastName + "@smu.edu.sg");
-        if (teamName != null) user.setTeam(TeamDAO.getTeamByName(teamName));
+//        user.setEmail(firstName + lastName + "@smu.edu.sg");
+        if (teamName != null) user.setTeam(TeamDAO.findTeamByName(teamName));
         return user;
     }
 }

@@ -138,10 +138,10 @@ CREATE TABLE `user` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
-  `email` varchar(50) NOT NULL,
+  `username` varchar(50) NOT NULL,
   `team_id` bigint(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `username` (`username`),
   KEY `team_id` (`team_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
 
@@ -149,15 +149,15 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `firstName`, `lastName`, `email`, `team_id`) VALUES
-(1, 'Suresh', 'SUBRAMANIAM', 'suresh.s.2010@sis.smu.edu.sg', 1),
-(2, 'Abhilash', 'MURTHY', 'abhilashm.2010@sis.smu.edu.sg', 1),
-(3, 'Tarlochan Singh', 'GILL', 'tsgill.ps.2010@sis.smu.edu.sg', 1),
-(4, 'Prakhar', 'AGARWAL', 'prakhara.2010@sis.smu.edu.sg', 1),
-(5, 'Xuling', 'DAI', 'xuling.dai.2010@sis.smu.edu.sg', 1),
-(6, 'Richard', 'DAVIS', 'rcdavis@smu.edu.sg', NULL),
-(7, 'Youngsoo', 'KIM', 'yskim@smu.edu.sg', NULL),
-(8, 'Lai-Tee', 'CHEOK', 'laiteecheok@smu.edu.sg', NULL);
+INSERT INTO `user` (`id`, `firstName`, `lastName`, `username`, `team_id`) VALUES
+(1, 'Suresh', 'SUBRAMANIAM', 'suresh.s.2010', 1),
+(2, 'Abhilash', 'MURTHY', 'abhilashm.2010', 1),
+(3, 'Tarlochan Singh', 'GILL', 'tsgill.ps.2010', 1),
+(4, 'Prakhar', 'AGARWAL', 'prakhara.2010', 1),
+(5, 'Xuling', 'DAI', 'xuling.dai.2010', 1),
+(6, 'Richard', 'DAVIS', 'rcdavis', NULL),
+(7, 'Youngsoo', 'KIM', 'yskim', NULL),
+(8, 'Lai-Tee', 'CHEOK', 'laiteecheok', NULL);
 
 -- --------------------------------------------------------
 

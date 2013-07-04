@@ -56,7 +56,7 @@ public class TeamDAO {
         return team;
     }
     
-    public static Team getTeamByName(String teamName) {
+    public static Team findTeamByName(String teamName) {
         session.beginTransaction();
         Query query = session.createQuery("from Team where name = :name")
                 .setParameter("name", teamName);

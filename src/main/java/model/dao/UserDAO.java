@@ -29,21 +29,21 @@ public class UserDAO {
         session.beginTransaction();
         session.saveOrUpdate(user);
         session.getTransaction().commit();
-        logger.info("Added user " + user.getEmail());
+        logger.info("Added user " + user.getUsername());
     }
 
     public static void update(User user) {
         session.beginTransaction();
         session.update(user);
         session.getTransaction().commit();
-        logger.info("Updated user " + user.getEmail());
+        logger.info("Updated user " + user.getUsername());
     }
 
     public static void delete(User user) {
         session.beginTransaction();
         session.delete(user);
         session.getTransaction().commit();
-        logger.info("Deleted user " + user.getEmail());
+        logger.info("Deleted user " + user.getUsername());
     }
 
     public static User findByUserId(int id) {
@@ -54,5 +54,14 @@ public class UserDAO {
         List<User> list = (List<User>) query.list();
         session.getTransaction().commit();
         return (User) list.get(0);
+    }
+    
+    public static User findByUsername(String username) {
+        session.beginTransaction();
+        Query query = session.createQuery("from User where username = :username ");
+        query.setParameter("username", username);
+        User user = (User) query.uniqueResult();
+        session.getTransaction().commit();
+        return user;
     }
 }

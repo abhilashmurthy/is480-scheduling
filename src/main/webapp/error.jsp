@@ -1,16 +1,18 @@
 <!DOCTYPE html>
+
+<%@ taglib prefix="s" uri="/struts-tags" %>
+
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>IS480 Scheduling System | Login</title>
-        <script data-main="js/app/main" src="js/plugins/require.js"></script>
+        <title>IS480 Scheduling System | Error</title>
 
-        <!-- Le styles -->
-        <link href="css/bootstrap.css" rel="stylesheet">
-        <% if (session.getAttribute("user") != null) {
-                response.sendRedirect("Index.jsp");
-            }%>
-
+        <link href="css/app.css" rel="stylesheet">
+        <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+        
+        
+        <% if (request.getAttribute("error") == null) {response.sendRedirect("Index.jsp");} %>
+        
         <style type="text/css">
             /* Override some defaults */
             html, body {
@@ -20,7 +22,7 @@
                 padding-top: 100px; 
             }
             .container {
-                width: 600px;
+                width: 800px;
             }
 
             /* The white background content wrapper */
@@ -46,31 +48,14 @@
                 color: #404040;
             }
 
-            h2 {
+            h1 {
                 position: relative;
                 text-align: center;
             }
 
-            #ssoBtn {
-                display: block;
-                margin: 0 auto;
-                width: 300px;
-                text-align: center;
-                font-size: 16px;
-            }
-            
-            .loadingContainer {
-                padding-top: 60px;
-                text-align: center;
-            }
-            
-            .loadingContainer p {
-                font-weight: 500;
-                font-size: 14px;
-                color: red;
-            }
-
         </style>
+
+        <script data-main="js/app/main" src="js/plugins/require.js"></script>
 
     </head>
     <body>
@@ -93,15 +78,9 @@
         <div class="container">
             <div class="content">
                 <div class="row">
-
-                    <h2>IS480 Scheduling System</h2>
-                    <button id="ssoBtn" class="btn btn-primary" type="submit">SMU Single Sign-On</button>
+                    <h1><%= request.getAttribute("error")%></h1>
                 </div>
             </div>
         </div> <!-- /container -->
-        <div class="container">
-            <div class="loadingContainer">
-            </div>
-        </div>
     </body>
 </html>
