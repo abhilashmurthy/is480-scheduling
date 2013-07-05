@@ -20,7 +20,10 @@
            String status = "";
            
            //based on teamId, update the database
-           int teamInt = Integer.parseInt(teamId);
+		   String[] teamInfo = teamId.split("-");
+		   teamInfo[0].trim();
+		   teamInfo[0].trim();
+           int teamInt = Integer.parseInt(teamInfo[0]);
            if(approve!=null){
                status = "ACCEPTED";
            }else if(reject !=null){

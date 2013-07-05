@@ -3,11 +3,13 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.Team;
 import model.Timeslot;
 import model.TimeslotStatus;
 import model.dao.*;
@@ -45,14 +47,15 @@ public class ResponseAction extends ActionSupport{
             Timeslot timeslotDetails = TimeslotDAO.findByDate(t.getId().getStartTime());
             
             //message.add("Team ID: " + timeslotDetails.getTeamId().toString() + " , TimeSlot: " + timeslotDetails.getId().getStartTime());
+			//Retrieving Team Id and Team Name and displaying it
             if(t.getStatus().toString().equals("PENDING")){
-                message.add(timeslotDetails.getTeamId().toString());
+                BigInteger teamId = timeslotDetails.getTeamId();
+				Team team = TeamDAO.findByTeamId(teamId.intValue());
+				String teamName = team.getTeamName();
+				message.add(teamId.toString() + "-" + teamName);
             }
-           
         }
-
         setMessage(message);
-
         return SUCCESS;
     }
     
