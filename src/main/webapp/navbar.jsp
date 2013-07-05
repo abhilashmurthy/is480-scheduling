@@ -4,6 +4,12 @@
     Author     : ABHILASHM.2010
 --%>
 
+<%@page import="org.slf4j.LoggerFactory"%>
+<%@page import="org.slf4j.Logger"%>
+<%@page import="model.User"%>
+
+<%@include file="imports.jsp"%>
+
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -15,10 +21,21 @@
             <a class="brand" href="Index.jsp">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
-                    <li class="active"><a href="Index.jsp">Home</a></li>
-                    <li><a href="Booking.jsp">Create Booking</a></li>
+                    <li id="navHome"><a href="Index.jsp">Home</a></li>
+                    <li id="navBooking"><a href="Booking.jsp">Create Booking</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
+            
+            <div class="btn-group userbox">
+                <button class="btn btn-inverse"><%= user.getFirstName() + " " + user.getLastName() + " of Team " + user.getTeam().getTeamName() + "" %></button>
+                <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                    <li class="disabled"><a tabindex="-1" href="#">Manage settings</a></li>
+                    <li><a id="logoutLink" tabindex="-1" href="#">Logout</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

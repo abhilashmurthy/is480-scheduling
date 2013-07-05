@@ -6,34 +6,34 @@
       
 <hibernate-configuration>
     
-  <session-factory>
-    <!-- Database connection settings -->
-    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-    <property name="connection.url">jdbc:mysql://localhost:3306/is480-scheduling</property>
-    <property name="connection.username">root</property>
-<!--    <property name="connection.password">[null]</property>-->
+    <session-factory>
+        <!-- Database connection settings -->
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/is480-scheduling</property>
+        <property name="connection.username">root</property>
+        <!--    <property name="connection.password">[null]</property>-->
 
-    <!-- JDBC connection pool (use the built-in) -->
-    <property name="connection.pool_size">1</property>
+        <!-- JDBC connection pool (use the built-in) -->
+        <property name="connection.pool_size">1</property>
 
-    <!-- SQL dialect -->
-    <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
 
-    <!-- Enable Hibernate's automatic session context management -->
-    <property name="current_session_context_class">thread</property>
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
 
-    <!-- Disable the second-level cache  -->
-    <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+        <!-- Disable the second-level cache  -->
+        <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
 
-    <!-- Echo all executed SQL to stdout -->
-    <property name="show_sql">true</property>
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
     
-    <mapping class="model.User" />
-    <mapping class="model.Term" />
-    <mapping class="model.Team" />
-	<mapping class="model.Schedule" />
-	<mapping class="model.Timeslot" />
-	<mapping class="model.TimeslotStatus" />
+        <mapping class="model.User" />
+        <mapping class="model.Term" />
+        <mapping class="model.Team" />
+        <mapping class="model.Schedule" />
+        <mapping class="model.Timeslot" />
+        <mapping class="model.TimeslotStatus" />
     
-  </session-factory>
+    </session-factory>
 </hibernate-configuration>
