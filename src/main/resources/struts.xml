@@ -4,7 +4,7 @@
 	"http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
-
+ 
     <constant name="struts.enable.DynamicMethodInvocation" value="false" />
     <constant name="struts.devMode" value="true" />
 
@@ -43,5 +43,10 @@
     </package>
 
     <!-- Add packages here -->
+    <package name="json" namespace="/" extends="json-default">
+        <action name="knockout" class="userAction.KnockoutAction" method="execute">
+            <result type="json" />
+        </action>
+    </package>
 
 </struts>

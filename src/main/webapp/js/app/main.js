@@ -1,48 +1,35 @@
 //Config
 require.config({
     baseUrl: 'js/',
+    //default paths
     paths: {
         jquery: 'plugins/jquery-2.0.2',
-		jqueryui: 'plugins/jquery-ui/js/jquery-ui-1.10.3.custom.min'
+        bootstrap: 'plugins/bootstrap',
+        knockout: 'plugins/knockout',
+        pages: 'app/pages'
+    },
+    //js dependencies
+    shim: {
+        'bootstrap': 'jquery'
     }
 });
 
 //Main logic
-require(['jquery', 'bootstrap', 'jqueryui', 'plugins/jquery-ui/js/jquery.timepicker.min'], function($, bootstrap, jqueryui, timepicker) {
-	
-	$("#datepicker").datepicker({
-		beforeShowDay: $.datepicker.noWeekends,
-		dateFormat: "yy-mm-dd"
-	});
-	
-    $("#timepicker").timepicker();
-	
-    $(".dropdown-toggle").on('click', function() {
-        this.dropdown;
-    });
+require([
+    'pages/login',
+    'pages/index',
+    'pages/nav',
+    'pages/createbooking',
+    'pages/knockoutapp'
+], function(login, index, nav, createbooking, knockoutapp) {
     
-    $("#logoutLink").on('click', function() {
-       document.location.href = '/is480-scheduling/logout';
-    });
+    //Initalize
+    login.init();
+    nav.init();
+    index.init();
     
-    function blink(selector) {
-        $(selector).fadeOut('slow', function() {
-            $(this).fadeIn('slow', function() {
-                blink(this);
-            });
-        });
-    }
-    
-    $("#ssoBtn").on('click', function() {
-        //Send an AJAX call to the IS480PSAS website
-       $(".loadingContainer").append("<p>Logging in</p>");
-       blink('p');
-       window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
-    });
-    
-    $(".nav li").on('click', function(){
-       $(".nav li").removeClass("active");
-       this.addClass("active");
-    });
- 
+    //Pages
+    createbooking.init(); 
+    knockoutapp.init();
+
 });
