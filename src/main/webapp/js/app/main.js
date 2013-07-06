@@ -2,13 +2,21 @@
 require.config({
     baseUrl: 'js/',
     paths: {
-        jquery: 'plugins/jquery-2.0.2'
+        jquery: 'plugins/jquery-2.0.2',
+		jqueryui: 'plugins/jquery-ui/js/jquery-ui-1.10.3.custom.min'
     }
 });
 
 //Main logic
-require(['jquery', 'bootstrap'], function($, bootstrap) {
-    
+require(['jquery', 'bootstrap', 'jqueryui', 'plugins/jquery-ui/js/jquery.timepicker.min'], function($, bootstrap, jqueryui, timepicker) {
+	
+	$("#datepicker").datepicker({
+		beforeShowDay: $.datepicker.noWeekends,
+		dateFormat: "yy-mm-dd"
+	});
+	
+    $("#timepicker").timepicker();
+	
     $(".dropdown-toggle").on('click', function() {
         this.dropdown;
     });
