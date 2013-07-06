@@ -23,10 +23,12 @@ require([
     'pages/knockoutapp'
 ], function(login, index, nav, createbooking, knockoutapp) {
     
-    //Initalized
+    //Initalize
     login.init();
     nav.init();
     index.init();
+    
+    //Pages
     createbooking.init(); 
     knockoutapp.init();
 
