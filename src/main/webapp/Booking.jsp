@@ -9,6 +9,13 @@
 <html>
     <head>
         <title>Create Booking</title>
+		<script type="text/javascript" src="js/plugins/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script type="text/javascript" src="js/plugins/jquery-2.0.2.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#datepicker").datepicker();
+			});
+		</script>
     </head>
     <body>
         <!-- Navigation -->
@@ -16,8 +23,15 @@
         <div class="container page">
             <h2>Create Booking</h2>
             <form action="createBooking" method="post">
-                Start Time: <input type="text" class="input-medium" name="startTime" /> &nbsp;
-                End Time: <input type="text" class="input-medium" name="endTime"/> <br/>
+                Date: <input type="text" class="input-medium" name="date" id="datepicker"/> &nbsp;
+				Start Time:
+				<select name="startTime" style="width: 100px;">
+					<% for (int i = 9; i < 19; i++) {%>
+					<option value="<% out.print(i + ":00:00");%>">
+						<% out.print(i + ":00");%>
+					</option>
+					<% }%>
+				</select> <br />
 				<select name="termId">
 					<option value="2013,1">2013-14 Term 1</option>
 					<option value="2013,2">2013-14 Term 2</option>
@@ -30,5 +44,6 @@
                 <input type="submit" class="btn btn-primary" value="Create"/>
             </form>
         </div>
+		
     </body>
 </html>

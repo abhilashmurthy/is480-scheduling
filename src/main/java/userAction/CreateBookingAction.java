@@ -5,7 +5,6 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
-import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +32,7 @@ import util.Status;
  */
 public class CreateBookingAction extends ActionSupport implements ServletRequestAware{
     
+	private String date;
     private String startTime;
 	private String endTime;
     private String termId;
@@ -105,7 +105,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		//Retrieve the corresponding booking slot
 		Timestamp bookingTime;
 		try {
-			bookingTime = Timestamp.valueOf(startTime);
+			String timestampStr = date + " " + startTime;
+			bookingTime = Timestamp.valueOf(timestampStr);
 		} catch (IllegalArgumentException e) {
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Start time could not be parsed");
@@ -172,6 +173,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		return SUCCESS;
     }
 
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+	
     public String getStartTime() {
         return startTime;
     }
