@@ -30,8 +30,9 @@
             <result name = "success">/Index.jsp</result>
         </action>
 		
-		<action name="newBooking" class="userAction.NewBookingAction" method="execute">
+		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
             <result name = "success">/Booking.jsp</result>
+			<param name="timeslots"></param>
         </action>
         
         <action name="acceptReject" class="userAction.ResponseAction" method="execute">

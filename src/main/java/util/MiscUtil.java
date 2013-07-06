@@ -36,11 +36,11 @@ public class MiscUtil {
 			term = 2;
 		}
 		
-		return TermDAO.findByYearAndTerm(year, term);
+		return TermDAO.findByYearAndTerm(2013, 1);
 	}
 	
 	public static Schedule getActiveSchedule() {
 		Term activeTerm = getActiveTerm();
-		return ScheduleDAO.findActiveScheduleByTermId(activeTerm.getId());
+		return ScheduleDAO.findByScheduleId(activeTerm.getId(), Milestone.ACCEPTANCE);
 	}
 }
