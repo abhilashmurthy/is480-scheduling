@@ -29,7 +29,7 @@
             Enter User Id <input type="text" name="userId"/> <br/>
             <input type="submit" class="btn btn-primary" value="Search"/>
         </form>
-        <script src="js/bootstrap.js" type="text/javascript"></script>
+        <script src="js/plugins/bootstrap.js" type="text/javascript"></script>
         <%-- <% String statuses = '<s:property value="message" />'; %> --%>
 
         <s:set var = "breakLoop" value = "%{false}" />

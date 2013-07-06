@@ -7,6 +7,7 @@
 <link href="css/redmond/jquery.timepicker.css" rel="stylesheet">
 <link href="css/bootstrap.css" rel="stylesheet" media="screen">
 
+<script type="text/javascript" src="js/plugins/knockout.js"></script>
 <script data-main="js/app/main" src="js/plugins/require.js"></script>
 
 <%!
