@@ -123,7 +123,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		//Check if timeslot has been found
 		if (bookingSlot == null) {
 			request.setAttribute("error", "We can't find the timeslot you're trying to book."
-					+ " Please check your date information!");
+					+ " Please check the details entered!");
 			logger.error("Chosen timeslot not found");
 			return ERROR;
 		}

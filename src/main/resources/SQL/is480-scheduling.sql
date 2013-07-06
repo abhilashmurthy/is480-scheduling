@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 30, 2013 at 01:24 PM
+-- Generation Time: Jul 06, 2013 at 08:06 AM
 -- Server version: 5.5.29
 -- PHP Version: 5.4.10
 
@@ -34,7 +34,9 @@ CREATE TABLE `schedule` (
 --
 
 INSERT INTO `schedule` (`milestone`, `term_id`, `startDate`, `endDate`) VALUES
-('ACCEPTANCE', 1, '2013-08-07 00:00:00', '2013-09-20 00:00:00');
+('ACCEPTANCE', 1, '2013-08-07 00:00:00', '2013-09-20 00:00:00'),
+('FINAL', 1, '2013-11-26 00:00:00', '2013-12-03 00:00:00'),
+('MIDTERM', 1, '2013-09-30 00:00:00', '2013-10-09 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -110,7 +112,9 @@ INSERT INTO `time_slot` (`term_id`, `milestone`, `startTime`, `endTime`, `team_i
 (1, 'ACCEPTANCE', '2013-08-07 11:00:00', '2013-08-07 12:00:00', NULL),
 (1, 'ACCEPTANCE', '2013-08-07 12:00:00', '2013-08-07 13:00:00', NULL),
 (1, 'ACCEPTANCE', '2013-08-07 13:00:00', '2013-08-07 14:00:00', NULL),
-(1, 'ACCEPTANCE', '2013-08-07 14:00:00', '2013-08-07 15:00:00', NULL);
+(1, 'ACCEPTANCE', '2013-08-07 14:00:00', '2013-08-07 15:00:00', NULL),
+(1, 'FINAL', '2013-11-26 10:00:00', '2013-11-26 11:00:00', NULL),
+(1, 'MIDTERM', '2013-09-30 10:00:00', '2013-09-30 11:00:00', NULL);
 
 -- --------------------------------------------------------
 
@@ -168,7 +172,7 @@ INSERT INTO `user` (`id`, `firstName`, `lastName`, `username`, `team_id`) VALUES
 CREATE TABLE `user_role` (
   `user_id` bigint(11) NOT NULL,
   `term_id` bigint(11) NOT NULL,
-  `role` varchar(50) NOT NULL  COMMENT 'Enum column storing SUPERVISOR, REVIEWER, STUDENT, TA',
+  `role` varchar(50) NOT NULL COMMENT 'Enum column storing SUPERVISOR, REVIEWER, STUDENT, TA',
   PRIMARY KEY (`user_id`,`term_id`,`role`),
   KEY `term_id` (`term_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
