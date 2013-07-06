@@ -20,7 +20,7 @@
             <h2>Create Booking</h2>
 
 			<!-- SECTION: Timeslot Table -->
-			<s:if test="%{timeslots.size() > 0}">
+			<s:if test="%{data.size() > 0}">
 				<div>
 					<h3>Time Slots in Chosen Milestone: </h3>
 					<table class="table table-hover">
@@ -34,7 +34,12 @@
 						</thead>
 						<tbody>
 							<s:iterator value="data">
-								<tr>
+								<s:if test="%{teamName != null}">
+									<tr class="error">	
+								</s:if><s:else>
+								<tr>	
+								</s:else>
+								
 									<td><s:property value="date"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>

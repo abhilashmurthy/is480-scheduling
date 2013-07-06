@@ -50,11 +50,11 @@ public class GetTimeslotsAction extends ActionSupport{
 	
 	private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 
-	public ArrayList<HashMap<String, String>> getTimeslots() {
+	public ArrayList<HashMap<String, String>> getData() {
 		return data;
 	}
 	
-	public void setTimeslots(ArrayList<HashMap<String, String>> data) {
+	public void setData(ArrayList<HashMap<String, String>> data) {
 		this.data = data;
 	}
 	
