@@ -22,7 +22,7 @@
             <div class="nav-collapse collapse">
                 <ul class="nav">
                     <li id="navHome"><a href="Index.jsp">Home</a></li>
-                    <li id="navBooking"><a href="Booking.jsp">Create Booking</a></li>
+                    <li id="navBooking"><a href="newBooking">Create Booking</a></li>
                     <li id="navKnockout"><a href="KnockoutTest.jsp">Knockout Test</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
