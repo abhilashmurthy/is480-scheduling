@@ -5,21 +5,24 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import model.Schedule;
 import model.Team;
+import model.Term;
 import model.Timeslot;
 import model.TimeslotStatus;
 import model.TimeslotStatusPk;
 import model.User;
 import model.dao.ScheduleDAO;
-import model.dao.TeamDAO;
+import model.dao.TermDAO;
 import model.dao.TimeslotDAO;
 import model.dao.TimeslotStatusDAO;
+import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.Milestone;
@@ -28,71 +31,117 @@ import util.Status;
  *
  * @author Prakhar
  */
-public class CreateBookingAction extends ActionSupport{
+public class CreateBookingAction extends ActionSupport implements ServletRequestAware{
     
-    private int teamId;
     private String startTime;
 	private String endTime;
-    private int termId;
+    private String termId;
     private String milestone;
-	private String response;
+	private HttpServletRequest request;
 
 	static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
 	
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		User user = (User) session.getAttribute("user");
+		Team team = user.getTeam();
+		
+		// Checking if the user is part of any team
+		if (team == null) {
+			request.setAttribute("error", "Doesn't look like you're part of any team."
+					+ " Can't let you make a booking!");
+			logger.error("User's team information not found");
+			return ERROR;
+		}
+		
+		//Sanity check for milestone info
+		Milestone enumMilestone;
+		if (milestone.equalsIgnoreCase("acceptance")) {
+			enumMilestone = Milestone.ACCEPTANCE;
+		} else if (milestone.equalsIgnoreCase("midterm")) {
+			enumMilestone = Milestone.MIDTERM;
+		} else if (milestone.equalsIgnoreCase("final")) {
+			enumMilestone = Milestone.FINAL;
+		} else {
+			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
+			logger.error("Milestone not found");
+			return ERROR;
+		}
+		
+		//Retreiving the term
+		Term term;
+		try {
+			int academicYear = Integer.valueOf(termId.split(",")[0]);
+			int termNum = Integer.valueOf(termId.split(",")[1]);
+			term = TermDAO.findByYearAndTerm(academicYear, termNum);
+			if (term == null) throw new Exception();
+		} catch (Exception e) {
+			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
+			logger.error("Term not found");
+			return ERROR;
+		}
+		
+		
 		//Retrieve the corresponding schedule object and its timeslots
-		Milestone enumMilestone = (milestone.equalsIgnoreCase("acceptance"))
-				? Milestone.ACCEPTANCE
-				: (milestone.equalsIgnoreCase("midterm"))
-				? Milestone.MIDTERM
-				: Milestone.FINAL ;
-		Schedule schedule = ScheduleDAO.findByScheduleId(termId, enumMilestone);
+		Schedule schedule = ScheduleDAO.findByScheduleId(term.getId(), enumMilestone);
+		if (schedule == null) {
+			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
+			logger.error("Schedule not found");
+		}
 		List<Timeslot> timeslots = schedule.getTimeslots();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Timestamp bookingTime = Timestamp.valueOf(startTime);
         
 		//Checking if the team already has a booking (pending/confirmed)
 		for (Timeslot t : timeslots) {
-			if (t.getTeamId() != null && t.getTeamId().intValue() == teamId) {
-				response = "This team already has a booking.";
-				System.err.println("ERROR: " + response);
-				return "fail";
+			if (t.getTeamId() != null && t.getTeamId().equals(team.getId())) {
+				request.setAttribute("error", "Seems like you already have a booking for this milestone."
+						+ " Can't let you make a booking!");
+				logger.error("Team's already booked a timeslot for the milestone this term");
+				return ERROR;
 			}
 		}
 		
 		//Retrieve the corresponding booking slot
+		Timestamp bookingTime;
+		try {
+			bookingTime = Timestamp.valueOf(startTime);
+		} catch (IllegalArgumentException e) {
+			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
+			logger.error("Start time could not be parsed");
+			return ERROR;
+		}
 		Timeslot bookingSlot = null;
 		for (Timeslot t : timeslots) {
 			Timestamp tStartTime = t.getId().getStartTime();
-			logger.debug(sdf.format(tStartTime));
-			logger.debug(sdf.format(bookingTime));
 			if (tStartTime.equals(bookingTime)) {
 				bookingSlot = t;
 				break;
 			}
 		}
 		
-//		//Check if timeslot has been found
-//		if (bookingSlot == null) {
-//			logger.error("Invalid details. Timeslot not found.");
-//			return ERROR;
-//		}
-//		
+		//Check if timeslot has been found
+		if (bookingSlot == null) {
+			request.setAttribute("error", "We can't find the timeslot you're trying to book."
+					+ " Please check your date information!");
+			logger.error("Chosen timeslot not found");
+			return ERROR;
+		}
+		
 		//Check if the timeslot is free
 		if (bookingSlot.getTeamId() != null) { //Slot is full
-				response = "This timeslot is already taken.";
-				return "fail";
+				request.setAttribute("error", "Oops. This timeslot is already taken."
+						+ " Please book another slot!");
+				logger.error("Chosen timeslot already booked");
+				return ERROR;
 		}
 		
 		//All conditions met. Assign timeslot to team
-		BigInteger bigIntTeamId = BigInteger.valueOf(teamId);
-		bookingSlot.setTeamId(bigIntTeamId);
+		bookingSlot.setTeamId(team.getId());
 		TimeslotDAO.save(bookingSlot);
 		
 		//Create timeslot status entries based on milestone
 		Milestone bookingMilestone = bookingSlot.getId().getMilestone();
-		Team team = TeamDAO.findByTeamId(teamId);
 		List<User> confirmationUsers = new ArrayList<User>();
 		if (bookingMilestone.equals(Milestone.ACCEPTANCE)) {
 			confirmationUsers.add(team.getSupervisor());
@@ -103,7 +152,9 @@ public class CreateBookingAction extends ActionSupport{
 			confirmationUsers.add(team.getSupervisor());
 			confirmationUsers.add(team.getReviewer1());
 		} else {
-			//TODO Pending
+			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
+			logger.error("FATAL ERROR: Code not to be reached!");
+			return ERROR;
 		}
 		
 		for (User u : confirmationUsers) {
@@ -119,14 +170,6 @@ public class CreateBookingAction extends ActionSupport{
 		}
 		
 		return SUCCESS;
-    }
-
-    public int getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(int teamId) {
-        this.teamId = teamId;
     }
 
     public String getStartTime() {
@@ -145,14 +188,14 @@ public class CreateBookingAction extends ActionSupport{
         this.endTime = endTime;
     }
 
-    public int getTermId() {
-        return termId;
-    }
+	public String getTermId() {
+		return termId;
+	}
 
-    public void setTermId(int termId) {
-        this.termId = termId;
-    }
-
+	public void setTermId(String termId) {
+		this.termId = termId;
+	}
+	
     public String getMilestone() {
         return milestone;
     }
@@ -160,13 +203,9 @@ public class CreateBookingAction extends ActionSupport{
     public void setMilestone(String milestone) {
         this.milestone = milestone;
     }
-	
-	public String getResponse() {
-		return response;
-	}
 
-	public void setResponse(String response) {
-		this.response = response;
+	public void setServletRequest(HttpServletRequest hsr) {
+		request = hsr;
 	}
-    
+	
 }

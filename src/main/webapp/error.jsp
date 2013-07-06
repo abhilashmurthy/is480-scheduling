@@ -11,7 +11,7 @@
         <link href="css/bootstrap.css" rel="stylesheet" media="screen">
         
         
-        <% if (request.getAttribute("error") == null) {response.sendRedirect("Index.jsp");} %>
+        <% // if (request.getAttribute("error") == null) {response.sendRedirect("Index.jsp");} %>
         
         <style type="text/css">
             /* Override some defaults */

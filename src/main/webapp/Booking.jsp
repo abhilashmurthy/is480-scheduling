@@ -16,11 +16,17 @@
         <div class="container page">
             <h2>Create Booking</h2>
             <form action="createBooking" method="post">
-                Enter Team Id <input type="text" name="teamId"/> <br/>
-                Enter Start Time <input type="text" name="startTime"/> <br/>
-                Enter End Time <input type="text" name="endTime"/> <br/>
-                Enter Term Id <input type="text" name="termId"/> <br/>
-                Enter Milestone <input type="text" name="milestone"/> <br/>
+                Start Time: <input type="text" class="input-medium" name="startTime" /> &nbsp;
+                End Time: <input type="text" class="input-medium" name="endTime"/> <br/>
+				<select name="termId">
+					<option value="2013,1">2013-14 Term 1</option>
+					<option value="2013,2">2013-14 Term 2</option>
+				</select> &nbsp;
+                <select name="milestone">
+					<option value="acceptance">Acceptance</option>
+					<option value="midterm">Midterm</option>
+					<option value="final">Final</option>
+				</select> <br /> <br />
                 <input type="submit" class="btn btn-primary" value="Create"/>
             </form>
         </div>

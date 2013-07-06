@@ -48,12 +48,11 @@ public class ScheduleDAO {
 				+ " Milestone: " + schedule.getId().getMilestone());
     }
 
-    public static Schedule findByScheduleId(int termId, Milestone milestone) {
+    public static Schedule findByScheduleId(BigInteger termId, Milestone milestone) {
         session.beginTransaction();
-        BigInteger bigIntTermId = BigInteger.valueOf(termId);
         Query query = session.createQuery("from Schedule where "
 				+ "id.termId = :termId and id.milestone = :milestone");
-        query.setParameter("termId", bigIntTermId);
+        query.setParameter("termId", termId);
 		query.setParameter("milestone", milestone);
         Schedule schedule = (Schedule) query.uniqueResult();
         session.getTransaction().commit();
