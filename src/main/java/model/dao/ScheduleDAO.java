@@ -5,8 +5,8 @@
 package model.dao;
 
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import model.Schedule;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -58,5 +58,19 @@ public class ScheduleDAO {
         session.getTransaction().commit();
         return schedule;
     }
+	
+	public static Schedule findActiveScheduleByTermId (BigInteger termId) {
+		session.beginTransaction();
+		Timestamp today = new Timestamp(Calendar.getInstance().getTimeInMillis());
+        Query query = session.createQuery("from Schedule where "
+				+ "id.termId = :termId and "
+				+ "startDate <= :today and "
+				+ "endDate >= :today");
+        query.setParameter("termId", termId);
+		query.setParameter("today", today);
+        Schedule schedule = (Schedule) query.uniqueResult();
+        session.getTransaction().commit();
+        return schedule;
+	}
     
 }

@@ -29,6 +29,10 @@
         <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
             <result name = "success">/Index.jsp</result>
         </action>
+		
+		<action name="newBooking" class="userAction.NewBookingAction" method="execute">
+            <result name = "success">/Booking.jsp</result>
+        </action>
         
         <action name="acceptReject" class="userAction.ResponseAction" method="execute">
             <result name="success">/AcceptReject.jsp</result>
