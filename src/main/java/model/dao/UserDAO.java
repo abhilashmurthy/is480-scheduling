@@ -64,4 +64,12 @@ public class UserDAO {
         session.getTransaction().commit();
         return user;
     }
+    
+    public static List<User> getAllUsers() {
+        session.beginTransaction();
+        Query query = session.createQuery("from User");
+        List<User> users = (List<User>) query.list();
+        session.getTransaction().commit();
+        return users;
+    }
 }
