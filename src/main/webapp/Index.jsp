@@ -10,7 +10,7 @@
         <!-- Navigation -->
         <%@include file="navbar.jsp" %>
         <div class="container page" />
-        <h1>Welcome to the IS480 Scheduling Project</h1>
+        <h1 id="welcomeText">Welcome to the IS480 Scheduling Project</h1>
     </div>
 </body>
 </html>
