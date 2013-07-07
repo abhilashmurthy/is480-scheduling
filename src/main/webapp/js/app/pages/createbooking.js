@@ -7,6 +7,7 @@ define([
     return {
         //Initialize function
         init: function() {
+            console.log("createbooking init");
             $("#datepicker").datepicker({
                 beforeShowDay: $.datepicker.noWeekends,
                 dateFormat: "yy-mm-dd"

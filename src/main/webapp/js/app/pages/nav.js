@@ -5,6 +5,7 @@ define([
     return {
         //Initialize function
         init: function() {
+            console.log("nav init");
             //Nav specific
             $(".dropdown-toggle").on('click', function() {
                 this.dropdown;

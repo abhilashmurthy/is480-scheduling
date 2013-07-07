@@ -5,6 +5,7 @@ define([
     return {
         //Initialize function
         init: function() {
+            console.log("index init");
             $("#welcomeText").on('click', function() {
                 alert("Hello there!");
             });

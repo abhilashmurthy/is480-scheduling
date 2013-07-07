@@ -38,7 +38,7 @@ public class UserManager {
         User user = null;
         try {
             em.getTransaction().begin();
-            Query q = em.createQuery("select o from User where username = :username")
+            Query q = em.createQuery("select o from User o where o.username = :username")
                     .setParameter("username", username);
             user = (User) q.getSingleResult();
             em.getTransaction().commit();
@@ -54,7 +54,7 @@ public class UserManager {
         List<User> result = null;
         try {
             em.getTransaction().begin();
-            Query q = em.createNativeQuery("select * from User");
+            Query q = em.createQuery("select o from User o");
             result = q.getResultList();
             em.getTransaction().commit();
         } catch (Exception e) {

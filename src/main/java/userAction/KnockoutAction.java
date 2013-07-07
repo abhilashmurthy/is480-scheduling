@@ -53,6 +53,9 @@ public class KnockoutAction extends ActionSupport {
 
     @Override
     public String execute() throws Exception {
+        
+        logger.info("Reached KnockoutAction");
+        
         request = ServletActionContext.getRequest();
         response = ServletActionContext.getResponse();
         

@@ -10,8 +10,18 @@ require.config({
     },
     //js dependencies
     shim: {
-        'bootstrap': 'jquery',
-        'knockout': 'jquery'
+        jQuery: {
+            exports: 'jquery'
+        },
+        bootstrap: {
+            deps: ['jquery'],
+            exports : 'jquery'
+        },
+        ko: {
+            deps: ['jquery'],
+            exports :'jquery'
+        },
+        enforceDefine: true
     }
 });
 
@@ -24,13 +34,15 @@ require([
     'pages/knockoutapp'
 ], function(login, index, nav, createbooking, knockoutapp) {
     
-    //Initalize
-    login.init();
-    nav.init();
-    index.init();
-    
-    //Pages
-    createbooking.init(); 
-    knockoutapp.init();
+    $(function(){
+        //Initalize
+        nav.init();
+        login.init();
+        index.init();
+
+        //Pages
+        createbooking.init();
+        knockoutapp.init();
+    })
 
 });

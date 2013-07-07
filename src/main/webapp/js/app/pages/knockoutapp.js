@@ -4,9 +4,9 @@ define([
     'knockout'
 ], function($, bootstrap, knockout) {
     return {
-        
         //Initialize function
         init: function(){
+            console.log("knockoutapp init");
             
             //KNOCKOUT STUFF
             var userModel = function(id, name, username) {
