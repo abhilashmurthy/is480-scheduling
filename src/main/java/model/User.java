@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,12 +24,14 @@ import util.Role;
  */
 @Entity
 public class User implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 	@Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+	@Column(unique = true)
 	private String username;
+	@Column(unique = true)
 	private String fullName;
 	@ManyToOne
 	private Team team;
@@ -51,14 +54,15 @@ public class User implements Serializable {
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
-	
+
 	public Team getTeam() {
 		return team;
 	}
+
 	public void setTeam(Team team) {
 		this.team = team;
 	}
-	
+
 	public ArrayList<HashMap<Term, Role>> getRoles() {
 		return roles;
 	}
@@ -107,5 +111,4 @@ public class User implements Serializable {
 	public String toString() {
 		return "model.User[ id=" + id + " ]";
 	}
-	
 }
