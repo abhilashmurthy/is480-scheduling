@@ -19,7 +19,7 @@ import javax.persistence.UniqueConstraint;
  * @author suresh
  */
 @Entity
-//@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"year","semester"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"academicYear","semester"}))
 public class Term implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id

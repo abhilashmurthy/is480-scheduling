@@ -5,9 +5,9 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import util.Role;
 
 /**
@@ -33,7 +32,7 @@ public class User implements Serializable {
 	private String fullName;
 	@ManyToOne
 	private Team team;
-//	private Set<HashMap<Term, Role>> roles = new HashSet<HashMap<Term, Role>>;
+	private ArrayList<HashMap<Term, Role>> roles = new ArrayList<HashMap<Term, Role>>();
 	@ManyToMany(mappedBy = "attendees")
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
@@ -59,14 +58,14 @@ public class User implements Serializable {
 	public void setTeam(Team team) {
 		this.team = team;
 	}
+	
+	public ArrayList<HashMap<Term, Role>> getRoles() {
+		return roles;
+	}
 
-//	public Set<HashMap<Term, Role>> getRoles() {
-//		return roles;
-//	}
-//
-//	public void setRoles(Set<HashMap<Term, Role>> roles) {
-//		this.roles = roles;
-//	}
+	public void setRoles(ArrayList<HashMap<Term, Role>> roles) {
+		this.roles = roles;
+	}
 
 	public Set<Timeslot> getTimeslots() {
 		return timeslots;
