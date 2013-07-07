@@ -134,7 +134,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             } else {
                 //Kick user out
                 request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo");
-                request.getRequestDispatcher("error.jsp").forward(request, response);
+                
+                return ERROR;
             }
             
         } else {

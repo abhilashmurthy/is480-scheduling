@@ -14,9 +14,9 @@ define([
             }
 
             $("#ssoBtn").on('click', function() {
-                //Send an AJAX call to the IS480PSAS website
-                $(".loadingContainer").append("<p>Logging in</p>");
-                blink('p');
+                //$(".loadingContainer").append("<p>Logging in</p>");
+                $(this).button('loading');
+                //blink(this);
                 window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
             });
         }

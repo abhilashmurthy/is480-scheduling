@@ -10,7 +10,8 @@ require.config({
     },
     //js dependencies
     shim: {
-        'bootstrap': 'jquery'
+        'bootstrap': 'jquery',
+        'knockout': 'jquery'
     }
 });
 
