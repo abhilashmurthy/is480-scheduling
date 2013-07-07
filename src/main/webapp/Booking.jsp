@@ -61,7 +61,7 @@
                         <option value="2013,1">2013-14 Term 1</option>
                         <option value="2013,2">2013-14 Term 2</option>
                     </select> &nbsp;
-                    <select name="milestone">
+                    <select name="milestoneStr">
                         <option value="acceptance">Acceptance</option>
                         <option value="midterm">Midterm</option>
                         <option value="final">Final</option>

@@ -13,7 +13,7 @@
         <global-results>
             <result name="error">/error.jsp</result>
         </global-results>
-<!--        
+        
         <action name="login" class="userAction.LoginAction" method="execute">
             <result name="success">/Index.jsp</result>
         </action>
@@ -28,7 +28,7 @@
         
         <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
             <result name = "success">/Index.jsp</result>
-        </action>
+        </action><!--
 		
 		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
             <result name = "success">/Booking.jsp</result>
@@ -43,10 +43,10 @@
     </package>
 
     <!-- Add packages here -->
-<!--    <package name="json" namespace="/" extends="json-default">
+    <package name="json" namespace="/" extends="json-default">
         <action name="knockout" class="userAction.KnockoutAction" method="execute">
             <result type="json" />
         </action>
-    </package>-->
+    </package>
 
 </struts>

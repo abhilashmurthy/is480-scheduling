@@ -28,7 +28,7 @@
             </div><!--/.nav-collapse -->
             
             <div class="btn-group userbox">
-                <button class="btn btn-inverse"><%= user.getFirstName() + " " + user.getLastName() + " of Team " + user.getTeam().getTeamName() + "" %></button>
+                <button class="btn btn-inverse"><%= user.getFullName() + " of Team " + user.getTeam().getTeamName() + "" %></button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>

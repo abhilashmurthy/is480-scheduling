@@ -5,21 +5,26 @@
 package model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import org.hibernate.annotations.Cascade;
 
 /**
  *
  * @author suresh
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"term_id","milestone_id"}))
 public class Schedule implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -30,7 +35,10 @@ public class Schedule implements Serializable {
 	private Term term;
 	@ManyToOne
 	private Milestone milestone;
-	@OneToMany
+	private Timestamp startDate;
+	private Timestamp endDate;
+	@OneToMany(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
 	public Term getTerm() {
@@ -49,6 +57,22 @@ public class Schedule implements Serializable {
 		this.milestone = milestone;
 	}
 
+	public Timestamp getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Timestamp startDate) {
+		this.startDate = startDate;
+	}
+
+	public Timestamp getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Timestamp endDate) {
+		this.endDate = endDate;
+	}
+	
 	public Set<Timeslot> getTimeslots() {
 		return timeslots;
 	}

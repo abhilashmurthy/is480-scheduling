@@ -17,23 +17,50 @@ import org.slf4j.LoggerFactory;
  * @author suresh
  */
 public class UserManager {
-	
-	private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
-	private static Logger logger = LoggerFactory.getLogger(UserManager.class);
-	
-	public static List<User> getAllUsers() {
-		logger.info("Getting all users");
-		List<User> result = null;
-		try {
-			em.getTransaction().begin();
-			Query q = em.createNativeQuery("select * from User");
-			result = q.getResultList();
-			em.getTransaction().commit();	
-		} catch (Exception e) {
-			logger.error("Database Operation Error");
-			em.getTransaction().rollback();
-		}
-		return result;
-	}
-	
+
+    private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+    private static Logger logger = LoggerFactory.getLogger(UserManager.class);
+    
+    public static void save(User user) {
+        logger.info("Saving user: " + user.getFullName());
+        try {
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+    }
+    
+    public static User findByUsername(String username) {
+        logger.info("Finding user: " + username);
+        User user = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createQuery("select o from User where username = :username")
+                    .setParameter("username", username);
+            user = (User) q.getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return user;
+    }
+
+    public static List<User> getAllUsers() {
+        logger.info("Getting all users");
+        List<User> result = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createNativeQuery("select * from User");
+            result = q.getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return result;
+    }
 }

@@ -39,6 +39,10 @@ public class Milestone implements Serializable {
 		return slotDuration;
 	}
 
+	/**
+	 * Method to set the duration of the slot.
+	 * @param slotDuration Duration of slot in minutes
+	 */
 	public void setSlotDuration(int slotDuration) {
 		this.slotDuration = slotDuration;
 	}
