@@ -7,7 +7,9 @@ package model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,14 +25,14 @@ import util.Status;
 public class Timeslot implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private Timestamp startTime;
 	private Timestamp endTime;
-	private List<HashMap<User, Status>> statusList;
+	private HashMap<User, Status> statusList = new HashMap<User, Status>();
 	private String venue;
 	@ManyToMany
-	private List<User> attendees;
+	private Set<User> attendees = new HashSet<User>();
 
 	public Timestamp getStartTime() {
 		return startTime;
@@ -48,11 +50,11 @@ public class Timeslot implements Serializable {
 		this.endTime = endTime;
 	}
 
-	public List<HashMap<User, Status>> getStatusList() {
+	public HashMap<User, Status> getStatusList() {
 		return statusList;
 	}
 
-	public void setStatusList(List<HashMap<User, Status>> statusList) {
+	public void setStatusList(HashMap<User, Status> statusList) {
 		this.statusList = statusList;
 	}
 
@@ -64,11 +66,11 @@ public class Timeslot implements Serializable {
 		this.venue = venue;
 	}
 
-	public List<User> getAttendees() {
+	public Set<User> getAttendees() {
 		return attendees;
 	}
 
-	public void setAttendees(List<User> attendees) {
+	public void setAttendees(Set<User> attendees) {
 		this.attendees = attendees;
 	}
 

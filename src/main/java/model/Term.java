@@ -19,11 +19,11 @@ import javax.persistence.UniqueConstraint;
  * @author suresh
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"year","semester"}))
+//@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"year","semester"}))
 public class Term implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private int academicYear;

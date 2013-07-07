@@ -20,10 +20,10 @@ public class Milestone implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(unique = true)
+//	@Column(unique = true)
 	private String name;
 	private int slotDuration;
 

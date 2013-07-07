@@ -5,7 +5,9 @@
 package model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,7 +23,7 @@ import javax.persistence.OneToMany;
 public class Schedule implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@ManyToOne
@@ -29,7 +31,7 @@ public class Schedule implements Serializable {
 	@ManyToOne
 	private Milestone milestone;
 	@OneToMany
-	private List<Timeslot> timeslots;
+	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
 	public Term getTerm() {
 		return term;
@@ -47,11 +49,11 @@ public class Schedule implements Serializable {
 		this.milestone = milestone;
 	}
 
-	public List<Timeslot> getTimeslots() {
+	public Set<Timeslot> getTimeslots() {
 		return timeslots;
 	}
 
-	public void setTimeslots(List<Timeslot> timeslots) {
+	public void setTimeslots(Set<Timeslot> timeslots) {
 		this.timeslots = timeslots;
 	}
 

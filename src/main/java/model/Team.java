@@ -6,12 +6,16 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  *
@@ -21,7 +25,7 @@ import javax.persistence.OneToMany;
 public class Team implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String teamName;
 	@ManyToOne
@@ -33,7 +37,7 @@ public class Team implements Serializable {
 	@ManyToOne
 	private User reviewer2;
 	@OneToMany(mappedBy = "team")
-	private ArrayList<User> members;
+	private Set<User> members = new HashSet<User>();
 
 	public String getTeamName() {
 		return teamName;
@@ -75,11 +79,11 @@ public class Team implements Serializable {
 		this.reviewer2 = reviewer2;
 	}
 
-	public ArrayList<User> getMembers() {
+	public Set<User> getMembers() {
 		return members;
 	}
 
-	public void setMembers(ArrayList<User> members) {
+	public void setMembers(Set<User> members) {
 		this.members = members;
 	}
 

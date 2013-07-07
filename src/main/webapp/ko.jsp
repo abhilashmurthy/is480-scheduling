@@ -1,6 +1,6 @@
+<%@page import="model.User"%>
 <%@page import="javax.persistence.Persistence"%>
 <%@page import="javax.persistence.EntityManagerFactory"%>
-<%@page import="util.JPAUtil"%>
 <%@page import="javax.persistence.EntityManager"%>
 <%@page import="util.TestUser"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -20,14 +20,14 @@
                 String username = "temptemp";
                 out.write("Writing new User " + name + ", username: " + username);
                 
-                EntityManagerFactory emf = Persistence.createEntityManagerFactory("tutorialPU");
+                EntityManagerFactory emf = Persistence.createEntityManagerFactory("scheduler");
                 EntityManager em = emf.createEntityManager();
                 em.getTransaction().begin();
 
-                TestUser tUser = new TestUser();
-                tUser.setName(name);
-                
-                em.persist(tUser);
+                User user = new User();
+                user.setFullName("Hello Hello");
+                user.setUsername("hihi");
+                em.persist(user);
                 out.write("Persisted User");
                 em.getTransaction().commit();
                 

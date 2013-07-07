@@ -4,9 +4,10 @@
  */
 package util;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import model.User;
 
 /**
  *
@@ -15,13 +16,20 @@ import java.util.Calendar;
 public class TestUtil {
 	
 	public static void main(String[] args) {
-		Calendar cal = Calendar.getInstance();
-		System.out.println("Cal time: " + cal.getTimeInMillis());
-		cal.set(2013, 0, 1, 0, 0, 0);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		System.out.println(sdf.format(cal.getTime()));
-		Timestamp time = new Timestamp(cal.getTimeInMillis());
-		System.out.println(time.toString());
+                String name = "temp";
+                String username = "temptemp";
+                System.out.println("Writing new User " + name + ", username: " + username);
+                
+                EntityManagerFactory emf = Persistence.createEntityManagerFactory("scheduler");
+                EntityManager em = emf.createEntityManager();
+                em.getTransaction().begin();
+
+                User user = new User();
+                user.setFullName("Hello Hello");
+                user.setUsername("hihi");
+                em.persist(user);
+                System.out.println("Persisted User");
+                em.getTransaction().commit();
 	}
 	
 }

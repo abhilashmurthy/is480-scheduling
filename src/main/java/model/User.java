@@ -6,13 +6,16 @@ package model;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import util.Role;
 
 /**
@@ -23,16 +26,16 @@ import util.Role;
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private String username;
 	private String fullName;
 	@ManyToOne
 	private Team team;
-	private List<HashMap<Term, Role>> roles;
+//	private Set<HashMap<Term, Role>> roles = new HashSet<HashMap<Term, Role>>;
 	@ManyToMany(mappedBy = "attendees")
-	private List<Timeslot> timeslots;
+	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
 	public String getUsername() {
 		return username;
@@ -53,24 +56,23 @@ public class User implements Serializable {
 	public Team getTeam() {
 		return team;
 	}
-
 	public void setTeam(Team team) {
 		this.team = team;
 	}
 
-	public List<HashMap<Term, Role>> getRoles() {
-		return roles;
-	}
+//	public Set<HashMap<Term, Role>> getRoles() {
+//		return roles;
+//	}
+//
+//	public void setRoles(Set<HashMap<Term, Role>> roles) {
+//		this.roles = roles;
+//	}
 
-	public void setRoles(List<HashMap<Term, Role>> roles) {
-		this.roles = roles;
-	}
-
-	public List<Timeslot> getTimeslots() {
+	public Set<Timeslot> getTimeslots() {
 		return timeslots;
 	}
 
-	public void setTimeslots(List<Timeslot> timeslots) {
+	public void setTimeslots(Set<Timeslot> timeslots) {
 		this.timeslots = timeslots;
 	}
 
