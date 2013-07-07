@@ -31,7 +31,8 @@
         </form>
         <script src="js/bootstrap.js" type="text/javascript"></script>
         <%-- <% String statuses = '<s:property value="message" />'; %> --%>
-
+		
+		<br/>
         <s:set var = "breakLoop" value = "%{false}" />
         <s:iterator value="message">
             <s:if test="!#breakLoop">
@@ -42,10 +43,12 @@
 
 
         <s:iterator value="message">
+			<%-- <s:textfield name="message" value="%{[0].toString()}" /><br/>--%>
+			<s:property value="teamName"/><br/>
             <form action="SlotUpdated.jsp" method="post">
                 <input type="submit" class="btn btn-primary" value="Approve" name="Approve"/>
                 <input type="submit" class="btn btn-primary" value="Reject" name="Reject"/>
-                <input type="hidden" name="teamId" value="<s:property />" />
+                <input type="hidden" name="teamId" value="<s:property value="teamIdInt"/>" />
             </form>
         </s:iterator>
 

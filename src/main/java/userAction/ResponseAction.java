@@ -23,14 +23,14 @@ import util.*;
  * @author Tarlochan
  */
 
-
-
 public class ResponseAction extends ActionSupport{
     private int termId;
     private int userId;
     private String approve;
     private String reject;
     private List<String> message = new ArrayList();
+	private String teamName;
+	private int teamIdInt;
     //private String response;
     
     static final Logger logger = LoggerFactory.getLogger(ResponseAction.class);
@@ -50,14 +50,24 @@ public class ResponseAction extends ActionSupport{
 			//Retrieving Team Id and Team Name and displaying it
             if(t.getStatus().toString().equals("PENDING")){
                 BigInteger teamId = timeslotDetails.getTeamId();
-				Team team = TeamDAO.findByTeamId(teamId.intValue());
-				String teamName = team.getTeamName();
-				message.add(teamId.toString() + "-" + teamName);
+				teamIdInt = teamId.intValue();
+				Team team = TeamDAO.findByTeamId(teamIdInt);
+				teamName = team.getTeamName();
+				//message.add(teamId.toString());
+				message.add(teamName);
             }
         }
         setMessage(message);
         return SUCCESS;
     }
+
+	  public int getTeamIdInt() {
+			return teamIdInt;
+	  }
+
+	  public void setTeamIdInt(int teamIdInt) {
+			this.teamIdInt = teamIdInt;
+	  }
     
       public List<String> getMessage() {
             return message;
