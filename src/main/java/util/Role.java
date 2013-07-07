@@ -9,5 +9,5 @@ package util;
  * @author suresh
  */
 public enum Role {
-	SUPERVISOR, REVIEWER, STUDENT, TA
+	SUPERVISOR, REVIEWER, STUDENT, TA, OTHER
 }

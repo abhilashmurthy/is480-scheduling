@@ -5,44 +5,42 @@
 package model;
 
 import java.io.Serializable;
-import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  *
  * @author suresh
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"year","semester"}))
-public class Term implements Serializable {
+public class Milestone implements Serializable {
 	private static final long serialVersionUID = 1L;
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	private int academicYear;
-	private int semester;
+	@Column(unique = true)
+	private String name;
+	private int slotDuration;
 
-	public int getAcademicYear() {
-		return academicYear;
+	public String getName() {
+		return name;
 	}
 
-	public void setAcademicYear(int academicYear) {
-		this.academicYear = academicYear;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public int getSemester() {
-		return semester;
+	public int getSlotDuration() {
+		return slotDuration;
 	}
 
-	public void setSemester(int semester) {
-		this.semester = semester;
+	public void setSlotDuration(int slotDuration) {
+		this.slotDuration = slotDuration;
 	}
 
 	public Long getId() {
@@ -63,10 +61,10 @@ public class Term implements Serializable {
 	@Override
 	public boolean equals(Object object) {
 		// TODO: Warning - this method won't work in the case the id fields are not set
-		if (!(object instanceof Term)) {
+		if (!(object instanceof Milestone)) {
 			return false;
 		}
-		Term other = (Term) object;
+		Milestone other = (Milestone) object;
 		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
 			return false;
 		}
@@ -75,7 +73,7 @@ public class Term implements Serializable {
 
 	@Override
 	public String toString() {
-		return "model.Term[ id=" + id + " ]";
+		return "model.Milestone[ id=" + id + " ]";
 	}
 	
 }

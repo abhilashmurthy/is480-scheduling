@@ -5,102 +5,106 @@
 package model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
-import javax.persistence.Column;
+import java.util.HashMap;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import util.Role;
 
 /**
  *
- * @author Prakhar
+ * @author suresh
  */
 @Entity
-@Table(name = "user")
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    @Id
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private BigInteger id;
+	private Long id;
+	
+	private String username;
+	private String fullName;
 	@ManyToOne
-	@JoinColumn(name="team_id")
-    private Team team;
-    @Column(name = "firstName")
-    private String firstName;
-    @Column(name = "lastName")
-    private String lastName;
-    @Column(name = "username")
-    private String username;
-            
-    public BigInteger getId() {
-        return id;
-    }
-    
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-    
-    public Team getTeam() {
-        return team;
-    }
-    
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-    
-    public String getFirstName() {
-        return firstName;
-    }
-    
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    
-    public String getLastName() {
-        return lastName;
-    }
-    
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-    
-    public String getUsername() {
-        return username;
-    }
-    
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += id.intValue();
-        return hash;
-    }
+	private Team team;
+	private List<HashMap<Term, Role>> roles;
+	@ManyToMany(mappedBy = "attendees")
+	private List<Timeslot> timeslots;
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof User)) {
-            return false;
-        }
-        User other = (User) object;
-        if (this.id != other.id) {
-            return false;
-        }
-        return true;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    @Override
-    public String toString() {
-        return "model.User[ id=" + id + " ]";
-    }
-    
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+	
+	public Team getTeam() {
+		return team;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
+	}
+
+	public List<HashMap<Term, Role>> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<HashMap<Term, Role>> roles) {
+		this.roles = roles;
+	}
+
+	public List<Timeslot> getTimeslots() {
+		return timeslots;
+	}
+
+	public void setTimeslots(List<Timeslot> timeslots) {
+		this.timeslots = timeslots;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		// TODO: Warning - this method won't work in the case the id fields are not set
+		if (!(object instanceof User)) {
+			return false;
+		}
+		User other = (User) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "model.User[ id=" + id + " ]";
+	}
+	
 }

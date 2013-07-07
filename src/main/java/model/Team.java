@@ -5,71 +5,45 @@
 package model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.List;
-import javax.persistence.Column;
+import java.util.ArrayList;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 /**
  *
- * @author Prakhar
+ * @author suresh
  */
 @Entity
-@Table(name="team")
 public class Team implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    @Id
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private BigInteger id;
-    
-    @Column(name = "name")
-    private String teamName;
-    
-    @ManyToOne
-	@JoinColumn(name="term_id")
-    private Term term;
-
+	private Long id;
+	private String teamName;
 	@ManyToOne
-	@JoinColumn(name="reviewer1")
-    private User reviewer1;
-
+	private Term term;
 	@ManyToOne
-	@JoinColumn(name="reviewer2")
-    private User reviewer2;
-    
-    @ManyToOne
-	@JoinColumn(name="supervisor")
-    private User supervisor;
-	
+	private User supervisor;
+	@ManyToOne
+	private User reviewer1;
+	@ManyToOne
+	private User reviewer2;
 	@OneToMany(mappedBy = "team")
-	private List<User> members;
+	private ArrayList<User> members;
 
-    public BigInteger getId() {
-        return id;
-    }
-    
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
+	public String getTeamName() {
+		return teamName;
+	}
 
-    public String getTeamName() {
-        return teamName;
-    }
+	public void setTeamName(String teamName) {
+		this.teamName = teamName;
+	}
 
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
-    
-    public Term getTerm() {
+	public Term getTerm() {
 		return term;
 	}
 
@@ -77,7 +51,15 @@ public class Team implements Serializable {
 		this.term = term;
 	}
 
-    public User getReviewer1() {
+	public User getSupervisor() {
+		return supervisor;
+	}
+
+	public void setSupervisor(User supervisor) {
+		this.supervisor = supervisor;
+	}
+
+	public User getReviewer1() {
 		return reviewer1;
 	}
 
@@ -93,45 +75,45 @@ public class Team implements Serializable {
 		this.reviewer2 = reviewer2;
 	}
 
-	public User getSupervisor() {
-		return supervisor;
-	}
-
-	public void setSupervisor(User supervisor) {
-		this.supervisor = supervisor;
-	}
-    
-	public List<User> getMembers() {
+	public ArrayList<User> getMembers() {
 		return members;
 	}
 
-	public void setMembers(List<User> members) {
+	public void setMembers(ArrayList<User> members) {
 		this.members = members;
 	}
-    
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += id.intValue();
-        return hash;
-    }
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Team)) {
-            return false;
-        }
-        Team other = (Team) object;
-        if (this.id != other.id) {
-            return false;
-        }
-        return true;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    @Override
-    public String toString() {
-        return "model.Team[ id=" + id + " ]";
-    }
-    
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		// TODO: Warning - this method won't work in the case the id fields are not set
+		if (!(object instanceof Team)) {
+			return false;
+		}
+		Team other = (Team) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "model.Team[ id=" + id + " ]";
+	}
+	
 }
