@@ -4,7 +4,7 @@
 	"http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
-
+ 
     <constant name="struts.enable.DynamicMethodInvocation" value="false" />
     <constant name="struts.devMode" value="true" />
 
@@ -29,6 +29,11 @@
         <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
             <result name = "success">/Index.jsp</result>
         </action>
+		
+		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
+            <result name = "success">/Booking.jsp</result>
+			<param name="timeslots"></param>
+        </action>
         
         <action name="acceptReject" class="userAction.ResponseAction" method="execute">
             <result name="success">/AcceptReject.jsp</result>
@@ -38,5 +43,10 @@
     </package>
 
     <!-- Add packages here -->
+    <package name="json" namespace="/" extends="json-default">
+        <action name="knockout" class="userAction.KnockoutAction" method="execute">
+            <result type="json" />
+        </action>
+    </package>
 
 </struts>

@@ -95,7 +95,7 @@
                 <div class="row">
 
                     <h2>IS480 Scheduling System</h2>
-                    <button id="ssoBtn" class="btn btn-primary" type="submit">SMU Single Sign-On</button>
+                    <button id="ssoBtn" class="btn btn-primary" data-loading-text="Logging in..." type="submit">SMU Single Sign-On</button>
                 </div>
             </div>
         </div> <!-- /container -->
