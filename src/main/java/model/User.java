@@ -17,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import constant.Role;
+import javax.persistence.CascadeType;
+import org.hibernate.annotations.Cascade;
 
 /**
  *
@@ -31,12 +33,13 @@ public class User implements Serializable {
 	private Long id;
 	@Column(unique = true)
 	private String username;
-	@Column(unique = true)
 	private String fullName;
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
 	private ArrayList<HashMap<Term, Role>> roles = new ArrayList<HashMap<Term, Role>>();
-	@ManyToMany(mappedBy = "attendees")
+	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
 	public String getUsername() {

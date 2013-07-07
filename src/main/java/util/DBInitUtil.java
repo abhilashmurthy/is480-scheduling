@@ -10,8 +10,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import model.Milestone;
 import model.Schedule;
+import model.Team;
 import model.Term;
 import model.Timeslot;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +26,10 @@ public class DBInitUtil {
 	 * Methods to initialize data in a new database.
 	 * WARNING! Please run this file only on a blank database!
 	 */
+	static Logger logger = LoggerFactory.getLogger(DBInitUtil.class);
+	
 	public static void main(String[] args) {
-		Logger logger = LoggerFactory.getLogger(DBInitUtil.class);
+		
 		EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
 		try {
 			logger.info("DB Initialization started");
@@ -44,7 +48,6 @@ public class DBInitUtil {
 		/*
 		 * MILESTONE TABLE POPULATION
 		 */
-		// Creation
 		Milestone acceptance = new Milestone();
 		acceptance.setName("Acceptance");
 		acceptance.setSlotDuration(60);
@@ -61,11 +64,11 @@ public class DBInitUtil {
 		em.persist(acceptance);
 		em.persist(midterm);
 		em.persist(finalMilestone);
+		logger.info("Milestones persisted");
 		
 		/*
 		 * TERM TABLE POPULATION
 		 */		
-		// Creation
 		Term term12013 = new Term();
 		term12013.setAcademicYear(2013);
 		term12013.setSemester(1);
@@ -77,11 +80,11 @@ public class DBInitUtil {
 		// Persistence
 		em.persist(term12013);
 		em.persist(term12013);
+		logger.info("Terms persisted");
 		
 		/*
 		 * SCHEDULE TABLE POPULATION
 		 */
-		// Creation
 		Schedule acceptance12013 = new Schedule();
 		acceptance12013.setTerm(term12013);
 		acceptance12013.setMilestone(acceptance);
@@ -107,5 +110,89 @@ public class DBInitUtil {
 		
 		// Persistence
 		em.persist(acceptance12013);
+		logger.info("Schedule and timeslots persisted");
+		
+		/*
+		 * USER TABLE POPULATION
+		 */
+		User u1 = new User();
+		u1.setUsername("suresh.s.2010");
+		u1.setFullName("Suresh SUBRAMANIAM");
+		
+		User u2 = new User();
+		u2.setUsername("abhilashm.2010");
+		u2.setFullName("Abhilash MURTHY");
+		
+		User u3 = new User();
+		u3.setUsername("tsgill.ps.2010");
+		u3.setFullName("Tarlochan Singh GILL S/O P S");
+		
+		User u4 = new User();
+		u4.setUsername("prakhara.2010");
+		u4.setFullName("Prakhar AGARWAL");
+		
+		User u5 = new User();
+		u5.setUsername("xuling.dai.2010");
+		u5.setFullName("DAI Xuling");
+		
+		User u6 = new User();
+		u6.setUsername("rcdavis");
+		u6.setFullName("Richard C. DAVIS");
+		
+		User u7 = new User();
+		u7.setUsername("yskim");
+		u7.setFullName("Youngsoo KIM");
+		
+		User u8 = new User();
+		u8.setUsername("laiteecheok");
+		u8.setFullName("CHEOK Lai-Tee");
+		
+		// Persistence
+		em.persist(u1);
+		em.persist(u2);
+		em.persist(u3);
+		em.persist(u4);
+		em.persist(u5);
+		em.persist(u6);
+		em.persist(u7);
+		em.persist(u8);
+		logger.info("Users persisted");
+		
+		/*
+		 * TEAM TABLE POPULATION
+		 */
+		Team t1 = new Team();
+		t1.setTerm(term12013);
+		t1.setTeamName("Thunderbolt");
+		t1.setSupervisor(u6);
+		t1.setReviewer1(u7);
+		t1.setReviewer2(u8);
+		HashSet<User> members = new HashSet<User>();
+		members.add(u1);
+		members.add(u2);
+		members.add(u3);
+		members.add(u4);
+		members.add(u5);
+		t1.setMembers(members);
+		
+		// Persistence
+		em.persist(t1);
+		logger.info("Teams persisted");
+		
+		/*
+		 * LINKING USERS AND TEAMS
+		 */
+		u1.setTeam(t1);
+		u2.setTeam(t1);
+		u3.setTeam(t1);
+		u4.setTeam(t1);
+		u5.setTeam(t1);
+		
+		em.persist(u1);
+		em.persist(u2);
+		em.persist(u3);
+		em.persist(u4);
+		em.persist(u5);
+		logger.info("User --> Team links persisted");
 	}
 }
