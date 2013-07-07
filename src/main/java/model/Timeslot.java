@@ -16,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import constant.Status;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -33,6 +34,8 @@ public class Timeslot implements Serializable {
 	private String venue;
 	@ManyToMany
 	private Set<User> attendees = new HashSet<User>();
+	@ManyToOne
+	private Team team;
 
 	public Timestamp getStartTime() {
 		return startTime;
@@ -72,6 +75,14 @@ public class Timeslot implements Serializable {
 
 	public void setAttendees(Set<User> attendees) {
 		this.attendees = attendees;
+	}
+
+	public Team getTeam() {
+		return team;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
 	}
 
 	public Long getId() {
