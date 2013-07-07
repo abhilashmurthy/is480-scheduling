@@ -31,5 +31,4 @@ public class TestUtil {
                 System.out.println("Persisted User");
                 em.getTransaction().commit();
 	}
-	
 }
