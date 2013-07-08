@@ -26,16 +26,16 @@
             <result name="success">/Test.jsp</result>
         </action>
         
-		<action name="createBooking" class="userAction.CreateBookingAction" method="execute">
+        <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
             <result name = "success">/Index.jsp</result>
         </action>
 		
-		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
+        <action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
             <result name = "success">/Booking.jsp</result>
-			<param name="timeslots"></param>
+            <param name="timeslots"></param>
         </action>
         
-<!--    <action name="acceptReject" class="userAction.ResponseAction" method="execute">
+        <!--    <action name="acceptReject" class="userAction.ResponseAction" method="execute">
             <result name="success">/AcceptReject.jsp</result>
             <param name="message"></param>
         </action>-->
@@ -45,6 +45,9 @@
     <!-- Add packages here -->
     <package name="json" namespace="/" extends="json-default">
         <action name="knockout" class="userAction.KnockoutAction" method="execute">
+            <result type="json" />
+        </action>
+        <action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
             <result type="json" />
         </action>
     </package>
