@@ -25,12 +25,13 @@ public class TermManager {
 		try {
 			em.getTransaction().begin();
 			Query q = em.createNativeQuery("select * from Term where academicYear = :year "
-					+ "and semester = :semester");
+					+ "and semester = :semester", Term.class);
 			q.setParameter("year", year);
 			q.setParameter("semester", semester);
 			result = (Term) q.getSingleResult();
 			em.getTransaction().commit();	
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error("Database Operation Error");
 			em.getTransaction().rollback();
 		}

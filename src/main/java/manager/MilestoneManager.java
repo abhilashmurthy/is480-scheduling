@@ -26,12 +26,12 @@ public class MilestoneManager {
 		Milestone result = null;
 		try {
 			em.getTransaction().begin();
-			Query q = em.createNativeQuery("select * from Milestone where name = :name");
+			Query q = em.createNativeQuery("select * from Milestone where name = :name", Milestone.class);
 			q.setParameter("name", name);
 			result = (Milestone) q.getSingleResult();
 			em.getTransaction().commit();	
 		} catch (Exception e) {
-			logger.error("Database Operation Error");
+			e.printStackTrace();
 			em.getTransaction().rollback();
 		}
 		return result;

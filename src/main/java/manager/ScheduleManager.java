@@ -26,8 +26,8 @@ public class ScheduleManager {
 		Schedule result = null;
 		try {
 			em.getTransaction().begin();
-			Query q = em.createQuery("select o from Schedule where o.term = :term"
-					+ " and o.milestone = :milestone");
+			Query q = em.createQuery("SELECT o FROM Schedule o WHERE o.term = :term"
+					+ " AND o.milestone = :milestone", Schedule.class);
 			q.setParameter("term", term);
 			q.setParameter("milestone", milestone);
 			result = (Schedule) q.getSingleResult();
