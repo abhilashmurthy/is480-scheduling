@@ -12,7 +12,11 @@ define([
                 dateFormat: "yy-mm-dd"
             });
 
-            $("#timepicker").timepicker();
+            $("#timepicker").timepicker({
+				timeFormat: 'H:i:s',
+				minTime: '9:00am',
+				maxTime: '18:00pm'
+			});
         }
     };
 });

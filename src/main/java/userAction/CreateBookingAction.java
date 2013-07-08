@@ -88,9 +88,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
         //Retrieve the corresponding schedule object and its timeslots
         Schedule schedule = ScheduleDAO.findByScheduleId(term.getId(), enumMilestone);
-        if (schedule == null) {
+        if (schedule == null || schedule.getTimeslots() == null) {
             request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
             logger.error("Schedule not found");
+			return ERROR;
         }
         List<Timeslot> timeslots = schedule.getTimeslots();
 
@@ -110,7 +111,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             String timestampStr = date + " " + startTime;
             bookingTime = Timestamp.valueOf(timestampStr);
         } catch (IllegalArgumentException e) {
-            request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
+            request.setAttribute("error", "Date information not entered correctly. Please try again!");
             logger.error("Start time could not be parsed");
             return ERROR;
         }
