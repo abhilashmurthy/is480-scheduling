@@ -27,17 +27,20 @@
         </action>
         
         <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
-            <result name = "success">/Index.jsp</result>
+            <result name="success">/Index.jsp</result>
         </action>
 		
 		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
-            <result name = "success">/Booking.jsp</result>
+            <result name="success">/Booking.jsp</result>
 			<param name="timeslots"></param>
         </action>
         
-        <action name="acceptReject" class="userAction.ResponseAction" method="execute">
-            <result name="success">/AcceptReject.jsp</result>
-            <param name="message"></param>
+        <action name="approveReject" class="userAction.ResponseAction" method="execute">
+            <result name="success">/ApproveReject.jsp</result>
+        </action>
+		
+		<action name="updateBookingStatus" class="userAction.ResponseAction" method="update">
+            <result name="success">/ApproveReject.jsp</result>
         </action>
 		
     </package>
