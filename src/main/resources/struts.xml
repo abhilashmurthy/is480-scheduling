@@ -39,7 +39,7 @@
             <result name="success">/ApproveReject.jsp</result>
         </action>
 		
-		<action name="updateBookingStatus" class="userAction.ResponseAction" method="update">
+		<action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
             <result name="success">/ApproveReject.jsp</result>
         </action>
 		

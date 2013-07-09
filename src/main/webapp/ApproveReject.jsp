@@ -19,9 +19,12 @@
 <html>
     <head>
         <title>Approve/Reject Booking</title>
-		<!-- <script type="text/javascript">
+		<!--<script type="text/javascript">
+			function hideBookingsTable() {
+					document.getElementById('confirmBookings').style.display = 'none';
+			}
 			function showBookingsTable() {
-				confirmBookings.style.visibility = 'visible';
+					document.getElementById('confirmBookings').style.display = 'block';
 			}
 		</script> -->
 		
@@ -49,13 +52,14 @@
 					<a id="acceptReject" data-toggle="tab">Accept/Reject</a>
 				</li>
 			</ul>
-		
-		<!-- SECTION: Approve/Reject Bookings -->
+
+			<!-- SECTION: Approve/Reject Bookings -->
 			<s:if test="%{data.size() > 0}"> 
+				<s:if test="%{teamName != null}">
 					<table class="table table-hover">
 						<thead>
 							<tr>
-								<th>Team Id</th>
+								<%--<th>Team Id</th>--%>
 								<th>Team</th>
 								<th>Milestone</th>
 								<th>Start Time</th>
@@ -64,12 +68,8 @@
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
-								<s:if test="%{teamName != null}"> 
-									<tr class="error">	
-								</s:if><s:else>
 								<tr>	
-									</s:else>
-									<td><s:property value="teamId"/></td>
+									<%--<td><s:property value="teamId"/></td> --%>
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestone"/></td>
 									<td><s:property value="startTime"/></td>
@@ -78,12 +78,15 @@
 									<form action="updateBookingStatus" method="post">
 										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
 										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
-										<td><input type="hidden" name="teamId"/></td>
+										<input type="hidden" name="teamId" id="teamId" value="<s:property value="teamId"/>"/>
 									</form>
 								</tr>
 							</s:iterator>
 						</tbody>
 					</table>
+				</s:if><s:else>
+					<h4>No pending bookings available for Approve/Reject!</h4>
+				</s:else>
 			</s:if><s:else>
 				<h4>No pending bookings available for Approve/Reject!</h4>
 			</s:else>

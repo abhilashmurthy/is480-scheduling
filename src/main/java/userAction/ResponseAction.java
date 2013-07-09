@@ -36,8 +36,6 @@ public class ResponseAction extends ActionSupport{
 	private String milestone;
 	private String startTime;
 	private String endTime;
-	private String approve;
-	private String reject;
 	private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 	private HttpServletRequest request;    
     static final Logger logger = LoggerFactory.getLogger(ResponseAction.class);
@@ -62,6 +60,7 @@ public class ResponseAction extends ActionSupport{
         for(TimeslotStatus t: ts) {
             Timeslot timeslotDetails = TimeslotDAO.findByDate(t.getId().getStartTime());
 			HashMap<String, String> map = new HashMap<String, String>();
+			
 			//Retrieving time slot details and displaying it
             if(t.getStatus().toString().equals("PENDING")){
 				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
@@ -70,6 +69,7 @@ public class ResponseAction extends ActionSupport{
 				milestone = timeslotDetails.getId().getMilestone().toString();
 				startTime = sdf.format(timeslotDetails.getId().getStartTime());
 				endTime = sdf.format(timeslotDetails.getEndTime());
+				
 				map.put("teamId", String.valueOf(teamId));
 				map.put("teamName", teamName);
 				map.put("milestone", milestone);
@@ -80,41 +80,8 @@ public class ResponseAction extends ActionSupport{
         }
         return SUCCESS;
     }
-	
-	//To update the database with the approve/reject status
-	//private int teamIntId;
-	public String update() throws Exception {
-		 String status = null;
-		 if(approve != null) {
-               status = "ACCEPTED";
-         } else if (reject != null) {
-               status = "REJECTED";
-		 } else {
-			 logger.error("No valid response recorded from user");
-			 return ERROR;
-		 }
-		 //Updating the time slot status of the respective team
-         TimeslotStatusDAO.updateTimeSlotStatusByTeamId(teamId, status);
-		 return SUCCESS;
-	}
 
 	//Getters and Setters
-	public String getApprove() {
-		return approve;
-	}
-
-	public void setApprove(String approve) {
-		this.approve = approve;
-	}
-
-	public String getReject() {
-		return reject;
-	}
-
-	public void setReject(String reject) {
-		this.reject = reject;
-	}
-	
 	public int getTeamId() {
 		  return teamId;
 	}
