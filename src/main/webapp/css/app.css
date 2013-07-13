@@ -41,3 +41,9 @@ body {
 .userbox .dropdown-menu {
     margin-left: 150px;
 }
+
+.line-separator{
+    height:1px;
+    background:#717171;
+    border-bottom:1px solid #313030;
+}
