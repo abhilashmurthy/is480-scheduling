@@ -61,7 +61,7 @@
         <action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
             <result type="json" />
         </action>
-        <action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
+        <action name="createTermJson" class="userAction.CreateTermAction" method="execute">
             <result type="json" />
         </action>
     </package>
