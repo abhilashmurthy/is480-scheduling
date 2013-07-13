@@ -20,40 +20,8 @@
             <h2>Create Booking</h2>
 
             <!-- SECTION: Timeslot Table -->
-            <s:if test="%{data.size() > 0}">
-                <div>
-                    <h3>Time Slots in Chosen Milestone: </h3>
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Start Time</th>
-                                <th>End Time</th>
-                                <th>Team</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <s:iterator value="data">
-                                <s:if test="%{teamName != null}">
-                                    <tr class="error">	
-                                    </s:if><s:else>
-                                    <tr>	
-                                    </s:else>
-
-                                    <td><s:property value="date"/></td>
-                                    <td><s:property value="startTime"/></td>
-                                    <td><s:property value="endTime"/></td>
-                                    <td><s:property value="teamName"/></td>
-                                </tr>
-                            </s:iterator>
-                        </tbody>
-                    </table>
-                </div>
-            </s:if>
-
-            <!-- SECTION: Timeslot Table -->
             <div>
-                <form action="createBooking" method="post">
+                <form id="createBookingForm" method="post">
                     Date: <input type="text" class="input-medium datepicker" name="date" /> &nbsp;
                     Start Time:
                     <input type="text" class="input-medium" name="startTime" id="timepicker"/> &nbsp;<br />
@@ -66,7 +34,7 @@
                         <option value="midterm">Midterm</option>
                         <option value="final">Final</option>
                     </select> <br /> <br />
-                    <input type="submit" class="btn btn-primary" value="Create"/>
+                    <input id="createBookingFormBtn" type="submit" class="btn btn-primary" value="Create"/>
                 </form>
             </div>
         </div>
@@ -82,6 +50,10 @@
                 minTime: '9:00am',
                 maxTime: '18:00pm'
             });
+			$("#createBookingFormBtn").bind('click', function(){
+				var formData = $("#createBookingForm").serialize();
+				alert(formData);
+			});
         </script>
     </body>
 </html>

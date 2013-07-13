@@ -42,8 +42,6 @@ public class TermManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			e.printStackTrace();
-		} finally {
-			em.close();
 		}
 		return false;
 	}
