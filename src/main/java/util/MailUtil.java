@@ -4,10 +4,9 @@
  */
 package util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class MailUtil {
 
 	public static final Logger logger = LoggerFactory.getLogger(MailUtil.class);
-	private static Properties props;
+	private static final Properties props;
 	private static Session session;
 	private static final String USERNAME = "is480.scheduling@gmail.com";
 	private static final String PASSWORD = "fyp2013-14";
@@ -47,17 +46,16 @@ public class MailUtil {
 		});
 	}
 
-	public static void sendEmail(String[] recipients, String subject, String body) {
+	public static void sendEmail(List<String> recipients, String subject, String body) {
 
 		try {
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress("is480.scheduling@gmail.com", "IS480 Scheduling"));
-			//TODO Use variables
+			message.setFrom(new InternetAddress("is480.scheduling@gmail.com",
+					"IS480 Scheduling"));
 			message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse("sureshs.592@gmail.com"));
-			message.setSubject("Testing Subject");
-			message.setText("Yo,"
-					+ "\n\n Got your email bruh?");
+					InternetAddress.parse(parseRecipientArray(recipients)));
+			message.setSubject(subject);
+			message.setText(body);
 
 			Transport.send(message);
 			logger.info("Email sent successfully");
@@ -65,5 +63,19 @@ public class MailUtil {
 			logger.error("Send Mail Error");
 			logger.error(e.getMessage());
 		}
+	}
+	
+	public static String parseRecipientArray(List<String> recipients) {
+		StringBuilder result = new StringBuilder();
+		Iterator<String> iter = recipients.iterator();
+		
+		while (iter.hasNext()) {
+			result.append(iter.next());
+			if (iter.hasNext()) {
+				result.append(",");
+			}
+		}
+		
+		return result.toString();
 	}
 }

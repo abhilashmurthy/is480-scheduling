@@ -30,7 +30,46 @@
                 </li>
             </ul>
             <div id="milestoneTabContent" class="tab-content">
-                <div class="tab-pane fade active in" id="acceptanceContent"><p>Acceptance stuff</p></div>
+                <div class="tab-pane fade active in" id="acceptanceContent">
+                    <p>Acceptance stuff</p>
+                    <div class="container" data-bind="load: loadData()">
+
+                        <table data-bind="visible: bookings().length > 0" class="bookings">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Team</th>
+                                    <th>Update Booking</th>
+                                    <th>Delete Booking</th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: bookings">
+                                <tr>
+                                    <td>
+                                        <span data-bind="text: date"></span>
+                                        <!--<input type="text" class="username" data-bind="value: username, visible: usernameUpdate, hasfocus: usernameUpdate">-->
+                                    </td>
+                                    <td>
+                                        <span data-bind="text: startTime"></span>
+                                        <!--<input type="text" class="username" data-bind="value: username, visible: usernameUpdate, hasfocus: usernameUpdate">-->
+                                    </td>
+                                    <td>
+                                        <span data-bind="text: endTime"></span>
+                                        <!--<input type="text" class="username" data-bind="value: username, visible: usernameUpdate, hasfocus: usernameUpdate">-->
+                                    </td>
+                                    <td>
+                                        <span data-bind="text: team"></span>
+                                        <!--<input type="text" class="username" data-bind="value: username, visible: usernameUpdate, hasfocus: usernameUpdate">-->
+                                    </td>
+                                    <td data-bind="click: $root.updateBooking"><a href="#">Update</a></td>
+                                    <td data-bind="click: $root.deleteBooking"><a href="#">Delete</a></td>
+                                </tr>
+                            </tbody>
+                        </table>  
+                    </div>
+                </div>
                 <div class="tab-pane fade" id="midtermContent"><p>Midterm stuff</p></div>
                 <div class="tab-pane fade" id="finalContent"><p>Final stuff</p></div>
             </div>

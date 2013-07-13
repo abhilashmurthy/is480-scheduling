@@ -5,7 +5,7 @@ require.config({
     paths: {
         jquery: 'plugins/jquery-2.0.2',
         bootstrap: 'plugins/bootstrap',
-        knockout: 'plugins/knockout',
+        ko: 'plugins/knockout',
         pages: 'app/pages'
     },
     //js dependencies
@@ -38,11 +38,11 @@ require([
         //Initalize
         nav.init();
         login.init();
-        index.init();
 
         //Pages
         createbooking.init();
-        knockoutapp.init();
-    })
+        index.init();
+//        knockoutapp.init();
+    });
 
 });

@@ -1,8 +1,8 @@
 define([
     'jquery',
     'bootstrap',
-    'knockout'
-], function($, bootstrap, knockout) {
+    'ko'
+], function($, bootstrap, ko) {
     return {
         //Initialize function
         init: function(){
