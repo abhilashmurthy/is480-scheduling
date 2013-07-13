@@ -44,10 +44,10 @@
         </action>
 		
 		<action name="createTerm" class="userAction.CreateTermAction" method="execute">
-            <result name="success">/Schedule.jsp</result>
+            <result name="success">/CreateTerm.jsp</result>
         </action>
 		
-		<action name="createSchedule" class="userAction.CreateScheduleAction" method="execute">
+		<action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
             <result name="success">/Schedule.jsp</result>
         </action>
 		
@@ -59,6 +59,9 @@
             <result type="json" />
         </action>
         <action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
+            <result type="json" />
+        </action>
+        <action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
             <result type="json" />
         </action>
     </package>
