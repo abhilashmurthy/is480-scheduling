@@ -30,7 +30,12 @@ public class GetTimeslotsAction extends ActionSupport{
 		Milestone milestone = MilestoneManager.findByName("Acceptance");
 		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(term, milestone);
 		Set<Timeslot> timeslots = activeSchedule.getTimeslots();
+		int counter = 0;
 		for (Timeslot t : timeslots) {
+			counter++;
+			if (counter >= 10) {
+				break;
+			}
 			HashMap<String, String> map = new HashMap<String, String>();
 			Calendar start = Calendar.getInstance();
 			start.setTimeInMillis(t.getStartTime().getTime());

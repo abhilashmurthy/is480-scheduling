@@ -3,20 +3,10 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import model.Team;
-import model.Timeslot;
-import model.TimeslotStatus;
-import model.dao.*;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.*;
 
 /**
  *
@@ -40,24 +30,24 @@ public class ResponseAction extends ActionSupport{
  
         //get TimeSlotStatus based on term and user
 
-        List<TimeslotStatus> ts = TimeslotStatusDAO.findTimeSlotStatusByTermAndUser(termId, userId);
-
-        for(TimeslotStatus t: ts){
-
-            Timeslot timeslotDetails = TimeslotDAO.findByDate(t.getId().getStartTime());
-            
-            //message.add("Team ID: " + timeslotDetails.getTeamId().toString() + " , TimeSlot: " + timeslotDetails.getId().getStartTime());
-			//Retrieving Team Id and Team Name and displaying it
-            if(t.getStatus().toString().equals("PENDING")){
-                BigInteger teamId = timeslotDetails.getTeamId();
-				teamIdInt = teamId.intValue();
-				Team team = TeamDAO.findByTeamId(teamIdInt);
-				teamName = team.getTeamName();
-				//message.add(teamId.toString());
-				message.add(teamName);
-            }
-        }
-        setMessage(message);
+//        List<TimeslotStatus> ts = TimeslotStatusDAO.findTimeSlotStatusByTermAndUser(termId, userId);
+//
+//        for(TimeslotStatus t: ts){
+//
+//            Timeslot timeslotDetails = TimeslotDAO.findByDate(t.getId().getStartTime());
+//            
+//            //message.add("Team ID: " + timeslotDetails.getTeamId().toString() + " , TimeSlot: " + timeslotDetails.getId().getStartTime());
+//			//Retrieving Team Id and Team Name and displaying it
+//            if(t.getStatus().toString().equals("PENDING")){
+//                BigInteger teamId = timeslotDetails.getTeamId();
+//				teamIdInt = teamId.intValue();
+//				Team team = TeamDAO.findByTeamId(teamIdInt);
+//				teamName = team.getTeamName();
+//				//message.add(teamId.toString());
+//				message.add(teamName);
+//            }
+//        }
+//        setMessage(message);
         return SUCCESS;
     }
 
