@@ -31,9 +31,9 @@
 				<select class="nav" name="navList" id="navList">
 					<option value="newBooking">Create Booking</option>
 					<option value="ApproveReject.jsp">Approve/Reject Booking</option>
-					<option value="Schedule.jsp">Create Schedule</option>
-					<option value="KnockoutTest.jsp">Knockout Test</option>
 					<option value="CreateTerm.jsp">Create Term</option>
+					<option value="newSchedule">Create Schedule</option>
+					<option value="KnockoutTest.jsp">Knockout Test</option>
 				</select>
 				
 				<script type="text/javascript">

@@ -22,21 +22,31 @@
         <%@include file="navbar.jsp" %>
         <div class="container page">
             <h3>Create Schedule</h3> <br/>
-			<form action="createSchedule" method="post">
-				<b> Choose Term </b>&nbsp&nbsp;<select name="term" > 
-								<option value="2013,1">2013-2014 Term 1</option>
-								<option value="2013,2">2013-2014 Term 2</option>
-							</select> <br/>
+			
+			<form action="createSchedule" method="post"> 
+				<!-- SECTION: Populating Terms -->
+				<b> Choose Term </b> &nbsp&nbsp; 
+				<s:if test="%{data.size() > 0}">
+					<s:iterator value="data">
+						<select name="term" > 
+							<option value=<s:property value="termId"/>><s:property value="termName"/></option>
+						</select> <br/>
+					</s:iterator>
+				</s:if>	
+
 				<b>Milestone 1: Acceptance</b> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;
 					Start Date <input type="text" class="input-medium datepicker" name="acceptanceStartDate"/> 
    &nbsp&nbsp&nbsp&nbsp; End Date <input type="text" class="input-medium datepicker" name="acceptanceEndDate"/><br/>
+
 				<b>Milestone 2: Midterm</b>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;
 					Start Date <input type="text" class="input-medium datepicker" name="midtermStartDate"/> 
    &nbsp&nbsp&nbsp&nbsp; End Date <input type="text" class="input-medium datepicker" name="midtermEndDate"/><br/>
+
 				<b>Milestone 3: Final</b> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 										  &nbsp&nbsp&nbsp&nbsp;
 					Start Date <input type="text" class="input-medium datepicker" name="finalStartDate"/> 
    &nbsp&nbsp&nbsp&nbsp; End Date <input type="text" class="input-medium datepicker" name="finalEndDate"/><br/>
+
 				<input type="submit" class="btn btn-primary" value="Create"/>
 			</form>
 		</div>

@@ -62,7 +62,6 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
 			logger.error("Error while creating new term");
 			return ERROR;
 		} 
-		
 		return SUCCESS;
 	}
 

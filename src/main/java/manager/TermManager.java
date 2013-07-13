@@ -4,6 +4,7 @@
  */
 package manager;
 
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -45,6 +46,22 @@ public class TermManager {
 			em.close();
 		}
 		return false;
+	}
+	
+	public static List<Term> getAllTerms() {
+		logger.info("Getting all term objects");
+		List<Term> sourceList = null;
+		EntityTransaction transaction = em.getTransaction();
+        try {
+			transaction.begin();
+            Query q = em.createQuery("Select t from Term t");
+            sourceList = q.getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return sourceList;
 	}
 	
 	public static Term findByYearAndSemester (int year, int semester) {
