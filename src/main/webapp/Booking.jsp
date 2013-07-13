@@ -54,7 +54,7 @@
             <!-- SECTION: Timeslot Table -->
             <div>
                 <form action="createBooking" method="post">
-                    Date: <input type="text" class="input-medium" name="date" id="datepicker"/> &nbsp;
+                    Date: <input type="text" class="input-medium datepicker" name="date" /> &nbsp;
                     Start Time:
                     <input type="text" class="input-medium" name="startTime" id="timepicker"/> &nbsp;<br />
                     <select name="termId">
