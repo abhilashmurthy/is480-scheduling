@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import constant.Status;
+import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 
 /**
@@ -30,6 +30,7 @@ public class Timeslot implements Serializable {
 	private Long id;
 	private Timestamp startTime;
 	private Timestamp endTime;
+	@Column(length=100000)
 	private HashMap<User, Status> statusList = new HashMap<User, Status>();
 	private String venue;
 	@ManyToMany

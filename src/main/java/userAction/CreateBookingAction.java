@@ -180,7 +180,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			}
 
 			bookingSlot.setStatusList(statusList);
-			em.persist(bookingSlot);
+			em.merge(bookingSlot);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			//Rolling back database transactions
