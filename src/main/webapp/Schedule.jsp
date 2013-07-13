@@ -18,15 +18,21 @@
         <!--<script type="text/javascript" src="js/plugins/jquery-ui/js/datepicker.js"></script>-->
     </head>
     <body>
+		
         <!-- Navigation -->
         <%@include file="navbar.jsp" %>
         <div class="container page">
             <h3>Create Schedule</h3> <br/>
             <form action="createSchedule" method="post">
-                <b> Choose Term </b>&nbsp&nbsp;<select name="term" > 
-                    <option value="2013,1">2013-2014 Term 1</option>
-                    <option value="2013,2">2013-2014 Term 2</option>
+                <b> Choose Term </b>&nbsp&nbsp;
+				<select name="term" > 
+					<s:if test="%{data.size() > 0}">
+						<s:iterator value="data">
+							<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
+						</s:iterator>
+					</s:if>
                 </select> <br/>
+				
                 <b>Milestone 1: Acceptance</b> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;
                 Start Date <input type="text" class="input-medium datepicker" name="acceptanceStartDate"/> 
                 &nbsp&nbsp&nbsp&nbsp; End Date <input type="text" class="input-medium datepicker" name="acceptanceEndDate"/><br/>
@@ -38,6 +44,7 @@
                 Start Date <input type="text" class="input-medium datepicker" name="finalStartDate"/> 
                 &nbsp&nbsp&nbsp&nbsp; End Date <input type="text" class="input-medium datepicker" name="finalEndDate"/><br/>
                 <input type="submit" class="btn btn-primary" value="Create"/>
+				
             </form>
         </div>
         <%@include file="footer.jsp"%>

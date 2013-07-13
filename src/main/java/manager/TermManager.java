@@ -59,7 +59,7 @@ public class TermManager {
             transaction.commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
-            em.getTransaction().rollback();
+            //em.getTransaction().rollback();
         }
         return sourceList;
 	}

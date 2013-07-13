@@ -35,6 +35,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 		listTerms = TermManager.getAllTerms();
 		if (listTerms != null) {
 			HashMap<String, String> map = new HashMap<String, String>();
+			data = new ArrayList<HashMap<String, String>>();
 			for (Term term: listTerms) {
 				int semester = term.getSemester();  //e.g. 1
 				int year = term.getAcademicYear();  //e.g. 2013
@@ -44,7 +45,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 				//e.g. Term 1
 				String academicTerm = " Term " + Integer.toString(semester);
 				String termName = academicYear + academicTerm;
-				map.put("term", termName);
+				map.put("termName", termName);
 				map.put("termId", Long.toString(termId));
 				
 				data.add(map);
