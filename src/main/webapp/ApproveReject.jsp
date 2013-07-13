@@ -55,7 +55,7 @@
 
 			<!-- SECTION: Approve/Reject Bookings -->
 			<s:if test="%{data.size() > 0}"> 
-				<s:if test="%{teamName != null}">
+				<%--<s:if test="%{teamName != null}"> --%>
 					<table class="table table-hover">
 						<thead>
 							<tr>
@@ -79,14 +79,15 @@
 										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
 										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
 										<input type="hidden" name="teamId" id="teamId" value="<s:property value="teamId"/>"/>
+										<input type="hidden" name="dataList" id="dataList" value=<s:property value="data"/>"/>
 									</form>
 								</tr>
 							</s:iterator>
 						</tbody>
 					</table>
-				</s:if><s:else>
-					<h4>No pending bookings available for Approve/Reject!</h4>
-				</s:else>
+				<%-- </s:if><s:else>
+					<h4>No pending bookings available for Approve/Reject!</h4> 
+				</s:else> --%>
 			</s:if><s:else>
 				<h4>No pending bookings available for Approve/Reject!</h4>
 			</s:else>

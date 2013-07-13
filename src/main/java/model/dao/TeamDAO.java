@@ -51,7 +51,7 @@ public class TeamDAO {
         Query query = session.createQuery("from Team where id = :id ");
         query.setParameter("id", bigIntId);
 		Team team = (Team) query.uniqueResult();
-		session.update(team.getMembers().get(0));
+		//session.update(team.getMembers().get(0));
         session.getTransaction().commit();
         return team;
     }
