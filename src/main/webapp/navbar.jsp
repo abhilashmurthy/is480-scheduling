@@ -21,16 +21,41 @@
             <a class="brand" href="Index.jsp">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
-                    <li id="navHome"><a href="Index.jsp">Home</a></li>
-                    <li id="navBooking"><a href="newBooking">Create Booking</a></li>
-					<li id="navApproveRejectBooking"><a href="ApproveReject.jsp">Approve/Reject Booking</a></li>
-					<li id="navSchedule"><a href="Schedule.jsp">Create Schedule</a></li>
+                    <li class="dropdown">
+                        <a id="bookingDropDown" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="newBooking">Create Booking</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="ApproveReject.jsp">Approve Booking</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a id="scheduleDropDown" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Schedule<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="Schedule.jsp">Create Schedule</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="CreateTerm.jsp">Create Term</a></li>
+                        </ul>
+                    </li>
                     <li id="navKnockout"><a href="KnockoutTest.jsp">Knockout Test</a></li>
-                </ul>
+                </ul> 
+                <!--                <select class="nav" name="navList" id="navList">
+                                        <option value="newBooking">Create Booking</option>
+                                        <option value="ApproveReject.jsp">Approve/Reject Booking</option>
+                                        <option value="Schedule.jsp">Create Schedule</option>
+                                        <option value="KnockoutTest.jsp">Knockout Test</option>
+                                        <option value="CreateTerm.jsp">Create Term</option>
+                                </select>-->
+
+                <script type="text/javascript">
+                    var urlmenu = document.getElementById('navList');
+                    urlmenu.onchange = function() {
+                        window.open(this.options[ this.selectedIndex ].value);
+                    };
+                </script>
+
             </div><!--/.nav-collapse -->
-            
+
             <div class="btn-group userbox">
-                <button class="btn btn-inverse"><%= user.getFullName() + " of Team " + user.getTeam().getTeamName() + "" %></button>
+                <button class="btn btn-inverse"><%= user.getFullName() + " of Team " + user.getTeam().getTeamName() + ""%></button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
@@ -42,3 +67,18 @@
         </div>
     </div>
 </div>
+<script type="text/javascript" src="js/plugins/jquery-2.0.2.js"/>
+<script type="text/javascript">
+    console.log("nav init");
+    //Nav specific
+    $(".dropdown-toggle").on('click', function() {
+        this.dropdown;
+    });
+    $("#logoutLink").on('click', function() {
+        document.location.href = '/is480-scheduling/logout';
+    });
+    $(".nav li").on('click', function() {
+        $(".nav li").removeClass("active");
+        $(this).addClass("active");
+    });
+</script>

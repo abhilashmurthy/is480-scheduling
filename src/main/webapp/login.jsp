@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf-8">
         <title>IS480 Scheduling System | Login</title>
-        <script data-main="js/app/main" src="js/plugins/require.js"></script>
 
         <!-- Le styles -->
         <link href="css/bootstrap.css" rel="stylesheet">
@@ -58,12 +57,12 @@
                 text-align: center;
                 font-size: 16px;
             }
-            
+
             .loadingContainer {
                 padding-top: 60px;
                 text-align: center;
             }
-            
+
             .loadingContainer p {
                 font-weight: 500;
                 font-size: 14px;
@@ -103,5 +102,22 @@
             <div class="loadingContainer">
             </div>
         </div>
+        <%@include file="footer.jsp"%>
+        <script type="text/javascript">
+            console.log("login init");
+            function blink(selector) {
+                $(selector).fadeOut('slow', function() {
+                    $(this).fadeIn('slow', function() {
+                        blink(this);
+                    });
+                });
+            }
+
+            $("#ssoBtn").on('click', function() {
+                $(this).button('loading');
+                //blink(this);
+                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
+            });
+        </script>
     </body>
 </html>

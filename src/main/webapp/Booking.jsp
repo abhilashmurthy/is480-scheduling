@@ -70,6 +70,18 @@
                 </form>
             </div>
         </div>
+        <%@include file="footer.jsp"%>
+        <script type="text/javascript">
+            $(".datepicker").datepicker({
+                beforeShowDay: $.datepicker.noWeekends,
+                dateFormat: "yy-mm-dd"
+            });
 
+            $("#timepicker").timepicker({
+                timeFormat: 'H:i:s',
+                minTime: '9:00am',
+                maxTime: '18:00pm'
+            });
+        </script>
     </body>
 </html>
