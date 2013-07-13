@@ -24,6 +24,7 @@
                     <li id="navHome"><a href="Index.jsp">Home</a></li>
                     <li id="navBooking"><a href="newBooking">Create Booking</a></li>
 					<li id="navApproveRejectBooking"><a href="ApproveReject.jsp">Approve/Reject Booking</a></li>
+					<li id="navSchedule"><a href="Schedule.jsp">Create Schedule</a></li>
                     <li id="navKnockout"><a href="KnockoutTest.jsp">Knockout Test</a></li>
                 </ul>
             </div><!--/.nav-collapse -->

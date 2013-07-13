@@ -7,16 +7,15 @@ define([
     return {
         //Initialize function
         init: function() {
-            console.log("createbooking init");
-            $("#datepicker").datepicker({
+            $(".datepicker").datepicker({
                 beforeShowDay: $.datepicker.noWeekends,
                 dateFormat: "yy-mm-dd"
             });
 
             $("#timepicker").timepicker({
+				timeFormat: 'H:i:s',
 				minTime: '9:00am',
-				maxTime: '6:00pm',
-				timeFormat: 'H:i:s'
+				maxTime: '18:00pm'
 			});
         }
     };
