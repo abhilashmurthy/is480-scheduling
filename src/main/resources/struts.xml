@@ -26,14 +26,14 @@
             <result name="success">/Test.jsp</result>
         </action>
         
-        <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
+<!--        <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
             <result name = "success">/Index.jsp</result>
         </action>
 		
 		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
             <result name="success">/Booking.jsp</result>
 			<param name="timeslots"></param>
-        </action>
+        </action> -->
        
         <action name="approveReject" class="userAction.ResponseAction" method="execute">
             <result name="success">/ApproveReject.jsp</result>
@@ -53,7 +53,7 @@
 		
     </package>
 
-    <!-- Add packages here -->
+    <!-- JSON Package -->
     <package name="json" namespace="/" extends="json-default">
         <action name="knockout" class="userAction.KnockoutAction" method="execute">
             <result type="json" />
