@@ -7,7 +7,7 @@ define([
     return {
         //Initialize function
         init: function() {
-            $("#datepicker").datepicker({
+            $(".datepicker").datepicker({
                 beforeShowDay: $.datepicker.noWeekends,
                 dateFormat: "yy-mm-dd"
             });

@@ -18,6 +18,6 @@
 <% logger.info("Reached imports"); %>
 <% User user = (User) session.getAttribute("user");
 if (session.getAttribute("user") == null) {
-    response.sendRedirect("login.jsp");
-    return;
-}%>
+	response.sendRedirect("login.jsp");
+	return; 
+}%> 

@@ -7,7 +7,10 @@ package model.dao;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.List;
 import model.Term;
+import model.User;
+import static model.dao.UserDAO.session;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -47,6 +50,14 @@ public class TermDAO {
         logger.info("Deleted term " + term.getId());
     }
     
+	public static List<Term> getAllTerms() {
+        session.beginTransaction();
+        Query query = session.createQuery("from Term");
+        List<Term> terms = (List<Term>) query.list();
+        session.getTransaction().commit();
+        return terms;
+    }
+	
     public static Term findByYearAndTerm(int yearInt, int termInt) {
         session.beginTransaction();
 		Calendar calYear = Calendar.getInstance();

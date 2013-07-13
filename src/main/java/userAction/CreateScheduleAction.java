@@ -4,12 +4,17 @@
  */
 package userAction;
 
+import static com.opensymphony.xwork2.Action.ERROR;
+import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import static userAction.ResponseAction.logger;
 
 /**
  *
- * @author User
+ * @author Prakhar
  */
 public class CreateScheduleAction extends ActionSupport{
-    
+    private String term;
+	private String acceptanceDates;
+	
 }
