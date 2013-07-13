@@ -16,7 +16,7 @@ import model.dao.TermDAO;
  */
 public class MiscUtil {
 	
-	/*
+	/**
 	 * Get the current/next active term based on today's date
 	 * Cutoff dates:
 	 * 15-May and 20-Dec
