@@ -6,9 +6,6 @@
     <head>
         <meta charset="utf-8">
         <title>IS480 Scheduling System | Error</title>
-
-        <link href="css/app.css" rel="stylesheet">
-        <link href="css/bootstrap.css" rel="stylesheet" media="screen">
         
         
         <% // if (request.getAttribute("error") == null) {response.sendRedirect("Index.jsp");} %>
