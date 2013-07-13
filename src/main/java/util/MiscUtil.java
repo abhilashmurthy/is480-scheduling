@@ -9,8 +9,6 @@ import manager.ScheduleManager;
 import manager.TermManager;
 import model.Schedule;
 import model.Term;
-import model.dao.ScheduleDAO;
-import model.dao.TermDAO;
 
 /**
  * Utility class to put miscellaneous code
@@ -26,11 +24,11 @@ public class MiscUtil {
 	public static Term getActiveTerm() {
 		int year, semester;
 		Calendar now = Calendar.getInstance();
+		
 		if (now.get(Calendar.MONTH) <= Calendar.MAY && now.get(Calendar.DATE) <= 15) {
 			year = now.get(Calendar.YEAR) - 1;
 			semester = 2;
-		} else if ((now.get(Calendar.MONTH) >= Calendar.MAY && now.get(Calendar.DATE) > 15)
-				&& (now.get(Calendar.MONTH) <= Calendar.DECEMBER && now.get(Calendar.DATE) <= 20)) {
+		} else if (now.get(Calendar.MONTH) <= Calendar.DECEMBER && now.get(Calendar.DATE) <= 20) {
 			year = now.get(Calendar.YEAR);
 			semester = 1;
 		} else {
@@ -43,6 +41,6 @@ public class MiscUtil {
 	
 	public static Schedule getActiveSchedule() {
 		Term activeTerm = getActiveTerm();
-		return ScheduleManager.findByTermAndMilestone(activeTerm, null);
+		return ScheduleManager.findActiveByTerm(activeTerm);
 	}
 }

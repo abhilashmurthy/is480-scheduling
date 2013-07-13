@@ -108,8 +108,32 @@ public class DBInitUtil {
 		}
 		acceptance12013.setTimeslots(timeslots);
 		
+		Schedule midterm12013 = new Schedule();
+		midterm12013.setTerm(term12013);
+		midterm12013.setMilestone(midterm);
+		midterm12013.setStartDate(new Timestamp(2013 - 1900, 9, 19, 0, 0, 0, 0));
+		midterm12013.setEndDate(new Timestamp(2013 - 1900, 10, 30, 0, 0, 0, 0));
+		HashSet<Timeslot> midtermTimeslots = new HashSet<Timeslot>();
+		for (int a = 19; a <= 30; a++) {
+			// Skipping weekends
+			if (a == 21 || a == 22 || a == 28 || a == 29) {
+				continue;
+			}
+			
+			for (int b = 9; b <= 18; b++) {
+				Timeslot t = new Timeslot();
+				t.setStartTime(new Timestamp(2013 - 1900, 7, a, b, 0, 0, 0));
+				t.setEndTime(new Timestamp(2013 - 1900, 7, a, b + 1, 0, 0, 0));
+				t.setVenue("SIS Seminar Room 2-1");
+				em.persist(t);
+				midtermTimeslots.add(t);
+			}	
+		}
+		midterm12013.setTimeslots(midtermTimeslots);
+		
 		// Persistence
 		em.persist(acceptance12013);
+		em.persist(midterm12013);
 		logger.info("Schedule and timeslots persisted");
 		
 		/*
