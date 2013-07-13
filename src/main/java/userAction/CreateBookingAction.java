@@ -39,8 +39,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 	private String termId;
 	private String milestoneStr;
 	private HttpServletRequest request;
-	private String json;
-	private HashMap<String, Object> jsonMap = new HashMap<String, Object>();
+	private HashMap<String, Object> json = new HashMap<String, Object>();
 	static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
 
 	@Override
@@ -55,7 +54,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			request.setAttribute("error", "Doesn't look like you're part of any team."
 					+ " Can't let you make a booking!");
 			logger.error("User's team information not found");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "Doesn't look like you're part of any team."
+					+ " Can't let you make a booking!");
+			return SUCCESS;
 		}
 
 		//Validating milestone info
@@ -63,7 +65,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		if (milestone == null) {
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Milestone not found");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+			return SUCCESS;
 		}
 
 		//Retreiving the term
@@ -78,7 +82,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		} catch (Exception e) {
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Term not found");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+			return SUCCESS;
 		}
 
 
@@ -87,7 +93,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		if (schedule == null || schedule.getTimeslots() == null) {
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Schedule not found");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+			return SUCCESS;
 		}
 		Set<Timeslot> timeslots = schedule.getTimeslots();
 
@@ -97,7 +105,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 				request.setAttribute("error", "Seems like you already have a booking for this milestone."
 						+ " Can't let you make a booking!");
 				logger.error("Team's already booked a timeslot for the milestone this term");
-				return ERROR;
+				json.put("success", false);
+				json.put("message", "Seems like you already have a booking for this milestone."
+						+ " Can't let you make a booking!");
+				return SUCCESS;
 			}
 		}
 
@@ -109,7 +120,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		} catch (IllegalArgumentException e) {
 			request.setAttribute("error", "Date information not entered correctly. Please try again!");
 			logger.error("Start time could not be parsed");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "Date information not entered correctly. Please try again!");
+			return SUCCESS;
 		}
 		Timeslot bookingSlot = null;
 		for (Timeslot t : timeslots) {
@@ -125,7 +138,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			request.setAttribute("error", "We can't find the timeslot you're trying to book."
 					+ " Please check the details entered!");
 			logger.error("Chosen timeslot not found");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "We can't find the timeslot you're trying to book."
+					+ " Please check the details entered!");
+			return SUCCESS;
 		}
 
 		//Check if the timeslot is free
@@ -133,12 +149,15 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			request.setAttribute("error", "Oops. This timeslot is already taken."
 					+ " Please book another slot!");
 			logger.error("Chosen timeslot already booked");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "Oops. This timeslot is already taken."
+					+ " Please book another slot!");
+			return SUCCESS;
 		}
 
 		//All conditions met. Begin persistence transactions
 		EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
-		try {	
+		try {
 			em.getTransaction().begin();
 
 			//Assign timeslot to team
@@ -159,7 +178,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 				logger.error("FATAL ERROR: Code not to be reached!");
 				throw new Exception();
 			}
-			
+
 			bookingSlot.setStatusList(statusList);
 			em.persist(bookingSlot);
 			em.getTransaction().commit();
@@ -168,10 +187,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			em.getTransaction().rollback();
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("FATAL ERROR: Database Write Error. Code not to be reached!");
-			return ERROR;
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+			return SUCCESS;
 		}
 
-
+		json.put("success", true);
+		json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees. (Coming soon..)");
+		
 		return SUCCESS;
 	}
 
@@ -214,12 +237,12 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 	public void setMilestoneStr(String milestoneStr) {
 		this.milestoneStr = milestoneStr;
 	}
-
-	public String getJson() {
+	
+	public HashMap<String, Object> getJson() {
 		return json;
 	}
 
-	public void setJson(String json) {
+	public void setJson(HashMap<String, Object> json) {
 		this.json = json;
 	}
 	

@@ -62,10 +62,9 @@
 			<result type="json" />
 		</action>
 		<action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
-			<param name="root">
-				json
-			</param>
-			<result type="json" />
+			<result type="json">
+				<param name="root">json</param>
+			</result>
 		</action>
 		<action name="createTermJson" class="userAction.CreateTermAction" method="execute">
 			<result type="json" />

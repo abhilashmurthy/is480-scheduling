@@ -21,7 +21,7 @@
 
             <!-- SECTION: Timeslot Table -->
             <div>
-                <form id="createBookingForm" method="post">
+                <form id="createBookingForm">
                     Date: <input type="text" class="input-medium datepicker" name="date" /> &nbsp;
                     Start Time:
                     <input type="text" class="input-medium" name="startTime" id="timepicker"/> &nbsp;<br />
@@ -37,31 +37,48 @@
                     <input type="submit" class="btn btn-primary" value="Create"/>
                 </form>
             </div>
+			<!-- SECTION: Response Banner -->
+			<div id="responseBanner" class="alert" hidden>
+				<span id="responseMessage" style="font-weight: bold"></span>
+			</div>
         </div>
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-            $(".datepicker").datepicker({
-                beforeShowDay: $.datepicker.noWeekends,
-                dateFormat: "yy-mm-dd"
-            });
+			$(".datepicker").datepicker({
+				beforeShowDay: $.datepicker.noWeekends,
+				dateFormat: "yy-mm-dd"
+			});
 
-            $("#timepicker").timepicker({
-                timeFormat: 'H:i:s',
-                minTime: '9:00am',
-                maxTime: '18:00pm'
-            });
-			$("#createBookingForm").bind('submit', function(){
+			$("#timepicker").timepicker({
+				timeFormat: 'H:i:s',
+				minTime: '9:00am',
+				maxTime: '18:00pm'
+			});
+			$("#createBookingForm").bind('submit', function() {
+				console.log("Submit function called");
 				var formData = $("#createBookingForm").serialize();
 				$.ajax({
-					type : 'GET',
-					url : 'createBookingJson',
-					data : formData,
-					dataType : 'json'
+					type: 'GET',
+					url: 'createBookingJson',
+					data: formData,
+					dataType: 'json'
 				}).done(function(response) {
-					
+					console.log(response);
+					$("#responseBanner").show();
+					if (response.success) {
+						$("#responseBanner").removeClass("alert-error").addClass("alert-success");
+						$("#responseMessage").text(response.message);
+					} else {
+						$("#responseBanner").removeClass("alert-success").addClass("alert-error");
+						$("#responseMessage").text(response.message);
+					}
 				}).fail(function(response) {
-					
+					console.log(response);
+					$("#responseBanner").show();
+					$("#responseBanner").removeClass("alert-success").addClass("alert-error");
+					$("#responseMessage").text("Oops. Something went wrong. Please try again!");
 				});
+				return false;
 			});
         </script>
     </body>
