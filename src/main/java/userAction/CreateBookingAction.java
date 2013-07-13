@@ -4,13 +4,20 @@
  */
 package userAction;
 
-import static com.opensymphony.xwork2.Action.ERROR;
+import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Status;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import manager.MilestoneManager;
+import manager.ScheduleManager;
+import manager.TermManager;
+import model.Milestone;
 import model.Schedule;
 import model.Team;
 import model.Term;
@@ -19,16 +26,6 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import constant.Status;
-import java.util.HashMap;
-import java.util.Set;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import manager.MilestoneManager;
-import manager.ScheduleManager;
-import manager.TermManager;
-import model.Milestone;
 
 /**
  *
@@ -42,6 +39,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 	private String termId;
 	private String milestoneStr;
 	private HttpServletRequest request;
+	private String json;
+	private HashMap<String, Object> jsonMap = new HashMap<String, Object>();
 	static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
 
 	@Override
@@ -216,6 +215,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		this.milestoneStr = milestoneStr;
 	}
 
+	public String getJson() {
+		return json;
+	}
+
+	public void setJson(String json) {
+		this.json = json;
+	}
+	
 	public void setServletRequest(HttpServletRequest hsr) {
 		request = hsr;
 	}

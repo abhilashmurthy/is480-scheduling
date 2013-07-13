@@ -34,7 +34,7 @@
                         <option value="midterm">Midterm</option>
                         <option value="final">Final</option>
                     </select> <br /> <br />
-                    <input id="createBookingFormBtn" type="submit" class="btn btn-primary" value="Create"/>
+                    <input type="submit" class="btn btn-primary" value="Create"/>
                 </form>
             </div>
         </div>
@@ -50,9 +50,18 @@
                 minTime: '9:00am',
                 maxTime: '18:00pm'
             });
-			$("#createBookingFormBtn").bind('click', function(){
+			$("#createBookingForm").bind('submit', function(){
 				var formData = $("#createBookingForm").serialize();
-				alert(formData);
+				$.ajax({
+					type : 'GET',
+					url : 'createBookingJson',
+					data : formData,
+					dataType : 'json'
+				}).done(function(response) {
+					
+				}).fail(function(response) {
+					
+				});
 			});
         </script>
     </body>
