@@ -17,6 +17,7 @@
         <title>Create Term</title>
     </head>
     <body>
+        <!-- Navbar -->
         <%@include file="navbar.jsp" %>
         <div class="container">
         <h3>Create Term</h3>
