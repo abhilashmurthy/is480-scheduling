@@ -25,7 +25,7 @@ import userAction.CreateBookingAction;
  */
 public class GetTermsAction extends ActionSupport implements ServletRequestAware{
 	private List<Term> listTerms;
-	private ArrayList<HashMap<String, String>> data;
+	private List<HashMap<String, String>> dataList;
 	private HttpServletRequest request;
 	static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
 	
@@ -34,9 +34,10 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 		//Getting all the term objects
 		listTerms = TermManager.getAllTerms();
 		if (listTerms != null) {
-			HashMap<String, String> map = new HashMap<String, String>();
-			data = new ArrayList<HashMap<String, String>>();
+			dataList = new ArrayList<HashMap<String, String>>();
+			HashMap<String, String> map = null;
 			for (Term term: listTerms) {
+				map = new HashMap<String, String>();
 				int semester = term.getSemester();  //e.g. 1
 				int year = term.getAcademicYear();  //e.g. 2013
 				long termId = term.getId();
@@ -48,7 +49,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 				map.put("termName", termName);
 				map.put("termId", Long.toString(termId));
 				
-				data.add(map);
+				dataList.add(map);
 			}
 		} else {
 			request.setAttribute("error", "You cannot create a schedule right now. Please create a term first!");
@@ -58,12 +59,12 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 		return SUCCESS;
 	}
 
-	public ArrayList<HashMap<String, String>> getData() {
-		return data;
+	public List<HashMap<String, String>> getDataList() {
+		return dataList;
 	}
 	
-	public void setData(ArrayList<HashMap<String, String>> data) {
-		this.data = data;
+	public void setDataList(ArrayList<HashMap<String, String>> dataList) {
+		this.dataList = dataList;
 	}
 	
 	public void setServletRequest(HttpServletRequest hsr) {
