@@ -23,14 +23,14 @@
                 <ul class="nav">
                     <li id="navHome"><a href="Index.jsp">Home</a></li>
                     <li id="navBooking"><a href="newBooking">Create Booking</a></li>
-					<li id="navApproveRejectBooking"><a href="ApproveReject.jsp">Approve/Reject Booking</a></li>
-					<li id="navSchedule"><a href="Schedule.jsp">Create Schedule</a></li>
+                    <li id="navApproveRejectBooking"><a href="ApproveReject.jsp">Approve/Reject Booking</a></li>
+                    <li id="navSchedule"><a href="Schedule.jsp">Create Schedule</a></li>
                     <li id="navKnockout"><a href="KnockoutTest.jsp">Knockout Test</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
-            
+
             <div class="btn-group userbox">
-                <button class="btn btn-inverse"><%= user.getFullName() + " of Team " + user.getTeam().getTeamName() + "" %></button>
+                <button class="btn btn-inverse"><%= user.getFullName() + " of Team " + user.getTeam().getTeamName() + ""%></button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
@@ -42,3 +42,18 @@
         </div>
     </div>
 </div>
+<script type="text/javascript" src="js/plugins/jquery-2.0.2.js"/>
+<script type="text/javascript">
+    console.log("nav init");
+    //Nav specific
+    $(".dropdown-toggle").on('click', function() {
+        this.dropdown;
+    });
+    $("#logoutLink").on('click', function() {
+        document.location.href = '/is480-scheduling/logout';
+    });
+    $(".nav li").on('click', function() {
+        $(".nav li").removeClass("active");
+        $(this).addClass("active");
+    });
+</script>

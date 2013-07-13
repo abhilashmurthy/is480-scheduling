@@ -55,8 +55,6 @@
 
         </style>
 
-        <script data-main="js/app/main" src="js/plugins/require.js"></script>
-
     </head>
     <body>
 
@@ -82,5 +80,6 @@
                 </div>
             </div>
         </div> <!-- /container -->
+        <%@include file="footer.jsp"%>
     </body>
 </html>
