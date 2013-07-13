@@ -6,14 +6,10 @@
 
 <%@page import="com.opensymphony.xwork2.ActionContext"%>
 <%@page import="com.opensymphony.xwork2.util.ValueStack"%>
-<%@page import="model.dao.TimeslotStatusDAO"%>
-<%@page import="model.dao.TimeslotDAO"%>
-<%@page import="util.Milestone"%>
 <%@page import="model.*"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page contentType="text/html" pageEncoding="windows-1252"%>
-<%@page import="model.dao.ScheduleDAO"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <!DOCTYPE html>
 <html>
