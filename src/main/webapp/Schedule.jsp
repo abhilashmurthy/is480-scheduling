@@ -25,9 +25,9 @@
             <h3>Create Schedule</h3> <br/>
             <form action="createSchedule" method="post">
                 <b> Choose Term </b>&nbsp&nbsp;
-				<select name="term" > 
-					<s:if test="%{data.size() > 0}">
-						<s:iterator value="data">
+				<select name="termId" > 
+					<s:if test="%{dataList.size() > 0}">
+						<s:iterator value="dataList">
 							<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
 						</s:iterator>
 					</s:if>
