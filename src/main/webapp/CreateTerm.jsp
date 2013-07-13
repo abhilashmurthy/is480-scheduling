@@ -17,29 +17,31 @@
         <title>Create Term</title>
     </head>
     <body>
+        <!-- Navbar -->
         <%@include file="navbar.jsp" %>
         <div class="container">
-        <h3>Create Term</h3>
-        <form action="createTerm" method="post">
-			<!-- Putting default values for testing purposes -->
-            Choose Year <select name="year"> 
-							<option value="2013">2013-2014</option>
-							<option value="2014">2014-2015</option>
-							<option value="2014">2015-2016</option>
-							<option value="2014">2016-2017</option>
-							<option value="2014">2017-2018</option>
-							<option value="2014">2018-2019</option>
-							<option value="2014">2019-2020</option>
-							<option value="2014">2020-2021</option>
-							<option value="2014">2021-2022</option>
-							<option value="2014">2022-2023</option>
-						</select> <br/>
-            Choose Semester <select name="semester"/> 
-								<option value="1">Semester 1</option>
-								<option value="2">Semester 2</option>
-							</select> <br/>
-			<input type="submit" class="btn btn-primary" value="Create"/>
-        </form>
-	</div>
-</body>
+            <h3>Create Term</h3>
+            <form action="createTerm" method="post">
+                <!-- Putting default values for testing purposes -->
+                Choose Year <select name="year"> 
+                    <option value="2013">2013-2014</option>
+                    <option value="2014">2014-2015</option>
+                    <option value="2014">2015-2016</option>
+                    <option value="2014">2016-2017</option>
+                    <option value="2014">2017-2018</option>
+                    <option value="2014">2018-2019</option>
+                    <option value="2014">2019-2020</option>
+                    <option value="2014">2020-2021</option>
+                    <option value="2014">2021-2022</option>
+                    <option value="2014">2022-2023</option>
+                </select> <br/>
+                Choose Semester <select name="semester"/> 
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                </select> <br/>
+                <input type="submit" class="btn btn-primary" value="Create"/>
+            </form>
+        </div>
+        <%@include file="footer.jsp"%>
+    </body>
 </html>
