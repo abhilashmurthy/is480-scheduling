@@ -78,12 +78,4 @@ public class MailUtil {
 		
 		return result.toString();
 	}
-	
-	public static void main(String[] args) {
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("sureshs.592@gmail.com");
-		list.add("abhilashm.2010@sis.smu.edu.sg");
-		list.add("prakhara.2010@sis.smu.edu.sg");
-		sendEmail(list, "Multi User Test", "Testing to see if an email can be sent to multiple recipients.");
-	}
 }
