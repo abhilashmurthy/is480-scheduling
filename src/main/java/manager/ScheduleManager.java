@@ -8,7 +8,9 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import model.Milestone;
 import model.Schedule;
@@ -78,4 +80,44 @@ public class ScheduleManager {
 		return result;
 	}
 	
+	 public static boolean save(List<Schedule> scheduleList, EntityTransaction transaction) {
+        logger.info("Creating new schedule");
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+			for (Schedule schedule: scheduleList) {
+				em.persist(schedule);
+			}
+            transaction.commit();
+            return true;
+        } catch (PersistenceException ex) {
+            //Rolling back data transactions
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            logger.error("Error making database call for Create Schedule");
+            ex.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return false;
+    }
+	 
+	public static List<Schedule> getAllSchedules() {
+	   logger.info("Getting all schedule objects");
+	   List<Schedule> sourceList = null;
+	   EntityTransaction transaction = em.getTransaction();
+	   try {
+		   transaction.begin();
+		   Query q = em.createQuery("Select s from Schedule s");
+		   sourceList = q.getResultList();
+		   transaction.commit();
+		   return sourceList;
+	   } catch (Exception e) {
+		   logger.error("Database Operation Error");
+		   e.printStackTrace();
+	   }
+	   return null;
+   }
 }

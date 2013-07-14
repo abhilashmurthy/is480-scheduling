@@ -95,7 +95,7 @@
                     <table>
                         <th>Milestone</th><th>Start Date</th><th>End Date</th>
                         <tr>
-                            <td class="formLabelTd">Accceptance</td>
+                            <td class="formLabelTd">Acceptance</td>
                             <td><input type="text" class="input-medium datepicker" name="acceptanceStartDate"/></td>
                             <td><input type="text" class="input-medium datepicker" name="acceptanceEndDate"/></td>
                         </tr>
