@@ -6,3 +6,5 @@
 <script type="text/javascript" src="js/plugins/jquery.timepicker.min.js"></script>
 <!-- Bootstrap -->
 <script type="text/javascript" src="js/plugins/bootstrap.js"></script>
+<!-- DateJS -->
+<script type="text/javascript" src="js/plugins/date.js"></script>

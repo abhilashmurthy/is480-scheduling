@@ -35,7 +35,7 @@
                             <li role="presentation"><a role="menuitem" tabindex="-1" href="CreateTerm.jsp">Create Term</a></li>
                         </ul>
                     </li>
-                    <!--<li id="navKnockout"><a href="KnockoutTest.jsp">Knockout Test</a></li>-->
+                    <li id="navKnockout"><a href="timeslots.jsp">Timeslot Test</a></li>
                 </ul>
             </div>
 
