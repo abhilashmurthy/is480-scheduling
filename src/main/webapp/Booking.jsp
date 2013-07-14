@@ -34,7 +34,7 @@
                         <option value="midterm">Midterm</option>
                         <option value="final">Final</option>
                     </select> <br /> <br />
-                    <input type="submit" class="btn btn-primary" value="Create"/>
+                    <input id="createBookingFormBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Waiting..."/>
                 </form>
             </div>
 			<!-- SECTION: Response Banner -->
@@ -55,6 +55,7 @@
 				maxTime: '18:00pm'
 			});
 			$("#createBookingForm").bind('submit', function() {
+				$("#createBookingFormBtn").button('loading');
 				console.log("Submit function called");
 				var formData = $("#createBookingForm").serialize();
 				$.ajax({
@@ -63,6 +64,7 @@
 					data: formData,
 					dataType: 'json'
 				}).done(function(response) {
+					$("#createBookingFormBtn").button('reset');
 					console.log(response);
 					$("#responseBanner").show();
 					if (response.success) {
@@ -73,6 +75,7 @@
 						$("#responseMessage").text(response.message);
 					}
 				}).fail(function(response) {
+					$("#createBookingFormBtn").button('reset');
 					console.log(response);
 					$("#responseBanner").show();
 					$("#responseBanner").removeClass("alert-success").addClass("alert-error");
