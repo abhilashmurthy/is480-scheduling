@@ -40,6 +40,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 	private String milestoneStr;
 	private HttpServletRequest request;
 	private HashMap<String, Object> json = new HashMap<String, Object>();
+
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
 	static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
 
 	@Override

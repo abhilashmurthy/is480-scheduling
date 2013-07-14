@@ -7,7 +7,7 @@
         <!-- Le styles -->
         <link href="css/bootstrap.css" rel="stylesheet">
         <% if (session.getAttribute("user") != null) {
-                response.sendRedirect("Index.jsp");
+                response.sendRedirect("index.jsp");
             }%>
 
         <style type="text/css">

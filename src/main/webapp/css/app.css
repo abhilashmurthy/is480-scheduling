@@ -9,6 +9,7 @@
 body {
     padding-top: 60px; /* 1px to make the container go all the way to the bottom of the topbar */
     padding-left: 10px;
+    /*font: 0.7em/1.5em "Trebuchet MS",Verdana,sans-serif !important;*/
 }
 
 .navbar .container {
@@ -46,4 +47,23 @@ body {
     height:1px;
     background:#717171;
     border-bottom:1px solid #313030;
+}
+
+/* Datepicker */
+#ui-datepicker-div{
+    font: 14px "Trebuchet MS",Verdana,sans-serif !important;
+}
+
+.ui-datepicker .ui-datepicker-calendar .ui-state-highlight a {
+	background: #1771E8 none;
+	color: white !important;
+}
+
+.ui-datepicker-today a {
+    background: #00134F none !important;
+    color: white !important;
+}
+
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
+    border: 1px solid #016CFF !important;
 }

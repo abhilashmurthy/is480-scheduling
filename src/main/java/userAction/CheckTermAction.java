@@ -20,7 +20,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
  *
  * @author Prakhar
  */
-public class CreateTermAction extends ActionSupport implements ServletRequestAware {
+public class CheckTermAction extends ActionSupport implements ServletRequestAware {
 
     private int year;    private int semester;
     private boolean canAdd;

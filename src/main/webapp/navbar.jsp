@@ -18,21 +18,21 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="Index.jsp">IS480 Scheduling</a>
+            <a class="brand" href="index.jsp">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
                     <li class="dropdown">
                         <a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="Booking.jsp">Create Booking</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="ApproveReject.jsp">Approve Booking</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="booking.jsp">Create Booking</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="approvereject.jsp">Approve Booking</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
                         <a id="scheduleDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Schedule<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
                             <li role="presentation"><a role="menuitem" tabindex="-1" href="newSchedule">Create Schedule</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="CreateTerm.jsp">Create Term</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="createterm.jsp">Create Term</a></li>
                         </ul>
                     </li>
                     <li id="navKnockout"><a href="timeslots.jsp">Timeslot Test</a></li>
