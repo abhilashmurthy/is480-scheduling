@@ -177,34 +177,29 @@
             /*----------------------------------------
             CREATE SCHEDULE
             ------------------------------------------*/
+            
+            /* Datepicker validation */
+            $(".datepicker").multiDatesPicker({
+                dateFormat: "yy-mm-dd"
+            });
+            
+            $("#midtermDatePicker").on('focus', function(){
+                //Enable only if acceptance has values
+               if ($("#acceptanceDatePicker").val()) {
+                    var acceptanceDates = $("#acceptanceDatePicker").multiDatesPicker('getDates');
+                    var lastAcceptanceDate = acceptanceDates[acceptanceDates.length - 1];
+                    $(this).multiDatesPicker({
+//                       minDate: new Date(lastAcceptanceDate).toDateString()
+                    });
+               }
+            });
 
             //Create Schedule AJAX Call
             $("#createScheduleForm").on('submit', function() {
                 displayCreateTimeslots();
                 return false;
-//                var formData = $("#createScheduleForm").serializeArray();
-//                $.ajax({
-//                    type: 'GET',
-//                    url: 'checkScheduleJson',
-//                    data: formData,
-//                    dataType: 'json'
-//                }).done(function(response) {
-//                    //Look at create term for example
-//
-//                }).fail(function(error) {
-//                    console.log("Create Schedule Form AJAX Fail");
-//                });
-//                return false;
             });
             
-            
-//            $("#createScheduleSubmitBtn").on('click', function(){
-//                
-//            });
-
-            $(".datepicker").multiDatesPicker({
-                dateFormat: "yy-mm-dd"
-            });
             
             function displayCreateTimeslots() {
                 //Display Create Schedule
@@ -249,6 +244,14 @@
                     makeCheckboxTable("finalTimeslotsTable", finalDates);
                 }
                 
+                $("#timeslotsForm").on('submit', function(){
+                    var scheduleData = $("#createScheduleForm").serializeArray();
+                    var timeslotsData = $(this).serializeArray();
+                    var finalData = $.merge(scheduleData, timeslotsData);
+                    console.log('Final serialized: ' + JSON.stringify(finalData));
+                    return false;
+                });
+                
                 function makeCheckboxTable(tableId, dateArray) {
                     //Append checkbox header names
                     var headerString = "<thead><tr><td></td>";
@@ -274,7 +277,7 @@
                         htmlString += "<td id='timeColumn'>" + time + "</td>";
                         for (i = 0; i < dateArray.length; i++) {
                             var date = dateArray[i].toString('dd-MMM-yyyy');
-                            htmlString += "<td><input class='chkBox_" + tableId + "_" + date + "' id='chk_" + tableId + "_" + date + "_" + time.replace(/:/g, '-') +"' type='checkbox' checked name='chkBox_" + tableId +"' value='" + date + " " + time +"' /></td>";
+                            htmlString += "<td><input class='chkBox_" + tableId + "_" + date + "' id='chk_" + tableId + "_" + date + "_" + time.replace(/:/g, '-') +"' type='checkbox' checked name='timeslot_" + tableId +"' value='" + date + " " + time +"' /></td>";
                         }
                         htmlString += "</tr>";
                         $("#" + tableId).append(htmlString);
@@ -297,12 +300,6 @@
                 }
                 
             }
-            
-            //Validation and shit
-//            $("#acceptanceDatePicker").on('blur', function(){
-//                var acceptanceDates = $(this).multiDatesPicker('getDates');
-//                var lastDate = acceptanceDates[acceptanceDates.length - 1];
-//            });
 
         });
     </script>
