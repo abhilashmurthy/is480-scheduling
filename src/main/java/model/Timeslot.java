@@ -30,7 +30,7 @@ public class Timeslot implements Serializable {
 	private Long id;
 	private Timestamp startTime;
 	private Timestamp endTime;
-	@Column(length=100000)
+	@Column(length=19000000)
 	private HashMap<User, Status> statusList = new HashMap<User, Status>();
 	private String venue;
 	@ManyToMany
