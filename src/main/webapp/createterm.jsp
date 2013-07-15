@@ -270,7 +270,8 @@
                     var termData = $("#createTermForm").serializeArray();
                     var scheduleData = $("#createScheduleForm").serializeArray();
                     var timeslotsData = $(this).serializeArray();
-                    var finalData = $.extend(termData, scheduleData, timeslotsData);
+                    var finalData = $.merge(termData, scheduleData);
+                    finalData = $.merge(finalData, timeslotsData);
                     console.log('\n\nData to be sent to the server: ' + JSON.stringify(finalData));
                     return false;
                 });
