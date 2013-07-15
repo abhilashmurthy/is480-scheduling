@@ -101,14 +101,14 @@
         <div class="line-separator"></div>
         
         <!-- Create Schedule -->
-        <div id="createSchedulePanel">
+        <div id="createSchedulePanel" hidden>
             <%@include file="createterm_createschedule.jsp" %>
         </div>
         
         <div class="line-separator"></div>
         
         <!-- Create Timeslots -->
-        <div id="createTimeslotsPanel">
+        <div id="createTimeslotsPanel" hidden>
             <%@include file="createterm_createtimeslots.jsp" %>
         </div>
         
@@ -138,8 +138,8 @@
                         console.log("Can Add: " + response.canAdd);
 
                         if (response.canAdd) {
-                            //Remove Create Button
-                            $("#createTermSubmitRow").fadeTo('slow', 0);
+                            //Remove Create Button - Brought it back
+//                            $("#createTermSubmitRow").fadeTo('slow', 0);
                             displayMessage("Creating Term...", false);
                             displayCreateSchedule();
 
@@ -162,6 +162,9 @@
                 //Display Create Schedule
                 $("#createSchedulePanel").show();
                 $("#createSchedulePanel").css('padding-top', '20px');
+                
+                //Scroll to the bottom
+                $("html, body").animate({ scrollTop: $(document).height() }, "slow");
             }
 
             //Display termMessage
@@ -180,31 +183,49 @@
             
             /* Datepicker validation */
             $(".datepicker").multiDatesPicker({
-                dateFormat: "yy-mm-dd"
-            });
-            
-            $("#midtermDatePicker").on('focus', function(){
-                //Enable only if acceptance has values
-               if ($("#acceptanceDatePicker").val()) {
-                    var acceptanceDates = $("#acceptanceDatePicker").multiDatesPicker('getDates');
-                    var lastAcceptanceDate = acceptanceDates[acceptanceDates.length - 1];
-                    $(this).multiDatesPicker({
-//                       minDate: new Date(lastAcceptanceDate).toDateString()
-                    });
-               }
+                dateFormat: "yy-mm-dd",
+                minDate: Date.today()
             });
 
-            //Create Schedule AJAX Call
+            resetDisabledDates("acceptanceDatePicker", "midtermDatePicker");
+            resetDisabledDates("midtermDatePicker", "finalDatePicker");
+            
+            function resetDisabledDates(first, second) {
+                //Mouseover required to completely reset the datepicker
+                $("#" + second).on('mouseover', function(){
+                   $("#" + second).datepicker("destroy");
+                });
+                
+                //Limits the dates to > end date of previous milestone
+                $("#" + second).on('mousedown', function(){
+                    //Enable only if acceptance has values
+                    var acceptanceDates = $("#" + first).multiDatesPicker('getDates');
+                    if (acceptanceDates) {
+                        var lastAcceptanceDate = acceptanceDates[acceptanceDates.length - 1];
+                        if (lastAcceptanceDate) {
+                            $("#" + second).multiDatesPicker({
+                                dateFormat: "yy-mm-dd",
+                                minDate: new Date(lastAcceptanceDate).addDays(1)
+                            });
+                        }
+                    }
+                });
+            }
+
+            //Create Schedule Submit - Show timeslots panel
             $("#createScheduleForm").on('submit', function() {
                 displayCreateTimeslots();
                 return false;
             });
             
-            
+            //Display create timeslots
             function displayCreateTimeslots() {
-                //Display Create Schedule
+                //Display create timeslots
                 $("#createTimeslotsPanel").show();
                 $("#createTimeslotsPanel").css('padding-top', '20px');
+                
+                //Scroll to the bottom
+                $("html, body").animate({ scrollTop: $(document).height() }, "slow");
                 
                 /*----------------------------------------
                 CREATE TIMESLOTS
@@ -214,9 +235,9 @@
                 var midtermDates = $("#midtermDatePicker").multiDatesPicker('getDates');
                 var finalDates = $("#finalDatePicker").multiDatesPicker('getDates');
                 
-                console.log(acceptanceDates);
-                console.log(midtermDates);
-                console.log(finalDates);
+//                console.log(acceptanceDates);
+//                console.log(midtermDates);
+//                console.log(finalDates);
                 
                 var dayStart = 9;
                 var dayEnd = 16;
@@ -225,9 +246,9 @@
                 //Get times
                 var timeArray = getTimes(dayStart, dayEnd, duration);
                 
-                console.log('TimeArray: ' + timeArray);
+//                console.log('TimeArray: ' + timeArray);
                 
-                //Append Header Names
+                //Append timeslot form details
                 if (acceptanceDates.length > 0) {
                     $("#acceptanceTimeslotsTable").show();
                     $("#acceptanceTimeslotsTable").before("<h4>Acceptance</h4>");
@@ -244,11 +265,13 @@
                     makeCheckboxTable("finalTimeslotsTable", finalDates);
                 }
                 
+                //OVERALL SUBMIT TO SERVER
                 $("#timeslotsForm").on('submit', function(){
+                    var termData = $("#createTermForm").serializeArray();
                     var scheduleData = $("#createScheduleForm").serializeArray();
                     var timeslotsData = $(this).serializeArray();
-                    var finalData = $.merge(scheduleData, timeslotsData);
-                    console.log('Final serialized: ' + JSON.stringify(finalData));
+                    var finalData = $.extend(termData, scheduleData, timeslotsData);
+                    console.log('\n\nData to be sent to the server: ' + JSON.stringify(finalData));
                     return false;
                 });
                 
@@ -262,13 +285,13 @@
                     $("#" + tableId).append(headerString);
                     
                     //Append checkbox 'ALL' checkboxes
-                    var allChkString = "<tr id='allChkRow'><td>ALL</td>";
-                    for (i = 0; i < dateArray.length; i++) {
-                        var date = dateArray[i].toString('dd-MMM-yyyy');
-                        allChkString += "<td>" + "<input class='chkALL_" + tableId + "' id='chkALL_" + tableId + "_" + date + "' type='checkbox' value='" + tableId + "_" + date + "' checked/></td>";
-                    }
-                    allChkString += "</tr>";
-                    $("#" + tableId).append(allChkString);
+//                    var allChkString = "<tr id='allChkRow'><td>ALL</td>";
+//                    for (i = 0; i < dateArray.length; i++) {
+//                        var date = dateArray[i].toString('dd-MMM-yyyy');
+//                        allChkString += "<td>" + "<input class='chkALL_" + tableId + "' id='chkALL_" + tableId + "_" + date + "' type='checkbox' value='" + tableId + "_" + date + "' checked/></td>";
+//                    }
+//                    allChkString += "</tr>";
+//                    $("#" + tableId).append(allChkString);
                     
                     //Append checkbox data
                     for (j = 0; j < timeArray.length; j++) {

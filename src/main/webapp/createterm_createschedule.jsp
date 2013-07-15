@@ -15,7 +15,7 @@
             <td class="formLabelTd">Final</td>
             <td><input type="text" id="finalDatePicker" class="input-medium datepicker" name="finalDates"/></td>
         </tr>
-        <tr class="submitBtnRow">
+        <tr class="createScheduleSubmitRow">
             <td></td>
             <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create"/></td>
         </tr>
