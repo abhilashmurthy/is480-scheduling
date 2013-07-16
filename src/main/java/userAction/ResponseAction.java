@@ -20,6 +20,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import constant.Status;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -30,6 +31,7 @@ import manager.ScheduleManager;
 import manager.TermManager;
 import model.Milestone;
 import static userAction.CreateBookingAction.logger;
+import util.MiscUtil;
 
 /**
  *
@@ -37,8 +39,8 @@ import static userAction.CreateBookingAction.logger;
  */
 
 public class ResponseAction extends ActionSupport implements ServletRequestAware{
-    private int termId;
-    private int userId;
+    private long termId;
+    private long userId;
 	private String teamName;
 	private int teamId;
 	private String milestone;
@@ -48,46 +50,50 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 	private HttpServletRequest request;    
     static final Logger logger = LoggerFactory.getLogger(ResponseAction.class);
     
-//    @Override
-//    public String execute() throws Exception {
-//		HttpSession session = request.getSession();
-//		//Getting the id of user
-//		User user = (User) session.getAttribute("user");
-//		userId = user.getId().intValue();
-//		
+    @Override
+    public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		//Getting the id of user
+		User user = (User) session.getAttribute("user");
+		userId = user.getId();
+		
+		//Getting the current term 
+		Term term = MiscUtil.getActiveTerm();
+		termId = term.getId();
+		
 //		//Checking whether the user is a reviewer/supervisor or not
 //		//Getting TimeSlotStatus based on term id and user id
-//		List<TimeslotStatus> ts = TimeslotStatusDAO.findTimeSlotStatusByTermAndUser(termId, userId);
-//		if (ts.size() == 0) {
-//			//request.setAttribute("error", "You cannot Approve/Reject a booking!");
-//            logger.error("User cannot access Approve/Reject Booking");
-//            return ERROR;
-//		}
-//		
-//		//Checking the timeslots for which the status is pending
-//        for(TimeslotStatus t: ts) {
-//            Timeslot timeslotDetails = TimeslotDAO.findByDate(t.getId().getStartTime());
-//			HashMap<String, String> map = new HashMap<String, String>();
-//			
-//			//Retrieving time slot details and displaying it
-//            if(t.getStatus().toString().equals("PENDING")){
-//				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-//                teamId = timeslotDetails.getTeamId().intValue();				
-//				teamName = TeamDAO.findByTeamId(teamId).getTeamName();
-//				milestone = timeslotDetails.getId().getMilestone().toString();
-//				startTime = sdf.format(timeslotDetails.getId().getStartTime());
-//				endTime = sdf.format(timeslotDetails.getEndTime());
-//				
-//				map.put("teamId", String.valueOf(teamId));
-//				map.put("teamName", teamName);
-//				map.put("milestone", milestone);
-//				map.put("startTime", startTime);
-//				map.put("endTime", endTime);
-//            }
-//			data.add(map);
-//        }
-//        return SUCCESS;
-//    }
+		List<TimeslotStatus> ts = TimeslotStatusDAO.findTimeSlotStatusByTermAndUser(termId, userId);
+		if (ts.size() == 0) {
+			//request.setAttribute("error", "You cannot Approve/Reject a booking!");
+            logger.error("User cannot access Approve/Reject Booking");
+            return ERROR;
+		}
+		
+		//Checking the timeslots for which the status is pending
+        for(TimeslotStatus t: ts) {
+            Timeslot timeslotDetails = TimeslotDAO.findByDate(t.getId().getStartTime());
+			HashMap<String, String> map = new HashMap<String, String>();
+			
+			//Retrieving time slot details and displaying it
+            if(t.getStatus().toString().equals("PENDING")){
+				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+                teamId = timeslotDetails.getTeamId().intValue();				
+				teamName = TeamDAO.findByTeamId(teamId).getTeamName();
+				milestone = timeslotDetails.getId().getMilestone().toString();
+				startTime = sdf.format(timeslotDetails.getId().getStartTime());
+				endTime = sdf.format(timeslotDetails.getEndTime());
+				
+				map.put("teamId", String.valueOf(teamId));
+				map.put("teamName", teamName);
+				map.put("milestone", milestone);
+				map.put("startTime", startTime);
+				map.put("endTime", endTime);
+            }
+			data.add(map);
+        }
+        return SUCCESS;
+    }
 
 	//Getters and Setters
 	public int getTeamId() {
@@ -98,19 +104,19 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 		  this.teamId = teamId;
 	}
 
-	public int getUserId(){
+	public long getUserId(){
 		return userId;
 	}
 
-	public int getTermId(){
+	public long getTermId(){
 		return termId;
 	}
 
-	public void setUserId(int userId){
+	public void setUserId(long userId){
 		this.userId = userId;
 	}
 
-	public void setTermId(int termId){
+	public void setTermId(long termId){
 		this.termId = termId;
 	}
 

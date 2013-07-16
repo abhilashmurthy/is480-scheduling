@@ -25,7 +25,7 @@
                         <a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
                             <li role="presentation"><a role="menuitem" tabindex="-1" href="Booking.jsp">Create Booking</a></li>
-                            <li role="presentation"><a role="menuitem" tabindex="-1" href="ApproveReject.jsp">Approve Booking</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">

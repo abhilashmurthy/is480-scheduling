@@ -29,8 +29,8 @@
         <%@include file="navbar.jsp" %>
         <div class="container">
         <h3>Approve/Reject Booking</h3>
-        <form action="approveReject" method="post">
-			<!-- Putting default values for testing purposes -->
+        <!--<form action="approveReject" method="post">
+			<!-- Putting default values for testing purposes 
             Choose Term <select name="termId"> 
 							<option value="1">1</option>
 							<option value="2">2</option>
@@ -39,7 +39,7 @@
 			<p style=text-indent:16.5em;>
 			   <input type="submit" class="btn btn-primary" value="Search"/>
 			</p>
-        </form>
+        </form> -->
 		
 		<div id ="confirmBookings"> 
 			<%-- Tab to view Accept/Reject Bookings --%>
