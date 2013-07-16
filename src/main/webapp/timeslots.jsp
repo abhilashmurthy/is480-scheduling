@@ -75,6 +75,7 @@
                 </table>
             </form>
         </div>
+        
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
             
@@ -109,7 +110,7 @@
                     var date = dateArray[i].toString('dd-MMM-yyyy');
                     allChkString += "<td>" + "<input class='chkALL' id='chkALL" + date + "' type='checkbox' value='" + date + "' checked/></td>";
                 }
-                allChkString += "</tr></thead>";
+                allChkString += "</tr>";
                 $("#timeslotsTable").append(allChkString);
                 
                 //Append checkbox data

@@ -15,7 +15,7 @@
         </global-results>
         
         <action name="login" class="userAction.LoginAction" method="execute">
-            <result name="success">/Index.jsp</result>
+            <result name="success">/index.jsp</result>
         </action>
         
         <action name="logout" class="userAction.LogoutAction" method="execute">
@@ -27,29 +27,29 @@
         </action>
         
 <!--        <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
-            <result name = "success">/Index.jsp</result>
+            <result name = "success">/index.jsp</result>
         </action>
 		
 		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
-            <result name="success">/Booking.jsp</result>
+			<result name="success">/booking.jsp</result>
 			<param name="timeslots"></param>
-        </action> -->
+		</action> -->
        
-        <action name="approveReject" class="userAction.ResponseAction" method="execute">
-            <result name="success">/ApproveReject.jsp</result>
-        </action>
+		<action name="approveReject" class="userAction.ResponseAction" method="execute">
+			<result name="success">/ApproveReject.jsp</result>
+		</action>
 		
 		<action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
-            <result name="success">/ApproveReject.jsp</result>
-        </action>
+			<result name="success">/ApproveReject.jsp</result>
+		</action>
 		
 		<action name="createTerm" class="userAction.CreateTermAction" method="execute">
-            <result name="success">/CreateTerm.jsp</result>
-        </action>
+			<result name="success">/createterm.jsp</result>
+		</action>
 		
 		<action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
-            <result name="success">/Schedule.jsp</result>
-        </action>
+			<result name="success">/schedule.jsp</result>
+		</action>
 		
 		<action name="createSchedule" class="userAction.CreateScheduleAction" method="execute">
             <result name="success">/ScheduleConfirmation.jsp</result>
@@ -57,17 +57,24 @@
 		
     </package>
 
-    <!-- JSON Package -->
-    <package name="json" namespace="/" extends="json-default">
-        <action name="knockout" class="userAction.KnockoutAction" method="execute">
-            <result type="json" />
-        </action>
-        <action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
-            <result type="json" />
-        </action>
-        <action name="createTermJson" class="userAction.CreateTermAction" method="execute">
-            <result type="json" />
-        </action>
-    </package>
+	<!-- JSON Package -->
+	<package name="json" namespace="/" extends="json-default">
+		<action name="knockout" class="userAction.KnockoutAction" method="execute">
+			<result type="json" />
+		</action>
+		<action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
+			<result type="json" />
+		</action>
+		<action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
+			<result type="json">
+				<param name="root">json</param>
+			</result>
+		</action>
+		<action name="checkTermJson" class="userAction.CheckTermAction" method="execute">
+			<result type="json">
+				<param name="root">json</param>
+			</result>
+		</action>
+	</package>
 
 </struts>

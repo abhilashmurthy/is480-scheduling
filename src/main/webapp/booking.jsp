@@ -21,7 +21,7 @@
 
             <!-- SECTION: Timeslot Table -->
             <div>
-                <form id="createBookingForm" method="post">
+                <form id="createBookingForm">
                     Date: <input type="text" class="input-medium datepicker" name="date" /> &nbsp;
                     Start Time:
                     <input type="text" class="input-medium" name="startTime" id="timepicker"/> &nbsp;<br />
@@ -34,8 +34,12 @@
                         <option value="midterm">Midterm</option>
                         <option value="final">Final</option>
                     </select> <br /> <br />
-                    <input id="createBookingFormBtn" type="submit" class="btn btn-primary" value="Create"/>
+                    <input id="createBookingFormBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Waiting..."/>
                 </form>
+            </div>
+            <!-- SECTION: Response Banner -->
+            <div id="responseBanner" class="alert" hidden>
+                <span id="responseMessage" style="font-weight: bold"></span>
             </div>
         </div>
         <%@include file="footer.jsp"%>
@@ -50,10 +54,35 @@
                 minTime: '9:00am',
                 maxTime: '18:00pm'
             });
-			$("#createBookingFormBtn").bind('click', function(){
-				var formData = $("#createBookingForm").serialize();
-				alert(formData);
-			});
+            $("#createBookingForm").bind('submit', function() {
+                $("#createBookingFormBtn").button('loading');
+                console.log("Submit function called");
+                var formData = $("#createBookingForm").serialize();
+                $.ajax({
+                    type: 'GET',
+                    url: 'createBookingJson',
+                    data: formData,
+                    dataType: 'json'
+                }).done(function(response) {
+                    $("#createBookingFormBtn").button('reset');
+                    console.log(response);
+                    $("#responseBanner").show();
+                    if (response.success) {
+                        $("#responseBanner").removeClass("alert-error").addClass("alert-success");
+                        $("#responseMessage").text(response.message);
+                    } else {
+                        $("#responseBanner").removeClass("alert-success").addClass("alert-error");
+                        $("#responseMessage").text(response.message);
+                    }
+                }).fail(function(response) {
+                    $("#createBookingFormBtn").button('reset');
+                    console.log(response);
+                    $("#responseBanner").show();
+                    $("#responseBanner").removeClass("alert-success").addClass("alert-error");
+                    $("#responseMessage").text("Oops. Something went wrong. Please try again!");
+                });
+                return false;
+            });
         </script>
     </body>
 </html>

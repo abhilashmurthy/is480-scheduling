@@ -70,7 +70,7 @@
 									<td><s:property value="milestone"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>
-									<!--<form action="SlotUpdated.jsp" method="post">-->
+									<!--<form action="slotupdated.jsp" method="post">-->
 									<form action="updateBookingStatus" method="post">
 										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
 										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
@@ -99,7 +99,7 @@
         <s:iterator value="message">
 			<%-- <s:textfield name="message" value="%{[0].toString()}" /><br/>--%>
 			<s:property value="teamName"/><br/>
-            <form action="SlotUpdated.jsp" method="post">
+            <form action="slotupdated.jsp" method="post">
                 <input type="submit" class="btn btn-primary" value="Approve" name="Approve"/>
                 <input type="submit" class="btn btn-primary" value="Reject" name="Reject"/>
                 <input type="hidden" name="teamId" value="<s:property value="teamIdInt"/>" />
