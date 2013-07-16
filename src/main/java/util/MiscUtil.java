@@ -12,6 +12,7 @@ import model.Term;
 
 /**
  * Utility class to put miscellaneous code
+ *
  * @author suresh
  */
 public class MiscUtil {
