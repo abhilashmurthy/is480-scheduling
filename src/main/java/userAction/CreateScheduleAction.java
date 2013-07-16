@@ -70,10 +70,10 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 		datesList.add(finalEndDate);
 		for (String dateToCheck: datesList) {
 			if (!"".equals(dateToCheck)) {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				try {
-					sdf.parse(dateToCheck);
-				} catch (ParseException e) {
+					String timestampToCheck = dateToCheck + " 00:00:00";
+					Timestamp checkTime = Timestamp.valueOf(timestampToCheck);
+				} catch (Exception e) {
 					request.setAttribute("error", "Please enter a valid date (" + (dateToCheck) + ")!");
 					logger.error("User entered invalid date.");
 					return ERROR;

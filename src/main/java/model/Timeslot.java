@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import constant.Status;
+import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 
@@ -37,7 +38,30 @@ public class Timeslot implements Serializable {
 	private Set<User> attendees = new HashSet<User>();
 	@ManyToOne
 	private Team team;
-
+	
+	/**
+	 * This method returns the overall status of the booking.
+	 * @return
+	 */
+	public Status getOverallBookingStatus() {
+		int counter = 0;
+		Collection<Status> values = statusList.values();
+		for (Status s: statusList.values()) {
+			if (s == Status.REJECTED) {
+				// Reject the booking if any one person has rejected it
+				return Status.REJECTED;
+			} else if (s == Status.ACCEPTED) {
+				counter++;
+			}
+		}
+		
+		// Check if everyone has approved the booking
+		if (counter == values.size()) {
+			return Status.ACCEPTED;
+		}
+		return Status.PENDING;
+	}
+	
 	public Timestamp getStartTime() {
 		return startTime;
 	}

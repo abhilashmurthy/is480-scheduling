@@ -50,7 +50,7 @@
 			</ul>
 
 			<!-- SECTION: Approve/Reject Bookings -->
-			<s:if test="%{data.size() > 0}"> 
+			<s:if test="%{data.size() > 0 && data != null}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
 					<table class="table table-hover">
 						<thead>
@@ -67,15 +67,14 @@
 								<tr>	
 									<%--<td><s:property value="teamId"/></td> --%>
 									<td><s:property value="teamName"/></td>
-									<td><s:property value="milestone"/></td>
+									<td><s:property value="milestoneName"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>
 									<!--<form action="slotupdated.jsp" method="post">-->
 									<form action="updateBookingStatus" method="post">
 										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
 										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
-										<input type="hidden" name="teamId" id="teamId" value="<s:property value="teamId"/>"/>
-										<input type="hidden" name="dataList" id="dataList" value=<s:property value="data"/>"/>
+										<input type="hidden" name="timeslotId" id="timeslotId" value="<s:property value="timeslotId"/>"/>
 									</form>
 								</tr>
 							</s:iterator>

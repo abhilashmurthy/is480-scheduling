@@ -36,11 +36,12 @@
 		</action> -->
        
 		<action name="approveReject" class="userAction.ResponseAction" method="execute">
-			<result name="success">/ApproveReject.jsp</result>
+			<result name="success">/approvereject.jsp</result>
 		</action>
 		
+		<!-- This action class calls another action class through chaining -->
 		<action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
-			<result name="success">/ApproveReject.jsp</result>
+			<result name="success" type="chain">approveReject</result>
 		</action>
 		
 		<action name="createTerm" class="userAction.CreateTermAction" method="execute">
@@ -52,7 +53,7 @@
 		</action>
 		
 		<action name="createSchedule" class="userAction.CreateScheduleAction" method="execute">
-            <result name="success">/ScheduleConfirmation.jsp</result>
+            <result name="success">/scheduleconfirmation.jsp</result>
         </action>
 		
     </package>
