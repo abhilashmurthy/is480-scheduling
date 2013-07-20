@@ -44,7 +44,7 @@
             </div>
 
             <div class="btn-group userbox">
-                <button class="btn btn-inverse"><%= user.getFullName() + " of Team " + user.getTeam().getTeamName() + ""%></button>
+                <button class="btn btn-inverse" id="userDashboard"><%= user.getFullName() + " | Team " + user.getTeam().getTeamName() + ""%></button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
@@ -57,6 +57,7 @@
     </div>
 </div>
 <script type="text/javascript" src="js/plugins/jquery-2.0.2.js"></script>
+<script type="text/javascript" src="js/plugins/bootstrap.js"></script>
 <script type="text/javascript">
     console.log("nav init");
     //Nav specific
@@ -70,5 +71,11 @@
         $(".nav li").removeClass("active");
         $(this).addClass("active");
     });
+	$('#userDashboard').popover({
+		placement:'bottom',
+		trigger: 'click',
+		title: "Dashboard",
+		content:"Information about the logged in user."
+	});
 </script>
 
