@@ -19,3 +19,7 @@ if (session.getAttribute("user") == null) {
 	response.sendRedirect("login.jsp");
 	return; 
 }%>
+
+<!--if(Role.getUserRole == supervisor)
+	boolean isSupervisor = true;
+	sessio.setATtribute(isSupervisor, true) -->

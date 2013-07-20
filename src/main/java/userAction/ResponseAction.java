@@ -48,6 +48,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 	private String milestoneName;
 	private String startTime;
 	private String endTime;
+	private String venue;
 	private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 	private HttpServletRequest request;    
     static final Logger logger = LoggerFactory.getLogger(ResponseAction.class);
@@ -93,6 +94,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 		if (pendingList != null && pendingList.size() > 0) {
 			for (Timeslot timeslot: pendingList) {
 				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+				venue = timeslot.getVenue();
 				timeslotId = timeslot.getId();
 				teamId = timeslot.getTeam().getId();				
 				teamName = timeslot.getTeam().getTeamName();
@@ -105,6 +107,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				map.put("milestone", milestoneName);
 				map.put("startTime", startTime);
 				map.put("endTime", endTime);
+				map.put("venue", venue);
 
 				data.add(map);
 			}
