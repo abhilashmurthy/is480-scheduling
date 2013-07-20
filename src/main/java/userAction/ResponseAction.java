@@ -18,10 +18,12 @@ import constant.Status;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import model.Role;
 import util.MiscUtil;
 
 /**
@@ -55,58 +57,72 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 //		Term term = MiscUtil.getActiveTerm();
 //		termId = term.getId();
 		
-		//Getting the current schedule based on term id
-		Schedule schedule = MiscUtil.getActiveSchedule();
-		//Getting the current milestone
-		//Set<Timeslot> pendingList = null;
-		Set<Timeslot> userTimeslots = null;
-		if (schedule != null) {
-			Set<Timeslot> allTimeslots = schedule.getTimeslots();
-			//Getting the pending timeslots for the particular user
-			if (allTimeslots != null && allTimeslots.size() > 0) {
-				//Iterating over the timeslots. Matching the user and checking if the status is pending.
-				for(Timeslot currentTimeslot: allTimeslots) {
-					HashMap<User,Status> statusList = currentTimeslot.getStatusList();
-					Iterator iter = statusList.keySet().iterator();
-					while (iter.hasNext()) {
-						User userObj = (User) iter.next();
-						if (userObj == user) {
-							//Checking if the status is pending
-//							if(statusList.get(userObj) == Status.PENDING) {
-								userTimeslots.add(currentTimeslot);
-//							}
-						}
-					}
-				}
+		//Getting the user's roles
+		List<Role> userAllRoles = user.getRoles();
+		List<Role> supervisorReviewerRoles = new ArrayList<Role>();
+		for (Role role: userAllRoles) {
+			if (role.getName().equalsIgnoreCase("Supervisor") || role.getName().equalsIgnoreCase("Reviewer")) {
+				supervisorReviewerRoles.add(role);
 			}
 		}
 		
-		//Putting the pending timeslot details in hash map to display it to the user
-		HashMap<String, String> map = new HashMap<String, String>();
-		if (userTimeslots != null && userTimeslots.size() > 0) {
-			for (Timeslot timeslot: userTimeslots) {
-				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-				venue = timeslot.getVenue();
-				timeslotId = timeslot.getId();
-				teamId = timeslot.getTeam().getId();				
-				teamName = timeslot.getTeam().getTeamName();
-				milestoneName = schedule.getMilestone().getName();
-				startTime = sdf.format(timeslot.getStartTime());
-				endTime = sdf.format(timeslot.getEndTime());
-				myStatus = timeslot.getStatusList().get(user).toString();
+		//Checking whether the user is a supervisor/reviewer. Only supervisor/reviewer can approve or reject a booking
+		if (supervisorReviewerRoles.size() > 0) {
+			//Getting the current schedule based on term id
+			Schedule schedule = MiscUtil.getActiveSchedule();
+			//Getting the current milestone
+			//Set<Timeslot> pendingList = null;
+			Set<Timeslot> userTimeslots = null;
+			if (schedule != null) {
+				Set<Timeslot> allTimeslots = schedule.getTimeslots();
+				//Getting the pending timeslots for the particular user
+				if (allTimeslots != null && allTimeslots.size() > 0) {
+					//Iterating over the timeslots. Matching the user and checking if the status is pending.
+					for(Timeslot currentTimeslot: allTimeslots) {
+						HashMap<User,Status> statusList = currentTimeslot.getStatusList();
+						Iterator iter = statusList.keySet().iterator();
+						while (iter.hasNext()) {
+							User userObj = (User) iter.next();
+							if (userObj == user) {
+								//Checking if the status is pending
+	//							if(statusList.get(userObj) == Status.PENDING) {
+									userTimeslots.add(currentTimeslot);
+	//							}
+							}
+						}
+					}
+				}
+				//Putting the pending timeslot details in hash map to display it to the user
+				HashMap<String, String> map = new HashMap<String, String>();
+				if (userTimeslots != null && userTimeslots.size() > 0) {
+					for (Timeslot timeslot: userTimeslots) {
+						SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+						venue = timeslot.getVenue();
+						timeslotId = timeslot.getId();
+						teamId = timeslot.getTeam().getId();				
+						teamName = timeslot.getTeam().getTeamName();
+						milestoneName = schedule.getMilestone().getName();
+						startTime = sdf.format(timeslot.getStartTime());
+						endTime = sdf.format(timeslot.getEndTime());
+						myStatus = timeslot.getStatusList().get(user).toString();
 
-				map.put("timeslotId", String.valueOf(timeslotId));
-				map.put("teamName", teamName);
-				map.put("milestone", milestoneName);
-				map.put("startTime", startTime);
-				map.put("endTime", endTime);
-				map.put("venue", venue);
-				map.put("myStatus", myStatus);
+						map.put("timeslotId", String.valueOf(timeslotId));
+						map.put("teamName", teamName);
+						map.put("milestone", milestoneName);
+						map.put("startTime", startTime);
+						map.put("endTime", endTime);
+						map.put("venue", venue);
+						map.put("myStatus", myStatus);
 
-				data.add(map);
+						data.add(map);
+					}
+				}
 			}
+			return SUCCESS;
 		}
-        return SUCCESS;
+        request.setAttribute("error", "Oops. You're not authorized to access this page!");
+		logger.error("User cannot access this page");
+		return ERROR;
     }
 
 	public long getTermId() {
@@ -183,5 +199,21 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 	
 	public void setServletRequest(HttpServletRequest hsr) {
 		this.request = hsr;
+	}
+
+	public String getVenue() {
+		return venue;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
+	}
+
+	public String getMyStatus() {
+		return myStatus;
+	}
+
+	public void setMyStatus(String myStatus) {
+		this.myStatus = myStatus;
 	}
 }
