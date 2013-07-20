@@ -140,7 +140,7 @@
                         if (response.canAdd) {
                             //Remove Create Button - Brought it back
 //                            $("#createTermSubmitRow").fadeTo('slow', 0);
-                            displayMessage("Creating Term...", false);
+                            displayMessage("Term selected", false);
                             displayCreateSchedule();
 
                         } else {
@@ -214,6 +214,25 @@
 
             //Create Schedule Submit - Show timeslots panel
             $("#createScheduleForm").on('submit', function() {
+                //AJAX call to save term and schedule dates
+                var termData = $("#createTermForm").serializeArray();
+                var scheduleData = $("#createScheduleForm").serializeArray();
+                var createScheduleData = $.merge(termData, scheduleData);
+                console.log('\n\nData to be sent to create schedule and term: ' + createScheduleData);
+                $.ajax({
+                    type: 'POST',
+                    url: 'createScheduleJson',
+                    data: createScheduleData,
+                    dataType: 'json'
+                }).done(function(response){
+                    console.log("createScheduleData was called");
+                    if (response.success) {
+                        console.log("it was also successful");
+                    }
+                }).fail(function(error){
+                    console.log("createScheduleData AJAX FAIL");
+                });
+                //Display create timeslots forms
                 displayCreateTimeslots();
                 return false;
             });

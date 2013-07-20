@@ -71,6 +71,11 @@
 				<param name="root">json</param>
 			</result>
 		</action>
+		<action name="createScheduleJson" class="userAction.CreateScheduleAction" method="execute">
+			<result type="json">
+				<param name="root">json</param>
+			</result>
+		</action>
 	</package>
 
 </struts>

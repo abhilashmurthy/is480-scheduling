@@ -7,6 +7,8 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import model.User;
@@ -19,115 +21,38 @@ import static userAction.ResponseAction.logger;
  *
  * @author Prakhar
  */
-public class CreateScheduleAction extends ActionSupport implements ServletRequestAware{
-    private String termId;  //To get the term id
-	private String acceptanceStartDate;
-	private String acceptanceEndDate;
-	private String midtermStartDate;
-	private String midtermEndDate;
-	private String finalStartDate;
-	private String finalEndDate;
-	private HttpServletRequest request;
-	static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
+public class CreateScheduleAction extends ActionSupport implements ServletRequestAware {
+    
+    private HttpServletRequest request;
+    private HashMap<String, Object> json = new HashMap<String, Object>();
+    static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
+    
+    public HashMap<String, Object> getJson() {
+        return json;
+    }
 
-	@Override
-	public String execute() throws Exception {
-		HttpSession session = request.getSession();
-		//User user = (User) session.getAttribute("user");
-	
-		//Checking whether any dates have been entered
-		if (acceptanceStartDate == null && acceptanceEndDate == null &&
-				midtermStartDate == null && midtermEndDate == null &&
-				finalStartDate == null && finalEndDate == null) {
-			request.setAttribute("error", "Incorrect inputs. Please enter the Start Date and End Date for atleast 1 milestone!");
-            logger.error("Start Date & End Date not entered for any milestone.");
-            return ERROR;
-		} 
-		
-		if ((acceptanceStartDate != null && acceptanceEndDate == null) || 
-				(acceptanceStartDate == null && acceptanceEndDate != null)) {
-			request.setAttribute("error", "Incorrect Inputs. Please enter Start Date/End Date for Acceptance!");
-            logger.error("Start Date or End Date not entered for Acceptance.");
-            return ERROR;
-		}
-		
-		if ((midtermStartDate != null && midtermEndDate == null) || 
-				(midtermStartDate == null && midtermEndDate != null)) {
-			request.setAttribute("error", "Incorrect Inputs. Please enter Start Date/End Date for Midterm!");
-            logger.error("Start Date or End Date not entered for Midterm.");
-            return ERROR;
-		}
-		
-		if ((finalStartDate != null && finalEndDate == null) || 
-				(finalStartDate == null && finalEndDate != null)) {
-			request.setAttribute("error", "Incorrect Inputs. Please enter Start Date/End Date for Final!");
-            logger.error("Start Date or End Date not entered for Final.");
-            return ERROR;
-		}
-		
-		
-		return SUCCESS;
-		
-		
-	}
+    public void setJson(HashMap<String, Object> json) {
+        this.json = json;
+    }
 
-	public String getTermId() {
-		return termId;
-	}
+    @Override
+    public String execute() throws Exception {
+        Map parameters = request.getParameterMap();
+        for (Object key : parameters.keySet()) {
+            logger.info("Received key: " + key + ", value: " + ((String[])parameters.get(key))[0]);
+        }
+        
+        int year = Integer.parseInt(((String[])parameters.get("year"))[0]);
+        int semester = Integer.parseInt(((String[])parameters.get("semester"))[0]);
+        String midtermDatesString = ((String[])parameters.get("midtermDates"))[0];
+        String acceptanceDatesString = ((String[])parameters.get("acceptanceDates"))[0];
+        String finalDatesString = ((String[])parameters.get("finalDates"))[0];
+        
+        json.put("success", true);
+        return SUCCESS;
+    }
 
-	public void setTermId(String termId) {
-		this.termId = termId;
-	}
-
-	public String getAcceptanceStartDate() {
-		return acceptanceStartDate;
-	}
-
-	public void setAcceptanceStartDate(String acceptanceStartDate) {
-		this.acceptanceStartDate = acceptanceStartDate;
-	}
-
-	public String getAcceptanceEndDate() {
-		return acceptanceEndDate;
-	}
-
-	public void setAcceptanceEndDate(String acceptanceEndDate) {
-		this.acceptanceEndDate = acceptanceEndDate;
-	}
-
-	public String getMidtermStartDate() {
-		return midtermStartDate;
-	}
-
-	public void setMidtermStartDate(String midtermStartDate) {
-		this.midtermStartDate = midtermStartDate;
-	}
-
-	public String getMidtermEndDate() {
-		return midtermEndDate;
-	}
-
-	public void setMidtermEndDate(String midtermEndDate) {
-		this.midtermEndDate = midtermEndDate;
-	}
-
-	public String getFinalStartDate() {
-		return finalStartDate;
-	}
-
-	public void setFinalStartDate(String finalStartDate) {
-		this.finalStartDate = finalStartDate;
-	}
-
-	public String getFinalEndDate() {
-		return finalEndDate;
-	}
-
-	public void setFinalEndDate(String finalEndDate) {
-		this.finalEndDate = finalEndDate;
-	}
-
-	public void setServletRequest(HttpServletRequest hsr) {
-		request = hsr;
-	}
+    public void setServletRequest(HttpServletRequest hsr) {
+        request = hsr;
+    }
 }
