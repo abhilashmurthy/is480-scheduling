@@ -10,6 +10,9 @@
 	
 	<!-- UNPROTECTED ACTIONS -->
 	<package name="unsafe" namespace="/" extends="struts-default">
+		<global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
 		<action name="login" class="userAction.LoginAction" method="execute">
             <result name="success">/index.jsp</result>
         </action>

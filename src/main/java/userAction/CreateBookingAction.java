@@ -82,7 +82,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		Term term;
 		try {
 			int academicYear = Integer.valueOf(termId.split(",")[0]);
-			int semester = Integer.valueOf(termId.split(",")[1]);
+			String semester = termId.split(",")[1];
 			term = TermManager.findByYearAndSemester(academicYear, semester);
 			if (term == null) {
 				throw new Exception();

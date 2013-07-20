@@ -88,8 +88,8 @@
                         </td>
                         <td>
                             <select name="semester"/> 
-                    <option value="1">Semester 1</option>
-                    <option value="2">Semester 2</option>
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
                     </select>
                     </td>
                     </tr>

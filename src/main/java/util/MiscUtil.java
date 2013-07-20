@@ -22,7 +22,8 @@ public class MiscUtil {
 	 * 15-May and 20-Dec
 	 */
 	public static Term getActiveTerm() {
-		int year, semester;
+		int year;
+		String semester;
 		Calendar now = Calendar.getInstance();
 		// Testing code if today's date needs to be changed for testing
 //		now.set(Calendar.DAY_OF_MONTH, 1);
@@ -31,13 +32,13 @@ public class MiscUtil {
 		
 		if (now.get(Calendar.MONTH) <= Calendar.MAY && now.get(Calendar.DATE) <= 15) {
 			year = now.get(Calendar.YEAR) - 1;
-			semester = 2;
+			semester = "Term 2";
 		} else if (now.get(Calendar.MONTH) <= Calendar.DECEMBER && now.get(Calendar.DATE) <= 20) {
 			year = now.get(Calendar.YEAR);
-			semester = 1;
+			semester = "Term 1";
 		} else {
 			year = now.get(Calendar.YEAR);
-			semester = 2;
+			semester = "Term 2";
 		}
 		
 		return TermManager.findByYearAndSemester(year, semester);

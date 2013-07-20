@@ -65,7 +65,7 @@ public class TermManager {
         return sourceList;
     }
 
-    public static Term findByYearAndSemester(int year, int semester) {
+    public static Term findByYearAndSemester(int year, String semester) {
         logger.info("Getting term by year and semester");
         Term result = null;
         try {
