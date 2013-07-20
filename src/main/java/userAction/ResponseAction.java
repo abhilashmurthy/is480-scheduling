@@ -4,16 +4,11 @@
  */
 package userAction;
 
-import static com.opensymphony.xwork2.Action.ERROR;
 import com.opensymphony.xwork2.ActionSupport;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import model.Schedule;
-import model.Team;
-import model.Term;
 import model.Timeslot;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -27,11 +22,6 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import manager.MilestoneManager;
-import manager.ScheduleManager;
-import manager.TermManager;
-import model.Milestone;
-import static userAction.CreateBookingAction.logger;
 import util.MiscUtil;
 
 /**
@@ -49,6 +39,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 	private String startTime;
 	private String endTime;
 	private String venue;
+	private String myStatus;
 	private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 	private HttpServletRequest request;    
     static final Logger logger = LoggerFactory.getLogger(ResponseAction.class);
@@ -67,7 +58,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 		//Getting the current schedule based on term id
 		Schedule schedule = MiscUtil.getActiveSchedule();
 		//Getting the current milestone
-		Set<Timeslot> pendingList = null;
+		//Set<Timeslot> pendingList = null;
+		Set<Timeslot> userTimeslots = null;
 		if (schedule != null) {
 			Set<Timeslot> allTimeslots = schedule.getTimeslots();
 			//Getting the pending timeslots for the particular user
@@ -80,9 +72,9 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						User userObj = (User) iter.next();
 						if (userObj == user) {
 							//Checking if the status is pending
-							if(statusList.get(userObj) == Status.PENDING) {
-								pendingList.add(currentTimeslot);
-							}
+//							if(statusList.get(userObj) == Status.PENDING) {
+								userTimeslots.add(currentTimeslot);
+//							}
 						}
 					}
 				}
@@ -91,8 +83,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 		
 		//Putting the pending timeslot details in hash map to display it to the user
 		HashMap<String, String> map = new HashMap<String, String>();
-		if (pendingList != null && pendingList.size() > 0) {
-			for (Timeslot timeslot: pendingList) {
+		if (userTimeslots != null && userTimeslots.size() > 0) {
+			for (Timeslot timeslot: userTimeslots) {
 				SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 				venue = timeslot.getVenue();
 				timeslotId = timeslot.getId();
@@ -101,6 +93,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				milestoneName = schedule.getMilestone().getName();
 				startTime = sdf.format(timeslot.getStartTime());
 				endTime = sdf.format(timeslot.getEndTime());
+				myStatus = timeslot.getStatusList().get(user).toString();
 
 				map.put("timeslotId", String.valueOf(timeslotId));
 				map.put("teamName", teamName);
@@ -108,6 +101,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				map.put("startTime", startTime);
 				map.put("endTime", endTime);
 				map.put("venue", venue);
+				map.put("myStatus", myStatus);
 
 				data.add(map);
 			}
