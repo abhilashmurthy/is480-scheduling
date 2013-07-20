@@ -7,9 +7,13 @@
 <%@page import="org.slf4j.LoggerFactory"%>
 <%@page import="org.slf4j.Logger"%>
 <%@page import="model.User"%>
-
+<style type="text/css">
+	i
+	{
+		padding-right:2px;
+	}
+</style>
 <%@include file="imports.jsp"%>
-
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -45,8 +49,8 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                    <li class="disabled"><a tabindex="-1" href="#">Manage settings</a></li>
-                    <li><a id="logoutLink" tabindex="-1" href="#">Logout</a></li>
+                    <li class="disabled"><a tabindex="-1" href="#"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
+                    <li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -67,3 +71,4 @@
         $(this).addClass("active");
     });
 </script>
+

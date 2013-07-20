@@ -38,9 +38,6 @@
     <%@include file="footer.jsp"%>
     <script type="text/javascript">
         console.log("index init");
-        $("#welcomeText").on('click', function() {
-            alert("Hello there!");
-        });
         
         $('#mileStoneTab a').on('click', function(e) {
             //Content effects
