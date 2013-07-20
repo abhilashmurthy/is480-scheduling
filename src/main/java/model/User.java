@@ -6,7 +6,6 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
@@ -16,7 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import constant.Role;
+import java.util.List;
 import javax.persistence.CascadeType;
 import org.hibernate.annotations.Cascade;
 
@@ -37,11 +36,16 @@ public class User implements Serializable {
 	@ManyToOne(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
-	private ArrayList<HashMap<Term, Role>> roles = new ArrayList<HashMap<Term, Role>>();
+	@ManyToMany
+	private List<Role> roles = new ArrayList<Role>();
 	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
+	public void addRole(Role role) {
+		roles.add(role);
+	}
+	
 	public String getUsername() {
 		return username;
 	}
@@ -66,11 +70,11 @@ public class User implements Serializable {
 		this.team = team;
 	}
 
-	public ArrayList<HashMap<Term, Role>> getRoles() {
+	public List<Role> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(ArrayList<HashMap<Term, Role>> roles) {
+	public void setRoles(List<Role> roles) {
 		this.roles = roles;
 	}
 
