@@ -15,14 +15,17 @@
 <html>
     <head>
         <title>Approve/Reject Booking</title>
-		<!--<script type="text/javascript">
-			function hideBookingsTable() {
-					document.getElementById('confirmBookings').style.display = 'none';
-			}
-			function showBookingsTable() {
-					document.getElementById('confirmBookings').style.display = 'block';
-			}
-		</script> -->
+		<script type="text/javascript">
+			// Listen for click on toggle checkbox
+			$('#select-all').click(function(event) {   
+				if(this.checked) {
+					// Iterate each checkbox
+					$(':checkbox').each(function() {
+						this.checked = true;                        
+					});
+				}
+			});
+		</script>
 		
     </head>
     <body>
@@ -56,27 +59,40 @@
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
-								<th>Team</th>
-								<th>Milestone</th>
+								<th><input type="checkbox" name="select-all" id="select-all"/></th>
+								<th>Team Name</th>
+								<th>Presentation Type</th>
 								<th>Start Time</th>
 								<th>End Time</th>
+								<th>Venue</th>
+								<th>Your Status</th>
+								<th>Overall Booking Status</th>
 							</tr>
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
 								<tr>	
 									<%--<td><s:property value="teamId"/></td> --%>
+									<td><input type="checkbox" name="approveRejectArray" value="<s:property value="timeslotId"/>"</td>
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestoneName"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>
-									<!--<form action="slotupdated.jsp" method="post">-->
-									<form action="updateBookingStatus" method="post">
+									<td><s:property value="venue"/></td>
+									<td><s:property value="myStatus"/></td>
+									<td><s:property value="overallStatus"/></td>
+								</tr>
+						</table>
+								<!--<form action="slotupdated.jsp" method="post">-->
+								<form action="updateBookingStatus" method="post">
+									<table>
+									<tr>
 										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
 										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
-										<input type="hidden" name="timeslotId" id="timeslotId" value="<s:property value="timeslotId"/>"/>
-									</form>
-								</tr>
+										<input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray"/> 
+									</tr>
+									</table>
+								</form>
 							</s:iterator>
 						</tbody>
 					</table>

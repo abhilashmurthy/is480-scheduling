@@ -26,7 +26,7 @@
             <result name="success">/Test.jsp</result>
         </action>
         
-<!--        <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
+<!--        <action name="createBooking" class="userAction.CreateBorokingAction" method="execute">
             <result name = "success">/index.jsp</result>
         </action>
 		
