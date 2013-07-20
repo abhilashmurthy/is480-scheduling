@@ -4,11 +4,11 @@
  */
 package userAction;
 
-import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Status;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -170,17 +170,26 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 			//Assign timeslot to team
 			bookingSlot.setTeam(team);
+			
+			//Add team members to attendees
+			HashSet<User> attendees = new HashSet<User>();
+			attendees.addAll(team.getMembers());
 
 			//Create timeslot status entries based on milestone
 			HashMap<User, Status> statusList = new HashMap<User, Status>();
 			if (milestone.getName().equalsIgnoreCase("acceptance")) {
 				statusList.put(team.getSupervisor(), Status.PENDING);
+				attendees.add(team.getSupervisor());
 			} else if (milestone.getName().equalsIgnoreCase("midterm")) {
 				statusList.put(team.getReviewer1(), Status.PENDING);
+				attendees.add(team.getReviewer1());
 				statusList.put(team.getReviewer2(), Status.PENDING);
+				attendees.add(team.getReviewer2());
 			} else if (milestone.getName().equalsIgnoreCase("final")) {
 				statusList.put(team.getSupervisor(), Status.PENDING);
+				attendees.add(team.getSupervisor());
 				statusList.put(team.getReviewer1(), Status.PENDING);
+				attendees.add(team.getReviewer1());
 			} else {
 				request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 				logger.error("FATAL ERROR: Code not to be reached!");
@@ -188,6 +197,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			}
 
 			bookingSlot.setStatusList(statusList);
+			bookingSlot.setAttendees(attendees);
 			em.merge(bookingSlot);
 			em.getTransaction().commit();
 		} catch (Exception e) {
