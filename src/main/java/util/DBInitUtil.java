@@ -71,11 +71,11 @@ public class DBInitUtil {
 		 */		
 		Term term12013 = new Term();
 		term12013.setAcademicYear(2013);
-		term12013.setSemester(1);
+		term12013.setSemester("Term 1");
 		
 		Term term22013 = new Term();
 		term22013.setAcademicYear(2013);
-		term22013.setSemester(2);
+		term22013.setSemester("Term 2");
 		
 		// Persistence
 		em.persist(term12013);

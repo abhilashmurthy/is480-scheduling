@@ -38,14 +38,13 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 			HashMap<String, String> map = null;
 			for (Term term: listTerms) {
 				map = new HashMap<String, String>();
-				int semester = term.getSemester();  //e.g. 1
+				String semester = term.getSemester();  //e.g. 1
 				int year = term.getAcademicYear();  //e.g. 2013
 				long termId = term.getId();
 				//e.g. 2013-2014
 				String academicYear = Integer.toString(year) + "-" + Integer.toString(year + 1);
 				//e.g. Term 1
-				String academicTerm = " Term " + Integer.toString(semester);
-				String termName = academicYear + academicTerm;
+				String termName = academicYear + semester;
 				map.put("termName", termName);
 				map.put("termId", Long.toString(termId));
 				
