@@ -44,7 +44,7 @@
             </div>
 
             <div class="btn-group userbox">
-                <button class="btn btn-inverse" id="userDashboard"><%= user.getFullName() + " | Team " + user.getTeam().getTeamName() + ""%></button>
+                <button class="btn btn-inverse" id="userDashboard"><i class="icon-user icon-white"></i>&nbsp;Dashboard</button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
@@ -56,26 +56,38 @@
         </div>
     </div>
 </div>
+<!-- USER DASHBOARD POPOVER CONTENT -->
+<div style="visibility: collapse" id="userDashboardContent" hidden="">
+	<p>Name: <% out.print(user.getFullName()); %></p>
+	<p>Team: <% out.print(user.getTeam().getTeamName()); %></p>
+	<p>User Roles:</p>
+	<ul>
+		
+	</ul>
+</div>
 <script type="text/javascript" src="js/plugins/jquery-2.0.2.js"></script>
 <script type="text/javascript" src="js/plugins/bootstrap.js"></script>
 <script type="text/javascript">
-    console.log("nav init");
-    //Nav specific
+	console.log("nav init");
+	//Nav specific
 //    $(".dropdown-toggle").on('click', function() {
 //        this.dropdown;
 //    });
-    $("#logoutLink").on('click', function() {
-        document.location.href = '/is480-scheduling/logout';
-    });
-    $(".nav li").on('click', function() {
-        $(".nav li").removeClass("active");
-        $(this).addClass("active");
-    });
+	$("#logoutLink").on('click', function() {
+		document.location.href = '/is480-scheduling/logout';
+	});
+	$(".nav li").on('click', function() {
+		$(".nav li").removeClass("active");
+		$(this).addClass("active");
+	});
 	$('#userDashboard').popover({
-		placement:'bottom',
+		placement: 'bottom',
 		trigger: 'click',
-		title: "Dashboard",
-		content:"Information about the logged in user."
+		title: "User Information",
+		html: true,
+		content: function() {
+			return $('#userDashboardContent').html();
+		}
 	});
 </script>
 
