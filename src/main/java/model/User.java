@@ -5,6 +5,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
@@ -36,11 +37,15 @@ public class User implements Serializable {
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
 	@ManyToMany
-	private List<Role> roles;
+	private List<Role> roles = new ArrayList<Role>();
 	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
+	public void addRole(Role role) {
+		roles.add(role);
+	}
+	
 	public String getUsername() {
 		return username;
 	}
