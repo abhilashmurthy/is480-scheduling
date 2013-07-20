@@ -80,7 +80,7 @@ public class DBInitUtil {
 		
 		// Persistence
 		em.persist(term12013);
-		em.persist(term12013);
+		em.persist(term22013);
 		logger.info("Terms persisted");
 		
 		/*
