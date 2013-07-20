@@ -26,8 +26,8 @@
                     Start Time:
                     <input type="text" class="input-medium" name="startTime" id="timepicker"/> &nbsp;<br />
                     <select name="termId">
-                        <option value="2013,1">2013-14 Term 1</option>
-                        <option value="2013,2">2013-14 Term 2</option>
+                        <option value="2013,Term 1">2013-14 Term 1</option>
+                        <option value="2013,Term 2">2013-14 Term 2</option>
                     </select> &nbsp;
                     <select name="milestoneStr">
                         <option value="acceptance">Acceptance</option>

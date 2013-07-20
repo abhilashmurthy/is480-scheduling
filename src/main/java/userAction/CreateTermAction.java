@@ -11,9 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.persistence.EntityTransaction;
 import manager.TermManager;
-import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 /**
@@ -22,7 +20,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
  */
 public class CreateTermAction extends ActionSupport implements ServletRequestAware {
 
-    private int year;    private int semester;
+    private int year;    private String semester;
     private boolean canAdd;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
@@ -87,11 +85,11 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
         this.year = year;
     }
 
-    public int getSemester() {
+    public String getSemester() {
         return semester;
     }
 
-    public void setSemester(int semester) {
+    public void setSemester(String semester) {
         this.semester = semester;
     }
 

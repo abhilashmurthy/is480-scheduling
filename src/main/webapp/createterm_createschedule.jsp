@@ -4,7 +4,7 @@
     <table>
         <th>Milestone</th><th>Dates</th>
         <tr>
-            <td class="formLabelTd">Accceptance</td>
+            <td class="formLabelTd">Acceptance</td>
             <td><input type="text" id="acceptanceDatePicker" class="input-medium datepicker" name="acceptanceDates"/></td>
         </tr>
         <tr>
