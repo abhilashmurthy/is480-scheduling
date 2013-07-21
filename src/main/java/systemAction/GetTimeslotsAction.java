@@ -5,6 +5,7 @@
 package systemAction;
 
 import com.opensymphony.xwork2.ActionSupport;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -26,44 +27,39 @@ public class GetTimeslotsAction extends ActionSupport{
 
 	@Override
 	public String execute() throws Exception {
+		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
 		Term term = TermManager.findByYearAndSemester(2013, "Term 1");
 		Milestone milestone = MilestoneManager.findByName("Acceptance");
 		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(term, milestone);
-		Set<Timeslot> timeslots = activeSchedule.getTimeslots();
-		int counter = 0;
-		for (Timeslot t : timeslots) {
-			counter++;
-			if (counter >= 10) {
-				break;
-			}
-			HashMap<String, String> map = new HashMap<String, String>();
-			Calendar start = Calendar.getInstance();
-			start.setTimeInMillis(t.getStartTime().getTime());
-			map.put("date", start.get(Calendar.DATE) + " "
-					+ start.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-					+ start.get(Calendar.YEAR));
-			map.put("startTime", start.get(Calendar.HOUR) + " "
-					+ start.get(Calendar.MINUTE) + " "
-					+ start.get(Calendar.AM_PM));
-			map.put("endTime", (start.get(Calendar.HOUR) + 1) + " "
-					+ start.get(Calendar.MINUTE) + " "
-					+ start.get(Calendar.AM_PM));
+		json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
+		json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
+		
+		ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
+		for (Timeslot t : activeSchedule.getTimeslots()) {
+			
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("date", dateFormat.format(t.getStartTime()));
+			map.put("startTime", timeFormat.format(t.getStartTime()));
+			map.put("endTime", timeFormat.format(t.getEndTime()));
 			if (t.getTeam() != null) {
 				map.put("teamName", t.getTeam().getTeamName());
 			}
-			data.add(map);
+			mapList.add(map);
 		}
+		json.put("timeslots", mapList);
 		return SUCCESS;
 	}
 	
-	private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
+	private HashMap<String, Object> json = new HashMap<String, Object>();
 
-	public ArrayList<HashMap<String, String>> getData() {
-		return data;
+	public HashMap<String, Object> getJson() {
+		return json;
 	}
-	
-	public void setData(ArrayList<HashMap<String, String>> data) {
-		this.data = data;
+
+	public void setJson(HashMap<String, Object> json) {
+		this.json = json;
 	}
 	
 }
