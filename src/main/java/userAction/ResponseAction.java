@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import constant.Status;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +73,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 			Schedule schedule = MiscUtil.getActiveSchedule();
 			//Getting the current milestone
 			//Set<Timeslot> pendingList = null;
-			Set<Timeslot> userTimeslots = null;
+			List<Timeslot> userTimeslots = new ArrayList<Timeslot>();
 			if (schedule != null) {
 				Set<Timeslot> allTimeslots = schedule.getTimeslots();
 				//Getting the pending timeslots for the particular user
@@ -83,20 +84,21 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						Iterator iter = statusList.keySet().iterator();
 						while (iter.hasNext()) {
 							User userObj = (User) iter.next();
-							if (userObj == user) {
-								//Checking if the status is pending
-	//							if(statusList.get(userObj) == Status.PENDING) {
-									userTimeslots.add(currentTimeslot);
-	//							}
+							if (userObj.equals(user)) {
+								userTimeslots.add(currentTimeslot);
 							}
 						}
 					}
 				}
-				//Putting the pending timeslot details in hash map to display it to the user
-				HashMap<String, String> map = new HashMap<String, String>();
-				if (userTimeslots != null && userTimeslots.size() > 0) {
+				
+				//Putting all the timeslot details for the user in hash map to display it 
+				//Sorting the timeslots list (Pending first, Approved/Rejected later)
+				ArrayList<HashMap<String, String>> pendingList = new ArrayList<HashMap<String, String>>();
+				ArrayList<HashMap<String, String>> approveRejectList = new ArrayList<HashMap<String, String>>();
+				if (userTimeslots.size() > 0) {
 					for (Timeslot timeslot: userTimeslots) {
-						SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+						HashMap<String, String> map = new HashMap<String, String>();
+						SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
 						venue = timeslot.getVenue();
 						timeslotId = timeslot.getId();
 						teamId = timeslot.getTeam().getId();				
@@ -113,9 +115,21 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						map.put("endTime", endTime);
 						map.put("venue", venue);
 						map.put("myStatus", myStatus);
-
-						data.add(map);
+						
+						if (map.get("myStatus").equalsIgnoreCase("Pending")) {
+							pendingList.add(map);
+						} else {
+							approveRejectList.add(map);
+						}
 					}
+					
+					for (int i = 0; i < (pendingList.size() + approveRejectList.size()); i++) {
+						if (i < pendingList.size()) {
+							data.add(pendingList.get(i));
+						} else {
+							data.add(approveRejectList.get(i));
+						}
+					} //end of loop
 				}
 			}
 			return SUCCESS;

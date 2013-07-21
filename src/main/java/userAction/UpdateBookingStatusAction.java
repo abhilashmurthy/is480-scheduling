@@ -8,10 +8,14 @@ import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Status;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.TimeslotManager;
@@ -26,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author Prakhar
  */
 public class UpdateBookingStatusAction extends ActionSupport implements ServletRequestAware{
-	private String timeslotId;
+	private String approveRejectArray[];
 	private String approve;
 	private String reject;
 	private HttpServletRequest request;    
@@ -45,42 +49,53 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 		}
 		
 		HttpSession session = request.getSession();
-		//Getting the user object
 		User user = (User) session.getAttribute("user");
 		
-		//Retrieving the timeslot to update
-		Timeslot timeslot = TimeslotManager.findById(Long.parseLong(timeslotId));
-		//Retrieving the status list of the timeslot
-		HashMap<User,Status> statusList = timeslot.getStatusList();
-		Iterator iter = statusList.keySet().iterator();
-		while (iter.hasNext()) {
-			if (iter.next() == user) {
-				if (status.equalsIgnoreCase("ACCEPTED")) {
-					statusList.put(user, Status.ACCEPTED);
-				} else if (status.equalsIgnoreCase("REJECTED")) {
-					statusList.put(user, Status.REJECTED);
+		//The list of slots to update in db
+		List<Timeslot> timeslotsToUpdate = new ArrayList<Timeslot>();
+		
+		approveRejectArray = request.getParameterValues("approveRejectArray");
+		if (approveRejectArray != null && approveRejectArray.length > 0) {
+			for (int i = 0; i < approveRejectArray.length; i++) {
+				String timeslotId = approveRejectArray[i];
+				//Retrieving the timeslot to update
+				Timeslot timeslot = TimeslotManager.findById(Long.parseLong(timeslotId));
+				//Retrieving the status list of the timeslot
+				HashMap<User,Status> statusList = timeslot.getStatusList();
+				Iterator iter = statusList.keySet().iterator();
+				while (iter.hasNext()) {
+					if (iter.next() == user) {
+						if (status.equalsIgnoreCase("ACCEPTED")) {
+							statusList.put(user, Status.ACCEPTED);
+						} else if (status.equalsIgnoreCase("REJECTED")) {
+							statusList.put(user, Status.REJECTED);
+						}
+					}
+				}
+			
+				if (statusList.size() > 0) {
+					//Setting the new status
+					timeslot.setStatusList(statusList);
+					timeslotsToUpdate.add(timeslot);
 				}
 			}
-		}
-		
-		if (statusList.size() > 0) {
-			//Setting the new status
-			timeslot.setStatusList(statusList);
 			//Updating the time slot 
-			EntityTransaction transaction = null;
-			TimeslotManager.updateTimeslotStatus(timeslot, transaction);
+			EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+			EntityTransaction transaction = em.getTransaction();
+			TimeslotManager.updateTimeslotStatus(timeslotsToUpdate, transaction);
 		}
 		return SUCCESS;
 	} //end of execute
 
 	
 	//Getters and Setters
-	public String getTimeslotId() {
-		return timeslotId;
+	
+	public String[] getApproveRejectArray() {
+		return approveRejectArray;
 	}
 
-	public void setTimeslotId(String timeslotId) {
-		this.timeslotId = timeslotId;
+	public void setApproveRejectArray(String[] approveRejectArray) {
+		this.approveRejectArray = approveRejectArray;
 	}
 	
 	public String getApprove() {
