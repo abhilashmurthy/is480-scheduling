@@ -48,7 +48,7 @@
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
                     <li class="disabled"><a tabindex="-1" href="#"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
                     <li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
                 </ul>
@@ -66,7 +66,6 @@
 	</ul>
 </div>
 <script type="text/javascript" src="js/plugins/jquery-2.0.2.js"></script>
-<script type="text/javascript" src="js/plugins/bootstrap.js"></script>
 <script type="text/javascript">
 	console.log("nav init");
 	//Nav specific
@@ -76,18 +75,19 @@
 	$("#logoutLink").on('click', function() {
 		document.location.href = '/is480-scheduling/logout';
 	});
-	$(".nav li").on('click', function() {
-		$(".nav li").removeClass("active");
-		$(this).addClass("active");
-	});
+//	$(".nav li").on('click', function() {
+//		$(".nav li").removeClass("active");
+//		$(this).addClass("active");
+//	});
 	$('#userDashboard').popover({
 		placement: 'bottom',
-		trigger: 'click',
 		title: "User Information",
 		html: true,
 		content: function() {
 			return $('#userDashboardContent').html();
 		}
 	});
+	$('#userDashboard').on('click', function() {
+		$(this).popover('toggle');
+	});
 </script>
-
