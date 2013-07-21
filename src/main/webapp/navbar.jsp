@@ -8,10 +8,10 @@
 <%@page import="org.slf4j.Logger"%>
 <%@page import="model.User"%>
 <style type="text/css">
-	i
-	{
-		padding-right:2px;
-	}
+    i
+    {
+        padding-right:2px;
+    }
 </style>
 <%@include file="imports.jsp"%>
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -44,7 +44,7 @@
             </div>
 
             <div class="btn-group userbox">
-                <button class="btn btn-inverse" id="userDashboard"><i class="icon-user icon-white"></i>&nbsp;Dashboard</button>
+                <button class="btn btn-inverse" id="userDashboard"><i class="icon-user icon-white"></i>&nbsp;<%= user.getFullName().split(" ")[0]%> -  Dashboard</button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
@@ -58,36 +58,37 @@
 </div>
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
-	<p>Name: <% out.print(user.getFullName()); %></p>
-	<p>Team: <% out.print(user.getTeam().getTeamName()); %></p>
-	<p>User Roles:</p>
-	<ul>
-		
-	</ul>
+    <p>Name: <% out.print(user.getFullName());%></p>
+    <p>Team: <% out.print(user.getTeam().getTeamName());%></p>
+    <p>User Roles:</p>
+    <ul>
+
+    </ul>
 </div>
-<script type="text/javascript" src="js/plugins/jquery-2.0.2.js"></script>
 <script type="text/javascript">
-	console.log("nav init");
-	//Nav specific
-//    $(".dropdown-toggle").on('click', function() {
-//        this.dropdown;
-//    });
-	$("#logoutLink").on('click', function() {
-		document.location.href = '/is480-scheduling/logout';
-	});
-//	$(".nav li").on('click', function() {
-//		$(".nav li").removeClass("active");
-//		$(this).addClass("active");
-//	});
-	$('#userDashboard').popover({
-		placement: 'bottom',
-		title: "User Information",
-		html: true,
-		content: function() {
-			return $('#userDashboardContent').html();
-		}
-	});
-	$('#userDashboard').on('click', function() {
-		$(this).popover('toggle');
-	});
+    //Makes use of footer.jsp's jQuery and bootstrap imports
+    window.onload = function(){
+        
+        //Nav specific
+        console.log("nav init");
+        
+        //Dropdown menu from bootstrap
+        $(".dropdown-toggle").dropdown();
+        
+        //Dashboard popover
+        $('#userDashboard').popover({
+            placement: 'bottom',
+            title: "User Information",
+            html: true,
+            content: function() {
+                return $('#userDashboardContent').html();
+            }
+        });
+        
+        //Logout link
+        $("#logoutLink").on('click', function() {
+            document.location.href = '/is480-scheduling/logout';
+        });
+        
+    };
 </script>
