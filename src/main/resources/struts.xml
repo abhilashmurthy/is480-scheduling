@@ -60,10 +60,6 @@
 			<result name="success" type="chain">approveReject</result>
 		</action>
 		
-		<action name="createTerm" class="userAction.CreateTermAction" method="execute">
-			<result name="success">/createterm.jsp</result>
-		</action>
-		
 		<action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
 			<result name="success">/schedule.jsp</result>
 		</action>
@@ -90,9 +86,6 @@
 			<result name="login">/login.jsp</result>
         </global-results>
 		
-		<action name="knockout" class="userAction.KnockoutAction" method="execute">
-			<result type="json" />
-		</action>
 		<action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
 			<result type="json" />
 		</action>
@@ -107,6 +100,11 @@
 			</result>
 		</action>
 		<action name="createScheduleJson" class="userAction.CreateScheduleAction" method="execute">
+			<result type="json">
+				<param name="root">json</param>
+			</result>
+		</action>
+		<action name="createTimeslotsJson" class="userAction.CreateTimeslotsAction" method="execute">
 			<result type="json">
 				<param name="root">json</param>
 			</result>

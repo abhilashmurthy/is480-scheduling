@@ -4,7 +4,6 @@
  */
 package userAction;
 
-import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.sql.Timestamp;
@@ -14,14 +13,12 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.TermManager;
 import model.Milestone;
 import model.Schedule;
 import model.Term;
-import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +84,8 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         logger.debug("Got milestones");
         logger.debug("Acceptance date is: " + acceptanceDates[0]);
         
+        //TODO: Check that the windows don't overlap with other schedules
+        
         //Getting and setting timestamps
         Timestamp acceptanceStartTimeStamp = Timestamp.valueOf(acceptanceDates[0] + " 00:00:00");
         Timestamp acceptanceEndTimeStamp = Timestamp.valueOf(acceptanceDates[acceptanceDates.length - 1] + " 00:00:00");
@@ -126,12 +125,21 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         scheduleList.add(acceptanceSched);
         scheduleList.add(midtermSched);
         scheduleList.add(finalSched);
-        
         logger.debug("Added to scheduleList");
         
         //Save schedules to DB
         ScheduleManager.save(scheduleList, transaction);
         logger.info("Schedules have been stored");
+        
+        Schedule storedAcceptance = ScheduleManager.findByWindow(acceptanceStartTimeStamp, acceptanceEndTimeStamp);
+        Schedule storedMidterm = ScheduleManager.findByWindow(midtermStartTimeStamp, midtermEndTimeStamp);
+        Schedule storedFinal = ScheduleManager.findByWindow(finalStartTimeStamp, finalEndTimeStamp);
+        
+        json.put("acceptanceScheduleId", storedAcceptance.getId());
+        json.put("midtermScheduleId", storedMidterm.getId());
+        json.put("finalScheduleId", storedFinal.getId());
+        
+        logger.debug("Retreived storedAcceptance: " + storedAcceptance.getId());
         
         json.put("success", true);
         return SUCCESS;

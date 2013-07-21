@@ -215,9 +215,16 @@
                     }
                 });
             }
+            
+            var acceptanceId = null;
+            var midtermId = null;
+            var finalId = null;
 
             //Create Schedule Submit - Show timeslots panel
             $("#createScheduleForm").on('submit', function() {
+                
+                //TODO: Check to ensure that all acceptance, midterm, and final dates have values
+                
                 //AJAX call to save term and schedule dates
                 var termData = $("#createTermForm").serializeArray();
                 var scheduleData = $("#createScheduleForm").serializeArray();
@@ -231,6 +238,9 @@
                 }).done(function(response){
                     if (response.success) {
                         console.log("Schedules have been created successfully");
+                        acceptanceId = response.acceptanceScheduleId;
+                        midtermId = response.midtermScheduleId;
+                        finalId = response.finalScheduleId;
                         //Display create timeslots forms
                         displayCreateTimeslots();
                     }
@@ -290,12 +300,35 @@
                 
                 //OVERALL SUBMIT TO SERVER
                 $("#timeslotsForm").on('submit', function(){
-                    var termData = $("#createTermForm").serializeArray();
-                    var scheduleData = $("#createScheduleForm").serializeArray();
-                    var timeslotsData = $(this).serializeArray();
-                    var finalData = $.merge(termData, scheduleData);
-                    finalData = $.merge(finalData, timeslotsData);
-                    console.log('\n\nData to be sent to the server: ' + JSON.stringify(finalData));
+                    var scheduleIdData = { acceptanceId:acceptanceId, midtermId:midtermId, finalId:finalId };
+                    //SerializeArray not functional for timeslots
+                    var data = $(this).serializeArray();
+                    var timeslotsData = {};
+                    
+                    for (var i = 0; i < data.length; i++){
+                        timeslotsData[data[i].name] = timeslotsData[data[i].name] || [];
+                        timeslotsData[data[i].name].push(data[i].value);
+                    }
+                    
+                    console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
+                    var extendData = $.extend(scheduleIdData, timeslotsData);
+                    var mergeData = $.merge(scheduleIdData, timeslotsData);
+                    console.log('Final data is: ' + JSON.stringify(extendData));
+                    console.log('Merge data is: ' + JSON.stringify(mergeData));
+                    $.ajax({
+                        type: 'POST',
+                        url: 'createTimeslotsJson',
+                        data: mergeData,
+                        dataType: 'json'
+                    }).done(function(response){
+                        if (response.success){
+                            console.log("createTimeslotsJson was successful");
+                        }
+                    }).fail(function(error){
+                        console.log("createTimeslotsJson AJAX FAIL");
+                        displayMessage("Oops.. something went wrong", true);
+                    });
+                    
                     return false;
                 });
                 
@@ -307,6 +340,9 @@
                     }
                     headerString += "</tr></thead>";
                     $("#" + tableId).append(headerString);
+                    
+                    //Make the table name
+                    var tableName = tableId.split("Timeslots")[0];
                     
                     //Append checkbox 'ALL' checkboxes
 //                    var allChkString = "<tr id='allChkRow'><td>ALL</td>";
@@ -323,8 +359,8 @@
                         var time = timeArray[j];
                         htmlString += "<td id='timeColumn'>" + time + "</td>";
                         for (i = 0; i < dateArray.length; i++) {
-                            var date = dateArray[i].toString('dd-MMM-yyyy');
-                            htmlString += "<td><input class='chkBox_" + tableId + "_" + date + "' id='chk_" + tableId + "_" + date + "_" + time.replace(/:/g, '-') +"' type='checkbox' checked name='timeslot_" + tableId +"' value='" + date + " " + time +"' /></td>";
+                            var date = dateArray[i].toString('yyyy-MM-dd');
+                            htmlString += "<td><input class='chkBox_" + tableName + "' id='chk_" + tableName + "_" + date + "_" + time.replace(/:/g, '-') +"' type='checkbox' checked name='timeslot_" + tableName +"[]' value='" + date + " " + time +"' /></td>";
                         }
                         htmlString += "</tr>";
                         $("#" + tableId).append(htmlString);
