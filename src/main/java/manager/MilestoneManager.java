@@ -17,10 +17,9 @@ import util.MiscUtil;
  * @author suresh
  */
 public class MilestoneManager {
-	private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 	private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
 	
-	public static Milestone findByName (String name) {
+	public static Milestone findByName (EntityManager em, String name) {
 		logger.info("Getting milestone by name");
 		Milestone result = null;
 		try {

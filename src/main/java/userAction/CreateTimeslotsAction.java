@@ -14,7 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
@@ -27,6 +29,7 @@ import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -48,6 +51,8 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		
         Map parameters = request.getParameterMap();
         for (Object key : parameters.keySet()) {
             logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[0]);
@@ -97,7 +102,8 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setEndTime(endTime);
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
-                acceptanceTimeslots.add(TimeslotManager.save(t, transaction));
+				//TODO: Handle write error
+                acceptanceTimeslots.add(TimeslotManager.save(em, t, transaction));
             }
 
             logger.debug("Persisted acceptance timeslots: count " + acceptanceTimeslots.size());
@@ -117,7 +123,8 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setEndTime(endTime);
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
-                midtermTimeslots.add(TimeslotManager.save(t, transaction));
+				//TODO: Handle write error
+                midtermTimeslots.add(TimeslotManager.save(em, t, transaction));
             }
 
             logger.debug("Persisted midterm timeslots: count " + midtermTimeslots.size());
@@ -138,7 +145,8 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
                 //Save timeslot
-                finalTimeslots.add(TimeslotManager.save(t, transaction));
+				//TODO: Handle write error
+                finalTimeslots.add(TimeslotManager.save(em, t, transaction));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,9 +158,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 //        TimeslotManager.saveTimeslots(midtermTimeslots, transaction);
 //        TimeslotManager.saveTimeslots(finalTimeslots, transaction);
 
-        Schedule acceptanceSchedule = ScheduleManager.findById(acceptanceId);
-        Schedule midtermSchedule = ScheduleManager.findById(midtermId);
-        Schedule finalSchedule = ScheduleManager.findById(finalId);
+        Schedule acceptanceSchedule = ScheduleManager.findById(em, acceptanceId);
+        Schedule midtermSchedule = ScheduleManager.findById(em, midtermId);
+        Schedule finalSchedule = ScheduleManager.findById(em, finalId);
 
         logger.debug("Got all schedules: acceptance[" + acceptanceSchedule + "], midterm[" + midtermSchedule + "], final[" + finalSchedule + "]");
 
@@ -162,9 +170,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 
         logger.debug("Set timeslots hashmaps into schedule objects");
         
-        ScheduleManager.update(acceptanceSchedule, transaction);
-        ScheduleManager.update(midtermSchedule, transaction);
-        ScheduleManager.update(finalSchedule, transaction);
+        ScheduleManager.update(em, acceptanceSchedule, transaction);
+        ScheduleManager.update(em, midtermSchedule, transaction);
+        ScheduleManager.update(em, finalSchedule, transaction);
         
         logger.debug("Merged all schedules");
 

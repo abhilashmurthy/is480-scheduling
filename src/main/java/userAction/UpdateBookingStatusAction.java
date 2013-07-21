@@ -38,6 +38,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 	
 	@Override
 	public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		
 		String status = null;
 		if(approve != null) {
 			  status = "ACCEPTED";
@@ -59,7 +61,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			for (int i = 0; i < approveRejectArray.length; i++) {
 				String timeslotId = approveRejectArray[i];
 				//Retrieving the timeslot to update
-				Timeslot timeslot = TimeslotManager.findById(Long.parseLong(timeslotId));
+				Timeslot timeslot = TimeslotManager.findById(em, Long.parseLong(timeslotId));
 				//Retrieving the status list of the timeslot
 				HashMap<User,Status> statusList = timeslot.getStatusList();
 				Iterator iter = statusList.keySet().iterator();
@@ -80,9 +82,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				}
 			}
 			//Updating the time slot 
-			EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 			EntityTransaction transaction = em.getTransaction();
-			TimeslotManager.updateTimeslotStatus(timeslotsToUpdate, transaction);
+			TimeslotManager.updateTimeslotStatus(em, timeslotsToUpdate, transaction);
 		}
 		return SUCCESS;
 	} //end of execute

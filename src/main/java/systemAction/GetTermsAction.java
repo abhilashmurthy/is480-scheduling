@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import manager.TermManager;
 import model.Term;
@@ -18,6 +20,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import userAction.CreateBookingAction;
+import util.MiscUtil;
 
 /**
  *
@@ -31,8 +34,10 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 	
 	@Override
 	public String execute() {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		
 		//Getting all the term objects
-		listTerms = TermManager.getAllTerms();
+		listTerms = TermManager.getAllTerms(em);
 		if (listTerms != null) {
 			dataList = new ArrayList<HashMap<String, String>>();
 			HashMap<String, String> map = null;

@@ -22,10 +22,9 @@ import util.MiscUtil;
  */
 public class TimeslotManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
 
-    public static Timeslot findById(long id) {
+    public static Timeslot findById(EntityManager em, long id) {
         logger.info("Getting timeslot based on id.");
         Timeslot timeslot = null;
         try {
@@ -42,7 +41,7 @@ public class TimeslotManager {
         return null;
     }
 	
-	public static boolean updateTimeslotStatus (List<Timeslot> timeslotsToUpdate, EntityTransaction transaction) {
+	public static boolean updateTimeslotStatus (EntityManager em, List<Timeslot> timeslotsToUpdate, EntityTransaction transaction) {
 		logger.info("Updating timeslot status");
         try {
             transaction.begin();
@@ -65,7 +64,7 @@ public class TimeslotManager {
         return false;
     }
     
-    public static boolean saveTimeslots(Set<Timeslot> timeslots, EntityTransaction transaction) {
+    public static boolean saveTimeslots(EntityManager em, Set<Timeslot> timeslots, EntityTransaction transaction) {
         logger.info("Saving timeslots starting from: " + timeslots);
         try {
             transaction = em.getTransaction();
@@ -90,7 +89,7 @@ public class TimeslotManager {
         return false;
     }
     
-    public static Timeslot save(Timeslot timeslot, EntityTransaction transaction) {
+    public static Timeslot save(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
         logger.info("Saving timeslot: " + timeslot);
         try {
             transaction = em.getTransaction();

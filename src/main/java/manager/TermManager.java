@@ -6,14 +6,12 @@ package manager;
 
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.MiscUtil;
 
 /**
  *
@@ -21,10 +19,9 @@ import util.MiscUtil;
  */
 public class TermManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(TermManager.class);
 
-    public static boolean save(Term term, EntityTransaction transaction) {
+    public static boolean save(EntityManager em, Term term, EntityTransaction transaction) {
         logger.info("Creating new term");
         try {
             transaction = em.getTransaction();
@@ -48,7 +45,7 @@ public class TermManager {
         return false;
     }
 
-    public static List<Term> getAllTerms() {
+    public static List<Term> getAllTerms(EntityManager em) {
         logger.info("Getting all term objects");
         List<Term> sourceList = null;
         EntityTransaction transaction = em.getTransaction();
@@ -64,7 +61,7 @@ public class TermManager {
         return sourceList;
     }
 
-    public static Term findByYearAndSemester(int year, String semester) {
+    public static Term findByYearAndSemester(EntityManager em, int year, String semester) {
         logger.info("Getting term by year and semester");
         Term result = null;
         try {
@@ -83,7 +80,7 @@ public class TermManager {
         return result;
     }
 	
-	public static Term findTermById (long id) {
+	public static Term findTermById (EntityManager em, long id) {
 		logger.info("Getting term by id");
 		Term term = null;
 		try {

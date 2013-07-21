@@ -4,7 +4,7 @@
  */
 package util;
 
-import java.util.Calendar;
+import javax.persistence.EntityManager;
 import manager.ScheduleManager;
 import manager.TermManager;
 import model.Schedule;
@@ -20,12 +20,12 @@ public class MiscUtil {
 	 */
 	public static final String PERSISTENCE_UNIT = "scheduler";
 	
-	public static Term getActiveTerm() {
-		return TermManager.findByYearAndSemester(2013, "Term 1");
+	public static Term getActiveTerm(EntityManager em) {
+		return TermManager.findByYearAndSemester(em, 2013, "Term 1");
 	}
 	
-	public static Schedule getActiveSchedule() {
-		Term activeTerm = getActiveTerm();
-		return ScheduleManager.findActiveByTerm(activeTerm);
+	public static Schedule getActiveSchedule(EntityManager em) {
+		Term activeTerm = getActiveTerm(em);
+		return ScheduleManager.findActiveByTerm(em, activeTerm);
 	}
 }

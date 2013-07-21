@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
@@ -22,6 +24,7 @@ import model.Term;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -44,6 +47,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
         Map parameters = request.getParameterMap();
         for (Object key : parameters.keySet()) {
             logger.info("Received key: " + key + ", value: " + ((String[])parameters.get(key))[0]);
@@ -65,7 +69,8 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         Term newTerm = new Term();
         newTerm.setAcademicYear(year);
         newTerm.setSemester(semester);
-        TermManager.save(newTerm, transaction);
+		//TODO Handle write error
+        TermManager.save(em, newTerm, transaction);
         
         logger.debug("Saved term");
         
@@ -77,9 +82,9 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         logger.debug("Arrayed dates");
         
         //Getting and setting milestones
-        Milestone acceptanceMil = MilestoneManager.findByName("Acceptance");
-        Milestone midtermMil = MilestoneManager.findByName("Midterm");
-        Milestone finalMil = MilestoneManager.findByName("Final");
+        Milestone acceptanceMil = MilestoneManager.findByName(em, "Acceptance");
+        Milestone midtermMil = MilestoneManager.findByName(em, "Midterm");
+        Milestone finalMil = MilestoneManager.findByName(em, "Final");
         
         logger.debug("Got milestones");
         logger.debug("Acceptance date is: " + acceptanceDates[0]);
@@ -96,7 +101,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         
         logger.debug("Created timestamps");
         
-        Term storedTerm = TermManager.findByYearAndSemester(year, semester);
+        Term storedTerm = TermManager.findByYearAndSemester(em, year, semester);
         
         logger.debug("Retreived storedTerm");
         
@@ -128,12 +133,13 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         logger.debug("Added to scheduleList");
         
         //Save schedules to DB
-        ScheduleManager.save(scheduleList, transaction);
+		//TODO Handle write error
+        ScheduleManager.save(em, scheduleList, transaction);
         logger.info("Schedules have been stored");
         
-        Schedule storedAcceptance = ScheduleManager.findByWindow(acceptanceStartTimeStamp, acceptanceEndTimeStamp);
-        Schedule storedMidterm = ScheduleManager.findByWindow(midtermStartTimeStamp, midtermEndTimeStamp);
-        Schedule storedFinal = ScheduleManager.findByWindow(finalStartTimeStamp, finalEndTimeStamp);
+        Schedule storedAcceptance = ScheduleManager.findByWindow(em, acceptanceStartTimeStamp, acceptanceEndTimeStamp);
+        Schedule storedMidterm = ScheduleManager.findByWindow(em, midtermStartTimeStamp, midtermEndTimeStamp);
+        Schedule storedFinal = ScheduleManager.findByWindow(em, finalStartTimeStamp, finalEndTimeStamp);
         
         json.put("acceptanceScheduleId", storedAcceptance.getId());
         json.put("midtermScheduleId", storedMidterm.getId());

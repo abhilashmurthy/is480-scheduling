@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.TermManager;
@@ -18,6 +20,7 @@ import model.Milestone;
 import model.Schedule;
 import model.Term;
 import model.Timeslot;
+import util.MiscUtil;
 
 /**
  *
@@ -27,12 +30,14 @@ public class GetScheduleAction extends ActionSupport{
 
 	@Override
 	public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		
 		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
-		Term term = TermManager.findByYearAndSemester(2013, "Term 1");
-		Milestone milestone = MilestoneManager.findByName("Acceptance");
-		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(term, milestone);
+		Term term = TermManager.findByYearAndSemester(em, 2013, "Term 1");
+		Milestone milestone = MilestoneManager.findByName(em, "Acceptance");
+		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
 		json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
 		json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
 		

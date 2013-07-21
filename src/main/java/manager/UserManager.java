@@ -19,10 +19,9 @@ import util.MiscUtil;
  */
 public class UserManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
     
-    public static void save(User user) {
+    public static void save(EntityManager em, User user) {
         logger.info("Saving user: " + user.getFullName());
         try {
             em.getTransaction().begin();
@@ -34,7 +33,7 @@ public class UserManager {
         }
     }
     
-    public static User findByUsername(String username) {
+    public static User findByUsername(EntityManager em, String username) {
         logger.info("Finding user: " + username);
         User user = null;
         try {
@@ -50,7 +49,7 @@ public class UserManager {
         return user;
     }
 
-    public static List<User> getAllUsers() {
+    public static List<User> getAllUsers(EntityManager em) {
         logger.info("Getting all users");
         List<User> result = null;
         try {

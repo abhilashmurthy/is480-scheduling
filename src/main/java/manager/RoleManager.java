@@ -19,10 +19,9 @@ import util.MiscUtil;
  * @author Prakhar
  */
 public class RoleManager {
-	private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 	private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
 	
-	public static List<Role> getAllRolesByTerm (Term term) {
+	public static List<Role> getAllRolesByTerm (EntityManager em, Term term) {
 		logger.info("Getting all roles for a particular term");
 		List<Role> rolesList = null;
 		long termId = term.getId();
