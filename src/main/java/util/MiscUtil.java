@@ -33,7 +33,8 @@ public class MiscUtil {
 		if (now.get(Calendar.MONTH) <= Calendar.MAY && now.get(Calendar.DATE) <= 15) {
 			year = now.get(Calendar.YEAR) - 1;
 			semester = "Term 2";
-		} else if (now.get(Calendar.MONTH) <= Calendar.DECEMBER && now.get(Calendar.DATE) <= 20) {
+		} else if ((now.get(Calendar.MONTH) >= Calendar.MAY && now.get(Calendar.DATE) > 15)
+				&& (now.get(Calendar.MONTH) <= Calendar.DECEMBER && now.get(Calendar.DATE) <= 20)) {
 			year = now.get(Calendar.YEAR);
 			semester = "Term 1";
 		} else {
