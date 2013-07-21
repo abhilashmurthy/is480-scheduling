@@ -9,6 +9,7 @@ import java.util.HashSet;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import model.Milestone;
+import model.Role;
 import model.Schedule;
 import model.Team;
 import model.Term;
@@ -79,8 +80,34 @@ public class DBInitUtil {
 		
 		// Persistence
 		em.persist(term12013);
-		em.persist(term12013);
+		em.persist(term22013);
 		logger.info("Terms persisted");
+		
+		/*
+		 * ROLE TABLE POPULATION
+		 */
+		Role student = new Role();
+		student.setName("Student");
+		student.setTerm(term12013);
+		
+		Role supervisor = new Role();
+		supervisor.setName("Supervisor");
+		supervisor.setTerm(term12013);
+		
+		Role reviewer = new Role();
+		reviewer.setName("Reviewer");
+		reviewer.setTerm(term12013);
+		
+		Role ta = new Role();
+		ta.setName("TA");
+		ta.setTerm(term12013);
+		
+		//Persistence
+		em.persist(student);
+		em.persist(supervisor);
+		em.persist(reviewer);
+		em.persist(ta);
+		logger.info("Roles persisted");
 		
 		/*
 		 * SCHEDULE TABLE POPULATION
@@ -142,34 +169,42 @@ public class DBInitUtil {
 		User u1 = new User();
 		u1.setUsername("suresh.s.2010");
 		u1.setFullName("Suresh SUBRAMANIAM");
+		u1.addRole(student);
 		
 		User u2 = new User();
 		u2.setUsername("abhilashm.2010");
 		u2.setFullName("Abhilash MURTHY");
+		u2.addRole(student);
 		
 		User u3 = new User();
 		u3.setUsername("tsgill.ps.2010");
 		u3.setFullName("Tarlochan Singh GILL S/O P S");
+		u3.addRole(student);
 		
 		User u4 = new User();
 		u4.setUsername("prakhara.2010");
 		u4.setFullName("Prakhar AGARWAL");
+		u4.addRole(supervisor);
 		
 		User u5 = new User();
 		u5.setUsername("xuling.dai.2010");
 		u5.setFullName("DAI Xuling");
+		u5.addRole(student);
 		
 		User u6 = new User();
 		u6.setUsername("rcdavis");
 		u6.setFullName("Richard C. DAVIS");
+		u6.addRole(supervisor);
 		
 		User u7 = new User();
 		u7.setUsername("yskim");
 		u7.setFullName("Youngsoo KIM");
+		u7.addRole(reviewer);
 		
 		User u8 = new User();
 		u8.setUsername("laiteecheok");
 		u8.setFullName("CHEOK Lai-Tee");
+		u8.addRole(reviewer);
 		
 		// Persistence
 		em.persist(u1);

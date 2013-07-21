@@ -11,9 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.persistence.EntityTransaction;
 import manager.TermManager;
-import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 /**
