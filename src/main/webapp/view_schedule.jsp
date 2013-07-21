@@ -42,7 +42,7 @@
 			$('#scheduleBody').append("<tr id=r" + i + "3><td>" + i + ":" + "30</td></tr>");
 		}
 		
-		$('#scheduleHeader').append("<th></th>")
+		$('#scheduleHeader').append("<th></th>");
 		//Adding the columns for the days
 		for (var i = 0; i < dateList.length; i++) {
 			var date = dateList[i];
