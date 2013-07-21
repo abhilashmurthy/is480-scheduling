@@ -38,8 +38,15 @@
 		var dayStr = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 		//Creating the row time markings (Interval: 30 min)
 		for (var i = 8; i < 19; i++) {
-			$('#scheduleBody').append("<tr id=r" + i + "0><td>" + i + ":" + "00</td></tr>");
-			$('#scheduleBody').append("<tr id=r" + i + "3><td>" + i + ":" + "30</td></tr>");
+			$('#scheduleBody').append("<tr id=r" + i + "0><td>" + i + ":" + "00</td>");
+			for (var y = 0; y < dateList.length; y++) {
+				$('#scheduleBody').append("<td></td>");
+			}
+			$('#scheduleBody').append("</tr><tr id=r" + i + "3><td>" + i + ":" + "30</td>");
+			for (var y = 0; y < dateList.length; y++) {
+				$('#scheduleBody').append("<td></td>");
+			}
+			$('#scheduleBody').append("</tr>");
 		}
 		
 		$('#scheduleHeader').append("<th></th>");
