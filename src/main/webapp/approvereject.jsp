@@ -1,5 +1,5 @@
-<%-- 
-    Document   : AcceptReject
+<%--
+    Document   : ApproveReject
     Created on : Jul 2, 2013, 11:14:06 PM
     Author     : Tarlochan
 --%>
@@ -17,15 +17,33 @@
         <title>Approve/Reject Booking</title>
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
-			// Listen for click on toggle checkbox
-			$('#select-all').click(function(event) {   
-				if(this.checked) {
-					// Iterate each checkbox
-					$(':checkbox').each(function() {
-						this.checked = true;                        
-					});
+		//To check/uncheck all boxes
+		checked = false;
+		function checkedAll () {
+		  if (checked == false) {
+			  checked = true
+		  } else {
+			  checked = false
+		  }
+		  for (var i = 0; i < document.getElementById('myform').elements.length; i++) {
+			document.getElementById('myform').elements[i].checked = checked;
+		  }
+		}
+		
+		//To validate the form (Make sure all checkboxes have been checked
+		function valthisform() {
+			var checkboxs=document.getElementsByName("approveRejectArray");
+			var okay = false;
+			for(var i = 0,l = checkboxs.length; i<l; i++) {
+				if(checkboxs[i].checked) {
+					okay = true;
 				}
-			});
+			}
+			if(!okay) {
+				alert("Please choose a timeslot!");
+			}
+			return false;
+		}
 		</script>
 		
     </head>
@@ -56,49 +74,47 @@
 			<!-- SECTION: Approve/Reject Bookings -->
 			<s:if test="%{data.size() > 0 && data != null}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
+				<form id="myform" action="updateBookingStatus" method="post">
 					<table class="table table-hover">
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
-								<th><input type="checkbox" name="select-all" id="select-all"/></th>
+								<th><input type="checkbox" name="checkall" onclick="checkedAll();"></th>
 								<th>Team Name</th>
 								<th>Presentation Type</th>
 								<th>Start Time</th>
 								<th>End Time</th>
 								<th>Venue</th>
 								<th>Your Status</th>
-								<th>Overall Booking Status</th>
 							</tr>
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
 								<tr>	
 									<%--<td><s:property value="teamId"/></td> --%>
-									<td><input type="checkbox" name="approveRejectArray" value="<s:property value="timeslotId"/>"</td>
+									<s:if test='myStatus.equals("PENDING")'>
+										<td><input type="checkbox" name="approveRejectArray" value="<s:property value="timeslotId"/>"/></td>
+									</s:if><s:else>
+										<td>-</td>
+									</s:else>
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestoneName"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>
 									<td><s:property value="venue"/></td>
 									<td><s:property value="myStatus"/></td>
-									<td><s:property value="overallStatus"/></td>
 								</tr>
 							</tbody>
 						</table>
-								<!--<form action="slotupdated.jsp" method="post">-->
-								<form action="updateBookingStatus" method="post">
-									<table>
-									<tr>
-										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
-										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
-										<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td>
-									</tr>
-									</table>
-								</form>
-							</s:iterator>
-				<%-- </s:if><s:else>
-					<h4>No pending bookings available for Approve/Reject!</h4> 
-				</s:else> --%>
+						<table>
+							<tr>
+								<td><input type="submit" class="btn btn-success" value="Approve" name="Approve" onclick='valthisform();'/></td>
+								<td><span class="button-divider"><input type="submit" class="btn btn-danger" value="Reject" name="Reject" onclick='valthisform();'/></span></td>
+								<!--<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td> -->
+							</tr>
+						</table>
+					</form>
+				</s:iterator>
 			</s:if><s:else>
 				<h4>No pending bookings available for Approve/Reject!</h4>
 			</s:else>
@@ -109,18 +125,6 @@
         <%-- <% String statuses = '<s:property value="message" />'; %> --%>
 		
 		<br/>
-		
-		
-        <s:iterator value="message">
-			<%-- <s:textfield name="message" value="%{[0].toString()}" /><br/>--%>
-			<s:property value="teamName"/><br/>
-            <form action="slotupdated.jsp" method="post">
-                <input type="submit" class="btn btn-primary" value="Approve" name="Approve"/>
-                <input type="submit" class="btn btn-primary" value="Reject" name="Reject"/>
-                <input type="hidden" name="teamId" value="<s:property value="teamIdInt"/>" />
-            </form>
-        </s:iterator>
-
         </div>
     </body>
 </html>
