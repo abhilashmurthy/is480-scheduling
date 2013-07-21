@@ -30,7 +30,9 @@
             </li>
         </ul>
         <div id="milestoneTabContent" class="tab-content">
-            <div class="tab-pane fade active in" id="acceptanceContent"><p>Acceptance stuff</p></div>
+            <div class="tab-pane fade active in" id="acceptanceContent">
+				<%@include file="view_schedule.jsp" %>
+			</div>
             <div class="tab-pane fade" id="midtermContent"><p>Midterm stuff</p></div>
             <div class="tab-pane fade" id="finalContent"><p>Final stuff</p></div>
         </div>
