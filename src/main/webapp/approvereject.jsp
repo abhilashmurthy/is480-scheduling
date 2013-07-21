@@ -83,6 +83,7 @@
 									<td><s:property value="myStatus"/></td>
 									<td><s:property value="overallStatus"/></td>
 								</tr>
+							</tbody>
 						</table>
 								<!--<form action="slotupdated.jsp" method="post">-->
 								<form action="updateBookingStatus" method="post">
@@ -90,13 +91,11 @@
 									<tr>
 										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
 										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
-										<input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray"/> 
+										<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td>
 									</tr>
 									</table>
 								</form>
 							</s:iterator>
-						</tbody>
-					</table>
 				<%-- </s:if><s:else>
 					<h4>No pending bookings available for Approve/Reject!</h4> 
 				</s:else> --%>
