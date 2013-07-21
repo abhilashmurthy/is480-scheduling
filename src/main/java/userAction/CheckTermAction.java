@@ -22,7 +22,8 @@ import org.apache.struts2.interceptor.ServletRequestAware;
  */
 public class CheckTermAction extends ActionSupport implements ServletRequestAware {
 
-    private int year;    private String semester;
+    private int year;    
+    private String semester;
     private boolean canAdd;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
