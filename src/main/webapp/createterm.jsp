@@ -229,15 +229,15 @@
                     data: createScheduleData,
                     dataType: 'json'
                 }).done(function(response){
-                    console.log("createScheduleData was called");
                     if (response.success) {
-                        console.log("it was also successful");
+                        console.log("Schedules have been created successfully");
+                        //Display create timeslots forms
+                        displayCreateTimeslots();
                     }
                 }).fail(function(error){
                     console.log("createScheduleData AJAX FAIL");
+                    displayMessage("Oops.. something went wrong", true);
                 });
-                //Display create timeslots forms
-                displayCreateTimeslots();
                 return false;
             });
             

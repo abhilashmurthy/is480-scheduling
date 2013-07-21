@@ -58,6 +58,8 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         String acceptanceDatesString = ((String[])parameters.get("acceptanceDates"))[0];
         String finalDatesString = ((String[])parameters.get("finalDates"))[0];
         
+        logger.debug("Initialized variables");
+        
         //Initate scheduleList
         scheduleList = new ArrayList<Schedule>();
         
@@ -68,25 +70,36 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         newTerm.setSemester(semester);
         TermManager.save(newTerm, transaction);
         
+        logger.debug("Saved term");
+        
         //Save schedule in DB
-        String[] acceptanceDates = midtermDatesString.split(acceptanceDatesString);
-        String[] midtermDates = midtermDatesString.split(midtermDatesString);
-        String[] finalDates = midtermDatesString.split(finalDatesString);
+        String[] acceptanceDates = acceptanceDatesString.split(",");
+        String[] midtermDates = midtermDatesString.split(",");
+        String[] finalDates = finalDatesString.split(",");
+        
+        logger.debug("Arrayed dates");
         
         //Getting and setting milestones
         Milestone acceptanceMil = MilestoneManager.findByName("Acceptance");
         Milestone midtermMil = MilestoneManager.findByName("Midterm");
         Milestone finalMil = MilestoneManager.findByName("Final");
         
+        logger.debug("Got milestones");
+        logger.debug("Acceptance date is: " + acceptanceDates[0]);
+        
         //Getting and setting timestamps
-        Timestamp acceptanceStartTimeStamp = Timestamp.valueOf(acceptanceDates[0] = "00:00:00");
-        Timestamp acceptanceEndTimeStamp = Timestamp.valueOf(acceptanceDates[acceptanceDates.length - 1] = "00:00:00");
-        Timestamp midtermStartTimeStamp = Timestamp.valueOf(midtermDates[0] = "00:00:00");
-        Timestamp midtermEndTimeStamp = Timestamp.valueOf(midtermDates[midtermDates.length - 1] = "00:00:00");
-        Timestamp finalStartTimeStamp = Timestamp.valueOf(finalDates[0] = "00:00:00");
-        Timestamp finalEndTimeStamp = Timestamp.valueOf(finalDates[finalDates.length - 1] = "00:00:00");
+        Timestamp acceptanceStartTimeStamp = Timestamp.valueOf(acceptanceDates[0] + " 00:00:00");
+        Timestamp acceptanceEndTimeStamp = Timestamp.valueOf(acceptanceDates[acceptanceDates.length - 1] + " 00:00:00");
+        Timestamp midtermStartTimeStamp = Timestamp.valueOf(midtermDates[0] + " 00:00:00");
+        Timestamp midtermEndTimeStamp = Timestamp.valueOf(midtermDates[midtermDates.length - 1] + " 00:00:00");
+        Timestamp finalStartTimeStamp = Timestamp.valueOf(finalDates[0] + " 00:00:00");
+        Timestamp finalEndTimeStamp = Timestamp.valueOf(finalDates[finalDates.length - 1] + " 00:00:00");
+        
+        logger.debug("Created timestamps");
         
         Term storedTerm = TermManager.findByYearAndSemester(year, semester);
+        
+        logger.debug("Retreived storedTerm");
         
         //Create schedule objects
         Schedule acceptanceSched = new Schedule();
@@ -107,14 +120,19 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         finalSched.setStartDate(finalStartTimeStamp);
         finalSched.setEndDate(finalEndTimeStamp);
         
+        logger.debug("Created schedules");
+        
         //Add schedules to scheduleList
         scheduleList.add(acceptanceSched);
         scheduleList.add(midtermSched);
         scheduleList.add(finalSched);
         
+        logger.debug("Added to scheduleList");
+        
         //Save schedules to DB
         ScheduleManager.save(scheduleList, transaction);
-        logger.info("Everything handled successfully");
+        logger.info("Schedules have been stored");
+        
         json.put("success", true);
         return SUCCESS;
     }
