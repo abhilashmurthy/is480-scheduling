@@ -23,7 +23,7 @@ import model.Timeslot;
  *
  * @author suresh
  */
-public class GetTimeslotsAction extends ActionSupport{
+public class GetScheduleAction extends ActionSupport{
 
 	@Override
 	public String execute() throws Exception {

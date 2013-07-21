@@ -93,7 +93,7 @@
 		<action name="knockout" class="userAction.KnockoutAction" method="execute">
 			<result type="json" />
 		</action>
-		<action name="getTimeslots" class="systemAction.GetTimeslotsAction" method="execute">
+		<action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
 			<result type="json" >
 				<param name="root">json</param>
 			</result>
