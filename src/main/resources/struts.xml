@@ -86,8 +86,13 @@
 			<result name="login">/login.jsp</result>
         </global-results>
 		
-		<action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
+		<action name="knockout" class="userAction.KnockoutAction" method="execute">
 			<result type="json" />
+		</action>
+		<action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
+			<result type="json" >
+				<param name="root">json</param>
+			</result>
 		</action>
 		<action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
 			<result type="json">

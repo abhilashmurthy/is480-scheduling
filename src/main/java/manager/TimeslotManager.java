@@ -43,14 +43,15 @@ public class TimeslotManager {
         }
         return null;
     }
-
-    public static boolean updateTimeslotStatus(Timeslot timeslot, EntityTransaction transaction) {
-        logger.info("Updating timeslot status");
+	
+	public static boolean updateTimeslotStatus (List<Timeslot> timeslotsToUpdate, EntityTransaction transaction) {
+		logger.info("Updating timeslot status");
         try {
-            transaction = em.getTransaction();
             transaction.begin();
-            em.merge(timeslot);
-            transaction.commit();
+			for (Timeslot timeslot: timeslotsToUpdate) {
+				em.persist(timeslot);
+			}
+			transaction.commit();
             return true;
         } catch (PersistenceException ex) {
             //Rolling back data transactions

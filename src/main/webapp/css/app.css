@@ -67,3 +67,8 @@ body {
 .ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
     border: 1px solid #016CFF !important;
 }
+
+/* For spaces between buttons */
+.button-divider {
+	margin:15px
+}
