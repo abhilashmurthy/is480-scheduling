@@ -18,6 +18,7 @@ import model.Schedule;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ScheduleManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+    private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(ScheduleManager.class);
 
     public static Schedule findByTermAndMilestone(Term term, Milestone milestone) {

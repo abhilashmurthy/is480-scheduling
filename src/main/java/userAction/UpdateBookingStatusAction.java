@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
@@ -24,6 +23,7 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -80,7 +80,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				}
 			}
 			//Updating the time slot 
-			EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+			EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 			EntityTransaction transaction = em.getTransaction();
 			TimeslotManager.updateTimeslotStatus(timeslotsToUpdate, transaction);
 		}

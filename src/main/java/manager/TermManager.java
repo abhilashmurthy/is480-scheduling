@@ -10,11 +10,10 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
-import model.Milestone;
-import model.Schedule;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -22,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TermManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+    private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(TermManager.class);
 
     public static boolean save(Term term, EntityTransaction transaction) {

@@ -11,6 +11,7 @@ import javax.persistence.Query;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UserManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+    private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
     
     public static void save(User user) {

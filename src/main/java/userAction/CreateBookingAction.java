@@ -26,6 +26,7 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -52,6 +53,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 	@Override
 	public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 		HttpSession session = request.getSession();
 
 		User user = (User) session.getAttribute("user");
@@ -163,8 +165,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			return SUCCESS;
 		}
 
-		//All conditions met. Begin persistence transactions
-		EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
 		try {
 			em.getTransaction().begin();
 

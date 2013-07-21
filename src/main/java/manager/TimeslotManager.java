@@ -4,8 +4,6 @@
  */
 package manager;
 
-import constant.Status;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -14,9 +12,9 @@ import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import model.Timeslot;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -24,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TimeslotManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+    private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
 
     public static Timeslot findById(long id) {

@@ -8,18 +8,18 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import model.Milestone;
 import model.Role;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
  * @author Prakhar
  */
 public class RoleManager {
-	private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
+	private static EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 	private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
 	
 	public static List<Role> getAllRolesByTerm (Term term) {

@@ -15,12 +15,11 @@ import model.Term;
  * @author suresh
  */
 public class MiscUtil {
-	
 	/**
-	 * Get the current/next active term based on today's date
-	 * Cutoff dates:
-	 * 15-May and 20-Dec
+	 * Name of the Persistence Unit used application-wide
 	 */
+	public static final String PERSISTENCE_UNIT = "scheduler";
+	
 	public static Term getActiveTerm() {
 		return TermManager.findByYearAndSemester(2013, "Term 1");
 	}
