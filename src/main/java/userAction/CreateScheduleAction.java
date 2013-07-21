@@ -7,15 +7,24 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import manager.MilestoneManager;
+import manager.ScheduleManager;
+import manager.TermManager;
+import model.Milestone;
+import model.Schedule;
+import model.Term;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static userAction.ResponseAction.logger;
 
 /**
  *
@@ -24,6 +33,7 @@ import static userAction.ResponseAction.logger;
 public class CreateScheduleAction extends ActionSupport implements ServletRequestAware {
     
     private HttpServletRequest request;
+    private List<Schedule> scheduleList;
     private HashMap<String, Object> json = new HashMap<String, Object>();
     static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
     
@@ -43,11 +53,68 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         }
         
         int year = Integer.parseInt(((String[])parameters.get("year"))[0]);
-        int semester = Integer.parseInt(((String[])parameters.get("semester"))[0]);
+        String semester = ((String[])parameters.get("semester"))[0];
         String midtermDatesString = ((String[])parameters.get("midtermDates"))[0];
         String acceptanceDatesString = ((String[])parameters.get("acceptanceDates"))[0];
         String finalDatesString = ((String[])parameters.get("finalDates"))[0];
         
+        //Initate scheduleList
+        scheduleList = new ArrayList<Schedule>();
+        
+        //Save Term in DB
+        EntityTransaction transaction = null;
+        Term newTerm = new Term();
+        newTerm.setAcademicYear(year);
+        newTerm.setSemester(semester);
+        TermManager.save(newTerm, transaction);
+        
+        //Save schedule in DB
+        String[] acceptanceDates = midtermDatesString.split(acceptanceDatesString);
+        String[] midtermDates = midtermDatesString.split(midtermDatesString);
+        String[] finalDates = midtermDatesString.split(finalDatesString);
+        
+        //Getting and setting milestones
+        Milestone acceptanceMil = MilestoneManager.findByName("Acceptance");
+        Milestone midtermMil = MilestoneManager.findByName("Midterm");
+        Milestone finalMil = MilestoneManager.findByName("Final");
+        
+        //Getting and setting timestamps
+        Timestamp acceptanceStartTimeStamp = Timestamp.valueOf(acceptanceDates[0] = "00:00:00");
+        Timestamp acceptanceEndTimeStamp = Timestamp.valueOf(acceptanceDates[acceptanceDates.length - 1] = "00:00:00");
+        Timestamp midtermStartTimeStamp = Timestamp.valueOf(midtermDates[0] = "00:00:00");
+        Timestamp midtermEndTimeStamp = Timestamp.valueOf(midtermDates[midtermDates.length - 1] = "00:00:00");
+        Timestamp finalStartTimeStamp = Timestamp.valueOf(finalDates[0] = "00:00:00");
+        Timestamp finalEndTimeStamp = Timestamp.valueOf(finalDates[finalDates.length - 1] = "00:00:00");
+        
+        Term storedTerm = TermManager.findByYearAndSemester(year, semester);
+        
+        //Create schedule objects
+        Schedule acceptanceSched = new Schedule();
+        acceptanceSched.setMilestone(acceptanceMil);
+        acceptanceSched.setTerm(storedTerm);
+        acceptanceSched.setStartDate(acceptanceStartTimeStamp);
+        acceptanceSched.setEndDate(acceptanceEndTimeStamp);
+        
+        Schedule midtermSched = new Schedule();
+        midtermSched.setMilestone(midtermMil);
+        midtermSched.setTerm(storedTerm);
+        midtermSched.setStartDate(midtermStartTimeStamp);
+        midtermSched.setEndDate(midtermEndTimeStamp);
+        
+        Schedule finalSched = new Schedule();
+        finalSched.setMilestone(finalMil);
+        finalSched.setTerm(storedTerm);
+        finalSched.setStartDate(finalStartTimeStamp);
+        finalSched.setEndDate(finalEndTimeStamp);
+        
+        //Add schedules to scheduleList
+        scheduleList.add(acceptanceSched);
+        scheduleList.add(midtermSched);
+        scheduleList.add(finalSched);
+        
+        //Save schedules to DB
+        ScheduleManager.save(scheduleList, transaction);
+        logger.info("Everything handled successfully");
         json.put("success", true);
         return SUCCESS;
     }

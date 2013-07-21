@@ -10,6 +10,8 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
+import model.Milestone;
+import model.Schedule;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +65,7 @@ public class TermManager {
         return sourceList;
     }
 
-    public static Term findByYearAndSemester(int year, int semester) {
+    public static Term findByYearAndSemester(int year, String semester) {
         logger.info("Getting term by year and semester");
         Term result = null;
         try {
@@ -81,4 +83,22 @@ public class TermManager {
         }
         return result;
     }
+	
+	public static Term findTermById (long id) {
+		logger.info("Getting term by id");
+		Term term = null;
+		try {
+			em.getTransaction().begin();
+			Query q = em.createQuery("SELECT t FROM Term t WHERE t.id = :id", Term.class);
+			q.setParameter("id", id);
+			term = (Term) q.getSingleResult();
+			em.getTransaction().commit();
+			return term;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			em.getTransaction().rollback();
+		}
+		return null;
+	}
+	
 }

@@ -15,22 +15,25 @@
 <html>
     <head>
         <title>Approve/Reject Booking</title>
-		<!--<script type="text/javascript">
-			function hideBookingsTable() {
-					document.getElementById('confirmBookings').style.display = 'none';
-			}
-			function showBookingsTable() {
-					document.getElementById('confirmBookings').style.display = 'block';
-			}
-		</script> -->
+		<script type="text/javascript">
+			// Listen for click on toggle checkbox
+			$('#select-all').click(function(event) {   
+				if(this.checked) {
+					// Iterate each checkbox
+					$(':checkbox').each(function() {
+						this.checked = true;                        
+					});
+				}
+			});
+		</script>
 		
     </head>
     <body>
         <%@include file="navbar.jsp" %>
         <div class="container">
         <h3>Approve/Reject Booking</h3>
-        <form action="approveReject" method="post">
-			<!-- Putting default values for testing purposes -->
+        <!--<form action="approveReject" method="post">
+			<!-- Putting default values for testing purposes 
             Choose Term <select name="termId"> 
 							<option value="1">1</option>
 							<option value="2">2</option>
@@ -39,7 +42,7 @@
 			<p style=text-indent:16.5em;>
 			   <input type="submit" class="btn btn-primary" value="Search"/>
 			</p>
-        </form>
+        </form> -->
 		
 		<div id ="confirmBookings"> 
 			<%-- Tab to view Accept/Reject Bookings --%>
@@ -50,34 +53,46 @@
 			</ul>
 
 			<!-- SECTION: Approve/Reject Bookings -->
-			<s:if test="%{data.size() > 0}"> 
+			<s:if test="%{data.size() > 0 && data != null}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
 					<table class="table table-hover">
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
-								<th>Team</th>
-								<th>Milestone</th>
+								<th><input type="checkbox" name="select-all" id="select-all"/></th>
+								<th>Team Name</th>
+								<th>Presentation Type</th>
 								<th>Start Time</th>
 								<th>End Time</th>
+								<th>Venue</th>
+								<th>Your Status</th>
+								<th>Overall Booking Status</th>
 							</tr>
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
 								<tr>	
 									<%--<td><s:property value="teamId"/></td> --%>
+									<td><input type="checkbox" name="approveRejectArray" value="<s:property value="timeslotId"/>"</td>
 									<td><s:property value="teamName"/></td>
-									<td><s:property value="milestone"/></td>
+									<td><s:property value="milestoneName"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>
-									<!--<form action="slotupdated.jsp" method="post">-->
-									<form action="updateBookingStatus" method="post">
+									<td><s:property value="venue"/></td>
+									<td><s:property value="myStatus"/></td>
+									<td><s:property value="overallStatus"/></td>
+								</tr>
+						</table>
+								<!--<form action="slotupdated.jsp" method="post">-->
+								<form action="updateBookingStatus" method="post">
+									<table>
+									<tr>
 										<td><input type="submit" class="btn btn-primary" value="Approve" name="Approve"/></td>
 										<td><input type="submit" class="btn btn-primary" value="Reject" name="Reject"/></td>
-										<input type="hidden" name="teamId" id="teamId" value="<s:property value="teamId"/>"/>
-										<input type="hidden" name="dataList" id="dataList" value=<s:property value="data"/>"/>
-									</form>
-								</tr>
+										<input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray"/> 
+									</tr>
+									</table>
+								</form>
 							</s:iterator>
 						</tbody>
 					</table>

@@ -26,7 +26,7 @@ public class GetTimeslotsAction extends ActionSupport{
 
 	@Override
 	public String execute() throws Exception {
-		Term term = TermManager.findByYearAndSemester(2013, 1);
+		Term term = TermManager.findByYearAndSemester(2013, "Term 1");
 		Milestone milestone = MilestoneManager.findByName("Acceptance");
 		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(term, milestone);
 		Set<Timeslot> timeslots = activeSchedule.getTimeslots();

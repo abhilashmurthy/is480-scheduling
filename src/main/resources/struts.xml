@@ -26,7 +26,7 @@
             <result name="success">/Test.jsp</result>
         </action>
         
-<!--        <action name="createBooking" class="userAction.CreateBookingAction" method="execute">
+<!--        <action name="createBooking" class="userAction.CreateBorokingAction" method="execute">
             <result name = "success">/index.jsp</result>
         </action>
 		
@@ -36,11 +36,12 @@
 		</action> -->
        
 		<action name="approveReject" class="userAction.ResponseAction" method="execute">
-			<result name="success">/ApproveReject.jsp</result>
+			<result name="success">/approvereject.jsp</result>
 		</action>
 		
+		<!-- This action class calls another action class through chaining -->
 		<action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
-			<result name="success">/ApproveReject.jsp</result>
+			<result name="success" type="chain">approveReject</result>
 		</action>
 		
 		<action name="createTerm" class="userAction.CreateTermAction" method="execute">
@@ -51,7 +52,11 @@
 			<result name="success">/schedule.jsp</result>
 		</action>
 		
-	</package>
+		<action name="createSchedule" class="userAction.CreateScheduleAction" method="execute">
+            <result name="success">/scheduleconfirmation.jsp</result>
+        </action>
+		
+    </package>
 
 	<!-- JSON Package -->
 	<package name="json" namespace="/" extends="json-default">
