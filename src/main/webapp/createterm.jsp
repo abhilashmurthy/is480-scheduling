@@ -88,8 +88,12 @@
                         </td>
                         <td>
                             <select name="semester"/> 
-                    <option value="Term 1">Term 1</option>
-                    <option value="Term 2">Term 2</option>
+                    <option value="Term 1">Semester 1</option>
+                    <option value="Modified Term 1A">Semester 1A</option>
+                    <option value="Modified Term 1B">Semester 1B</option>
+                    <option value="Term 2">Semester 2</option>
+                    <option value="Modified Term 2A">Semester 2A</option>
+                    <option value="Modified Term 2B">Semester 2B</option>
                     </select>
                     </td>
                     </tr>
@@ -140,7 +144,7 @@
                         if (response.canAdd) {
                             //Remove Create Button - Brought it back
 //                            $("#createTermSubmitRow").fadeTo('slow', 0);
-                            displayMessage("Creating Term...", false);
+                            displayMessage("Term selected", false);
                             displayCreateSchedule();
 
                         } else {
@@ -214,7 +218,26 @@
 
             //Create Schedule Submit - Show timeslots panel
             $("#createScheduleForm").on('submit', function() {
-                displayCreateTimeslots();
+                //AJAX call to save term and schedule dates
+                var termData = $("#createTermForm").serializeArray();
+                var scheduleData = $("#createScheduleForm").serializeArray();
+                var createScheduleData = $.merge(termData, scheduleData);
+                console.log('\n\nData to be sent to create schedule and term: ' + createScheduleData);
+                $.ajax({
+                    type: 'POST',
+                    url: 'createScheduleJson',
+                    data: createScheduleData,
+                    dataType: 'json'
+                }).done(function(response){
+                    if (response.success) {
+                        console.log("Schedules have been created successfully");
+                        //Display create timeslots forms
+                        displayCreateTimeslots();
+                    }
+                }).fail(function(error){
+                    console.log("createScheduleData AJAX FAIL");
+                    displayMessage("Oops.. something went wrong", true);
+                });
                 return false;
             });
             

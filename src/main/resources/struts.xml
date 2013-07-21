@@ -93,8 +93,10 @@
 		<action name="knockout" class="userAction.KnockoutAction" method="execute">
 			<result type="json" />
 		</action>
-		<action name="loadBookings" class="systemAction.GetTimeslotsAction" method="execute">
-			<result type="json" />
+		<action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
+			<result type="json" >
+				<param name="root">json</param>
+			</result>
 		</action>
 		<action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
 			<result type="json">
@@ -102,6 +104,11 @@
 			</result>
 		</action>
 		<action name="checkTermJson" class="userAction.CheckTermAction" method="execute">
+			<result type="json">
+				<param name="root">json</param>
+			</result>
+		</action>
+		<action name="createScheduleJson" class="userAction.CreateScheduleAction" method="execute">
 			<result type="json">
 				<param name="root">json</param>
 			</result>
