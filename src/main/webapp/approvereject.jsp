@@ -15,6 +15,7 @@
 <html>
     <head>
         <title>Approve/Reject Booking</title>
+		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
 			// Listen for click on toggle checkbox
 			$('#select-all').click(function(event) {   
