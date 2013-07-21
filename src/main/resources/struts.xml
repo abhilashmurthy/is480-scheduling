@@ -86,9 +86,6 @@
 			<result name="login">/login.jsp</result>
         </global-results>
 		
-		<action name="knockout" class="userAction.KnockoutAction" method="execute">
-			<result type="json" />
-		</action>
 		<action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
 			<result type="json" >
 				<param name="root">json</param>
