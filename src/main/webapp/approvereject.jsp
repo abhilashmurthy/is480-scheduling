@@ -34,15 +34,16 @@
 		function valthisform() {
 			var checkboxs=document.getElementsByName("approveRejectArray");
 			var okay = false;
-			for(var i = 0,l = checkboxs.length; i<l; i++) {
+			for(var i = 0, l = checkboxs.length; i<l; i++) {
 				if(checkboxs[i].checked) {
 					okay = true;
 				}
 			}
 			if(!okay) {
 				alert("Please choose a timeslot!");
+				return false;
 			}
-			return false;
+			return true;
 		}
 		</script>
 		
@@ -90,7 +91,7 @@
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
-								<tr>	
+								<tr>
 									<%--<td><s:property value="teamId"/></td> --%>
 									<s:if test='myStatus.equals("PENDING")'>
 										<td><input type="checkbox" name="approveRejectArray" value="<s:property value="timeslotId"/>"/></td>
@@ -108,15 +109,15 @@
 						</table>
 						<table>
 							<tr>
-								<td><input type="submit" class="btn btn-success" value="Approve" name="Approve" onclick='valthisform();'/></td>
-								<td><span class="button-divider"><input type="submit" class="btn btn-danger" value="Reject" name="Reject" onclick='valthisform();'/></span></td>
+								<td><input type="submit" class="btn btn-success" value="Approve" name="Approve" onclick="return valthisform();"/></td>
+								<td><span class="button-divider"><input type="submit" class="btn btn-danger" value="Reject" name="Reject" onclick="return valthisform();"/></span></td>
 								<!--<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td> -->
 							</tr>
 						</table>
+						</s:iterator>
 					</form>
-				</s:iterator>
 			</s:if><s:else>
-				<h4>No pending bookings available for Approve/Reject!</h4>
+				<h4>No bookings available!</h4>
 			</s:else>
 		</div>
 		

@@ -58,6 +58,8 @@
 		<!-- This action class calls another action class through chaining -->
 		<action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
 			<result name="success" type="chain">approveReject</result>
+			<!--<result name="success" type="redirectAction">approveReject?val=${value}</result>-->
+			<!--<result name="success" type="redirect">login</result>-->
 		</action>
 		
 		<action name="newSchedule" class="systemAction.GetTermsAction" method="execute">

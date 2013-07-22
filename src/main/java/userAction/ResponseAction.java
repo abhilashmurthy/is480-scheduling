@@ -132,6 +132,10 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 					} //end of loop
 				}
 			}
+//			String value = request.getParameter("value");
+//			if (value.equals("1")) {
+//				
+//			}
 			return SUCCESS;
 		}
         request.setAttribute("error", "Oops. You're not authorized to access this page!");
