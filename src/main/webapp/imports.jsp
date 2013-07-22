@@ -20,3 +20,20 @@ if (session.getAttribute("user") == null) {
 	return; 
 }
 %>
+
+<script type="text/javascript">
+    //This is used for multiple window.onload's
+    function addLoadEvent(func) {
+        var oldonload = window.onload;
+        if (typeof window.onload !== 'function') {
+            window.onload = func;
+        } else {
+            window.onload = function() {
+                if (oldonload) {
+                    oldonload();
+                }
+                func();
+            };
+        }
+    }
+</script>
