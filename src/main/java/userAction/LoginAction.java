@@ -155,10 +155,9 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				session.setAttribute("isTA", isTA);
 			} else {
 				//Kick user out
-				request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo");
-				request.getRequestDispatcher("error.jsp").forward(request, response);
+				request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo!");
+				request.getRequestDispatcher("login.jsp").forward(request, response);
 			}
-
 		} else {
 			//Login unsuccessful
 			logger.error("LOGIN - SOMETHING WENT WRONG");

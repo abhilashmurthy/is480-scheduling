@@ -102,6 +102,22 @@
             <div class="loadingContainer">
             </div>
         </div>
+		
+		<!-- To display the login message error -->
+		<div class="container">
+			<div class="row">
+				<% Object loginMsg = request.getAttribute("error");
+				   String loginError = "";
+				   if (loginMsg != null) {
+					   loginError = loginMsg.toString();
+				   }
+				%>
+				<p class="text-error" style="text-align:center">
+					<strong><%= loginError %></strong>
+				</p>
+			</div>
+        </div> <!-- /container -->
+		
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
             console.log("login init");
