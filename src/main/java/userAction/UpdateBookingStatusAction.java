@@ -24,6 +24,7 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static userAction.ResponseAction.logger;
 
 /**
  *
@@ -33,6 +34,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 	private String approveRejectArray[];
 	private String approve;
 	private String reject;
+	private String value = "0";  
 	private HttpServletRequest request;    
 	static final Logger logger = LoggerFactory.getLogger(UpdateBookingStatusAction.class);
 	
@@ -64,7 +66,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				HashMap<User,Status> statusList = timeslot.getStatusList();
 				Iterator iter = statusList.keySet().iterator();
 				while (iter.hasNext()) {
-					if (iter.next() == user) {
+					if (iter.next().equals(user)) {
 						if (status.equalsIgnoreCase("ACCEPTED")) {
 							statusList.put(user, Status.ACCEPTED);
 						} else if (status.equalsIgnoreCase("REJECTED")) {
@@ -82,9 +84,16 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			//Updating the time slot 
 			EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
 			EntityTransaction transaction = em.getTransaction();
-			TimeslotManager.updateTimeslotStatus(timeslotsToUpdate, transaction);
+			boolean result = TimeslotManager.updateTimeslotStatus(timeslotsToUpdate, transaction);
+			if (result == true) {
+				//em.close();
+				value = "1";
+				return SUCCESS;
+			}
 		}
-		return SUCCESS;
+		request.setAttribute("error", "No timeslot selected!");
+		logger.error("User hasn't selected a timeslot to approve/reject!");
+		return ERROR;
 	} //end of execute
 
 	
@@ -116,5 +125,13 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 	
 	public void setServletRequest(HttpServletRequest hsr) {
 		this.request = hsr;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 }
