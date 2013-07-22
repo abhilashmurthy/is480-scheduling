@@ -40,11 +40,12 @@ public class GetScheduleAction extends ActionSupport{
 		for (Timeslot t : activeSchedule.getTimeslots()) {
 			
 			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("date", dateFormat.format(t.getStartTime()));
-			map.put("startTime", timeFormat.format(t.getStartTime()));
-			map.put("endTime", timeFormat.format(t.getEndTime()));
+                        map.put("id", t.getId());
+			map.put("datetime", dateFormat.format(t.getStartTime()) + " " + timeFormat.format(t.getStartTime()));
+//			map.put("startTime", timeFormat.format(t.getStartTime()));
+//			map.put("endTime", timeFormat.format(t.getEndTime()));
 			if (t.getTeam() != null) {
-				map.put("teamName", t.getTeam().getTeamName());
+				map.put("team", t.getTeam().getTeamName());
 			}
 			mapList.add(map);
 		}
