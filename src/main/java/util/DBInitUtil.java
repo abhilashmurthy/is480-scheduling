@@ -185,6 +185,7 @@ public class DBInitUtil {
 		u4.setUsername("prakhara.2010");
 		u4.setFullName("Prakhar AGARWAL");
 		u4.addRole(supervisor);
+		u4.addRole(reviewer);
 		
 		User u5 = new User();
 		u5.setUsername("xuling.dai.2010");
@@ -224,7 +225,7 @@ public class DBInitUtil {
 		t1.setTerm(term12013);
 		t1.setTeamName("Thunderbolt");
 		t1.setSupervisor(u4);
-		t1.setReviewer1(u7);
+		t1.setReviewer1(u4);
 		t1.setReviewer2(u8);
 		HashSet<User> members = new HashSet<User>();
 		members.add(u1);

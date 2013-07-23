@@ -34,6 +34,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 	//Request and Response
 	private HttpServletRequest request;
 	private HttpServletResponse response;
+	private List<Role> userRoles;
 	// sorted in alphabetical order. ordering is important
 	// when generating the signature
 	private static final String[] keys = {
@@ -132,10 +133,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				//To check the user's role
 				boolean isSupervisorOrReviewer = false;  //Supervisor and Reviewer will have the same view
 				boolean isStudent = false;
-				//boolean isAdmin = false;
+				boolean isAdmin = false;
 				boolean isTA = false;
 				//Getting the users roles
-				List<Role> userRoles = user.getRoles();
+				userRoles = user.getRoles();
 				if (userRoles != null && userRoles.size() > 0) {
 					for (Role role : userRoles) {
 						if (role.getName().equalsIgnoreCase("Supervisor") || role.getName().equalsIgnoreCase("Reviewer")) {
@@ -147,12 +148,16 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 						} else if (role.getName().equalsIgnoreCase("TA")) {
 							isTA = true;
 							session.setAttribute("isTA", isTA);
+						} else if (role.getName().equalsIgnoreCase("Administrator")) {
+							isAdmin = true;
+							session.setAttribute("isAdmin", isAdmin);
 						}
 					}
 				}
 				session.setAttribute("isSupervisorOrReviewer", isSupervisorOrReviewer);
 				session.setAttribute("isStudent", isStudent);
 				session.setAttribute("isTA", isTA);
+				session.setAttribute("isAdmin", isAdmin);
 			} else {
 				//Kick user out
 				request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo!");
@@ -162,7 +167,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 			//Login unsuccessful
 			logger.error("LOGIN - SOMETHING WENT WRONG");
 		}
-
+		
+		//To check if user has multiple roles (If yes, redirect to another page)
+		if (userRoles.size() > 1) {
+			return "goToRoles";
+		}
 		return SUCCESS;
 	}
 
@@ -180,5 +189,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
 	public void setServletResponse(HttpServletResponse response) {
 		this.response = response;
+	}
+
+	public List<Role> getUserRoles() {
+		return userRoles;
+	}
+
+	public void setUserRoles(List<Role> userRoles) {
+		this.userRoles = userRoles;
 	}
 }
