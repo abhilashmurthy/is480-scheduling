@@ -70,7 +70,7 @@ public class TimeslotManager {
             transaction = em.getTransaction();
             transaction.begin();
             for (Timeslot t : timeslots) {
-                em.persist(t);
+                em.merge(t);
             }
             logger.debug("All timeslots have been saved");
             transaction.commit();

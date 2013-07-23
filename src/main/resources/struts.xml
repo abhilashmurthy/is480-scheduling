@@ -15,6 +15,7 @@
         </global-results>
 		<action name="login" class="userAction.LoginAction" method="execute">
             <result name="success">/index.jsp</result>
+			<result name="goToRoles">/multipleroles.jsp</result>
         </action>
 	</package>
 	
@@ -38,7 +39,11 @@
             <result name="success">/login.jsp</result>
         </action>
 		
-        <action name="test" class="userAction.TestAction" method="execute">
+<!--		<action name="login" class="userAction.LoginAction" method="execute">
+            <result name="goToRoles">/multipleroles.jsp</result>
+        </action>-->
+
+		<action name="test" class="userAction.TestAction" method="execute">
             <result name="success">/Test.jsp</result>
         </action>
         
@@ -58,6 +63,8 @@
 		<!-- This action class calls another action class through chaining -->
 		<action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
 			<result name="success" type="chain">approveReject</result>
+			<!--<result name="success" type="redirectAction">approveReject?val=${value}</result>-->
+			<!--<result name="success" type="redirect">login</result>-->
 		</action>
 		
 		<action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
@@ -86,9 +93,6 @@
 			<result name="login">/login.jsp</result>
         </global-results>
 		
-		<action name="knockout" class="userAction.KnockoutAction" method="execute">
-			<result type="json" />
-		</action>
 		<action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
 			<result type="json" >
 				<param name="root">json</param>

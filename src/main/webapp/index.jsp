@@ -31,23 +31,28 @@
         </ul>
         <div id="milestoneTabContent" class="tab-content">
             <div class="tab-pane fade active in" id="acceptanceContent">
-				<%@include file="view_schedule.jsp" %>
-			</div>
-            <div class="tab-pane fade" id="midtermContent"><p>Midterm stuff</p></div>
-            <div class="tab-pane fade" id="finalContent"><p>Final stuff</p></div>
+                <%@include file="view_schedule.jsp" %>
+            </div>
+            <div class="tab-pane fade" id="midtermContent" hidden>
+                Midterm stuff
+            </div>
+            <div class="tab-pane fade" id="finalContent" hidden>
+                Final stuff
+            </div>
         </div>
     </div>
     <%@include file="footer.jsp"%>
     <script type="text/javascript">
         console.log("index init");
-        
+
         $('#mileStoneTab a').on('click', function(e) {
             //Content effects
             var contentId = $(this).attr('id') + "Content";
             console.log("Showing " + contentId);
-
             $(".tab-pane").removeClass("active in");
+            $(".tab-pane").hide();
             $("#" + contentId).addClass("active in");
+            $("#" + contentId).show();
         });
 
 
