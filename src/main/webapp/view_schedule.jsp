@@ -64,9 +64,9 @@
 //            }
 
                 //Append header names
-                var headerString = "<thead><tr id='scheduleHeader'><td></td>";
+                var headerString = "<thead><tr id='scheduleHeader'><th></th>";
                 for (i = 0; i < datesArray.length; i++) {
-                    headerString += "<td>" + new Date(datesArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(datesArray[i]).toString('ddd') + "</td>";
+                    headerString += "<th>" + new Date(datesArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(datesArray[i]).toString('ddd') + "</th>";
                 }
                 headerString += "</tr></thead>";
                 $("." + tableClass).append(headerString);

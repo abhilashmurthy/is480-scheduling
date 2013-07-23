@@ -4,7 +4,7 @@
  */
 package util;
 
-import java.util.Calendar;
+import javax.persistence.EntityManager;
 import manager.ScheduleManager;
 import manager.TermManager;
 import model.Schedule;
@@ -15,18 +15,17 @@ import model.Term;
  * @author suresh
  */
 public class MiscUtil {
-	
 	/**
-	 * Get the current/next active term based on today's date
-	 * Cutoff dates:
-	 * 15-May and 20-Dec
+	 * Name of the Persistence Unit used application-wide
 	 */
-	public static Term getActiveTerm() {
-		return TermManager.findByYearAndSemester(2013, "Term 1");
+	public static final String PERSISTENCE_UNIT = "scheduler";
+	
+	public static Term getActiveTerm(EntityManager em) {
+		return TermManager.findByYearAndSemester(em, 2013, "Term 1");
 	}
 	
-	public static Schedule getActiveSchedule() {
-		Term activeTerm = getActiveTerm();
-		return ScheduleManager.findActiveByTerm(activeTerm);
+	public static Schedule getActiveSchedule(EntityManager em) {
+		Term activeTerm = getActiveTerm(em);
+		return ScheduleManager.findActiveByTerm(em, activeTerm);
 	}
 }

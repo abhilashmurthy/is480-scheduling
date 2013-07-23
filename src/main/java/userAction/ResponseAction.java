@@ -49,6 +49,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
     
     @Override
     public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		
 		HttpSession session = request.getSession();
 		//Getting the id of user
 		User user = (User) session.getAttribute("user");
@@ -70,7 +72,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 		//Checking whether the user is a supervisor/reviewer. Only supervisor/reviewer can approve or reject a booking
 		if (supervisorReviewerRoles.size() > 0) {
 			//Getting the current schedule based on term id
-			Schedule schedule = MiscUtil.getActiveSchedule();
+			Schedule schedule = MiscUtil.getActiveSchedule(em);
 			//Getting the current milestone
 			//Set<Timeslot> pendingList = null;
 			List<Timeslot> userTimeslots = new ArrayList<Timeslot>();

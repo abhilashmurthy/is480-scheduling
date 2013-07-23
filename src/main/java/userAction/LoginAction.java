@@ -13,6 +13,8 @@ import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -24,6 +26,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -72,6 +75,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
 	@Override
 	public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		
 		logger.info("Reached LoginAction");
 
 		//return to login
@@ -129,7 +134,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 			//Login successful
 
 			//Check if user exists in our DB
-			User user = UserManager.findByUsername(request.getParameter("smu_username"));
+			User user = UserManager.findByUsername(em, request.getParameter("smu_username"));
 			if (user != null) {
 				//Welcome to the system
 				session.setAttribute("user", user);

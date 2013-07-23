@@ -7,14 +7,15 @@ package userAction;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.util.HashMap;
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import manager.TermManager;
-import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import util.MiscUtil;
 
 /**
  *
@@ -49,12 +50,13 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
         //To check if this term already exists
         
         json.put("year", year);
         json.put("semester", semester);
         
-        Term existingTerm = TermManager.findByYearAndSemester(year, semester);
+        Term existingTerm = TermManager.findByYearAndSemester(em, year, semester);
         if (existingTerm != null) {
             request.setAttribute("error", "This term has already been created. Please try again!");
             logger.error("Term already created");

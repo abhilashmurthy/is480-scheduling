@@ -26,6 +26,7 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -52,6 +53,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 	@Override
 	public String execute() throws Exception {
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 		HttpSession session = request.getSession();
 
 		User user = (User) session.getAttribute("user");
@@ -69,7 +71,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		}
 
 		//Validating milestone info
-		Milestone milestone = MilestoneManager.findByName(milestoneStr);
+		Milestone milestone = MilestoneManager.findByName(em, milestoneStr);
 		if (milestone == null) {
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Milestone not found");
@@ -83,13 +85,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		try {
 			int academicYear = Integer.valueOf(termId.split(",")[0]);
 			String semester = termId.split(",")[1];
-			term = TermManager.findByYearAndSemester(academicYear, semester);
+			term = TermManager.findByYearAndSemester(em, academicYear, semester);
 			if (term == null) {
 				throw new Exception();
 			}
 		} catch (Exception e) {
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Term not found");
+			logger.error(e.getMessage());
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong on our end. Please try again!");
 			return SUCCESS;
@@ -97,7 +100,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 
 		//Retrieve the corresponding schedule object and its timeslots
-		Schedule schedule = ScheduleManager.findByTermAndMilestone(term, milestone);
+		Schedule schedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
 		if (schedule == null || schedule.getTimeslots() == null) {
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Schedule not found");
@@ -163,8 +166,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			return SUCCESS;
 		}
 
-		//All conditions met. Begin persistence transactions
-		EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
 		try {
 			em.getTransaction().begin();
 
@@ -198,10 +199,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 			bookingSlot.setStatusList(statusList);
 			bookingSlot.setAttendees(attendees);
-			em.merge(bookingSlot);
+			em.persist(bookingSlot);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			//Rolling back database transactions
+			//Rolling back write operations
 			em.getTransaction().rollback();
 			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("FATAL ERROR: Database Write Error. Code not to be reached!");

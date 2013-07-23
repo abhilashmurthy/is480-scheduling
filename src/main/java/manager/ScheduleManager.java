@@ -18,6 +18,7 @@ import model.Schedule;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -25,10 +26,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ScheduleManager {
 
-    private static EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
     private static Logger logger = LoggerFactory.getLogger(ScheduleManager.class);
 
-    public static Schedule findByTermAndMilestone(Term term, Milestone milestone) {
+    public static Schedule findByTermAndMilestone(EntityManager em, Term term, Milestone milestone) {
         logger.info("Getting schedule by term and milestone");
         Schedule result = null;
         try {
@@ -46,7 +46,7 @@ public class ScheduleManager {
         return result;
     }
 
-    public static Schedule findActiveByTerm(Term term) {
+    public static Schedule findActiveByTerm(EntityManager em, Term term) {
         logger.info("Getting active schedule by term");
         Schedule result = null;
         try {
@@ -67,7 +67,7 @@ public class ScheduleManager {
         return result;
     }
 
-    public static List<Schedule> findByTerm(Term term) {
+    public static List<Schedule> findByTerm(EntityManager em, Term term) {
         logger.info("Getting schedules by term");
         List<Schedule> result = null;
         try {
@@ -83,7 +83,7 @@ public class ScheduleManager {
         return result;
     }
 
-    public static boolean save(List<Schedule> scheduleList, EntityTransaction transaction) {
+    public static boolean save(EntityManager em, List<Schedule> scheduleList, EntityTransaction transaction) {
         logger.info("Creating new schedule");
         try {
             transaction = em.getTransaction();
@@ -107,7 +107,7 @@ public class ScheduleManager {
         return false;
     }
     
-    public static boolean update(Schedule schedule, EntityTransaction transaction) {
+    public static boolean update(EntityManager em, Schedule schedule, EntityTransaction transaction) {
         logger.info("Creating new schedule");
         try {
             transaction = em.getTransaction();
@@ -129,7 +129,7 @@ public class ScheduleManager {
         return false;
     }
 
-    public static List<Schedule> getAllSchedules() {
+    public static List<Schedule> getAllSchedules(EntityManager em) {
         logger.info("Getting all schedule objects");
         List<Schedule> sourceList = null;
         EntityTransaction transaction = em.getTransaction();
@@ -146,7 +146,7 @@ public class ScheduleManager {
         return null;
     }
     
-    public static Schedule findByWindow(Timestamp startDate, Timestamp endDate) {
+    public static Schedule findByWindow(EntityManager em, Timestamp startDate, Timestamp endDate) {
         logger.info("Getting schedule by window: start[" + startDate + "], end[" + endDate + "]");
         Schedule schedule = null;
         EntityTransaction transaction = em.getTransaction();
@@ -164,7 +164,7 @@ public class ScheduleManager {
         return schedule;
     }
     
-    public static Schedule findById(long id) {
+    public static Schedule findById(EntityManager em, long id) {
         logger.info("Getting schedule by id: " + id);
         Schedule schedule = null;
         EntityTransaction transaction = em.getTransaction();
