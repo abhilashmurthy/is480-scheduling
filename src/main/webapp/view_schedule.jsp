@@ -8,6 +8,7 @@
 <script type="text/javascript">
     //Makes use of footer.jsp's jQuery and bootstrap imports
     viewScheduleLoad = function() {
+        
         $('.scheduleTable').ready(function() {
             $.ajax({
                 type: 'GET',
@@ -15,6 +16,15 @@
                 dataType: 'json'
             }).done(function(response) {
                 makeSchedule(response);
+                
+                $(".timeslotCell").mouseenter(function(){
+                    $(this).css('border', '2px solid #f5f5f5');
+                });
+                
+                $(".timeslotCell").mouseleave(function(){
+                    $(this).css('border', 'none');
+                });
+                
             });
         });
 
@@ -59,7 +69,7 @@
                 var datesHashArray = datesSet.values().sort();
                 var minDate = new Date(datesHashArray[0]);
                 var maxDate = new Date(datesHashArray[datesHashArray.length - 1]);
-                console.log("Mindate: " + minDate + ", maxDate: " + maxDate);
+//                console.log("Mindate: " + minDate + ", maxDate: " + maxDate);
                 var datesArray = getDates(minDate, maxDate);
                 
                 function getDates(startDate, stopDate) {
@@ -85,19 +95,38 @@
                 $("." + tableClass).append(headerString);
 
                 //Append timeslot data
+                var rowspanArr = new Array();
                 for (var i = 0; i < timesArray.length; i++) {
                     var htmlString = "<tr>";
                     var time = timesArray[i];
                     htmlString += "<td>" + time + "</td>";
+                    rowloop: //Loop label
                     for (var j = 0; j < datesArray.length; j++) {
                         var date = datesArray[j];
-                        htmlString += "<td";
+                        date = new Date(date).toString("yyyy-MM-dd");
+                        //Identifier for table cell
+                        var datetimeString = date + " " + time + ":00";
+                        //Checking if table cell is part of a timeslot
+                        for (var k=0; k < rowspanArr.length; k++) {
+                            
+                            if (datetimeString === rowspanArr[k]) {
+                                console.log("Skipped: " + datetimeString);
+                                continue rowloop;
+                            }
+                        }
+                        
+                        //Table cell not part of timeslot yet. Proceed.
 
                         //Get the timeslot id from datetime
                         var id = getTimeslotId(timeslots, date, time);
+                        htmlString += "<td class='timeslotCell'";
                         
                         //If timeslot is available
                         if (id !== -1) {
+                            htmlString += " rowspan='2'";
+                            var temp = new Date(Date.parse(datetimeString)).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
+                            console.log("Temp is: " + temp);
+                            rowspanArr.push(temp);
                             htmlString += " id='timeslot_" + id + "'";
 
                             //Get the team name from id
@@ -122,8 +151,8 @@
             }
 
             function getTimeslotId(timeslots, date, time) {
-                var datetimeString = (new Date(date).toString("yyyy-MM-dd") + " " + time + ":00").trim();
-                console.log("Date string: " + datetimeString);
+                var datetimeString = (date + " " + time + ":00").trim();
+//                console.log("Date string: " + datetimeString);
                 for (var i = 0; i < timeslots.length; i++) {
                     if (timeslots[i].datetime === datetimeString) {
                         return timeslots[i].id;
@@ -167,6 +196,7 @@
 //                        + dayOfWeek + "</th>");
 //            }
 //        }
+
     };
 
     addLoadEvent(viewScheduleLoad);
