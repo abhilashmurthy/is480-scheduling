@@ -8,6 +8,7 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.crypto.Mac;
@@ -19,8 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
+import manager.RoleManager;
 import manager.UserManager;
 import model.Role;
+import model.Term;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
@@ -38,6 +41,12 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	private List<Role> userRoles;
+	private boolean isSupervisor;   
+	private boolean isReviewer;
+	private boolean isAdmin;
+	private boolean isStudent;
+	private boolean isTA;
+	
 	// sorted in alphabetical order. ordering is important
 	// when generating the signature
 	private static final String[] keys = {
@@ -136,17 +145,36 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				session.setAttribute("groups", request.getParameter("smu_groups").split(","));
 
 				//To check the user's role
-				boolean isSupervisorOrReviewer = false;  //Supervisor and Reviewer will have the same view
-				boolean isStudent = false;
-				boolean isAdmin = false;
-				boolean isTA = false;
-				//Getting the users roles
-				userRoles = user.getRoles();
+				isSupervisor = false;  
+				isReviewer = false;
+				isStudent = false;
+				isAdmin = false;
+				isTA = false;
+				
+				//Getting the users roles for active term
+				userRoles = new ArrayList<Role>();
+				Term activeTerm = MiscUtil.getActiveTerm(em);
+				List<Role> activeRoles = RoleManager.getAllRolesByTerm(em, activeTerm);
+				for (Role role: activeRoles) {
+					List<User> listUsers = role.getUsers();
+					for (User userObj: listUsers) {
+						if (user.equals(userObj)) {
+							userRoles.add(role);
+						}
+					}
+				}
+				
+				//This is not for the active term
+				//userRoles = user.getRoles();
+				
 				if (userRoles != null && userRoles.size() > 0) {
 					for (Role role : userRoles) {
-						if (role.getName().equalsIgnoreCase("Supervisor") || role.getName().equalsIgnoreCase("Reviewer")) {
-							isSupervisorOrReviewer = true;
-							session.setAttribute("isSupervisorOrReviewer", isSupervisorOrReviewer);
+						if (role.getName().equalsIgnoreCase("Supervisor")) {
+							isSupervisor = true;
+							session.setAttribute("isSupervisor", isSupervisor);
+						} else if (role.getName().equalsIgnoreCase("Reviewer")) {
+							isReviewer = true;
+							session.setAttribute("isReviewer", isReviewer);
 						} else if (role.getName().equalsIgnoreCase("Student")) {
 							isStudent = true;
 							session.setAttribute("isStudent", isStudent);
@@ -159,7 +187,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 						}
 					}
 				}
-				session.setAttribute("isSupervisorOrReviewer", isSupervisorOrReviewer);
+				session.setAttribute("isSupervisor", isSupervisor);
+				session.setAttribute("isReviewer", isReviewer);
 				session.setAttribute("isStudent", isStudent);
 				session.setAttribute("isTA", isTA);
 				session.setAttribute("isAdmin", isAdmin);
@@ -202,5 +231,45 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
 	public void setUserRoles(List<Role> userRoles) {
 		this.userRoles = userRoles;
+	}
+
+	public boolean isIsSupervisor() {
+		return isSupervisor;
+	}
+
+	public void setIsSupervisor(boolean isSupervisor) {
+		this.isSupervisor = isSupervisor;
+	}
+
+	public boolean isIsReviewer() {
+		return isReviewer;
+	}
+
+	public void setIsReviewer(boolean isReviewer) {
+		this.isReviewer = isReviewer;
+	}
+
+	public boolean isIsAdmin() {
+		return isAdmin;
+	}
+
+	public void setIsAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+
+	public boolean isIsStudent() {
+		return isStudent;
+	}
+
+	public void setIsStudent(boolean isStudent) {
+		this.isStudent = isStudent;
+	}
+
+	public boolean isIsTA() {
+		return isTA;
+	}
+
+	public void setIsTA(boolean isTA) {
+		this.isTA = isTA;
 	}
 }

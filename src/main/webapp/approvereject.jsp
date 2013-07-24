@@ -45,10 +45,21 @@
 			}
 			return true;
 		}
+		
+		//To show/hide buttons if checkbox exists or not
+		function displayButtons() {
+			if(document.getElementById('approveRejectArray') == null) {
+				 document.getElementById("approveButton").style.visibility = "hidden";
+				 document.getElementById("rejectButton").style.visibility = "hidden";
+			} else {
+				document.getElementById("approveButton").style.visibility = "visible";
+				document.getElementById("rejectButton").style.visibility = "visible";
+			}
+		}
 		</script>
 		
     </head>
-    <body>
+    <body onload="displayButtons()">
         <%@include file="navbar.jsp" %>
         <div class="container">
         <h3>Approve/Reject Booking</h3>
@@ -94,7 +105,7 @@
 								<tr>
 									<%--<td><s:property value="teamId"/></td> --%>
 									<s:if test='myStatus.equals("PENDING")'>
-										<td><input type="checkbox" name="approveRejectArray" value="<s:property value="timeslotId"/>"/></td>
+										<td><input type="checkbox" id="approveRejectArray" name="approveRejectArray" value="<s:property value="timeslotId"/>"/></td>
 									</s:if><s:else>
 										<td>-</td>
 									</s:else>
@@ -109,8 +120,12 @@
 						</table>
 						<table>
 							<tr>
-								<td><input type="submit" class="btn btn-success" value="Approve" name="Approve" onclick="return valthisform();"/></td>
-								<td><span class="button-divider"><input type="submit" class="btn btn-danger" value="Reject" name="Reject" onclick="return valthisform();"/></span></td>
+								<td><input type="submit" class="btn btn-success" id="approveButton" value="Approve" name="Approve" onclick="return valthisform();"/></td>
+								<td>
+									<span class="button-divider">
+										<input type="submit" class="btn btn-danger" id="rejectButton" value="Reject" name="Reject" onclick="return valthisform();"/>
+									</span>
+								</td>
 								<!--<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td> -->
 							</tr>
 						</table>
@@ -119,8 +134,7 @@
 			</s:if><s:else>
 				<h4>No bookings available!</h4>
 			</s:else>
-		</div>
-		
+		</div>		
 		
         <script src="js/plugins/bootstrap.js" type="text/javascript"></script>
         <%-- <% String statuses = '<s:property value="message" />'; %> --%>
