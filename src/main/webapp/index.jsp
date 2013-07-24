@@ -12,8 +12,8 @@
 
         <!-- Welcome Text -->
         <div class="container page" />
-        <h1 id="welcomeText">Welcome to the IS480 Scheduling Project</h1>
-    </div>
+        <h3 id="welcomeText">Welcome to the IS480 Scheduling Project</h3>
+		</div>
 
     <!-- Main schedule navigation -->
     <div class="container">

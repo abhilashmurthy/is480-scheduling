@@ -14,6 +14,12 @@
     }
 </style>
 <%@include file="imports.jsp"%>
+<% boolean isStudent = (Boolean)session.getAttribute("isStudent");
+   boolean isSupervisor = (Boolean)session.getAttribute("isSupervisor");
+   boolean isReviewer = (Boolean)session.getAttribute("isReviewer");
+   boolean isTA = (Boolean)session.getAttribute("isTA");
+   boolean isAdmin = (Boolean)session.getAttribute("isAdmin");
+%>
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -40,18 +46,15 @@
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
     <p><strong>Name</strong><br/> <% out.print(user.getFullName());%></p>
-    <strong>User Roles</strong> 
+    <strong>Your Role(s)</strong>
 	<ul class="unstyled">
-		<% boolean var1 = (Boolean)session.getAttribute("isAdmin");
-		   if (var1) { %>
+		<% if (isAdmin) { %>
 		   <li>Administrator</li>
 		<% } %>
-		<% boolean var2 = (Boolean)session.getAttribute("isSupervisor");
-		   if (var2) { %>
+		<% if (isSupervisor) { %>
 		   <li>Supervisor</li>
 		<% } %>
-		<% boolean var3 = (Boolean)session.getAttribute("isReviewer");
-		   if (var3) { %>
+		<% if (isReviewer) { %>
 		   <li>Reviewer</li>
 		<% } %>
 	</ul>
@@ -82,6 +85,7 @@
         });
         
     };
-    
-    addLoadEvent(navbarLoad);
+	
+	addLoadEvent(navbarLoad);
+
 </script>

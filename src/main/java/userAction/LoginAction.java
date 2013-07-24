@@ -192,6 +192,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				session.setAttribute("isStudent", isStudent);
 				session.setAttribute("isTA", isTA);
 				session.setAttribute("isAdmin", isAdmin);
+				session.setAttribute("userRoles", userRoles);  //Setting the list of roles for user
 			} else {
 				//Kick user out
 				request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo!");
