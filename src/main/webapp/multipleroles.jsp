@@ -9,11 +9,11 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-        <title>Welcome | Roles</title>
+        <title>Welcome | Your Roles</title>
 		<%@include file="footer.jsp"%>
     </head>
     <body>
-        <%@include file="navbar.jsp" %>
+        <%@include file="navbar_multipleroles.jsp" %>
         <div class="container">
 			<h3>Choose your Role</h3>
 			<% Object supervisor = session.getAttribute("isSupervisor");

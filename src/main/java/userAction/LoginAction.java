@@ -8,6 +8,7 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.crypto.Mac;
@@ -19,8 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
+import manager.RoleManager;
 import manager.UserManager;
 import model.Role;
+import model.Term;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
@@ -147,8 +150,23 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				isStudent = false;
 				isAdmin = false;
 				isTA = false;
-				//Getting the users roles
-				userRoles = user.getRoles();
+				
+				//Getting the users roles for active term
+				userRoles = new ArrayList<Role>();
+				Term activeTerm = MiscUtil.getActiveTerm(em);
+				List<Role> activeRoles = RoleManager.getAllRolesByTerm(em, activeTerm);
+				for (Role role: activeRoles) {
+					List<User> listUsers = role.getUsers();
+					for (User userObj: listUsers) {
+						if (user.equals(userObj)) {
+							userRoles.add(role);
+						}
+					}
+				}
+				
+				//This is not for the active term
+				//userRoles = user.getRoles();
+				
 				if (userRoles != null && userRoles.size() > 0) {
 					for (Role role : userRoles) {
 						if (role.getName().equalsIgnoreCase("Supervisor")) {
