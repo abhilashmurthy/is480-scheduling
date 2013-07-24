@@ -1,5 +1,5 @@
 <!-- EMBEDDABLE PAGE. NOT TO BE USED ALONE -->
-<table id="acceptanceScheduleTable" class="scheduleTable table-condensed table-hover table-bordered table-striped">
+<table id="acceptanceScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
 </table>
 
 <!-- jshashset imports -->
@@ -38,30 +38,43 @@
             makeSchedule("scheduleTable", data.timeslots);
 
             function makeSchedule(tableClass, timeslots) {
-
-                //Get unique times
-                var timesSet = new HashSet();
-                for (i = 0; i < timeslots.length; i++) {
-                    timesSet.add(Date.parse(timeslots[i].datetime).toString("HH:mm:ss"));
+                
+                //TODO: Get from server/admin console/whatevs
+                var minTime = 9;
+                var maxTime = 19;
+                
+                var timesArray = new Array();
+                for (var i = minTime; i < maxTime; i++) {
+                    var timeVal = Date.parse(i+":00:00");
+                    timesArray.push(timeVal.toString("HH:mm"));
+                    timeVal.addMinutes(30);
+                    timesArray.push(timeVal.toString("HH:mm"));
                 }
 
-                //Get unique dates
+                //Get unique dates, minDate, and maxDate
                 var datesSet = new HashSet();
                 for (i = 0; i < timeslots.length; i++) {
                     datesSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
                 }
-
-                //Sort arrays
-                var timesArray = timesSet.values().sort();
-                var datesArray = datesSet.values().sort();
-
-//            for (i = 0; i < datesArray.length; i++) {
-//                console.log("Date is: " + datesArray[i]);
-//            }
-//
-//            for (i = 0; i < timesArray.length; i++) {
-//                console.log("Time is: " + timesArray[i]);
-//            }
+                var datesHashArray = datesSet.values().sort();
+                var minDate = new Date(datesHashArray[0]);
+                var maxDate = new Date(datesHashArray[datesHashArray.length - 1]);
+                console.log("Mindate: " + minDate + ", maxDate: " + maxDate);
+                var datesArray = getDates(minDate, maxDate);
+                
+                function getDates(startDate, stopDate) {
+                    var dateArray = new Array();
+                    var currentDate = startDate;
+                    while (currentDate <= stopDate) {
+                        if (new Date(currentDate).isWeekday()) {
+                            dateArray.push(currentDate);
+                        }
+                        currentDate = new Date(currentDate).addDays(1);
+                    }
+                    return dateArray;
+                }
+                
+                //Get dates between minDate and maxDate
 
                 //Append header names
                 var headerString = "<thead><tr id='scheduleHeader'><th></th>";
@@ -78,15 +91,25 @@
                     htmlString += "<td>" + time + "</td>";
                     for (var j = 0; j < datesArray.length; j++) {
                         var date = datesArray[j];
+                        htmlString += "<td";
 
                         //Get the timeslot id from datetime
                         var id = getTimeslotId(timeslots, date, time);
-                        htmlString += "<td id='timeslot_" + id + "'>";
+                        
+                        //If timeslot is available
+                        if (id !== -1) {
+                            htmlString += " id='timeslot_" + id + "'";
 
-                        //Get the team name from id
-                        var team = getTeam(timeslots, id);
-                        if (team !== null) {
-                            htmlString += team;
+                            //Get the team name from id
+                            var team = getTeam(timeslots, id);
+                            if (team !== null) {
+                                htmlString += " style='background-color: #f2dede; border-left: 1px solid #dddddd'>";
+                                htmlString += team;
+                            } else {
+                                htmlString += " style='background-color: #d9edf7; border-left: 1px solid #dddddd'>";
+                            }
+                        } else {
+                            htmlString += " style='background-color: #f5f5f5; border-left: 1px solid #dddddd'>";
                         }
 
                         //Close td
@@ -99,7 +122,8 @@
             }
 
             function getTimeslotId(timeslots, date, time) {
-                var datetimeString = (date + " " + time).trim();
+                var datetimeString = (new Date(date).toString("yyyy-MM-dd") + " " + time + ":00").trim();
+                console.log("Date string: " + datetimeString);
                 for (var i = 0; i < timeslots.length; i++) {
                     if (timeslots[i].datetime === datetimeString) {
                         return timeslots[i].id;

@@ -120,7 +120,7 @@ public class DBInitUtil {
 		HashSet<Timeslot> timeslots = new HashSet<Timeslot>();
 		for (int a = 7; a <= 20; a++) {
 			// Skipping weekends
-			if (a == 11 || a == 12 || a == 18 || a == 19) {
+			if (a == 10 || a == 11 || a == 17 || a == 18) {
 				continue;
 			}
 			
@@ -143,7 +143,7 @@ public class DBInitUtil {
 		HashSet<Timeslot> midtermTimeslots = new HashSet<Timeslot>();
 		for (int a = 19; a <= 30; a++) {
 			// Skipping weekends
-			if (a == 21 || a == 22 || a == 28 || a == 29) {
+			if (a == 20 || a == 21 || a == 27 || a == 28) {
 				continue;
 			}
 			
