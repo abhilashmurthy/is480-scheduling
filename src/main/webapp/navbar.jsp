@@ -58,9 +58,9 @@
 </div>
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
-    <p>Name: <% out.print(user.getFullName());%></p>
-    <p>Team: <% out.print(user.getTeam().getTeamName());%></p>
-    <p>User Roles:</p>
+    <p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>
+    <p><strong>Team<br/></strong><% out.print(user.getTeam().getTeamName());%></p>
+    <p><strong>User Roles</strong><br/></p>
     <ul>
 
     </ul>

@@ -39,12 +39,22 @@
 </div>
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
-    <p><strong>Name:</strong> <% out.print(user.getFullName());%></p>
-    <p><strong>Team:</strong> <% out.print(user.getTeam().getTeamName());%></p>
-    <p><strong>User Roles: </strong></p>
-    <ul>
-
-    </ul>
+    <p><strong>Name</strong><br/> <% out.print(user.getFullName());%></p>
+    <strong>User Roles</strong> 
+	<ul class="unstyled">
+		<% boolean var1 = (Boolean)session.getAttribute("isAdmin");
+		   if (var1) { %>
+		   <li>Administrator</li>
+		<% } %>
+		<% boolean var2 = (Boolean)session.getAttribute("isSupervisor");
+		   if (var2) { %>
+		   <li>Supervisor</li>
+		<% } %>
+		<% boolean var3 = (Boolean)session.getAttribute("isReviewer");
+		   if (var3) { %>
+		   <li>Reviewer</li>
+		<% } %>
+	</ul>
 </div>
 <script type="text/javascript">
     //Makes use of footer.jsp's jQuery and bootstrap imports

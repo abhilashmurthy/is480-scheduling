@@ -7,7 +7,7 @@
 <%@page contentType="text/html" pageEncoding="windows-1252"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 
-<s:if test="%{userRoles.size() > 1}"> 
+<s:if test="%{userRoles.size() > 1}">
 <!DOCTYPE html>
 <html>
     <head>
@@ -55,7 +55,8 @@
 		</div>
     </body>
 </html>
-</s:if><s:else>
+</s:if>
+<s:else>
 	<% response.sendRedirect("index.jsp"); 	%>
 </s:else>
 
