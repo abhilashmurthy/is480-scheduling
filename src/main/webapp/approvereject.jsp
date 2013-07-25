@@ -46,8 +46,7 @@
 			return true;
 		}
 		
-		//To show/hide buttons if checkbox exists or not
-		function displayButtons() {
+		jQuery(document).ready(function(){
 			if(document.getElementById('approveRejectArray') == null) {
 				 document.getElementById("approveButton").style.visibility = "hidden";
 				 document.getElementById("rejectButton").style.visibility = "hidden";
@@ -55,11 +54,12 @@
 				document.getElementById("approveButton").style.visibility = "visible";
 				document.getElementById("rejectButton").style.visibility = "visible";
 			}
-		}
+		});
+		//To show/hide buttons if checkbox exists or not
 		</script>
 		
     </head>
-    <body onload="displayButtons()">
+    <body>
         <%@include file="navbar.jsp" %>
         <div class="container">
         <h3>Approve/Reject Booking</h3>

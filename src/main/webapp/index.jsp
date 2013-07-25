@@ -11,7 +11,7 @@
         <%@include file="navbar.jsp" %>
 
         <!-- Welcome Text -->
-        <div class="container page" />
+        <div class="container " />
         <h3 id="welcomeText">Welcome to the IS480 Scheduling Project</h3>
 		</div>
 
