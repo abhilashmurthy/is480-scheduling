@@ -11,7 +11,7 @@
 <%@ taglib prefix="s" uri="/struts-tags" %>
 
 <% List<Role> userRoles = (List<Role>) session.getAttribute("userRoles"); 
-   if (userRoles != null && userRoles.size() > 0) {  %>
+   if (userRoles.size() > 1) {  %>
 <!DOCTYPE html>
 <html>
     <head>

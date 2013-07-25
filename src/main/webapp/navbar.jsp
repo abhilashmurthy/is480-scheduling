@@ -97,7 +97,7 @@
             </div>
 
             <div class="btn-group userbox">
-                <button class="btn btn-inverse" id="userDashboard"><i class="icon-user icon-white"></i>&nbsp;<%= user.getFullName().split(" ")[0]%> -  Dashboard</button>
+                <button class="btn" id="userDashboard"><i class="icon-user icon-black"></i>&nbsp;<%= user.getFullName().split(" ")[0]%> -  Dashboard</button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
