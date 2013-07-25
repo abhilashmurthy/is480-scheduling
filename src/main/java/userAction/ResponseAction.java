@@ -24,7 +24,10 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import manager.RoleManager;
 import model.Role;
+import model.Team;
+import model.Term;
 import util.MiscUtil;
 
 /**
@@ -43,6 +46,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 	private String endTime;
 	private String venue;
 	private String myStatus;
+	private String userRole;
 	private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 	private HttpServletRequest request;    
     static final Logger logger = LoggerFactory.getLogger(ResponseAction.class);
@@ -60,8 +64,20 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 //		Term term = MiscUtil.getActiveTerm();
 //		termId = term.getId();
 		
-		//Getting the user's roles
-		List<Role> userAllRoles = user.getRoles();
+		//Getting the user's roles for the active term
+		List<Role> userAllRoles = new ArrayList<Role>();
+		Term activeTerm = MiscUtil.getActiveTerm(em);
+		List<Role> activeRoles = RoleManager.getAllRolesByTerm(em, activeTerm);
+		for (Role role: activeRoles) {
+			List<User> listUsers = role.getUsers();
+			for (User userObj: listUsers) {
+				if (user.equals(userObj)) {
+					userAllRoles.add(role);
+				}
+			}
+		}
+				
+		//List<Role> userAllRoles = user.getRoles();   //This is to get all user roles (and not for active semester)
 		List<Role> supervisorReviewerRoles = new ArrayList<Role>();
 		for (Role role: userAllRoles) {
 			if (role.getName().equalsIgnoreCase("Supervisor") || role.getName().equalsIgnoreCase("Reviewer")) {
@@ -103,16 +119,26 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
 						venue = timeslot.getVenue();
 						timeslotId = timeslot.getId();
-						teamId = timeslot.getTeam().getId();				
-						teamName = timeslot.getTeam().getTeamName();
+						Team team = timeslot.getTeam();
+						teamId = team.getId();				
+						teamName = team.getTeamName();
 						milestoneName = schedule.getMilestone().getName();
 						startTime = sdf.format(timeslot.getStartTime());
 						endTime = sdf.format(timeslot.getEndTime());
 						myStatus = timeslot.getStatusList().get(user).toString();
-
+						//A user can only have 1 role in a team (Supervisor and Reviewer cannot be same for the same team)
+						if (team.getSupervisor().equals(user)) {
+							userRole = "Supervisor";
+						} else if (team.getReviewer1().equals(user)) {
+							userRole = "Reviewer";
+						} else if (team.getReviewer2().equals(user)) {
+							userRole = "Reviewer";
+						}
+						
 						map.put("timeslotId", String.valueOf(timeslotId));
 						map.put("teamName", teamName);
 						map.put("milestone", milestoneName);
+						map.put("userRole", userRole);
 						map.put("startTime", startTime);
 						map.put("endTime", endTime);
 						map.put("venue", venue);
@@ -235,5 +261,13 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 
 	public void setMyStatus(String myStatus) {
 		this.myStatus = myStatus;
+	}
+
+	public String getUserRole() {
+		return userRole;
+	}
+
+	public void setUserRole(String userRole) {
+		this.userRole = userRole;
 	}
 }

@@ -94,6 +94,7 @@
 								<th><input type="checkbox" name="checkall" onclick="checkedAll();"></th>
 								<th>Team Name</th>
 								<th>Presentation Type</th>
+								<th>Your Role</th>
 								<th>Start Time</th>
 								<th>End Time</th>
 								<th>Venue</th>
@@ -111,6 +112,7 @@
 									</s:else>
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestoneName"/></td>
+									<td><s:property value="userRole"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>
 									<td><s:property value="venue"/></td>
