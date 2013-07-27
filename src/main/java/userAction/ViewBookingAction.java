@@ -4,13 +4,16 @@
  */
 package userAction;
 
+import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Status;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -27,150 +30,122 @@ import util.MiscUtil;
  *
  * @author Tarlochan
  */
-public class ViewBookingAction extends ActionSupport implements ServletRequestAware{
+public class ViewBookingAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
-    private String timeSlotID;
-    private String longMsg;
-    private HashMap<String, Object> json = new HashMap<String, Object>();
-    
-    
-    public void setServletRequest(HttpServletRequest hsr) {
-        request = hsr;
-    }
-    
-    
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-    
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }
-    
+    private String timeslotId;
+//	private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
+	private HashMap<String, Object> json = new HashMap<String, Object>();
+	
     @Override
     public String execute() throws Exception {
-        //convert the chosen ID into long
-        long chosenID = Long.parseLong(timeSlotID);
         EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-        Timeslot ts = TimeslotManager.findById(em,chosenID);
-       
-        if(ts!=null){
-            Timestamp st = ts.getStartTime();
-            Timestamp et = ts.getEndTime();
-            Date date = new Date(st.getTime());
-            Date date2 = new Date(et.getTime());
-            
-            //long dt = date.getTime();
-            //put date into format
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
-            
-            //get team's ID from timeslot
-            
-            String teamName = "-";
-           
-            
-            if(ts.getTeam()!=null){
-                Team team = ts.getTeam();
-                teamName = team.getTeamName().toString();
-            }
-            
-            HashMap<User,Status> attendees = null;
-            
-            //get every user
-            String allUserNames = "-";
-            if(ts.getStatusList() !=null){
-               attendees = ts.getStatusList();
-               Iterator it = attendees.entrySet().iterator();
-               allUserNames = "";
-               while (it.hasNext()) {
-                    Map.Entry pairs = (Map.Entry)it.next();
-                    User u = (User)pairs.getKey();
-                    Status status = (Status)pairs.getValue();
-                    //it.remove(); // avoids a ConcurrentModificationException
-                    
-                    if (!it.hasNext()) {
-                        // last iteration
-                        allUserNames += u.getFullName()+ "( " + status + " )";
-                    }else{    
-                        allUserNames += u.getFullName() + "( " + status + " ), ";
-                    }
-                    
-               }
-               
-              //allUserNames = Integer.toString(attendees.size());
-                
-            }
-            
-            //get venue
-            String venue = "-";
-            venue = ts.getVenue();
-            
-            //Things this code cannot get as of now (can only do this when database has values)
-            String nonCompulsoryAttendees = "-";
-            String TA = "-";
-            String teamWiki = "-";
-            //Ends here
-            
-            String dateSlot = dateFormat.format(date);
-            
-            SimpleDateFormat dateFormat2 = new SimpleDateFormat("HH:mm");
-            String startTimeString = dateFormat2.format(date);
-            String endTimeString = dateFormat2.format(date2);
-            json.put("success",true);
-            longMsg = "Team Name: " + teamName + "\n" + 
-					  "Date: " + dateSlot + "\n" + 
-					  "Start Time: " + startTimeString + "\n" +
-                      "End Time: " + endTimeString + "\n" + 
-					  "Venue: " + venue + "\n" + 
-					  "Compulsory Attendees: " + allUserNames + "\n" +
-                      "Non-compulsory Attendees: " + nonCompulsoryAttendees + "\n" + 
-					  "TA: " + TA + "\n" +  
-					  "Team Wiki: " + teamWiki;
-							  
-            json.put("message",longMsg);
-            /*json.put("Date", dateSlot);
-            json.put("Start Time", startTimeString);
-            json.put("End Time", endTimeString);
-            json.put("Venue", venue);
-            json.put("Compulsory Attendees", attendees.toString());
-            json.put("Non-compulsory Attendees", nonCompulsoryAttendees);
-            json.put("TA",TA);
-            json.put("Team Wiki", teamWiki);*/
-            //em.getTransaction().commit();
-            //request.setAttribute("details",longMsg);
-            
-            return SUCCESS;
-        }
+		//convert the chosen ID into long
+        long chosenID = Long.parseLong(timeslotId);
+        Timeslot ts = TimeslotManager.findById(em, chosenID);
         
-         json.put("error",true);
-         json.put("message","there are no bookings!");
-         //em.getTransaction().commit();
-         return SUCCESS;
-        
-    }
+		//Check whether timeslot exists
+        if (ts != null) {
+			//Check whether timeslot has a team assigned to it
+			if (ts.getTeam() != null) {
+				Timestamp st = ts.getStartTime();
+				Timestamp et = ts.getEndTime();
+				Date startDate = new Date(st.getTime());
+				Date endDate = new Date(et.getTime());
 
-    public HashMap<String, Object> getJson() {
+				SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+				//Converting the start date of timeslot
+				String dateSlot = dateFormat.format(startDate);
+				json.put("startDate", dateSlot);
+				//Converting the start time & end time of timeslot
+				String startTimeString = timeFormat.format(startDate);
+				json.put("startTime", startTimeString);
+				String endTimeString = timeFormat.format(endDate);
+				json.put("endTime", endTimeString);
+
+				//Get team's name from the timeslot
+				String teamName = ts.getTeam().getTeamName();
+				json.put("teamName", teamName);
+
+				//This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
+				List<HashMap<String, String>> attendees = new ArrayList<HashMap<String, String>>();
+				
+				//Getting all the team members associated with the timeslot
+				//First getting the team members
+				Team team = ts.getTeam();
+				if (team != null) {
+					Set<User> teamMembers = team.getMembers();
+					Iterator it = teamMembers.iterator();
+					while (it.hasNext()) {
+						HashMap<String, String> userMap = new HashMap<String, String>();
+						User teamMember = (User) it.next();
+						userMap.put("name", teamMember.getFullName());
+
+						attendees.add(userMap);
+					}
+				}
+				
+				//Second getting the supervisor/reviewer for the timeslot
+				HashMap<User, Status> members = null;
+				if (ts.getStatusList() != null) {
+				   members = ts.getStatusList();
+				   Iterator iter = members.keySet().iterator();
+				   while (iter.hasNext()) {
+					   HashMap<String, String> userMap = new HashMap<String, String>();
+					   User supervisorReviewer = (User) iter.next();
+					   Status status = members.get(supervisorReviewer);
+					   userMap.put("name", supervisorReviewer.getFullName());
+					   userMap.put("status", status.toString());
+					   
+					   attendees.add(userMap);
+				   }
+				}
+				//Setting the list of attendees
+				json.put("attendees", attendees);
+				
+				//Getting venue for timeslot
+				String venue = ts.getVenue();
+				json.put("venue", venue);
+				
+				//Things this code cannot get as of now (can only do this when database has values)
+				String TA = "-";
+				json.put("TA", TA);
+				String teamWiki = "-";
+				json.put("teamWiki", teamWiki);
+				
+				if (json.size() > 0) {
+					return SUCCESS;
+				}
+			}
+			json.put("error",true);
+			json.put("message", "This booking is empty!");
+			return SUCCESS;
+		}
+		json.put("error",true);
+        json.put("message","This booking doesnt exist!");
+        return SUCCESS;
+		
+	} //end of execute
+	
+	public void setServletRequest(HttpServletRequest hsr) {
+		this.request = hsr;
+	}
+
+	public String getTimeslotId() {
+		return timeslotId;
+	}
+
+	public void setTimeslotId(String timeslotId) {
+		this.timeslotId = timeslotId;
+	}
+
+	public HashMap<String, Object> getJson() {
 		return json;
-    }
+	}
 
-    public void setJson(HashMap<String, Object> json) {
-            this.json = json;
-    }
-    
-    public String gettimeSlotID(){
-        return timeSlotID;
-    }
-    
-    public void setTimeSlotID(String newTimeSlotID){
-        timeSlotID = newTimeSlotID;
-    }
-    
-    public String getLongMsg(){
-        return longMsg;
-    }
-    
-    public void setLongMsg(String newMsg){
-        longMsg = newMsg;
-    }
-}
+	public void setJson(HashMap<String, Object> json) {
+		this.json = json;
+	}
+} //end of class

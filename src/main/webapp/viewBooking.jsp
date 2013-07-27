@@ -26,7 +26,7 @@
                     return true;">
                
                 <br />
-                <select name="timeSlotID" onchange="submitForm()">
+                <select name="timeslotId" onchange="submitForm()">
                     <option>--Choose a timeslot ID--</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -36,6 +36,7 @@
                     <option value="6">6</option>
                     <option value="7">7</option>
                     <option value="11">11</option>
+					<option value="33">33</option>
                 </select> 
                 <input id="viewBookingFormBtn" type="submit" class="btn btn-primary" value="View" data-loading-text="Loading..." style="visibility:hidden" />
             </form>
