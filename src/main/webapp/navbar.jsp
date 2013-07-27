@@ -106,8 +106,8 @@
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
-                                                                <li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
-                                                        </ul>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
+							</ul>
                                                         
 						</li>
 				<% } else if (activeRole.equalsIgnoreCase("Student")) { %>
@@ -115,7 +115,7 @@
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="booking.jsp">Create Booking</a></li>
-                                                                <li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
 							</ul>
 						</li>
 				<% } else if (activeRole.equalsIgnoreCase("TA")) { %>	

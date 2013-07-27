@@ -118,9 +118,16 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
             String startTimeString = dateFormat2.format(date);
             String endTimeString = dateFormat2.format(date2);
             json.put("success",true);
-            longMsg = "Team Name: " + teamName + ", Date: " + dateSlot + ", Start Time: " + startTimeString
-                    + ", End Time: " + endTimeString + ", Venue: " + venue + ", Compulsory Attendees: " + allUserNames
-                        + ", Non-compulsory Attendees: " + nonCompulsoryAttendees + ", TA: " + TA + ", Team Wiki: " + teamWiki;
+            longMsg = "Team Name: " + teamName + "\n" + 
+					  "Date: " + dateSlot + "\n" + 
+					  "Start Time: " + startTimeString + "\n" +
+                      "End Time: " + endTimeString + "\n" + 
+					  "Venue: " + venue + "\n" + 
+					  "Compulsory Attendees: " + allUserNames + "\n" +
+                      "Non-compulsory Attendees: " + nonCompulsoryAttendees + "\n" + 
+					  "TA: " + TA + "\n" +  
+					  "Team Wiki: " + teamWiki;
+							  
             json.put("message",longMsg);
             /*json.put("Date", dateSlot);
             json.put("Start Time", startTimeString);
