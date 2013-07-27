@@ -118,13 +118,12 @@
 				<param name="root">json</param>
 			</result>
 		</action>
-                
-                
-                <action name="viewBookingJson" class="userAction.ViewBookingAction" method="execute">
-                    <result type="json">
-                        <param name="root">json</param>
-                    </result>
-                </action>
+		<action name="viewBookingJson" class="userAction.ViewBookingAction" method="execute">
+			<result type="json">
+				<param name="root">json</param>
+			</result>
+		</action>
+		
 	</package>
 
 </struts>
