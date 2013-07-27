@@ -171,32 +171,6 @@
             }
         }
 
-//        function initTable(dateList) {
-//            var dayStr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-//            //Creating the row time markings (Interval: 30 min)
-//            for (var i = 8; i < 19; i++) {
-//                $('#scheduleBody').append("<tr id=r" + i + "0><td>" + i + ":" + "00</td>");
-//                for (var y = 0; y < dateList.length; y++) {
-//                    $('#scheduleBody').append("<td></td>");
-//                }
-//                $('#scheduleBody').append("</tr><tr id=r" + i + "3><td>" + i + ":" + "30</td>");
-//                for (var y = 0; y < dateList.length; y++) {
-//                    $('#scheduleBody').append("<td></td>");
-//                }
-//                $('#scheduleBody').append("</tr>");
-//            }
-//
-//            $('#scheduleHeader').append("<th></th>");
-//            //Adding the columns for the days
-//            for (var i = 0; i < dateList.length; i++) {
-//                var date = dateList[i];
-//                var dayOfWeek = dayStr[date.getDay()];
-//                var day = date.getDate();
-//                $('#scheduleHeader').append("<th id=d" + day + "m" + date.getMonth() + ">" + date.toString('dd MMM') + "<br />"
-//                        + dayOfWeek + "</th>");
-//            }
-//        }
-
     };
 
     addLoadEvent(viewScheduleLoad);
