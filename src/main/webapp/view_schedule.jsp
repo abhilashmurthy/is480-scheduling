@@ -18,11 +18,11 @@
                 makeSchedule(response);
                 
                 $(".timeslotCell").mouseenter(function(){
-                    $(this).css('border', '2px solid #f5f5f5');
+                    $(this).css('border', '2px solid #FCFFBA');
                 });
                 
                 $(".timeslotCell").mouseleave(function(){
-                    $(this).css('border', 'none');
+                    $(this).css('border', '1px solid #dddddd');
                 });
                 
             });
@@ -132,13 +132,13 @@
                             //Get the team name from id
                             var team = getTeam(timeslots, id);
                             if (team !== null) {
-                                htmlString += " style='background-color: #f2dede; border-left: 1px solid #dddddd'>";
+                                htmlString += " style='background-color: #f2dede; border: 1px solid #dddddd'>";
                                 htmlString += team;
                             } else {
-                                htmlString += " style='background-color: #d9edf7; border-left: 1px solid #dddddd'>";
+                                htmlString += " style='background-color: #d9edf7; border: 1px solid #dddddd'>";
                             }
                         } else {
-                            htmlString += " style='background-color: #f5f5f5; border-left: 1px solid #dddddd'>";
+                            htmlString += " style='background-color: #f5f5f5; border: 1px solid #dddddd'>";
                         }
 
                         //Close td
