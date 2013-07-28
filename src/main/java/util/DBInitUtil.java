@@ -269,7 +269,6 @@ public class DBInitUtil {
 		activeTerms.setName("activeTerms");
 		ArrayList<Long> activeTermIds = new ArrayList<Long>();
 		activeTermIds.add(term12013.getId());
-		activeTermIds.add(term22013.getId());
 		activeTerms.setValue(new Gson().toJson(activeTermIds));
 		
 		Settings milestones = new Settings();
