@@ -5,11 +5,12 @@
 package systemAction;
 
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Status;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -18,8 +19,10 @@ import manager.ScheduleManager;
 import manager.TermManager;
 import model.Milestone;
 import model.Schedule;
+import model.Team;
 import model.Term;
 import model.Timeslot;
+import model.User;
 import util.MiscUtil;
 
 /**
@@ -40,6 +43,7 @@ public class GetScheduleAction extends ActionSupport{
 		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
 		json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
 		json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
+		json.put("duration", milestone.getSlotDuration());
 		
 		ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
 		for (Timeslot t : activeSchedule.getTimeslots()) {
@@ -47,10 +51,55 @@ public class GetScheduleAction extends ActionSupport{
 			HashMap<String, Object> map = new HashMap<String, Object>();
                         map.put("id", t.getId());
 			map.put("datetime", dateFormat.format(t.getStartTime()) + " " + timeFormat.format(t.getStartTime()));
-//			map.put("startTime", timeFormat.format(t.getStartTime()));
-//			map.put("endTime", timeFormat.format(t.getEndTime()));
+			
+			//Getting venue for timeslot
+			String venue = t.getVenue();
+			map.put("venue", venue);
+				
 			if (t.getTeam() != null) {
 				map.put("team", t.getTeam().getTeamName());
+				
+				//This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
+				List<HashMap<String, String>> attendees = new ArrayList<HashMap<String, String>>();
+				
+				//Getting all the team members associated with the timeslot
+				//First getting the team members
+				Team team = t.getTeam();
+				if (team != null) {
+					Set<User> teamMembers = team.getMembers();
+					Iterator it = teamMembers.iterator();
+					while (it.hasNext()) {
+						HashMap<String, String> userMap = new HashMap<String, String>();
+						User teamMember = (User) it.next();
+						userMap.put("name", teamMember.getFullName());
+
+						attendees.add(userMap);
+					}
+				}
+				
+				//Second getting the supervisor/reviewer for the timeslot
+				HashMap<User, Status> members = null;
+				if (t.getStatusList() != null) {
+				   members = t.getStatusList();
+				   Iterator iter = members.keySet().iterator();
+				   while (iter.hasNext()) {
+					   HashMap<String, String> userMap = new HashMap<String, String>();
+					   User supervisorReviewer = (User) iter.next();
+					   Status status = members.get(supervisorReviewer);
+					   userMap.put("name", supervisorReviewer.getFullName());
+					   userMap.put("status", status.toString());
+					   
+					   attendees.add(userMap);
+				   }
+				}
+				//Setting the list of attendees
+				map.put("attendees", attendees);
+				
+				//Things this code cannot get as of now (can only do this when database has values)
+				String TA = "-";
+				map.put("TA", TA);
+				String teamWiki = "-";
+				map.put("teamWiki", teamWiki);
 			}
 			mapList.add(map);
 		}

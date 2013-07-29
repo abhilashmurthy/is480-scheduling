@@ -2,31 +2,52 @@
 <table id="acceptanceScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
 </table>
 
+<!-- CONFIRMED BOOKING MODAL -->
+<div id="confirmedModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="confirmedModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="confirmedModalLabel">Booking Details</h3>
+	</div>
+	<div class="modal-body" id="confirmedModalBody">
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	</div>
+</div>
 <!-- jshashset imports -->
 <script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
 <script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
-<script type="text/javascript">
-    //Makes use of footer.jsp's jQuery and bootstrap imports
-    viewScheduleLoad = function() {
-        
-        $('.scheduleTable').ready(function() {
-            $.ajax({
-                type: 'GET',
-                url: 'getSchedule',
-                dataType: 'json'
-            }).done(function(response) {
-                makeSchedule(response);
-                
-                $(".timeslotCell").mouseenter(function(){
-                    $(this).css('border', '2px solid #FCFFBA');
-                });
-                
-                $(".timeslotCell").mouseleave(function(){
-                    $(this).css('border', '1px solid #dddddd');
-                });
-                
-            });
-        });
+<script type="text/javascript">	
+	//Makes use of footer.jsp's jQuery and bootstrap imports
+	viewScheduleLoad = function() {
+		//Generate schedule table
+		$('.scheduleTable').ready(function() {
+			$.ajax({
+				type: 'GET',
+				url: 'getSchedule',
+				dataType: 'json'
+			}).done(function(response) {
+				makeSchedule(response);
+
+				$(".timeslotCell").mouseenter(function() {
+					$(this).css('border', '2px solid #FCFFBA');
+				});
+
+				$(".timeslotCell").mouseleave(function() {
+					$(this).css('border', '1px solid #dddddd');
+				});
+				setupModals();
+			});
+		});
+		
+		function setupModals() {
+			//Show/hide modals
+			$('[id^=timeslot]').on('click', function() {
+				console.log('called');
+				$('#confirmedModal').modal();
+			});
+		}
+		
 
 
 //	function makeSchedule(data) {

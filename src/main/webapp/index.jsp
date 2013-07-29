@@ -50,6 +50,7 @@
                 Final stuff
             </div>
         </div>
+		<br />
     </div>
     <%@include file="footer.jsp"%>
     <script type="text/javascript">
