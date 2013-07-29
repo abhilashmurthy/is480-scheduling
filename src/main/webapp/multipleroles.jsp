@@ -17,7 +17,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
         <title>Welcome | Your Roles</title>
-		<%@include file="footer.jsp"%>
+		<%@include file="footer.jsp"%>	
     </head>
     <body>
         <%@include file="navbar_multipleroles.jsp" %>
@@ -25,38 +25,51 @@
 			<h3>Choose your Role</h3>
 				
 			<div style="text-align:center" align="middle">
+				<br/><br/><br/><br/>
+				<div class="btn-group">
+				<form id="myform" action="setRole" method="post">
 				<table align="center">
 					<tr>
 					<% if (isAdmin) { %>
- 						<td width="30%">
-							<a href="index.jsp?role=ar"><img src="img/administrator.jpg" class="img-polaroid" title="Administrator" height="200" width="150"/></a>
+ 						<td>
+							<input type="submit" class="btn btn-large" value="Administrator" name="administrator"/>
+							<!--<img src="img/administrator.jpg" class="img-polaroid" title="Administrator" height="200" width="150"/>-->
 						</td>
 					<% } %>
 					<% if (isSupervisor) { %>
-						<td width="40%">
-							<a href="index.jsp?role=sr"><img src="img/supervisor.jpg" class="img-polaroid" title="Supervisor" height="210" width="150"/></a>
+						<td>
+							<input type="submit" class="btn btn-large" value="Supervisor" name="supervisor"/>
+							<!--<img src="img/supervisor.jpg" class="img-polaroid" title="Supervisor" height="210" width="150"/>-->
 						</td>
 					<% } %>
 					<% if (isReviewer) { %>
-						<td width="48%">
-							<a href="index.jsp?role=rr"><img src="img/reviewer.jpg" class="img-polaroid" title="Reviewer" height="220" width="170"/></a>
+						<td>
+							<input type="submit" class="btn btn-large" value="Reviewer" name="reviewer"/>
+							<!--<img src="img/reviewer.jpg" class="img-polaroid" title="Reviewer" height="220" width="170"/>-->
 						</td>
 					<% } %>
 					</tr>
-					<tr>
-						<% if (isAdmin) { %>
-							<td><h4>Administrator</h4></td>
-						<% } %>
-						<% if (isSupervisor) { %>
-							<td><h4>Supervisor</h4></td>
-						<% } %>
-						<% if (isReviewer) { %>
-							<td><h4>Reviewer</h4></td>
-						<% } %>
-					</tr>
+					
 				</table>
+				</form><!--</form>-->
+				</div>
 			</div>
 		</div>
+					
+		<!-- To display error messages -->
+		<div class="container">
+			<div class="row">
+				<% Object msg = request.getAttribute("rolesError");
+				   String errorMsg = "";
+				   if (msg != null) {
+					   errorMsg = msg.toString();
+				   }
+				%>
+				<p class="text-error" style="text-align:center">
+					<strong><%= errorMsg %></strong>
+				</p>
+			</div>
+        </div>
     </body>
 </html>
 <% } else { 
