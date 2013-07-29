@@ -75,6 +75,10 @@
             <result name="success">/scheduleconfirmation.jsp</result>
         </action>
 		
+		<action name="setRole" class="userAction.SetRolesAction" method="execute">
+            <result name="success">/index.jsp</result>
+        </action>
+		
     </package>
 
 	<!-- JSON Package -->
