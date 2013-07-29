@@ -1,6 +1,9 @@
+<%@page import="model.Term"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE HTML>
-
+<%
+	Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
+%>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -11,8 +14,15 @@
         <%@include file="navbar.jsp" %>
 
         <!-- Welcome Text -->
-        <div class="container " />
-        <h3 id="welcomeText">Welcome to the IS480 Scheduling Project</h3>
+        <div class="container" />
+        <h2 id="activeTermName">
+		<%
+			String yearPlus1 = String.valueOf(activeTerm.getAcademicYear() + 1);
+			String termName = activeTerm.getAcademicYear()
+					+ "/" + yearPlus1.substring(2) + " " + activeTerm.getSemester();
+			out.print(termName);
+		%>
+		</h2>
 		</div>
 
     <!-- Main schedule navigation -->

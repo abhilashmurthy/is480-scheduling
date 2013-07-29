@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import manager.RoleManager;
+import manager.SettingsManager;
 import manager.UserManager;
 import model.Role;
 import model.Term;
@@ -143,6 +144,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				session.setAttribute("user", user);
 				session.setAttribute("fullname", request.getParameter("smu_fullname"));
 				session.setAttribute("groups", request.getParameter("smu_groups").split(","));
+				ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+				session.setAttribute("currentActiveTerm", activeTerms.get(0));
 
 				//To check the user's role
 				isSupervisor = false;  
@@ -153,7 +156,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				
 				//Getting the users roles for active term
 				userRoles = new ArrayList<Role>();
-				Term activeTerm = MiscUtil.getActiveTerm(em);
+				Term activeTerm = activeTerms.get(0);
 				List<Role> activeRoles = RoleManager.getAllRolesByTerm(em, activeTerm);
 				for (Role role: activeRoles) {
 					List<User> listUsers = role.getUsers();

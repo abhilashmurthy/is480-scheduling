@@ -84,15 +84,12 @@ public class TermManager {
 		logger.info("Getting term by id");
 		Term term = null;
 		try {
-			em.getTransaction().begin();
 			Query q = em.createQuery("SELECT t FROM Term t WHERE t.id = :id", Term.class);
 			q.setParameter("id", id);
 			term = (Term) q.getSingleResult();
-			em.getTransaction().commit();
 			return term;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			em.getTransaction().rollback();
 		}
 		return null;
 	}

@@ -4,13 +4,17 @@
  */
 package util;
 
+import com.google.gson.Gson;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import model.Milestone;
 import model.Role;
 import model.Schedule;
+import model.Settings;
 import model.Team;
 import model.Term;
 import model.Timeslot;
@@ -19,16 +23,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Contains method to initialize data in a new database.
+ * WARNING! Please run this file only on a blank database!
  * @author suresh
  */
 public class DBInitUtil {
-	/**
-	 * Methods to initialize data in a new database.
-	 * WARNING! Please run this file only on a blank database!
-	 */
+	
 	static Logger logger = LoggerFactory.getLogger(DBInitUtil.class);
 	
+	/**
+	 * Method to initialize data in a new database.
+	 * WARNING! Please run this file only on a blank database!
+	 */
 	public static void main(String[] args) {
 		
 		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
@@ -55,11 +61,11 @@ public class DBInitUtil {
 		
 		Milestone midterm = new Milestone();
 		midterm.setName("Midterm");
-		midterm.setSlotDuration(60);
+		midterm.setSlotDuration(90);
 		
 		Milestone finalMilestone = new Milestone();
 		finalMilestone.setName("Final");
-		finalMilestone.setSlotDuration(60);
+		finalMilestone.setSlotDuration(90);
 		
 		// Persistence
 		em.persist(acceptance);
@@ -255,5 +261,35 @@ public class DBInitUtil {
 		em.persist(u4);
 		em.persist(u5);
 		logger.info("User --> Team links persisted");
+		
+		/*
+		 * INITIALIZING SETTINGS
+		 */
+		Settings activeTerms = new Settings();
+		activeTerms.setName("activeTerms");
+		ArrayList<Long> activeTermIds = new ArrayList<Long>();
+		activeTermIds.add(term12013.getId());
+		activeTerms.setValue(new Gson().toJson(activeTermIds));
+		
+		Settings milestones = new Settings();
+		milestones.setName("milestones");
+		ArrayList<HashMap<String,Object>> milestoneList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String,Object> accMap = new HashMap<String, Object>();
+		accMap.put("name", "Acceptance");
+		accMap.put("duration", 60);
+		milestoneList.add(accMap);
+		HashMap<String,Object> midMap = new HashMap<String, Object>();
+		midMap.put("name", "Midterm");
+		midMap.put("duration", 90);
+		milestoneList.add(midMap);
+		HashMap<String,Object> finMap = new HashMap<String, Object>();
+		finMap.put("name", "Final");
+		finMap.put("duration", 90);
+		milestoneList.add(finMap);
+		milestones.setValue(new Gson().toJson(milestoneList));
+		
+		//Persistence
+		em.persist(activeTerms);
+		em.persist(milestones);
 	}
 }

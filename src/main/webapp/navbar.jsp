@@ -184,7 +184,8 @@
         //Dashboard popover
         $('#userDashboard').popover({
             placement: 'bottom',
-            title: "Your Information",
+            title: 'Your Information',
+			trigger: 'click',
             html: true,
             content: function() {
                 return $('#userDashboardContent').html();
