@@ -91,6 +91,9 @@
 
         <div class="container">
             <div class="content">
+				<div>
+					<img src="img/full-logo.png"/>
+				</div>
                 <div class="row">
 
                     <h2>IS480 Scheduling System</h2>
