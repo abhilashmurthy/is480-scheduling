@@ -30,6 +30,16 @@ import util.MiscUtil;
  * @author suresh
  */
 public class GetScheduleAction extends ActionSupport{
+    
+    private String milestoneString;
+
+    public String getMilestoneString() {
+        return milestoneString;
+    }
+
+    public void setMilestoneString(String milestoneString) {
+        this.milestoneString = milestoneString;
+    }
 
 	@Override
 	public String execute() throws Exception {
@@ -39,7 +49,7 @@ public class GetScheduleAction extends ActionSupport{
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
 		Term term = TermManager.findByYearAndSemester(em, 2013, "Term 1");
-		Milestone milestone = MilestoneManager.findByName(em, "Acceptance");
+		Milestone milestone = MilestoneManager.findByName(em, milestoneString);
 		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
 		json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
 		json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
