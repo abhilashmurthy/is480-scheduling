@@ -2,81 +2,137 @@
 <table id="acceptanceScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
 </table>
 
-<!-- CONFIRMED BOOKING MODAL -->
-<div id="confirmedModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="confirmedModalLabel" aria-hidden="true">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-		<h3 id="confirmedModalLabel">Booking Details</h3>
-	</div>
-	<div class="modal-body" id="confirmedModalBody">
-	</div>
-	<div class="modal-footer">
-		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	</div>
-</div>
 <!-- jshashset imports -->
 <script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
 <script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
-<script type="text/javascript">	
-	//Makes use of footer.jsp's jQuery and bootstrap imports
-	viewScheduleLoad = function() {
-		//Generate schedule table
-		$('.scheduleTable').ready(function() {
-			$.ajax({
-				type: 'GET',
-				url: 'getSchedule',
-				dataType: 'json'
-			}).done(function(response) {
-				makeSchedule(response);
+<script type="text/javascript">
+    //Makes use of footer.jsp's jQuery and bootstrap imports
+    viewScheduleLoad = function() {
+        //Generate schedule table
+        $('.scheduleTable').ready(function() {
+            $.ajax({
+                type: 'GET',
+                url: 'getSchedule',
+                dataType: 'json'
+            }).done(function(response) {
+                makeSchedule(response);
 
-				$(".timeslotCell").mouseenter(function() {
-					$(this).css('border', '2px solid #FCFFBA');
-				});
+                $(".timeslotCell").mouseenter(function() {
+                    $(this).css('border', '2px solid #FCFFBA');
+                });
 
-				$(".timeslotCell").mouseleave(function() {
-					$(this).css('border', '1px solid #dddddd');
-				});
-				setupModals();
-			});
-		});
-		
-		function setupModals() {
-			//Show/hide modals
-			$('[id^=timeslot]').on('click', function() {
-				console.log('called');
-				$('#confirmedModal').modal();
-			});
-		}
-		
+                $(".timeslotCell").mouseleave(function() {
+                    $(this).css('border', '1px solid #dddddd');
+                    clearCell(this);
+                });
+                setupPopovers();
+            });
+        });
 
+        function setupPopovers() {            
+            //ViewBookingData JSON
+            var viewBookingData = null;
+            
+            //Show/hide popovers
+            $(".timeslotCell").on('click', function() {
 
-//	function makeSchedule(data) {
-//		var startDate = new Date(data.startDate);
-//		var endDate = new Date(data.endDate);
-//		var dateArray = [];
-//		var tempDate = startDate;
-//		
-//		while(tempDate <= endDate) {
-//			dateArray.push(tempDate);
-//			tempDate = new Date(tempDate).addDays(1);
-//		}
-//		
-//		initTable(dateArray);
-//	}
+                //Clear cell
+                clearCell(this);
+
+                //Add clickedCell class
+                var currentClasses = $(this).attr('class');
+                $(this).removeClass("clickedCell");
+                $(this).attr('class',  currentClasses + " " + "clickedCell");
+                
+                //Populate JSON to show
+                viewBookingData = getJson(this);
+                
+                function getJson(elem) {
+                        var toReturn = null;
+                        
+                        //Get cell ID
+                        var cellId = $(elem).attr('id').split("_")[1];
+                        var data = {timeslotId:cellId};
+                        
+                        //AJAX View Booking details
+                        $.ajax({
+                           type: 'GET',
+                           url: 'viewBookingJson',
+                           data: data,
+                           async: false,
+                           dataType: 'json'
+                        }).done(function(response){
+                            toReturn = response;
+                        }).fail(function(error){
+                           toReturn = "AJAX fail";
+                        });
+                        return toReturn;
+                }
+            });
+            
+            //Popover element
+            $(".timeslotCell").popover({
+                container: 'body',
+                html: 'true',
+                trigger: 'click',
+                placement: 'right',
+                content: function() {
+                    //Output in the form of a table
+                    var output = "<table>";
+                    if (!viewBookingData.error){
+                        //View booking
+                        output += "<tr><td><b>Team Name: </b></td>";
+                        output += "<td>" + viewBookingData.teamName + "</td></tr>";
+                        output += "<tr><td><b>Date: </b></td>";
+                        output += "<td>" + viewBookingData.startDate + "</td></tr>";
+                        output += "<tr><td><b>Start Time: </b></td>";
+                        output += "<td>" + viewBookingData.startTime + "</td></tr>";
+                        output += "<tr><td><b>Team Wiki</b></td>";
+                        output += "<td>" + viewBookingData.teamWiki + "</td></tr>";
+                        output += "<tr><td><b>Attendees</b></td>";
+                        output += "<td>";
+                        for (var i = 0; i < viewBookingData.attendees.length; i++) {
+                            output += viewBookingData.attendees[i].name;
+                            output += "<br/>";
+                        }
+                        output += "</td></tr>";
+
+                    } else {
+                        //Create Booking
+                        output += "<td>" + viewBookingData.message + "</td>";
+                    }
+                    //Close table
+                    output += "</table>";
+                    return output;
+                },
+                title: function(){
+                    if (!viewBookingData.error){
+                        return "View Booking";
+                    } else {
+                        return "Create Booking";
+                    }
+                }
+            });
+        }
+        
+        //Remove clickedCell class
+        function clearCell(cell) {
+            $(cell).removeClass("clickedCell");
+        }
 
         function makeSchedule(data) {
 
             makeSchedule("scheduleTable", data.timeslots);
 
             function makeSchedule(tableClass, timeslots) {
-                
+
                 //TODO: Get from server/admin console/whatevs
                 var minTime = 9;
                 var maxTime = 19;
-                
+
                 var timesArray = new Array();
                 for (var i = minTime; i < maxTime; i++) {
-                    var timeVal = Date.parse(i+":00:00");
+                    var timeVal = Date.parse(i + ":00:00");
                     timesArray.push(timeVal.toString("HH:mm"));
                     timeVal.addMinutes(30);
                     timesArray.push(timeVal.toString("HH:mm"));
@@ -92,7 +148,7 @@
                 var maxDate = new Date(datesHashArray[datesHashArray.length - 1]);
 //                console.log("Mindate: " + minDate + ", maxDate: " + maxDate);
                 var datesArray = getDates(minDate, maxDate);
-                
+
                 function getDates(startDate, stopDate) {
                     var dateArray = new Array();
                     var currentDate = startDate;
@@ -104,7 +160,7 @@
                     }
                     return dateArray;
                 }
-                
+
                 //Get dates between minDate and maxDate
 
                 //Append header names
@@ -122,31 +178,31 @@
                     var time = timesArray[i];
                     htmlString += "<td>" + time + "</td>";
                     rowloop: //Loop label
-                    for (var j = 0; j < datesArray.length; j++) {
+                            for (var j = 0; j < datesArray.length; j++) {
                         var date = datesArray[j];
                         date = new Date(date).toString("yyyy-MM-dd");
                         //Identifier for table cell
                         var datetimeString = date + " " + time + ":00";
                         //Checking if table cell is part of a timeslot
-                        for (var k=0; k < rowspanArr.length; k++) {
-                            
+                        for (var k = 0; k < rowspanArr.length; k++) {
+
                             if (datetimeString === rowspanArr[k]) {
-                                console.log("Skipped: " + datetimeString);
+//                                console.log("Skipped: " + datetimeString);
                                 continue rowloop;
                             }
                         }
-                        
+
                         //Table cell not part of timeslot yet. Proceed.
 
                         //Get the timeslot id from datetime
                         var id = getTimeslotId(timeslots, date, time);
                         htmlString += "<td class='timeslotCell'";
-                        
+
                         //If timeslot is available
                         if (id !== -1) {
                             htmlString += " rowspan='2'";
                             var temp = new Date(Date.parse(datetimeString)).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
-                            console.log("Temp is: " + temp);
+//                            console.log("Temp is: " + temp);
                             rowspanArr.push(temp);
                             htmlString += " id='timeslot_" + id + "'";
 
