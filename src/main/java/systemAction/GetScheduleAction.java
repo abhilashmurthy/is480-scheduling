@@ -23,6 +23,8 @@ import model.Team;
 import model.Term;
 import model.Timeslot;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.MiscUtil;
 
 /**
@@ -31,6 +33,7 @@ import util.MiscUtil;
  */
 public class GetScheduleAction extends ActionSupport{
     
+    private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
     private String milestoneString;
 
     public String getMilestoneString() {
@@ -50,6 +53,7 @@ public class GetScheduleAction extends ActionSupport{
 		
 		Term term = TermManager.findByYearAndSemester(em, 2013, "Term 1");
 		Milestone milestone = MilestoneManager.findByName(em, milestoneString);
+                
 		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
 		json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
 		json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));

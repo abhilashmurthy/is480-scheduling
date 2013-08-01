@@ -1,4 +1,6 @@
+<%@page import="model.Team"%>
 <%@page import="model.Term"%>
+<%@page import="model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE HTML>
 <%
@@ -23,6 +25,9 @@
                 out.print(termName);
             %>
         </h2>
+        
+        <!-- Initialize Team object -->
+        <% Team team = user.getTeam(); %>
     </div>
 
     <!-- Main schedule navigation -->
@@ -71,14 +76,17 @@
             //Index page stuff
             console.log("index init");
             $('#mileStoneTab a').on('click', function(e) {
-                //Content effects
-                var contentId = $(this).attr('id') + "Content";
+                //Content TAB effect
+                
+                var id = $(this).attr('id');
+                
+                var contentId = id + "Content";
                 $(".tab-pane").removeClass("active in");
                 $(".tab-pane").hide();
                 $("#" + contentId).addClass("active in");
                 $("#" + contentId).show();
                 
-                var milestoneStr = $(this).attr('id').toUpperCase();
+                var milestoneStr = id.toUpperCase();
                 clearSchedules();
                 populateSchedule(milestoneStr);
             });
@@ -184,7 +192,34 @@
 
                         } else {
                             //Create Booking
-                            output += "<td>" + viewBookingData.message + "</td>";
+                            //Initialize values
+                            var teamName = "<%= team.getTeamName() %>";
+                            var supervisor = "<%= team.getSupervisor().getFullName() %>";
+                            var reviewer1 = "<%= team.getReviewer1().getFullName() %>";
+                            var reviewer2 = "<%= team.getReviewer2().getFullName() %>";
+                            var date = Date.parse($(this).attr('value')).toString('dddd, dd MMM');
+                            var startTime = Date.parse($(this).attr('value')).toString('HH:mm');
+                            //TODO: Change by milestone
+                            var endTime = new Date(Date.parse($(this).attr('value'))).addHours(1).toString('HH:mm');
+                            
+                            //Print values in form
+                            output += "<tr><td><b>Team Name: </b></td>";
+                            output += "<td>" + teamName + "</td></tr>";
+                            output += "<tr><td><b>Supervisor </b></td>";
+                            output += "<td>" + supervisor + "</td></tr>";
+                            output += "<tr><td><b>Date </b></td>";
+                            output += "<td>" + date + "</td></tr>";
+                            output += "<tr><td><b>Start Time </b></td>";
+                            output += "<td>" + startTime + "</td></tr>";
+                            output += "<tr><td><b>End Time </b></td>";
+                            output += "<td>" + endTime + "</td></tr>";
+                            output += "<tr><td><br/></td><td></td></tr>";
+                            output += "<tr><td><input id='createBookingFormBtn' type='submit' class='btn btn-primary' value='Create' data-loading-text='Waiting...'/></td>";
+                            //Todo: Change this according to acceptance, midterm, and final
+//                            output += "<tr><td><b>Reviewer 1: </b></td>";
+//                            output += "<td>" + reviewer1 + "</td></tr>";
+//                            output += "<tr><td><b>Reviewer 2: </b></td>";
+//                            output += "<td>" + reviewer2 + "</td></tr>";
                         }
                         //Close table
                         output += "</table>";
@@ -290,6 +325,7 @@
     //                            console.log("Temp is: " + temp);
                                 rowspanArr.push(temp);
                                 htmlString += " id='timeslot_" + id + "'";
+                                htmlString += " value='" + datetimeString + "'";
 
                                 //Get the team name from id
                                 var team = getTeam(timeslots, id);
