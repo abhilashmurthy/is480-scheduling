@@ -14,6 +14,10 @@
     <body>
         <!-- Navigation -->
         <%@include file="navbar.jsp" %>
+        
+        <%
+            Team team = user.getTeam();
+        %>
 
         <!-- Welcome Text -->
         <div class="container" />
@@ -25,9 +29,10 @@
                 out.print(termName);
             %>
         </h2>
-        
-        <!-- Initialize Team object -->
-        <% Team team = user.getTeam(); %>
+        <!-- SECTION: Response Banner -->
+        <div id="responseBanner" class="alert" hidden>
+            <span id="responseMessage" style="font-weight: bold"></span>
+        </div>
     </div>
 
     <!-- Main schedule navigation -->
@@ -70,8 +75,11 @@
         //Makes use of footer.jsp's jQuery and bootstrap imports
         viewScheduleLoad = function() {
             
+            //Default milestoneStr is ACCEPTANCE
+            var milestoneStr = "ACCEPTANCE";
+            
             //Default schedule to see upon opening index page
-            populateSchedule("ACCEPTANCE");
+            populateSchedule(milestoneStr);
             
             //Index page stuff
             console.log("index init");
@@ -86,7 +94,7 @@
                 $("#" + contentId).addClass("active in");
                 $("#" + contentId).show();
                 
-                var milestoneStr = id.toUpperCase();
+                milestoneStr = id.toUpperCase();
                 clearSchedules();
                 populateSchedule(milestoneStr);
             });
@@ -172,6 +180,7 @@
                     content: function() {
                         //Output in the form of a table
                         var output = "<table>";
+                        var self = $(this);
                         if (!viewBookingData.error) {
                             //View booking
                             output += "<tr><td><b>Team Name: </b></td>";
@@ -197,10 +206,16 @@
                             var supervisor = "<%= team.getSupervisor().getFullName() %>";
                             var reviewer1 = "<%= team.getReviewer1().getFullName() %>";
                             var reviewer2 = "<%= team.getReviewer2().getFullName() %>";
-                            var date = Date.parse($(this).attr('value')).toString('dddd, dd MMM');
-                            var startTime = Date.parse($(this).attr('value')).toString('HH:mm');
+                            var dateToView = Date.parse(self.attr('value')).toString('dddd, dd MMM');
+                            var date = Date.parse(self.attr('value')).toString('yyyy-MM-dd');
+                            var startTimeToView = Date.parse(self.attr('value')).toString('HH:mm');
+                            var startTime= Date.parse(self.attr('value')).toString('HH:mm:ss');
+                            
                             //TODO: Change by milestone
-                            var endTime = new Date(Date.parse($(this).attr('value'))).addHours(1).toString('HH:mm');
+                            var endTime = new Date(Date.parse(self.attr('value'))).addHours(1).toString('HH:mm');
+                            var termId = "<%= activeTerm.getAcademicYear() %>,<%= activeTerm.getSemester() %>";
+                            var termToView = termId.split(",")[0] + ", " + termId.split(",")[1];
+                            var endTime = new Date(Date.parse(self.attr('value'))).addHours(1).toString('HH:mm');
                             
                             //Print values in form
                             output += "<tr><td><b>Team Name: </b></td>";
@@ -208,19 +223,62 @@
                             output += "<tr><td><b>Supervisor </b></td>";
                             output += "<td>" + supervisor + "</td></tr>";
                             output += "<tr><td><b>Date </b></td>";
-                            output += "<td>" + date + "</td></tr>";
+                            output += "<td>" + dateToView + "</td></tr>";
                             output += "<tr><td><b>Start Time </b></td>";
-                            output += "<td>" + startTime + "</td></tr>";
+                            output += "<td>" + startTimeToView + "</td></tr>";
                             output += "<tr><td><b>End Time </b></td>";
                             output += "<td>" + endTime + "</td></tr>";
+                            output += "<tr><td><b>Term </b></td>";
+                            output += "<td>" + termToView + "</td></tr>";
+                            output += "<tr><td><b>Milestone </b></td>";
+                            output += "<td>" + milestoneStr + "</td></tr>";
                             output += "<tr><td><br/></td><td></td></tr>";
-                            output += "<tr><td><input id='createBookingFormBtn' type='submit' class='btn btn-primary' value='Create' data-loading-text='Waiting...'/></td>";
+                            output += "<tr><td><button id='createBookingBtn' class='btn btn-primary'>Create</button></td>";
+                            
+                            //Create Booking AJAX
+                            $("body").on('click', '#createBookingBtn', function(){
+                                var data = {
+                                  date: date,
+                                  startTime: startTime,
+                                  termId: termId,
+                                  milestoneStr: milestoneStr.toLowerCase()
+                                };
+                                console.log("Submitting data: " + JSON.stringify(data));
+                                $.ajax({
+                                    type: 'POST',
+                                    url: 'createBookingJson',
+                                    data: data,
+                                    dataType: 'json'
+                                }).done(function(response) {
+                                    $("#responseBanner").show();
+                                    if (response.success) {
+                                        $("#responseBanner").removeClass("alert-error").addClass("alert-success");
+                                        $("#responseMessage").text(response.message);
+                                        
+                                        //Update the timeslot on the schedule
+                                        self.html(teamName);
+                                        self.addClass('bookedTimeslot');
+                                        
+                                    } else {
+                                        $("#responseBanner").removeClass("alert-success").addClass("alert-error");
+                                        $("#responseMessage").text(response.message);
+                                    }
+                                }).fail(function(response) {
+                                    $("#responseBanner").show();
+                                    $("#responseBanner").removeClass("alert-success").addClass("alert-error");
+                                    $("#responseMessage").text("Oops. Something went wrong. Please try again!");
+                                });
+                                return false;
+                            });
+                            
+                            
                             //Todo: Change this according to acceptance, midterm, and final
 //                            output += "<tr><td><b>Reviewer 1: </b></td>";
 //                            output += "<td>" + reviewer1 + "</td></tr>";
 //                            output += "<tr><td><b>Reviewer 2: </b></td>";
 //                            output += "<td>" + reviewer2 + "</td></tr>";
                         }
+                        
                         //Close table
                         output += "</table>";
                         return output;
@@ -316,7 +374,10 @@
 
                             //Get the timeslot id from datetime
                             var id = getTimeslotId(timeslots, date, time);
-                            htmlString += "<td class='timeslotCell'";
+                            var classes = new Array();
+                            var team = null;
+                            classes.push('timeslotCell');
+                            htmlString += "<td";
 
                             //If timeslot is available
                             if (id !== -1) {
@@ -328,15 +389,28 @@
                                 htmlString += " value='" + datetimeString + "'";
 
                                 //Get the team name from id
-                                var team = getTeam(timeslots, id);
+                                team = getTeam(timeslots, id);
                                 if (team !== null) {
-                                    htmlString += " style='background-color: #f2dede; border: 1px solid #dddddd'>";
-                                    htmlString += team;
+                                    classes.push('bookedTimeslot');
                                 } else {
-                                    htmlString += " style='background-color: #d9edf7; border: 1px solid #dddddd'>";
+                                    classes.push('unbookedTimeslot');
                                 }
                             } else {
-                                htmlString += " style='background-color: #f5f5f5; border: 1px solid #dddddd'>";
+                                classes.push('noTimeslot');
+                            }
+                            
+                            //Add classes
+                            var classStr = " class='";
+                            for (var c = 0; c < classes.length; c++) {
+                                classStr += classes[c] + ' ';
+                            }
+                            classStr += "'>";
+                            console.log("Class string: "+ classStr);
+                            htmlString += classStr;
+                            
+                            //Add team
+                            if (team !== null) {
+                                htmlString += team;
                             }
 
                             //Close td
