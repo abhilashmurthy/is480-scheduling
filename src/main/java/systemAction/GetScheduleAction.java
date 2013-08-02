@@ -31,10 +31,28 @@ import util.MiscUtil;
  *
  * @author suresh
  */
-public class GetScheduleAction extends ActionSupport{
-    
+public class GetScheduleAction extends ActionSupport {
+
     private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
     private String milestoneString;
+    private String academicYearString;
+
+    public String getAcademicYearString() {
+        return academicYearString;
+    }
+
+    public void setAcademicYearString(String academicYearString) {
+        this.academicYearString = academicYearString;
+    }
+
+    public String getSemesterString() {
+        return semesterString;
+    }
+
+    public void setSemesterString(String semesterString) {
+        this.semesterString = semesterString;
+    }
+    private String semesterString;
 
     public String getMilestoneString() {
         return milestoneString;
@@ -44,91 +62,89 @@ public class GetScheduleAction extends ActionSupport{
         this.milestoneString = milestoneString;
     }
 
-	@Override
-	public String execute() throws Exception {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-		
-		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		
-		Term term = TermManager.findByYearAndSemester(em, 2013, "Term 1");
-		Milestone milestone = MilestoneManager.findByName(em, milestoneString);
-                
-		Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
-		json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
-		json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
-		json.put("duration", milestone.getSlotDuration());
-		
-		ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
-		for (Timeslot t : activeSchedule.getTimeslots()) {
-			
-			HashMap<String, Object> map = new HashMap<String, Object>();
-                        map.put("id", t.getId());
-			map.put("datetime", dateFormat.format(t.getStartTime()) + " " + timeFormat.format(t.getStartTime()));
-			
-			//Getting venue for timeslot
-			String venue = t.getVenue();
-			map.put("venue", venue);
-				
-			if (t.getTeam() != null) {
-				map.put("team", t.getTeam().getTeamName());
-				
-				//This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
-				List<HashMap<String, String>> attendees = new ArrayList<HashMap<String, String>>();
-				
-				//Getting all the team members associated with the timeslot
-				//First getting the team members
-				Team team = t.getTeam();
-				if (team != null) {
-					Set<User> teamMembers = team.getMembers();
-					Iterator it = teamMembers.iterator();
-					while (it.hasNext()) {
-						HashMap<String, String> userMap = new HashMap<String, String>();
-						User teamMember = (User) it.next();
-						userMap.put("name", teamMember.getFullName());
+    @Override
+    public String execute() throws Exception {
+        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
-						attendees.add(userMap);
-					}
-				}
-				
-				//Second getting the supervisor/reviewer for the timeslot
-				HashMap<User, Status> members = null;
-				if (t.getStatusList() != null) {
-				   members = t.getStatusList();
-				   Iterator iter = members.keySet().iterator();
-				   while (iter.hasNext()) {
-					   HashMap<String, String> userMap = new HashMap<String, String>();
-					   User supervisorReviewer = (User) iter.next();
-					   Status status = members.get(supervisorReviewer);
-					   userMap.put("name", supervisorReviewer.getFullName());
-					   userMap.put("status", status.toString());
-					   
-					   attendees.add(userMap);
-				   }
-				}
-				//Setting the list of attendees
-				map.put("attendees", attendees);
-				
-				//Things this code cannot get as of now (can only do this when database has values)
-				String TA = "-";
-				map.put("TA", TA);
-				String teamWiki = "-";
-				map.put("teamWiki", teamWiki);
-			}
-			mapList.add(map);
-		}
-		json.put("timeslots", mapList);
-		return SUCCESS;
-	}
-	
-	private HashMap<String, Object> json = new HashMap<String, Object>();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	public HashMap<String, Object> getJson() {
-		return json;
-	}
+        Term term = TermManager.findByYearAndSemester(em, Integer.parseInt(academicYearString), semesterString);
+        Milestone milestone = MilestoneManager.findByName(em, milestoneString);
 
-	public void setJson(HashMap<String, Object> json) {
-		this.json = json;
-	}
-	
+        Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
+        json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
+        json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
+        json.put("duration", milestone.getSlotDuration());
+
+        ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
+        for (Timeslot t : activeSchedule.getTimeslots()) {
+
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("id", t.getId());
+            map.put("datetime", dateFormat.format(t.getStartTime()) + " " + timeFormat.format(t.getStartTime()));
+
+            //Getting venue for timeslot
+            String venue = t.getVenue();
+            map.put("venue", venue);
+
+            if (t.getTeam() != null) {
+                map.put("team", t.getTeam().getTeamName());
+
+                //This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
+                List<HashMap<String, String>> attendees = new ArrayList<HashMap<String, String>>();
+
+                //Getting all the team members associated with the timeslot
+                //First getting the team members
+                Team team = t.getTeam();
+                if (team != null) {
+                    Set<User> teamMembers = team.getMembers();
+                    Iterator it = teamMembers.iterator();
+                    while (it.hasNext()) {
+                        HashMap<String, String> userMap = new HashMap<String, String>();
+                        User teamMember = (User) it.next();
+                        userMap.put("name", teamMember.getFullName());
+
+                        attendees.add(userMap);
+                    }
+                }
+
+                //Second getting the supervisor/reviewer for the timeslot
+                HashMap<User, Status> members = null;
+                if (t.getStatusList() != null) {
+                    members = t.getStatusList();
+                    Iterator iter = members.keySet().iterator();
+                    while (iter.hasNext()) {
+                        HashMap<String, String> userMap = new HashMap<String, String>();
+                        User supervisorReviewer = (User) iter.next();
+                        Status status = members.get(supervisorReviewer);
+                        userMap.put("name", supervisorReviewer.getFullName());
+                        userMap.put("status", status.toString());
+
+                        attendees.add(userMap);
+                    }
+                }
+                //Setting the list of attendees
+                map.put("attendees", attendees);
+
+                //Things this code cannot get as of now (can only do this when database has values)
+                String TA = "-";
+                map.put("TA", TA);
+                String teamWiki = "-";
+                map.put("teamWiki", teamWiki);
+            }
+            mapList.add(map);
+        }
+        json.put("timeslots", mapList);
+        return SUCCESS;
+    }
+    private HashMap<String, Object> json = new HashMap<String, Object>();
+
+    public HashMap<String, Object> getJson() {
+        return json;
+    }
+
+    public void setJson(HashMap<String, Object> json) {
+        this.json = json;
+    }
 }
