@@ -94,3 +94,16 @@ body {
     font-weight: bold;
     font-size: 14px;
 }
+
+.legend {  
+    font-size: 14px;
+	position: absolute;
+	left:60%;
+	top:19%;
+}
+
+.notification-drawer {  
+	position: absolute;
+	top:22%;
+	left:76%;
+}

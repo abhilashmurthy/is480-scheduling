@@ -88,7 +88,11 @@
                 </ul>
 				<!--<li id="navKnockout"><a href="timeslots.jsp">Timeslot Test</a></li>-->
             </div>
-
+			
+			<div class="notification-drawer">
+				<a href="#"><img src="img/mail-icon.png" height="28" width="30" title="Notifications" /></a>
+			</div>
+				
             <div class="btn-group userbox">
                 <button class="btn" id="userDashboard"><i class="icon-user icon-black"></i>&nbsp;<%= user.getFullName().split(" ")[0]%> -  Dashboard</button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
