@@ -83,12 +83,12 @@ body {
 }
 
 .unbookedTimeslot {
-    background-color: #d9edf7 !important; 
+    background-color: #AEC7C9 !important; 
     border: 1px solid #dddddd;
 }
 
 .bookedTimeslot {
-    background-color: #EBE4B0 !important; 
+    background-color: #F6EE4E !important; 
     border: 1px solid #dddddd;
     text-align: center;
     font-weight: bold;

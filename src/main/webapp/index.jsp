@@ -16,6 +16,7 @@
         <%@include file="navbar.jsp" %>
 
         <%
+			//User user = (User) session.getAttribute("user");
             Team team = user.getTeam();
         %>
 
@@ -136,7 +137,8 @@
             //Function to create mouse UI events
             function setupMouseEvents() {
                 $(".timeslotCell").mouseenter(function() {
-                    $(this).css('border', '2px solid #FCFFBA');
+                    $(this).css('border', '2px solid #1E647C');
+					$(this).css('cursor', 'crosshair');
                 });
 
                 $(".timeslotCell").mouseleave(function() {
@@ -196,7 +198,7 @@
                 //Setup common variables
                 var date = null;
                 var teamName = null;
-                var supervisor = null;
+                //var supervisor = null;
                 var reviewer1 = null;
                 var reviewer2 = null;
                 var dateToView = null;
@@ -218,20 +220,22 @@
                         var self = $(this);
 
                         //Output in the form of a table
-                        var output = "<table id='viewTimeslotTable'>";
+                        var output = "<table id='viewTimeslotTable' width='600'>";
 
                         //If there is a booking on the timeslotCell
                         if (!viewBookingData.error) {
                             //View booking
-                            output += "<tr><td><b>Team Name: </b></td>";
+							var output = "<table id='viewTimeslotTable' width='300'>";
+							
+                            output += "<tr><td><b>Team: </b></td>";
                             output += "<td>" + viewBookingData.teamName + "</td></tr>";
                             output += "<tr><td><b>Date: </b></td>";
                             output += "<td>" + viewBookingData.startDate + "</td></tr>";
                             output += "<tr><td><b>Start Time: </b></td>";
                             output += "<td>" + viewBookingData.startTime + "</td></tr>";
-                            output += "<tr><td><b>Team Wiki</b></td>";
+                            output += "<tr><td><b>Team Wiki: </b></td>";
                             output += "<td>" + viewBookingData.teamWiki + "</td></tr>";
-                            output += "<tr><td><b>Attendees</b></td>";
+                            output += "<tr><td><b>Attendees: </b></td>";
                             output += "<td>";
                             for (var i = 0; i < viewBookingData.attendees.length; i++) {
                                 output += viewBookingData.attendees[i].name;
@@ -243,7 +247,7 @@
                             //Create Booking
                             //Initialize values
                             teamName = "<%= team.getTeamName()%>";
-                            supervisor = "<%= team.getSupervisor().getFullName()%>";
+                            //supervisor = "<%= team.getSupervisor().getFullName()%>";
                             reviewer1 = "<%= team.getReviewer1().getFullName()%>";
                             reviewer2 = "<%= team.getReviewer2().getFullName()%>";
                             dateToView = Date.parse(self.attr('value')).toString('dddd, dd MMM');
@@ -256,21 +260,23 @@
                             termId = activeAcademicYearStr + "," + activeSemesterStr;
                             termToView = termId.split(",")[0] + ", " + termId.split(",")[1];
                             endTime = new Date(Date.parse(self.attr('value'))).addHours(1).toString('HH:mm');
-
+							
+							var output = "<table id='viewTimeslotTable' width='250'>";
+							
                             //Print values in create booking
-                            output += "<tr><td><b>Team Name: </b></td>";
+                            output += "<tr><td><b>Team: </b></td>";
                             output += "<td>" + teamName + "</td></tr>";
-                            output += "<tr><td><b>Supervisor </b></td>";
-                            output += "<td>" + supervisor + "</td></tr>";
-                            output += "<tr><td><b>Date </b></td>";
+                            //output += "<tr><td><b>Supervisor </b></td>";
+                            //output += "<td>" + supervisor + "</td></tr>";
+                            output += "<tr><td><b>Date: </b></td>";
                             output += "<td>" + dateToView + "</td></tr>";
-                            output += "<tr><td><b>Start Time </b></td>";
+                            output += "<tr><td><b>Start Time: </b></td>";
                             output += "<td>" + startTimeToView + "</td></tr>";
-                            output += "<tr><td><b>End Time </b></td>";
+                            output += "<tr><td><b>End Time: </b></td>";
                             output += "<td>" + endTime + "</td></tr>";
-                            output += "<tr><td><b>Term </b></td>";
+                            output += "<tr><td><b>Term: </b></td>";
                             output += "<td>" + termToView + "</td></tr>";
-                            output += "<tr><td><b>Milestone </b></td>";
+                            output += "<tr><td><b>Milestone: </b></td>";
                             output += "<td>" + milestoneStr + "</td></tr>";
                             output += "<tr><td><br/></td><td></td></tr>";
                             output += "<tr><td><button id='createBookingBtn' class='btn btn-primary'>Create</button></td>";
@@ -412,7 +418,7 @@
                     for (var i = 0; i < timesArray.length; i++) {
                         var htmlString = "<tr>";
                         var time = timesArray[i];
-                        htmlString += "<td>" + time + "</td>";
+                        htmlString += "<td><b>" + time + "</b></td>";
                         rowloop: //Loop label
                                 for (var j = 0; j < datesArray.length; j++) {
                             var date = datesArray[j];
