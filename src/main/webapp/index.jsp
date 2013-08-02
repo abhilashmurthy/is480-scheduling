@@ -143,7 +143,7 @@
 
                 $(".timeslotCell").mouseleave(function() {
                     $(this).css('border', '1px solid #dddddd');
-                    clearCell($(this));
+                    $(this).removeClass("clickedCell");
                 });
             }
 
@@ -153,17 +153,15 @@
                 //This will be populated based on a clicked timeslotCell
                 var viewBookingData = null;
                 
-                $(".timeslotCell").on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                $(".timeslotCell").on('click', function() {
                     console.log("clicked");
                     var self = $(this);
 
                     //Clear other popovers
-                    clearOtherPopovers();
+                    $(".popover").detach();
 
                     //Add clickedCell class
-                    clearCell(self);
+                    $(this).removeClass("clickedCell");
                     var currentClasses = $(this).attr('class');
                     $(this).removeClass("clickedCell");
                     $(this).attr('class', currentClasses + " " + "clickedCell");
@@ -196,6 +194,7 @@
                 });
 
                 //Setup common variables
+                var self = null;
                 var date = null;
                 var teamName = null;
                 //var supervisor = null;
@@ -217,7 +216,7 @@
                     trigger: 'click',
                     placement: 'right',
                     content: function() {
-                        var self = $(this);
+                        self = $(this);
 
                         //Output in the form of a table
                         var output = "<table id='viewTimeslotTable' width='600'>";
@@ -242,7 +241,6 @@
                                 output += "<br/>";
                             }
                             output += "</td></tr>";
-
                         } else {
                             //Create Booking
                             //Initialize values
@@ -280,61 +278,13 @@
                             output += "<td>" + milestoneStr + "</td></tr>";
                             output += "<tr><td><br/></td><td></td></tr>";
                             output += "<tr><td><button id='createBookingBtn' class='btn btn-primary'>Create</button></td>";
+                            
                             //Todo: Change this according to acceptance, midterm, and final
 //                            output += "<tr><td><b>Reviewer 1: </b></td>";
 //                            output += "<td>" + reviewer1 + "</td></tr>";
 //                            output += "<tr><td><b>Reviewer 2: </b></td>";
 //                            output += "<td>" + reviewer2 + "</td></tr>";
-
-                            //NOTE: Using body.onclick instead createBookingBtn.onclick
-                            //Use this kind of event trigger for dynamic buttons
-                            $("body").on('click', '#createBookingBtn', function(e) {
-                                e.stopPropagation();
-                                var data = {
-                                    date: date,
-                                    startTime: startTime,
-                                    termId: termId,
-                                    milestoneStr: milestoneStr.toLowerCase()
-                                };
-                                console.log("Submitting create booking data: " + JSON.stringify(data));
-                                //Create Booking AJAX
-                                $.ajax({
-                                    type: 'POST',
-                                    async: false,
-                                    url: 'createBookingJson',
-                                    data: data,
-                                    cache: false,
-                                    dataType: 'json'
-                                }).done(function(response) {
-                                    console.log("Response: " + JSON.stringify(response));
-                                    $("#viewTimeslotTable").empty();
-                                    var resultStr = "<tr><td>";
-                                    resultStr += "<div id='responseBanner'";
-
-                                    if (response.success) {
-                                        resultStr += " class='alert-success'>";
-
-                                        //Update the timeslot on the schedule
-                                        self.html(teamName);
-                                        self.addClass('bookedTimeslot');
-                                    } else {
-                                        resultStr += " class='alert-error'>";
-                                    }
-
-                                    resultStr += "<span id='responseMessage'>";
-                                    resultStr += response.message;
-                                    resultStr += "</span>";
-                                    resultStr += "</div>";
-                                    resultStr += "</td></tr>";
-                                    $("#viewTimeslotTable").append(resultStr);
-
-                                }).fail(function(response) {
-                                    alert("Oops. There was an error");
-                                });
-                                return false;
-                            });
                         }
-
                         //Close table
                         output += "</table>";
                         return output;
@@ -347,18 +297,67 @@
                         }
                     }
                 });
-                
                 viewBookingData = null;
-            }
+                
+                 //NOTE: Using body.onclick instead createBookingBtn.onclick
+                 //Use this kind of event trigger for dynamic buttons
+                 $("body").on('click', '#createBookingBtn', function() {
+                     var data = {
+                         date: date,
+                         startTime: startTime,
+                         termId: termId,
+                         milestoneStr: milestoneStr.toLowerCase()
+                     };
+                     console.log("Submitting create booking data: " + JSON.stringify(data));
+                     //Create Booking AJAX
+                     $.ajax({
+                         type: 'POST',
+                         async: false,
+                         url: 'createBookingJson',
+                         data: data,
+                         cache: false,
+                         dataType: 'json'
+                     }).done(function(response) {
+                         self.popover('destroy');
+                         var resultStr = "<table id='viewTimeslotTable'><tr><td>";
+                         resultStr += "<div id='responseBanner'";
+                         if (response.success) {
+                             resultStr += " class='alert-success'>";
 
-            //Remove clickedCell class
-            function clearCell(cell) {
-                cell.removeClass("clickedCell");
-            }
+                             //Update the timeslot on the schedule
+                             self.html(teamName);
+                             self.addClass('bookedTimeslot');
+                         } else {
+                             resultStr += " class='alert-error'>";
+                         }
+                         resultStr += "<span id='responseMessage'>";
+                         resultStr += response.message;
+                         resultStr += "</span>";
+                         resultStr += "</div>";
+                         resultStr += "</td></tr>";
+                         resultStr += "</table>";
 
-            //Clear other popovers
-            function clearOtherPopovers() {
-                $(".popover").detach();
+                         self.popover({
+                             container: 'body',
+                             title: 'Result',
+                             placement: 'right',
+                             content: resultStr,
+                             html: true
+                         });
+                         self.popover('show');
+
+                         setTimeout(function(){
+                             $(".popover").slideUp(300, function(){
+                                 $(this).remove();
+                             });
+                         }, 3000);
+
+
+                     }).fail(function(response) {
+                         alert("Oops. There was an error");
+                     });
+                     return false;
+                 });
             }
 
             //Function to make schedule based on GetScheduleAction response
