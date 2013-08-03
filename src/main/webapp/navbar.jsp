@@ -72,7 +72,7 @@
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
 							</ul>
 						</li>
-						
+						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
 				<% } else if (activeRole.equalsIgnoreCase("Student")) { %>
 						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
@@ -81,8 +81,9 @@
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
 							</ul>
 						</li>
-						
+						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
 				<% } else if (activeRole.equalsIgnoreCase("TA")) { %>	
+						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
 						<!--Nothing for now!-->
 				<% } %>
                 </ul>

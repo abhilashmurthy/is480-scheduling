@@ -34,13 +34,13 @@
 	<table class="legend">
 		<tr>
 			<!-- <td style="width:50px"><b>Legend:</b></td>-->
-			<td style="background-color:#AEC7C9;width:17px;"></td><td>No Booking</td> 
+			<td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;No Booking</td> 
 			<td style="width:15px"></td>
-			<td style="background-color:#F6EE4E;width:17px;"></td><td>Booking Made</td> 
+			<td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Booking Made</td> 
 			<td style="width:15px"></td>
-			<td style="background-color:#a9dba9;width:17px;"></td><td>Booking Confirmed</td> 
+			<td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Booking Confirmed</td> 
 			<td style="width:15px"></td>
-			<td style="background-color:#D1D0CE;width:17px;"></td><td>Holiday</td> 
+			<td style="background-color:#D1D0CE;width:17px;"></td><td>&nbsp;Holiday</td> 
 		</tr>
 	</table>
     <!-- Main schedule navigation -->
@@ -521,6 +521,5 @@
 
         addLoadEvent(viewScheduleLoad);
     </script>
-
 </body>
 </html>
