@@ -292,7 +292,7 @@
                 //Popover for unbookedTimeslot
                 $(".unbookedTimeslot").on('click', function() {
                     //Check if booking already exists
-                    var exists = $(".scheduleTable").find(":contains(" + teamName + ")").length;
+                    var exists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
                     if (exists) {
                         //If booking exists, just create it so that the error can be produced
                         createBooking();
@@ -398,8 +398,9 @@
                         if (response.success) {
                             resultStr += " class='alert-success'>";
 
-                            //Update the timeslot on the schedule
+                            //Update the timeslot to bookedTimeslot on the schedule
                             self.html(teamName);
+                            self.removeClass('unbookedTimeslot');
                             self.addClass('bookedTimeslot');
                         } else {
                             resultStr += " class='alert-error'>";
