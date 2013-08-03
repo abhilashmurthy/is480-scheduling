@@ -278,10 +278,10 @@
                         },
                         title: function() {
                             if (!viewBookingData.error) {
-                                return "View Booking <div class='close'>x</div>";
+                                return "View Booking <button type='button' class='close'>&times;</button>";
                             } else {
                                 //return "Error <button id='closeBookingBtn' class='btn btn-small btn-danger'>X</button>";
-								return "Error <div class='close'>x</div>";
+								return "Error <button type='button' class='close'>&times;</button>";
                             }
                         }
                     });
@@ -344,9 +344,9 @@
                             },
                             title: function() {
                                 if (viewBookingData.error) {
-                                    return "Create Booking <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                                    return "Create Booking <button type='button' class='close'>&times;</button>";
                                 } else {
-                                    return "Error <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                                    return "Error <button type='button' class='close'>&times;</button>";
                                 }
                             }
                         });
@@ -412,7 +412,7 @@
 
                         self.popover({
                             container: ".page",
-                            title: "Result <div class='close'>x</div>",
+                            title: "Result <button type='button' class='close'>&times;</button>",
                             placement: "right",
                             content: resultStr,
                             html: true
@@ -574,5 +574,7 @@
 
         addLoadEvent(viewScheduleLoad);
     </script>
+	<br/>
+	<%@include file="navbar_footer.jsp" %>
 </body>
 </html>
