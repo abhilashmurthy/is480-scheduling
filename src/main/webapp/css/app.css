@@ -26,10 +26,6 @@ body {
     /*margin-top: -20px !important;*/
 }
 
-.page {
-    padding-top: 20px;
-}
-
 .container {
     width: 90% !important;
 }
@@ -106,4 +102,20 @@ body {
 	position: absolute;
 	top:22%;
 	left:76%;
+}
+
+.popover {
+    max-width: 100% !important;
+}
+
+#viewTimeslotTable {
+    max-width: 300px;
+}
+
+#createTimeslotTable {
+    max-width: 300px;
+}
+
+#closeBookingBtn {
+    float: right;
 }

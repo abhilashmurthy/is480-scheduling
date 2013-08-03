@@ -16,12 +16,11 @@
         <%@include file="navbar.jsp" %>
 
         <%
-			//User user = (User) session.getAttribute("user");
             Team team = user.getTeam();
         %>
 
         <!-- Welcome Text -->
-        <div class="container" />
+        <div class="container page" />
         <h2 id="activeTermName">
             <%
                 String yearPlus1 = String.valueOf(activeTerm.getAcademicYear() + 1);
@@ -31,20 +30,20 @@
             %>
         </h2>
     </div>
-	<table class="legend">
-		<tr>
-			<!-- <td style="width:50px"><b>Legend:</b></td>-->
-			<td style="background-color:#AEC7C9;width:17px;"></td><td>No Booking</td> 
-			<td style="width:15px"></td>
-			<td style="background-color:#F6EE4E;width:17px;"></td><td>Booking Made</td> 
-			<td style="width:15px"></td>
-			<td style="background-color:#a9dba9;width:17px;"></td><td>Booking Confirmed</td> 
-			<td style="width:15px"></td>
-			<td style="background-color:#D1D0CE;width:17px;"></td><td>Holiday</td> 
-		</tr>
-	</table>
+    <table class="legend">
+        <tr>
+            <!-- <td style="width:50px"><b>Legend:</b></td>-->
+            <td style="background-color:#AEC7C9;width:17px;"></td><td>No Booking</td> 
+            <td style="width:15px"></td>
+            <td style="background-color:#F6EE4E;width:17px;"></td><td>Booking Made</td> 
+            <td style="width:15px"></td>
+            <td style="background-color:#a9dba9;width:17px;"></td><td>Booking Confirmed</td> 
+            <td style="width:15px"></td>
+            <td style="background-color:#D1D0CE;width:17px;"></td><td>Holiday</td> 
+        </tr>
+    </table>
     <!-- Main schedule navigation -->
-    <div class="container">
+    <div class="container page">
         <ul id="mileStoneTab" class="nav nav-tabs">
             <!-- TODO: populate dynamic milestones -->
             <li class="active">
@@ -73,7 +72,7 @@
         </div>
         <br />
     </div>
-	
+
     <%@include file="footer.jsp"%>
 
     <!-- View Schedule Javascript -->
@@ -148,9 +147,17 @@
 
             //Function to create mouse UI events
             function setupMouseEvents() {
+                $(".page").on('click', function() {
+                    console.log("page clicked");
+                    var popovers = $(".container div.popover:visible");
+                    if (popovers.length) {
+                        popovers.remove();
+                    }
+                });
+
                 $(".timeslotCell").mouseenter(function() {
                     $(this).css('border', '2px solid #1E647C');
-					$(this).css('cursor', 'crosshair');
+                    $(this).css('cursor', 'crosshair');
                 });
 
                 $(".timeslotCell").mouseleave(function() {
@@ -161,22 +168,45 @@
 
             //Function to setup popover events
             function setupPopovers() {
-                
+                //Setup common variables
+                var self = null;
+                var date = null;
+                var teamName = null;
+                var supervisor = null;
+                var reviewer1 = null;
+                var reviewer2 = null;
+                var date = null;
+                var startTime = null;
+                var endTime = null;
+                var termId = null;
+                var endTime = null;
+
                 //This will be populated based on a clicked timeslotCell
                 var viewBookingData = null;
-                
-                $(".timeslotCell").on('click', function() {
+
+                $(".timeslotCell").on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     console.log("clicked");
-                    var self = $(this);
+
+                    //Initialize variables
+                    self = $(this);
+                    teamName = "<%= team.getTeamName()%>";
+                    supervisor = "<%= team.getSupervisor().getFullName()%>";
+                    reviewer1 = "<%= team.getReviewer1().getFullName()%>";
+                    reviewer2 = "<%= team.getReviewer2().getFullName()%>";
+                    startTime = Date.parse(self.attr('value')).toString('HH:mm:ss');
+                    //TODO: Change endtime by milestone
+                    endTime = new Date(Date.parse(self.attr('value'))).addHours(1).toString('HH:mm');
+                    date = Date.parse(self.attr('value')).toString('yyyy-MM-dd');
+                    termId = activeAcademicYearStr + "," + activeSemesterStr;
 
                     //Clear other popovers
                     $(".popover").detach();
 
                     //Add clickedCell class
                     $(this).removeClass("clickedCell");
-                    var currentClasses = $(this).attr('class');
-                    $(this).removeClass("clickedCell");
-                    $(this).attr('class', currentClasses + " " + "clickedCell");
+                    $(this).addClass("clickedCell");
 
                     //Populate JSON to show
                     viewBookingData = getViewBookingJson(this);
@@ -205,171 +235,191 @@
                     }
                 });
 
-                //Setup common variables
-                var self = null;
-                var date = null;
-                var teamName = null;
-                //var supervisor = null;
-                var reviewer1 = null;
-                var reviewer2 = null;
-                var dateToView = null;
-                var date = null;
-                var startTimeToView = null;
-                var startTime = null;
-                var endTime = null;
-                var termId = null;
-                var termToView = null;
-                var endTime = null;
+                //-----------------------------//
 
-                //Create Popover based on view booking data
-                $(".timeslotCell").popover({
-                    container: 'body', //This is important for the popover to overflow the schedule
-                    html: 'true',
-                    trigger: 'click',
-                    placement: 'right',
-                    content: function() {
-                        self = $(this);
+                //Popover for booked timeslot
+                $(".bookedTimeslot").on('click', function() {
+                    $(this).popover({
+                        container: '.page', //This is important for the popover to overflow the schedule
+                        trigger: 'manual',
+                        html: 'true',
+                        placement: 'right',
+                        content: function() {
+                            //Output in the form of a table
+                            var output = "<table id='viewTimeslotTable'>";
 
-                        //Output in the form of a table
-                        var output = "<table id='viewTimeslotTable' width='600'>";
-
-                        //If there is a booking on the timeslotCell
-                        if (!viewBookingData.error) {
-                            //View booking
-							var output = "<table id='viewTimeslotTable' width='300'>";
-							
-                            output += "<tr><td><b>Team: </b></td>";
-                            output += "<td>" + viewBookingData.teamName + "</td></tr>";
-                            output += "<tr><td><b>Date: </b></td>";
-                            output += "<td>" + viewBookingData.startDate + "</td></tr>";
-                            output += "<tr><td><b>Start Time: </b></td>";
-                            output += "<td>" + viewBookingData.startTime + "</td></tr>";
-                            output += "<tr><td><b>Team Wiki: </b></td>";
-                            output += "<td>" + viewBookingData.teamWiki + "</td></tr>";
-                            output += "<tr><td><b>Attendees: </b></td>";
-                            output += "<td>";
-                            for (var i = 0; i < viewBookingData.attendees.length; i++) {
-                                output += viewBookingData.attendees[i].name;
-                                output += "<br/>";
+                            //There should be no error for bookedTimeslot
+                            if (!viewBookingData.error) {
+                                //View booking
+                                output += "<tr><td><b>Team: </b></td>";
+                                output += "<td>" + viewBookingData.teamName + "</td></tr>";
+                                output += "<tr><td><b>Date: </b></td>";
+                                output += "<td>" + viewBookingData.startDate + "</td></tr>";
+                                output += "<tr><td><b>Start Time: </b></td>";
+                                output += "<td>" + viewBookingData.startTime + "</td></tr>";
+                                output += "<tr><td><b>Team Wiki: </b></td>";
+                                output += "<td>" + viewBookingData.teamWiki + "</td></tr>";
+                                output += "<tr><td><b>Attendees: </b></td>";
+                                output += "<td>";
+                                for (var i = 0; i < viewBookingData.attendees.length; i++) {
+                                    output += viewBookingData.attendees[i].name;
+                                    output += "<br/>";
+                                }
+                                output += "</td></tr>";
+                            } else {
+                                //There was an error
+                                output += "<tr><td>Oops. There was an error..</td></tr>";
                             }
-                            output += "</td></tr>";
-                        } else {
-                            //Create Booking
-                            //Initialize values
-                            teamName = "<%= team.getTeamName()%>";
-                            //supervisor = "<%= team.getSupervisor().getFullName()%>";
-                            reviewer1 = "<%= team.getReviewer1().getFullName()%>";
-                            reviewer2 = "<%= team.getReviewer2().getFullName()%>";
-                            dateToView = Date.parse(self.attr('value')).toString('dddd, dd MMM');
-                            date = Date.parse(self.attr('value')).toString('yyyy-MM-dd');
-                            startTimeToView = Date.parse(self.attr('value')).toString('HH:mm');
-                            startTime = Date.parse(self.attr('value')).toString('HH:mm:ss');
+                            //Close table
+                            output += "</table>";
+                            return output;
+                        },
+                        title: function() {
+                            if (!viewBookingData.error) {
+                                return "View Booking <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                            } else {
+                                return "Error <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                            }
+                        }
+                    });
+                    console.log('Toggling A');
+                    $(this).popover('toggle');
+                });
 
-                            //TODO: Change by milestone
-                            endTime = new Date(Date.parse(self.attr('value'))).addHours(1).toString('HH:mm');
-                            termId = activeAcademicYearStr + "," + activeSemesterStr;
-                            termToView = termId.split(",")[0] + ", " + termId.split(",")[1];
-                            endTime = new Date(Date.parse(self.attr('value'))).addHours(1).toString('HH:mm');
-							
-							var output = "<table id='viewTimeslotTable' width='250'>";
-							
-                            //Print values in create booking
-                            output += "<tr><td><b>Team: </b></td>";
-                            output += "<td>" + teamName + "</td></tr>";
-                            //output += "<tr><td><b>Supervisor </b></td>";
-                            //output += "<td>" + supervisor + "</td></tr>";
-                            output += "<tr><td><b>Date: </b></td>";
-                            output += "<td>" + dateToView + "</td></tr>";
-                            output += "<tr><td><b>Start Time: </b></td>";
-                            output += "<td>" + startTimeToView + "</td></tr>";
-                            output += "<tr><td><b>End Time: </b></td>";
-                            output += "<td>" + endTime + "</td></tr>";
-                            output += "<tr><td><b>Term: </b></td>";
-                            output += "<td>" + termToView + "</td></tr>";
-                            output += "<tr><td><b>Milestone: </b></td>";
-                            output += "<td>" + milestoneStr + "</td></tr>";
-                            output += "<tr><td><br/></td><td></td></tr>";
-                            output += "<tr><td><button id='createBookingBtn' class='btn btn-primary'>Create</button></td>";
-                            
-                            //Todo: Change this according to acceptance, midterm, and final
-//                            output += "<tr><td><b>Reviewer 1: </b></td>";
-//                            output += "<td>" + reviewer1 + "</td></tr>";
-//                            output += "<tr><td><b>Reviewer 2: </b></td>";
-//                            output += "<td>" + reviewer2 + "</td></tr>";
-                        }
-                        //Close table
-                        output += "</table>";
-                        return output;
-                    },
-                    title: function() {
-                        if (!viewBookingData.error) {
-                            return "View Booking";
-                        } else {
-                            return "Create Booking";
-                        }
+                //Popover for unbookedTimeslot
+                $(".unbookedTimeslot").on('click', function() {
+                    //Check if booking already exists
+                    var exists = $(".scheduleTable").find(":contains(" + teamName + ")").length;
+                    if (exists) {
+                        //If booking exists, just create it so that the error can be produced
+                        createBooking();
+                    } else {
+                        $(this).popover({
+                            container: '.page', //This is important for the popover to overflow the schedule
+                            html: 'true',
+                            trigger: 'manual',
+                            placement: 'right',
+                            content: function() {
+                                //Output in the form of a table
+                                var output = "<table id='createTimeslotTable'>";
+
+                                //There should be an error in viewBookingData for an unbookedTimeslot
+                                if (viewBookingData.error) {
+                                    //Create Booking
+                                    var termToView = termId;
+                                    var dateToView = Date.parse(date).toString("dd MMM");
+                                    var startTimeToView = Date.parse(startTime).toString("HH:mm");
+
+                                    //Print values in create booking
+                                    output += "<tr><td><b>Team: </b></td>";
+                                    output += "<td>" + teamName + "</td></tr>";
+                                    output += "<tr><td><b>Date: </b></td>";
+                                    output += "<td>" + dateToView + "</td></tr>";
+                                    output += "<tr><td><b>Start Time: </b></td>";
+                                    output += "<td>" + startTimeToView + "</td></tr>";
+                                    output += "<tr><td><b>End Time: </b></td>";
+                                    output += "<td>" + endTime + "</td></tr>";
+                                    output += "<tr><td><b>Term: </b></td>";
+                                    output += "<td>" + termToView + "</td></tr>";
+                                    output += "<tr><td><b>Milestone: </b></td>";
+                                    output += "<td>" + milestoneStr + "</td></tr>";
+                                    //TODO: Change this according to acceptance, midterm, and final
+                                    //                            output += "<tr><td><b>Reviewer 1: </b></td>";
+                                    //                            output += "<td>" + reviewer1 + "</td></tr>";
+                                    //                            output += "<tr><td><b>Reviewer 2: </b></td>";
+                                    //                            output += "<td>" + reviewer2 + "</td></tr>";
+                                    output += "<tr><td><br/></td><td></td></tr>";
+                                    output += "<tr>";
+                                    output += "<td><button id='createBookingBtn' class='btn btn-primary'>Create</button></td>";
+                                    output += "</tr>";
+                                } else {
+                                    output += "<tr><td>There was an error... </td></tr>";
+                                }
+                                //Close table
+                                output += "</table>";
+                                return output;
+                            },
+                            title: function() {
+                                if (viewBookingData.error) {
+                                    return "Create Booking <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                                } else {
+                                    return "Error <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                                }
+                            }
+                        });
+                        console.log('Toggling B');
+                        $(this).popover('toggle');
                     }
                 });
-                viewBookingData = null;
-                
-                 //NOTE: Using body.onclick instead createBookingBtn.onclick
-                 //Use this kind of event trigger for dynamic buttons
-                 $("body").on('click', '#createBookingBtn', function() {
-                     var data = {
-                         date: date,
-                         startTime: startTime,
-                         termId: termId,
-                         milestoneStr: milestoneStr.toLowerCase()
-                     };
-                     console.log("Submitting create booking data: " + JSON.stringify(data));
-                     //Create Booking AJAX
-                     $.ajax({
-                         type: 'POST',
-                         async: false,
-                         url: 'createBookingJson',
-                         data: data,
-                         cache: false,
-                         dataType: 'json'
-                     }).done(function(response) {
-                         self.popover('destroy');
-                         var resultStr = "<table id='viewTimeslotTable'><tr><td>";
-                         resultStr += "<div id='responseBanner'";
-                         if (response.success) {
-                             resultStr += " class='alert-success'>";
 
-                             //Update the timeslot on the schedule
-                             self.html(teamName);
-                             self.addClass('bookedTimeslot');
-                         } else {
-                             resultStr += " class='alert-error'>";
-                         }
-                         resultStr += "<span id='responseMessage'>";
-                         resultStr += response.message;
-                         resultStr += "</span>";
-                         resultStr += "</div>";
-                         resultStr += "</td></tr>";
-                         resultStr += "</table>";
+                //-----------------------------//
 
-                         self.popover({
-                             container: 'body',
-                             title: 'Result',
-                             placement: 'right',
-                             content: resultStr,
-                             html: true
-                         });
-                         self.popover('show');
+                //NOTE: Using body.onclick instead createBookingBtn.onclick
+                //Use this kind of event trigger for dynamic buttons
+                $(".page").on('click', '#createBookingBtn', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    createBooking();
+                    return false;
+                });
 
-                         setTimeout(function(){
-                             $(".popover").slideUp(300, function(){
-                                 $(this).remove();
-                             });
-                         }, 3000);
+                $(".page").on('click', '#closeBookingBtn', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Destroying B');
+                    self.popover('destroy');
+                    return false;
+                });
 
+                function createBooking() {
+                    var data = {
+                        date: date,
+                        startTime: startTime,
+                        termId: termId,
+                        milestoneStr: milestoneStr.toLowerCase()
+                    };
+                    console.log("Submitting create booking data: " + JSON.stringify(data));
+                    //Create Booking AJAX
+                    $.ajax({
+                        type: 'POST',
+                        async: false,
+                        url: 'createBookingJson',
+                        data: data,
+                        cache: false,
+                        dataType: 'json'
+                    }).done(function(response) {
+                        console.log('Destroying A');
+                        self.popover('destroy');
+                        var resultStr = "<table id='viewTimeslotTable' class='bookingResult'><tr><td>";
+                        resultStr += "<div id='responseBanner'";
+                        if (response.success) {
+                            resultStr += " class='alert-success'>";
 
-                     }).fail(function(response) {
-                         alert("Oops. There was an error");
-                     });
-                     return false;
-                 });
+                            //Update the timeslot on the schedule
+                            self.html(teamName);
+                            self.addClass('bookedTimeslot');
+                        } else {
+                            resultStr += " class='alert-error'>";
+                        }
+                        resultStr += "<span id='responseMessage'>";
+                        resultStr += response.message;
+                        resultStr += "</span>";
+                        resultStr += "</div>";
+                        resultStr += "</table>";
+
+                        self.popover({
+                            container: ".page",
+                            title: "Result <button id='closeBookingBtn' class='btn btn-danger'>Close</button>",
+                            placement: "right",
+                            content: resultStr,
+                            html: true
+                        });
+                        console.log('Toggling D');
+                        self.popover('toggle');
+                    }).fail(function(response) {
+                        alert("Oops. There was an error");
+                    });
+                }
             }
 
             //Function to make schedule based on GetScheduleAction response
