@@ -278,9 +278,10 @@
                         },
                         title: function() {
                             if (!viewBookingData.error) {
-                                return "View Booking <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                                return "View Booking <div class='close'>x</div>";
                             } else {
-                                return "Error <button id='closeBookingBtn' class='btn btn-danger'>Close</button>";
+                                //return "Error <button id='closeBookingBtn' class='btn btn-small btn-danger'>X</button>";
+								return "Error <div class='close'>x</div>";
                             }
                         }
                     });
@@ -411,7 +412,7 @@
 
                         self.popover({
                             container: ".page",
-                            title: "Result <button id='closeBookingBtn' class='btn btn-danger'>Close</button>",
+                            title: "Result <div class='close'>x</div>",
                             placement: "right",
                             content: resultStr,
                             html: true
