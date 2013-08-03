@@ -575,6 +575,6 @@
         addLoadEvent(viewScheduleLoad);
     </script>
 	<br/>
-	<%@include file="navbar_footer.jsp" %>
+	<%--<%@include file="navbar_footer.jsp" %>--%>
 </body>
 </html>

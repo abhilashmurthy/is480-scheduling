@@ -180,4 +180,22 @@ public class ScheduleManager {
         }
         return schedule;
     }
+	
+	// Gives the schedule based on the timeslot date (Each timeslot is part of 1 schedule)
+	public static Schedule findByTimeslot(EntityManager em, Timestamp startTime) {
+        logger.info("Getting schedule by timeslot: start[" + startTime + "]");
+        Schedule schedule = null;
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            Query q = em.createQuery("select o from Schedule o where o.startDate <= :startTime and o.endDate >= :startTime", Schedule.class)
+                    .setParameter("startTime", startTime, TemporalType.TIMESTAMP);
+            schedule = (Schedule) q.getSingleResult();
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            e.printStackTrace();
+        }
+        return schedule;
+    }
 }
