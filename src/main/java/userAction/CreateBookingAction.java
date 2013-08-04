@@ -4,6 +4,7 @@
  */
 package userAction;
 
+import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Status;
 import java.sql.Timestamp;
@@ -57,23 +58,27 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		HttpSession session = request.getSession();
 
 		User user = (User) session.getAttribute("user");
-		Team team = user.getTeam();
-
-		// Checking if the user is part of any team
-		if (team == null) {
-			request.setAttribute("error", "Doesn't look like you're part of any team."
-					+ " Can't let you make a booking!");
-			logger.error("User's team information not found");
-			json.put("success", false);
-			json.put("message", "Doesn't look like you're part of any team."
-					+ " Can't let you make a booking!");
-			return SUCCESS;
+		String activeRole = (String) request.getAttribute("activeRole");
+		Team team = null;
+		
+		if (activeRole.equalsIgnoreCase("Student")) {
+			team = user.getTeam();
+		} else if (activeRole.equalsIgnoreCase("Administrator")) { //TODO Admin roles not yet setup! Verify code after setup.
+			//Get team based on input provided.
 		}
+		
+		// Checking if team information is found
+		if (team == null) {
+			logger.error("Team information not found or unauthorized user role");
+			json.put("success", false);
+			json.put("message", "Team not identified or you do not have required"
+					+ " permissions to make a booking.");
+			return SUCCESS;
+		}	
 
 		//Validating milestone info
 		Milestone milestone = MilestoneManager.findByName(em, milestoneStr);
 		if (milestone == null) {
-			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Milestone not found");
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong on our end. Please try again!");
@@ -90,7 +95,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 				throw new Exception();
 			}
 		} catch (Exception e) {
-			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Term not found");
 			logger.error(e.getMessage());
 			json.put("success", false);
@@ -102,7 +106,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		//Retrieve the corresponding schedule object and its timeslots
 		Schedule schedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
 		if (schedule == null || schedule.getTimeslots() == null) {
-			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("Schedule not found");
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong on our end. Please try again!");
@@ -113,8 +116,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		//Checking if the team already has a booking (pending/confirmed)
 		for (Timeslot t : timeslots) {
 			if (t.getTeam() != null && t.getTeam().equals(team)) {
-				request.setAttribute("error", "Seems like you already have a booking for this milestone."
-						+ " Can't let you make a booking!");
 				logger.error("Team's already booked a timeslot for the milestone this term");
 				json.put("success", false);
 				json.put("message", "Seems like you already have a booking for this milestone."
@@ -129,7 +130,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			String timestampStr = date + " " + startTime;
 			bookingTime = Timestamp.valueOf(timestampStr);
 		} catch (IllegalArgumentException e) {
-			request.setAttribute("error", "Date information not entered correctly. Please try again!");
 			logger.error("Start time could not be parsed");
 			json.put("success", false);
 			json.put("message", "Date information not entered correctly. Please try again!");
@@ -146,8 +146,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 		//Check if timeslot has been found
 		if (bookingSlot == null) {
-			request.setAttribute("error", "We can't find the timeslot you're trying to book."
-					+ " Please check the details entered!");
 			logger.error("Chosen timeslot not found");
 			json.put("success", false);
 			json.put("message", "We can't find the timeslot you're trying to book."
@@ -157,8 +155,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 		//Check if the timeslot is free
 		if (bookingSlot.getTeam() != null) { //Slot is full
-			request.setAttribute("error", "Oops. This timeslot is already taken."
-					+ " Please book another slot!");
 			logger.error("Chosen timeslot already booked");
 			json.put("success", false);
 			json.put("message", "Oops. This timeslot is already taken."
@@ -192,7 +188,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 				statusList.put(team.getReviewer1(), Status.PENDING);
 				attendees.add(team.getReviewer1());
 			} else {
-				request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 				logger.error("FATAL ERROR: Code not to be reached!");
 				throw new Exception();
 			}
@@ -204,7 +199,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		} catch (Exception e) {
 			//Rolling back write operations
 			em.getTransaction().rollback();
-			request.setAttribute("error", "Oops. Something went wrong on our end. Please try again!");
 			logger.error("FATAL ERROR: Database Write Error. Code not to be reached!");
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong on our end. Please try again!");

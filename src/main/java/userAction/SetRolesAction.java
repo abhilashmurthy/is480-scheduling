@@ -38,7 +38,6 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 	
 	@Override
 	public String execute() throws Exception {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 		
 		//Getting the session object
 		HttpSession session = request.getSession();  
