@@ -400,7 +400,7 @@
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
-                        if (response.success) {
+                        if (!response.exception) {
                             console.log('Destroying A');
                             self.popover('destroy');
                             var resultStr = "<table id='viewTimeslotTable' class='bookingResult'><tr><td>";

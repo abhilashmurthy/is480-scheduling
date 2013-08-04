@@ -58,6 +58,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     @Override
     public String execute() throws Exception {
         try {
+            json.put("exception", false);
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             HttpSession session = request.getSession();
 
@@ -219,6 +220,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 }
             }
             json.put("success", false);
+            json.put("exception", true);
             json.put("message", "Error with SendEmail: Escalate to developers!");
         }
         return SUCCESS;

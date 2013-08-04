@@ -122,9 +122,8 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     String teamWiki = "-";
                     json.put("teamWiki", teamWiki);
 
-                    if (json.size() > 0) {
-                        return SUCCESS;
-                    }
+                    json.put("success", true);
+                    return SUCCESS;
                 }
                 json.put("error", true);
                 json.put("message", "This booking is empty!");
