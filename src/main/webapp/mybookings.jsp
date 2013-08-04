@@ -42,6 +42,7 @@
 							<th>End Time</th>
 							<th>Venue</th>
 							<th>Booking Status</th>
+							<th>Overall Status</th>
 						</tr>
 					<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
 						<tr>
@@ -58,21 +59,22 @@
 				</thead>
 				<tbody> 
 					<s:iterator value="data">
+						<% if (activeRole.equalsIgnoreCase("Student")) { %>
 						<tr>
-							<%--<td><s:property value="teamId"/></td> --%>
-							<s:if test='myStatus.equals("PENDING")'>
-								<td><input type="checkbox" id="approveRejectArray" name="approveRejectArray" value="<s:property value="timeslotId"/>"/></td>
-							</s:if><s:else>
-								<td>-</td>
-							</s:else>
+							<td>1</td>
 							<td><s:property value="teamName"/></td>
-							<td><s:property value="milestoneName"/></td>
-							<td><s:property value="userRole"/></td>
+							<td><s:property value="milestone"/></td>
 							<td><s:property value="startTime"/></td>
 							<td><s:property value="endTime"/></td>
 							<td><s:property value="venue"/></td>
 							<td><s:property value="myStatus"/></td>
+							<td>
+							<s:iterator value="overallBookingStatus">
+								<s:property value="status"/> by <s:property value="name"/> <br/>
+							</s:iterator>
+							</td>
 						</tr>
+						<% } %>
 					</tbody>
 				</table>
 				</s:iterator>
