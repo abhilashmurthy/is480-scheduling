@@ -25,6 +25,7 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class Timeslot implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,7 +39,9 @@ public class Timeslot implements Serializable {
 	private Set<User> attendees = new HashSet<User>();
 	@ManyToOne
 	private Team team;
-	
+	@ManyToOne
+	private Schedule schedule;
+
 	/**
 	 * This method returns the overall status of the booking.
 	 * @return
@@ -110,6 +113,14 @@ public class Timeslot implements Serializable {
 		this.team = team;
 	}
 
+	public Schedule getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(Schedule schedule) {
+		this.schedule = schedule;
+	}
+	
 	public Long getId() {
 		return id;
 	}

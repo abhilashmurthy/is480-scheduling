@@ -20,19 +20,17 @@ public class UserValidator implements Interceptor{
 	Logger logger = LoggerFactory.getLogger(UserValidator.class);
 
 	public String intercept(ActionInvocation ai) throws Exception {
-		try {
-			Map<String, Object> session = ActionContext.getContext().getSession();
-
+		Map<String, Object> session = ActionContext.getContext().getSession();
+		
+		if (session != null) {
 			User user = (User) session.get("user");
-
+			
 			if (user != null) {
 				return ai.invoke();	
-			} else {
-				return "login";
-			}	
-		} catch (NullPointerException e) {
-			return "login";
-		}		
+			}
+		}
+		
+		return "login";
 	}
 
 	public void destroy() {

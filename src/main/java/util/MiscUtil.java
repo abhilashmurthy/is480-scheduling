@@ -33,20 +33,20 @@ public class MiscUtil {
 	}
 	
 	// Gives the schedule based on the timeslot date (Each timeslot is part of 1 schedule)
-	public static Schedule getScheduleByTimeslot (EntityManager em, Timeslot timeslot) {
-		Timestamp timeslotTime = timeslot.getStartTime();
-		List<Schedule> allSchedules = ScheduleManager.getAllSchedules(em);
-		if (allSchedules.size() > 0) {
-			for (Schedule schedule: allSchedules) {
-				Timestamp startDate = schedule.getStartDate();
-				Timestamp endDate = schedule.getEndDate();
-				//Checking whether the timeslot date falls between the schedule dates
-				if (timeslotTime.after(startDate) && timeslotTime.before(endDate)) {
-					return schedule;
-				}
-			}
-			return null;
-		}
-		return null;
-	}
+//	public static Schedule getScheduleByTimeslot (EntityManager em, Timeslot timeslot) {
+//		Timestamp timeslotTime = timeslot.getStartTime();
+//		List<Schedule> allSchedules = ScheduleManager.getAllSchedules(em);
+//		if (allSchedules.size() > 0) {
+//			for (Schedule schedule: allSchedules) {
+//				Timestamp startDate = schedule.getStartDate();
+//				Timestamp endDate = schedule.getEndDate();
+//				//Checking whether the timeslot date falls between the schedule dates
+//				if (timeslotTime.after(startDate) && timeslotTime.before(endDate)) {
+//					return schedule;
+//				}
+//			}
+//			return null;
+//		}
+//		return null;
+//	}
 }
