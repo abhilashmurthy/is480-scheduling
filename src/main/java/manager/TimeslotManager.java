@@ -4,6 +4,8 @@
  */
 package manager;
 
+import constant.Status;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -11,7 +13,9 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import model.Team;
 import model.Timeslot;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -40,15 +44,15 @@ public class TimeslotManager {
         }
         return null;
     }
-	
-	public static boolean updateTimeslotStatus (EntityManager em, List<Timeslot> timeslotsToUpdate, EntityTransaction transaction) {
-		logger.info("Updating timeslot status");
+
+    public static boolean updateTimeslotStatus(EntityManager em, List<Timeslot> timeslotsToUpdate, EntityTransaction transaction) {
+        logger.info("Updating timeslot status");
         try {
             transaction.begin();
-			for (Timeslot timeslot: timeslotsToUpdate) {
-				em.persist(timeslot);
-			}
-			transaction.commit();
+            for (Timeslot timeslot : timeslotsToUpdate) {
+                em.persist(timeslot);
+            }
+            transaction.commit();
             return true;
         } catch (PersistenceException ex) {
             //Rolling back data transactions
@@ -63,7 +67,7 @@ public class TimeslotManager {
         }
         return false;
     }
-    
+
     public static boolean saveTimeslots(EntityManager em, Set<Timeslot> timeslots, EntityTransaction transaction) {
         logger.info("Saving timeslots starting from: " + timeslots);
         try {
@@ -88,7 +92,7 @@ public class TimeslotManager {
         }
         return false;
     }
-    
+
     public static Timeslot save(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
         logger.info("Saving timeslot: " + timeslot);
         try {
@@ -110,5 +114,35 @@ public class TimeslotManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean deleteTimeslotBooking(EntityManager em, Timeslot ts) {
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            HashMap<User, Status> statusList = new HashMap<User, Status>();
+            transaction.begin();
+            String sQuery = "UPDATE Timeslot t SET t.statusList = :statusList, t.team = :team "
+                    + "WHERE t.id = :id";
+            Query query = em.createQuery(sQuery);
+
+            query.setParameter("statusList", statusList);
+            query.setParameter("team", null);
+            query.setParameter("id", ts.getId());
+            query.executeUpdate();
+            transaction.commit();
+
+            return true;
+        } catch (PersistenceException ex) {
+            //Rolling back data transactions
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            logger.error("Error making database call for update timeslot status");
+            ex.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return false;
     }
 }

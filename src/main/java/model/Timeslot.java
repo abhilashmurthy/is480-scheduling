@@ -23,6 +23,7 @@ import javax.persistence.ManyToOne;
  *
  * @author suresh
  */
+
 @Entity
 public class Timeslot implements Serializable {
 	

@@ -17,6 +17,7 @@
 
         <%
             Team team = user.getTeam();
+            String fullName = user.getFullName();
         %>
 
         <!-- Welcome Text -->
@@ -36,9 +37,9 @@
             <!-- <td style="width:50px"><b>Legend:</b></td>-->
             <td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;Available</td> 
             <td style="width:15px"></td>
-			<td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
+            <td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
             <td style="width:15px"></td>
-			<td style="background-color:#F75D59;width:17px;"></td><td>&nbsp;Rejected</td> 
+            <td style="background-color:#F75D59;width:17px;"></td><td>&nbsp;Rejected</td> 
             <td style="width:15px"></td>
             <td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
             <td style="width:15px"></td>
@@ -150,7 +151,7 @@
                         var eid = btoa(response.message);
                         window.location = "error.jsp?eid=" + eid;
                     }
-                }).fail(function(error){
+                }).fail(function(error) {
                     alert("There was an error in retrieving schedule");
                 });
             }
@@ -248,6 +249,79 @@
                         });
                         return toReturn;
                     }
+
+                    //delete booking
+                    $(".page").on('click', '#deleteBookingBtn', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        deleteBooking(self);
+                        return false;
+                    });
+
+                    //delete booking button
+                    $(".page").on('click', '#closeBookingBtn', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Destroying B');
+                        self.popover('destroy');
+                        return false;
+                    });
+
+                    //delete booking function
+                    function deleteBooking(elem) {
+                        //get the timeslotID for that cell and send as request
+                        var cellId = $(elem).attr('id').split("_")[1];
+                        var data = {timeslotId: cellId};
+                        console.log("Submitting delete booking data: " + JSON.stringify(data));
+                        console.log("data");
+                        //Delete Booking AJAX
+                        $.ajax({
+                            type: 'POST',
+                            async: false,
+                            url: 'deleteBookingJson',
+                            data: data,
+                            cache: false,
+                            dataType: 'json'
+                        }).done(function(response) {
+                            if (!response.exception) {
+                                console.log('Destroying A');
+                                self.popover('destroy');
+                                var resultStr = "<table id='createTimeslotTable' class='bookingResult'><tr><td>";
+                                resultStr += "<div id='responseBanner'";
+                                if (response.success) {
+                                    resultStr += " class='alert-success'>";
+
+                                    //Update the timeslot to unbookedTimeslot on the schedule
+                                    self.html('');
+                                    self.removeClass('bookedTimeslot');
+                                    self.addClass('unbookedTimeslot');
+                                } else {
+                                    resultStr += " class='alert-error'>";
+                                }
+                                resultStr += "<span id='responseMessage'>";
+                                resultStr += response.message;
+                                resultStr += "</span>";
+                                resultStr += "</div>";
+                                resultStr += "</table>";
+
+                                self.popover({
+                                    container: ".page",
+                                    title: "Result <button type='button' class='close'>&times;</button>",
+                                    placement: "right",
+                                    content: resultStr,
+                                    html: true
+                                });
+                                console.log('Toggling D');
+                                self.popover('toggle');
+                            } else {
+                                var eid = btoa(response.message);
+                                window.location = "error.jsp?eid=" + eid;
+                            }
+                        }).fail(function(error) {
+                            alert("Oops. There was an error: " + error);
+                        });
+                    }
+
                 });
 
                 //-----------------------------//
@@ -281,6 +355,20 @@
                                     output += "<br/>";
                                 }
                                 output += "</td></tr>";
+
+                                //go through the list of attendees and check if the current user name matches that
+                                //of the attendees and also check if it is a student
+                                for (var i = 0; i < viewBookingData.attendees.length; i++) {
+                                    var personnel = viewBookingData.attendees[i].name;
+                                    //var status = viewBookingData.attendees[i].status;
+                                    if ($.trim(personnel) === '<%=fullName%>' && <%=isStudent == true%> || <%=isAdmin == true%>) {
+                                        output += "<tr>";
+                                        output += "<td><button id='deleteBookingBtn' class='btn btn-primary'>Delete</button></td>";
+                                        output += "</tr>";
+                                        break;
+                                    }
+                                }
+
                             } else {
                                 //There was an error
                                 output += "<tr><td>Oops. There was an error..</td></tr>";
