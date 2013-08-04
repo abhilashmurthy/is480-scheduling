@@ -40,7 +40,7 @@ import util.MiscUtil;
 public class GetScheduleAction extends ActionSupport implements ServletRequestAware {
     
     private HttpServletRequest request;
-    private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
+    private static Logger logger = LoggerFactory.getLogger(GetScheduleAction.class);
     private final boolean debugMode = true;
     private String milestoneString;
     private String academicYearString;
@@ -153,6 +153,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 mapList.add(map);
             }
             json.put("timeslots", mapList);
+            json.put("success", true);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (debugMode) {
@@ -160,9 +161,8 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     logger.debug(s.toString());
                 }
             }
-            request.setAttribute("error", "Error with GetSchedule: Escalate to developers!");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
-            dispatcher.forward(request, null);
+            json.put("success", false);
+            json.put("message", "Error with GetSchedule: Escalate to developers!");
         }
         return SUCCESS;
     }

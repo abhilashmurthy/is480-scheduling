@@ -1,3 +1,6 @@
+<%@page import="sun.misc.BASE64Decoder"%>
+<%@page import="java.io.ByteArrayInputStream"%>
+<%@page import="javax.xml.bind.DatatypeConverter"%>
 <!DOCTYPE html>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <html lang="en">
@@ -5,9 +8,16 @@
         <meta charset="utf-8">
         <title>IS480 Scheduling System | Error</title>
 
-        <% if (request.getAttribute("error") == null) {
-            request.setAttribute("error", "Oops, something went wrong.<br/>");
-        } %>
+        <% 
+            String eid = request.getParameter("eid");
+            if (eid != null) {
+                BASE64Decoder decoder = new BASE64Decoder(); 
+                String errorMsg = new String(decoder.decodeBuffer(eid.trim()), "UTF-8");
+                request.setAttribute("error", errorMsg);
+            } else if (request.getAttribute("error") == null) {
+                request.setAttribute("error", "Oops, something went wrong.<br/>");
+            }
+        %>
         <style type="text/css">
 
             h1 {

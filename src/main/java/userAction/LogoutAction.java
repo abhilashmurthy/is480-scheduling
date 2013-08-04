@@ -6,6 +6,7 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -22,17 +23,27 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
 
     //Request and Response
     private HttpServletRequest request;
+    private static Logger logger = LoggerFactory.getLogger(LogoutAction.class);
+    private final boolean debugMode = true;
     private HttpServletResponse response;
-    
- 
-    static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
     
     @Override
     public String execute() throws Exception {
+        try {
         logger.info("Reached LogoutAction");
         HttpSession session = request.getSession();
         session.removeAttribute("user");
         logger.info("Logout successful");
+        } catch (Exception e) {
+            logger.error("Exception caught: " + e.getMessage());
+            if (debugMode) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            request.setAttribute("error", "Error with Logout: Escalate to developers!");
+            return ERROR;
+        }
         return SUCCESS;
     }
     

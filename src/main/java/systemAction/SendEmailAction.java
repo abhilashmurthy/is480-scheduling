@@ -21,9 +21,10 @@ import org.slf4j.LoggerFactory;
 public class SendEmailAction extends ActionSupport implements ServletRequestAware{
     
     private HttpServletRequest request;
-    private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
+    private static Logger logger = LoggerFactory.getLogger(SendEmailAction.class);
     private final boolean debugMode = true;
     
+    @Override
     public String execute() throws ServletException, IOException {
         try {
             //Code here
@@ -34,9 +35,8 @@ public class SendEmailAction extends ActionSupport implements ServletRequestAwar
                     logger.debug(s.toString());
                 }
             }
-            request.setAttribute("error", "Error with GetSchedule: Escalate to developers!");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
-            dispatcher.forward(request, null);
+            request.setAttribute("error", "Error with SendEmail: Escalate to developers!");
+            return ERROR;
         }
         return SUCCESS;
     }

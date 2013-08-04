@@ -136,7 +136,7 @@
                     dataType: 'json'
                 }).done(function(response) {
 
-                    if (response) {
+                    if (response.success) {
                         console.log("Checked year: " + response.year);
                         console.log("Checked semester: " + response.semester);
                         console.log("Can Add: " + response.canAdd);
@@ -152,7 +152,8 @@
                             displayMessage("Term already exists", true);
                         }
                     } else {
-                        alert("Oops. something went wrong..");
+                        var eid = btoa(response.message);
+                        window.location="error.jsp?eid=" + eid;
                     }
 
                 }).fail(function(error) {
@@ -243,6 +244,9 @@
                         finalId = response.finalScheduleId;
                         //Display create timeslots forms
                         displayCreateTimeslots();
+                    } else {
+                        var eid = btoa(response.message);
+                        window.location="error.jsp?eid=" + eid;
                     }
                 }).fail(function(error){
                     console.log("createScheduleData AJAX FAIL");
@@ -323,6 +327,9 @@
                     }).done(function(response){
                         if (response.success){
                             console.log("createTimeslotsJson was successful");
+                        } else {
+                            var eid = btoa(response.message);
+                            window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error){
                         console.log("createTimeslotsJson AJAX FAIL");

@@ -34,38 +34,38 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
     private List<Term> listTerms;
     private List<HashMap<String, String>> dataList;
     private HttpServletRequest request;
-    static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
+    static final Logger logger = LoggerFactory.getLogger(GetTermsAction.class);
     private final boolean debugMode = true;
 
     @Override
     public String execute() throws ServletException, IOException {
         try {
-        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
-        //Getting all the term objects
-        listTerms = TermManager.getAllTerms(em);
-        if (listTerms != null) {
-            dataList = new ArrayList<HashMap<String, String>>();
-            HashMap<String, String> map = null;
-            for (Term term : listTerms) {
-                map = new HashMap<String, String>();
-                String semester = term.getSemester();  //e.g. 1
-                int year = term.getAcademicYear();  //e.g. 2013
-                long termId = term.getId();
-                //e.g. 2013-2014
-                String academicYear = Integer.toString(year) + "-" + Integer.toString(year + 1);
-                //e.g. Term 1
-                String termName = academicYear + semester;
-                map.put("termName", termName);
-                map.put("termId", Long.toString(termId));
+            //Getting all the term objects
+            listTerms = TermManager.getAllTerms(em);
+            if (listTerms != null) {
+                dataList = new ArrayList<HashMap<String, String>>();
+                HashMap<String, String> map = null;
+                for (Term term : listTerms) {
+                    map = new HashMap<String, String>();
+                    String semester = term.getSemester();  //e.g. 1
+                    int year = term.getAcademicYear();  //e.g. 2013
+                    long termId = term.getId();
+                    //e.g. 2013-2014
+                    String academicYear = Integer.toString(year) + "-" + Integer.toString(year + 1);
+                    //e.g. Term 1
+                    String termName = academicYear + semester;
+                    map.put("termName", termName);
+                    map.put("termId", Long.toString(termId));
 
-                dataList.add(map);
+                    dataList.add(map);
+                }
+            } else {
+                request.setAttribute("error", "You cannot create a schedule right now. Please create a term first!");
+                logger.error("User cannot create schedule before creating term.");
+                return ERROR;
             }
-        } else {
-            request.setAttribute("error", "You cannot create a schedule right now. Please create a term first!");
-            logger.error("User cannot create schedule before creating term.");
-            return ERROR;
-        }
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (debugMode) {
@@ -74,8 +74,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
                 }
             }
             request.setAttribute("error", "Error with GetTerms: Escalate to developers!");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
-            dispatcher.forward(request, null);
+            return ERROR;
         }
         return SUCCESS;
     }
