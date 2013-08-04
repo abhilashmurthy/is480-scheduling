@@ -21,26 +21,26 @@
 
         <!-- Welcome Text -->
         <div class="container page" />
-        <h2 id="activeTermName">
+        <h3 id="activeTermName">
             <%
                 String yearPlus1 = String.valueOf(activeTerm.getAcademicYear() + 1);
                 String termName = activeTerm.getAcademicYear()
                         + "/" + yearPlus1.substring(2) + " " + activeTerm.getSemester();
                 out.print(termName);
             %>
-        </h2>
+        </h3>
     </div>
 		
 	<table class="legend">
 		<tr>
 			<!-- <td style="width:50px"><b>Legend:</b></td>-->
-			<td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;No Booking</td> 
+			<td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;Available</td> 
 			<td style="width:15px"></td>
-			<td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Booking Made</td> 
+			<td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
 			<td style="width:15px"></td>
-			<td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Booking Confirmed</td> 
+			<td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
 			<td style="width:15px"></td>
-			<td style="background-color:#D1D0CE;width:17px;"></td><td>&nbsp;Holiday</td> 
+			<td style="background-color:#D1D0CE;width:17px;"></td><td>&nbsp;Not Available</td> 
 		</tr>
 	</table>
 
@@ -292,7 +292,7 @@
                 //Popover for unbookedTimeslot
                 $(".unbookedTimeslot").on('click', function() {
                     //Check if booking already exists
-                    var exists = $(".scheduleTable").find(":contains(" + teamName + ")").length;
+                    var exists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
                     if (exists) {
                         //If booking exists, just create it so that the error can be produced
                         createBooking();
@@ -398,8 +398,9 @@
                         if (response.success) {
                             resultStr += " class='alert-success'>";
 
-                            //Update the timeslot on the schedule
+                            //Update the timeslot to bookedTimeslot on the schedule
                             self.html(teamName);
+                            self.removeClass('unbookedTimeslot');
                             self.addClass('bookedTimeslot');
                         } else {
                             resultStr += " class='alert-error'>";
