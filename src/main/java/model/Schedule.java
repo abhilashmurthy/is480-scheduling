@@ -37,8 +37,8 @@ public class Schedule implements Serializable {
 	private Milestone milestone;
 	private Timestamp startDate;
 	private Timestamp endDate;
-	@OneToMany(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
 	public Term getTerm() {

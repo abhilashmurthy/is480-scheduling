@@ -100,8 +100,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 						SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
 						String venue = timeslot.getVenue();
 						String teamName = timeslot.getTeam().getTeamName();
-						//Getting the schedule based on timeslot (Each timeslot belongs to 1 unique schedule)
-						Schedule schedule = MiscUtil.getScheduleByTimeslot(em, timeslot);
+						Schedule schedule = timeslot.getSchedule();
 						String milestoneName = "";
 						if (schedule != null) {
 							milestoneName = schedule.getMilestone().getName();
