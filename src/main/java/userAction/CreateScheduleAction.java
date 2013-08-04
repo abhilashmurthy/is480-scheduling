@@ -25,7 +25,6 @@ import model.Term;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static userAction.CreateBookingAction.logger;
 import util.MiscUtil;
 
 /**
