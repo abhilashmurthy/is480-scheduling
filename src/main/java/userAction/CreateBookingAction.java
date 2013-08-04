@@ -63,8 +63,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		
 		if (activeRole.equalsIgnoreCase("Student")) {
 			team = user.getTeam();
-		} else if (activeRole.equalsIgnoreCase("Administrator")) { //TODO Admin roles not yet setup! Verify code after setup.
-			//Get team based on input provided.
+		} else if (activeRole.equalsIgnoreCase("Administrator")) {
+			//TODO Get team input for Admin role
 		}
 		
 		// Checking if team information is found
