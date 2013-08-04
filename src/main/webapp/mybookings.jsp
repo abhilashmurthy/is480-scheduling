@@ -75,21 +75,9 @@
 						</tr>
 					</tbody>
 				</table>
-				<table>
-					<tr>
-						<td><input type="submit" class="btn btn-success" id="approveButton" value="Approve" name="Approve" onclick="return valthisform();"/></td>
-						<td>
-							<span class="button-divider">
-								<input type="submit" class="btn btn-danger" id="rejectButton" value="Reject" name="Reject" onclick="return valthisform();"/>
-							</span>
-						</td>
-						<!--<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td> -->
-					</tr>
-				</table>
 				</s:iterator>
 		</s:if><s:else>
 			<h4>No bookings have been made!</h4>
 		</s:else>
-		
     </body>
 </html>

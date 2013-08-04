@@ -4,11 +4,14 @@
  */
 package util;
 
+import java.sql.Timestamp;
+import java.util.List;
 import javax.persistence.EntityManager;
 import manager.ScheduleManager;
 import manager.TermManager;
 import model.Schedule;
 import model.Term;
+import model.Timeslot;
 
 /**
  * Utility class to put miscellaneous code
@@ -27,5 +30,23 @@ public class MiscUtil {
 	public static Schedule getActiveSchedule(EntityManager em) {
 		Term activeTerm = getActiveTerm(em);
 		return ScheduleManager.findActiveByTerm(em, activeTerm);
+	}
+	
+	// Gives the schedule based on the timeslot date (Each timeslot is part of 1 schedule)
+	public static Schedule getScheduleByTimeslot (EntityManager em, Timeslot timeslot) {
+		Timestamp timeslotTime = timeslot.getStartTime();
+		List<Schedule> allSchedules = ScheduleManager.getAllSchedules(em);
+		if (allSchedules.size() > 0) {
+			for (Schedule schedule: allSchedules) {
+				Timestamp startDate = schedule.getStartDate();
+				Timestamp endDate = schedule.getEndDate();
+				//Checking whether the timeslot date falls between the schedule dates
+				if (timeslotTime.after(startDate) && timeslotTime.before(endDate)) {
+					return schedule;
+				}
+			}
+			return null;
+		}
+		return null;
 	}
 }
