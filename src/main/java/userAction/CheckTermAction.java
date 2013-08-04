@@ -52,22 +52,23 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
     @Override
     public String execute() throws Exception {
         try {
-        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-        //To check if this term already exists
+            json.put("exception", false);
+            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            //To check if this term already exists
 
-        json.put("year", year);
-        json.put("semester", semester);
+            json.put("year", year);
+            json.put("semester", semester);
 
-        Term existingTerm = TermManager.findByYearAndSemester(em, year, semester);
-        if (existingTerm != null) {
-            request.setAttribute("error", "This term has already been created. Please try again!");
-            logger.error("Term already created");
-            json.put("canAdd", false);
-            return SUCCESS;
+            Term existingTerm = TermManager.findByYearAndSemester(em, year, semester);
+            if (existingTerm != null) {
+                request.setAttribute("error", "This term has already been created. Please try again!");
+                logger.error("Term already created");
+                json.put("canAdd", false);
+                return SUCCESS;
 //            return ERROR;
-        }
+            }
 
-        //Don't add Term yet. Add it after Term + Schedule + Timeslots have all been set
+            //Don't add Term yet. Add it after Term + Schedule + Timeslots have all been set
 //        EntityTransaction transaction = null;
 //        Term term = new Term();
 //        term.setAcademicYear(year);
@@ -80,8 +81,7 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
 //            return SUCCESS;
 ////            return ERROR;
 //        }
-        json.put("success", true);
-        json.put("canAdd", true);
+            json.put("canAdd", true);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (debugMode) {
@@ -89,7 +89,7 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
                     logger.debug(s.toString());
                 }
             }
-            json.put("success", false);
+            json.put("exception", true);
             json.put("message", "Error with CheckTerm: Escalate to developers!");
         }
         return SUCCESS;

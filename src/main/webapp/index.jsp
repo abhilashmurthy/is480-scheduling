@@ -150,6 +150,8 @@
                         var eid = btoa(response.message);
                         window.location = "error.jsp?eid=" + eid;
                     }
+                }).fail(function(error){
+                    alert("There was an error in retrieving schedule");
                 });
             }
 
@@ -476,9 +478,7 @@
                         var dateArray = new Array();
                         var currentDate = startDate;
                         while (currentDate <= stopDate) {
-                            if (new Date(currentDate).isWeekday()) {
-                                dateArray.push(currentDate);
-                            }
+                            dateArray.push(currentDate);
                             currentDate = new Date(currentDate).addDays(1);
                         }
                         return dateArray;

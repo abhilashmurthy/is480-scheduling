@@ -90,6 +90,12 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         Set<Timeslot> finalTimeslots = new HashSet<Timeslot>();
         Calendar cal = Calendar.getInstance();
         EntityTransaction transaction = null;
+        
+        Schedule acceptanceSchedule = ScheduleManager.findById(em, acceptanceId);
+        Schedule midtermSchedule = ScheduleManager.findById(em, midtermId);
+        Schedule finalSchedule = ScheduleManager.findById(em, finalId);
+
+        logger.debug("Got all schedules: acceptance[" + acceptanceSchedule + "], midterm[" + midtermSchedule + "], final[" + finalSchedule + "]");
 
         try {
             //Set acceptance timeslots
@@ -107,7 +113,8 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
                 //TODO: Handle write error
-                acceptanceTimeslots.add(TimeslotManager.save(em, t, transaction));
+                t.setSchedule(acceptanceSchedule);
+                TimeslotManager.save(em, t, transaction);
             }
 
             logger.debug("Persisted acceptance timeslots: count " + acceptanceTimeslots.size());
@@ -127,8 +134,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setEndTime(endTime);
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
+                t.setSchedule(midtermSchedule);
                 //TODO: Handle write error
-                midtermTimeslots.add(TimeslotManager.save(em, t, transaction));
+               TimeslotManager.save(em, t, transaction);
             }
 
             logger.debug("Persisted midterm timeslots: count " + midtermTimeslots.size());
@@ -148,37 +156,16 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setEndTime(endTime);
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
+                t.setSchedule(finalSchedule);
                 //Save timeslot
                 //TODO: Handle write error
-                finalTimeslots.add(TimeslotManager.save(em, t, transaction));
+                TimeslotManager.save(em, t, transaction);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         logger.debug("Persisted final timeslots: count " + finalTimeslots.size());
-
-//        TimeslotManager.saveTimeslots(acceptanceTimeslots, transaction);
-//        TimeslotManager.saveTimeslots(midtermTimeslots, transaction);
-//        TimeslotManager.saveTimeslots(finalTimeslots, transaction);
-
-        Schedule acceptanceSchedule = ScheduleManager.findById(em, acceptanceId);
-        Schedule midtermSchedule = ScheduleManager.findById(em, midtermId);
-        Schedule finalSchedule = ScheduleManager.findById(em, finalId);
-
-        logger.debug("Got all schedules: acceptance[" + acceptanceSchedule + "], midterm[" + midtermSchedule + "], final[" + finalSchedule + "]");
-
-        acceptanceSchedule.setTimeslots(acceptanceTimeslots);
-        midtermSchedule.setTimeslots(midtermTimeslots);
-        finalSchedule.setTimeslots(finalTimeslots);
-
-        logger.debug("Set timeslots hashmaps into schedule objects");
-
-        ScheduleManager.update(em, acceptanceSchedule, transaction);
-        ScheduleManager.update(em, midtermSchedule, transaction);
-        ScheduleManager.update(em, finalSchedule, transaction);
-
-        logger.debug("Merged all schedules");
 
         json.put("success", true);
         } catch (Exception e) {

@@ -22,7 +22,7 @@ import util.MiscUtil;
  */
 public class TimeslotManager {
 
-    private static Logger logger = LoggerFactory.getLogger(UserManager.class);
+    private static Logger logger = LoggerFactory.getLogger(TimeslotManager.class);
 
     public static Timeslot findById(EntityManager em, long id) {
         logger.info("Getting timeslot based on id.");

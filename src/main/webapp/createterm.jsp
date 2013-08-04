@@ -136,7 +136,7 @@
                     dataType: 'json'
                 }).done(function(response) {
 
-                    if (response.success) {
+                    if (!response.exception) {
                         console.log("Checked year: " + response.year);
                         console.log("Checked semester: " + response.semester);
                         console.log("Can Add: " + response.canAdd);
@@ -189,7 +189,8 @@
             /* Datepicker validation */
             $(".datepicker").multiDatesPicker({
                 dateFormat: "yy-mm-dd",
-                minDate: Date.today()
+                minDate: Date.today(),
+                beforeShowDay: $.datepicker.noWeekends
             });
 
             resetDisabledDates("acceptanceDatePicker", "midtermDatePicker");
@@ -210,7 +211,8 @@
                         if (lastAcceptanceDate) {
                             $("#" + second).multiDatesPicker({
                                 dateFormat: "yy-mm-dd",
-                                minDate: new Date(lastAcceptanceDate).addDays(1)
+                                minDate: new Date(lastAcceptanceDate).addDays(1),
+                                beforeShowDay: $.datepicker.noWeekends
                             });
                         }
                     }
@@ -311,7 +313,7 @@
                     
                     for (var i = 0; i < data.length; i++){
                         timeslotsData[data[i].name] = timeslotsData[data[i].name] || [];
-                        timeslotsData[data[i].name].push(data[i].value);
+                        timeslotsData[data[i].name].push(Date.parse(data[i].value).toString('yyyy-MM-dd HH:mm:ss'));
                     }
                     
                     console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));

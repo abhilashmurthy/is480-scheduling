@@ -108,7 +108,7 @@ public class ScheduleManager {
     }
     
     public static boolean update(EntityManager em, Schedule schedule, EntityTransaction transaction) {
-        logger.info("Creating new schedule");
+        logger.info("Updated schedule: " + schedule);
         try {
             transaction = em.getTransaction();
             transaction.begin();
