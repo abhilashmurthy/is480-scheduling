@@ -58,7 +58,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		HttpSession session = request.getSession();
 
 		User user = (User) session.getAttribute("user");
-		String activeRole = (String) request.getAttribute("activeRole");
+		String activeRole = (String) session.getAttribute("activeRole");
 		Team team = null;
 		
 		if (activeRole.equalsIgnoreCase("Student")) {

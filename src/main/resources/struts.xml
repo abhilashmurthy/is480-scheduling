@@ -49,12 +49,7 @@
         
 <!--        <action name="createBooking" class="userAction.CreateBorokingAction" method="execute">
             <result name = "success">/index.jsp</result>
-        </action>
-		
-		<action name="newBooking" class="systemAction.GetTimeslotsAction" method="execute">
-			<result name="success">/booking.jsp</result>
-			<param name="timeslots"></param>
-		</action> -->
+        </action> -->
        
 		<action name="approveReject" class="userAction.ResponseAction" method="execute">
 			<result name="success">/approvereject.jsp</result>

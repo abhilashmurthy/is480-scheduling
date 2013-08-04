@@ -108,11 +108,15 @@ public class DBInitUtil {
 		ta.setName("TA");
 		ta.setTerm(term12013);
 		
+		Role admin = new Role();
+		admin.setName("Administrator");
+		
 		//Persistence
 		em.persist(student);
 		em.persist(supervisor);
 		em.persist(reviewer);
 		em.persist(ta);
+		em.persist(admin);
 		logger.info("Roles persisted");
 		
 		/*
@@ -176,6 +180,7 @@ public class DBInitUtil {
 		u1.setUsername("suresh.s.2010");
 		u1.setFullName("Suresh SUBRAMANIAM");
 		u1.addRole(student);
+		u1.addRole(admin);
 		
 		User u2 = new User();
 		u2.setUsername("abhilashm.2010");
