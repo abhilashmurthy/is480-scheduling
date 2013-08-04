@@ -13,6 +13,8 @@ import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.persistence.Persistence;
+import javax.servlet.RequestDispatcher;
+import manager.MilestoneManager;
 import manager.TermManager;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import util.MiscUtil;
@@ -23,7 +25,10 @@ import util.MiscUtil;
  */
 public class CheckTermAction extends ActionSupport implements ServletRequestAware {
 
-    private int year;    
+    private HttpServletRequest request;
+    static final Logger logger = LoggerFactory.getLogger(CheckTermAction.class);
+    private final boolean debugMode = true;
+    private int year;
     private String semester;
     private boolean canAdd;
     private HashMap<String, Object> json = new HashMap<String, Object>();
@@ -44,18 +49,15 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
         this.canAdd = canAdd;
     }
 
-
-    private HttpServletRequest request;
-    static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
-
     @Override
     public String execute() throws Exception {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+        try {
+        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
         //To check if this term already exists
-        
+
         json.put("year", year);
         json.put("semester", semester);
-        
+
         Term existingTerm = TermManager.findByYearAndSemester(em, year, semester);
         if (existingTerm != null) {
             request.setAttribute("error", "This term has already been created. Please try again!");
@@ -78,7 +80,18 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
 //            return SUCCESS;
 ////            return ERROR;
 //        }
+        json.put("success", true);
         json.put("canAdd", true);
+        } catch (Exception e) {
+            logger.error("Exception caught: " + e.getMessage());
+            if (debugMode) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            json.put("success", false);
+            json.put("message", "Error with CheckTerm: Escalate to developers!");
+        }
         return SUCCESS;
     }
 

@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
@@ -29,6 +30,7 @@ import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static userAction.CreateScheduleAction.logger;
 import util.MiscUtil;
 
 /**
@@ -38,8 +40,9 @@ import util.MiscUtil;
 public class CreateTimeslotsAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
+    static final Logger logger = LoggerFactory.getLogger(CreateTimeslotsAction.class);
+    private final boolean debugMode = true;
     private HashMap<String, Object> json = new HashMap<String, Object>();
-    static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
 
     public HashMap<String, Object> getJson() {
         return json;
@@ -51,8 +54,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-		
+        try {
+        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+
         Map parameters = request.getParameterMap();
         for (Object key : parameters.keySet()) {
             logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[0]);
@@ -102,7 +106,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setEndTime(endTime);
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
-				//TODO: Handle write error
+                //TODO: Handle write error
                 acceptanceTimeslots.add(TimeslotManager.save(em, t, transaction));
             }
 
@@ -123,7 +127,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setEndTime(endTime);
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
-				//TODO: Handle write error
+                //TODO: Handle write error
                 midtermTimeslots.add(TimeslotManager.save(em, t, transaction));
             }
 
@@ -145,7 +149,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 //TODO: Change to the venue variable
                 t.setVenue("SIS Seminar Room 2-1");
                 //Save timeslot
-				//TODO: Handle write error
+                //TODO: Handle write error
                 finalTimeslots.add(TimeslotManager.save(em, t, transaction));
             }
         } catch (Exception e) {
@@ -169,14 +173,24 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         finalSchedule.setTimeslots(finalTimeslots);
 
         logger.debug("Set timeslots hashmaps into schedule objects");
-        
+
         ScheduleManager.update(em, acceptanceSchedule, transaction);
         ScheduleManager.update(em, midtermSchedule, transaction);
         ScheduleManager.update(em, finalSchedule, transaction);
-        
+
         logger.debug("Merged all schedules");
 
         json.put("success", true);
+        } catch (Exception e) {
+            logger.error("Exception caught: " + e.getMessage());
+            if (debugMode) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            json.put("success", false);
+            json.put("message", "Error with CreateTimeslots: Escalate to developers!");
+        }
         return SUCCESS;
     }
 

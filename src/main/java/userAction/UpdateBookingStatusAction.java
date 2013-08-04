@@ -15,6 +15,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.TimeslotManager;
@@ -29,109 +30,120 @@ import util.MiscUtil;
  *
  * @author Prakhar
  */
-public class UpdateBookingStatusAction extends ActionSupport implements ServletRequestAware{
-	private String approveRejectArray[];
-	private String approve;
-	private String reject;
-	private String value = "0";  
-	private HttpServletRequest request;    
-	static final Logger logger = LoggerFactory.getLogger(UpdateBookingStatusAction.class);
-	
-	@Override
-	public String execute() throws Exception {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-		
-		String status = null;
-		if(approve != null) {
-			  status = "ACCEPTED";
-		} else if (reject != null) {
-			  status = "REJECTED";
-		} else {
-			logger.error("No valid response recorded from user");
-			return ERROR;
-		}
-		
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
-		
-		//The list of slots to update in db
-		List<Timeslot> timeslotsToUpdate = new ArrayList<Timeslot>();
-		
-		approveRejectArray = request.getParameterValues("approveRejectArray");
-		if (approveRejectArray != null && approveRejectArray.length > 0) {
-			for (int i = 0; i < approveRejectArray.length; i++) {
-				String timeslotId = approveRejectArray[i];
-				//Retrieving the timeslot to update
-				Timeslot timeslot = TimeslotManager.findById(em, Long.parseLong(timeslotId));
-				//Retrieving the status list of the timeslot
-				HashMap<User,Status> statusList = timeslot.getStatusList();
-				Iterator iter = statusList.keySet().iterator();
-				while (iter.hasNext()) {
-					if (iter.next().equals(user)) {
-						if (status.equalsIgnoreCase("ACCEPTED")) {
-							statusList.put(user, Status.ACCEPTED);
-						} else if (status.equalsIgnoreCase("REJECTED")) {
-							statusList.put(user, Status.REJECTED);
-						}
-					}
-				}
-			
-				if (statusList.size() > 0) {
-					//Setting the new status
-					timeslot.setStatusList(statusList);
-					timeslotsToUpdate.add(timeslot);
-				}
-			}
-			//Updating the time slot 
-			EntityTransaction transaction = em.getTransaction();
-			boolean result = TimeslotManager.updateTimeslotStatus(em, timeslotsToUpdate, transaction);
-			if (result == true) {
-				//em.close();
-				value = "1";
-				return SUCCESS;
-			}
-		}
-		request.setAttribute("error", "No timeslot selected!");
-		logger.error("User hasn't selected a timeslot to approve/reject!");
-		return ERROR;
-	} //end of execute
+public class UpdateBookingStatusAction extends ActionSupport implements ServletRequestAware {
 
-	
-	//Getters and Setters
-	
-	public String[] getApproveRejectArray() {
-		return approveRejectArray;
-	}
+    private HttpServletRequest request;
+    private static Logger logger = LoggerFactory.getLogger(UpdateBookingStatusAction.class);
+    private final boolean debugMode = true;
+    private String approveRejectArray[];
+    private String approve;
+    private String reject;
+    private String value = "0";;
 
-	public void setApproveRejectArray(String[] approveRejectArray) {
-		this.approveRejectArray = approveRejectArray;
-	}
-	
-	public String getApprove() {
-		return approve;
-	}
+    @Override
+    public String execute() throws Exception {
+        try {
+        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
-	public void setApprove(String approve) {
-		this.approve = approve;
-	}
+        String status = null;
+        if (approve != null) {
+            status = "ACCEPTED";
+        } else if (reject != null) {
+            status = "REJECTED";
+        } else {
+            logger.error("No valid response recorded from user");
+            return ERROR;
+        }
 
-	public String getReject() {
-		return reject;
-	}
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
 
-	public void setReject(String reject) {
-		this.reject = reject;
-	}
-	
-	public void setServletRequest(HttpServletRequest hsr) {
-		this.request = hsr;
-	}
+        //The list of slots to update in db
+        List<Timeslot> timeslotsToUpdate = new ArrayList<Timeslot>();
 
-	public String getValue() {
-		return value;
-	}
+        approveRejectArray = request.getParameterValues("approveRejectArray");
+        if (approveRejectArray != null && approveRejectArray.length > 0) {
+            for (int i = 0; i < approveRejectArray.length; i++) {
+                String timeslotId = approveRejectArray[i];
+                //Retrieving the timeslot to update
+                Timeslot timeslot = TimeslotManager.findById(em, Long.parseLong(timeslotId));
+                //Retrieving the status list of the timeslot
+                HashMap<User, Status> statusList = timeslot.getStatusList();
+                Iterator iter = statusList.keySet().iterator();
+                while (iter.hasNext()) {
+                    if (iter.next().equals(user)) {
+                        if (status.equalsIgnoreCase("ACCEPTED")) {
+                            statusList.put(user, Status.ACCEPTED);
+                        } else if (status.equalsIgnoreCase("REJECTED")) {
+                            statusList.put(user, Status.REJECTED);
+                        }
+                    }
+                }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+                if (statusList.size() > 0) {
+                    //Setting the new status
+                    timeslot.setStatusList(statusList);
+                    timeslotsToUpdate.add(timeslot);
+                }
+            }
+            //Updating the time slot 
+            EntityTransaction transaction = em.getTransaction();
+            boolean result = TimeslotManager.updateTimeslotStatus(em, timeslotsToUpdate, transaction);
+            if (result == true) {
+                //em.close();
+                value = "1";
+                return SUCCESS;
+            }
+        }
+        request.setAttribute("error", "No timeslot selected!");
+        logger.error("User hasn't selected a timeslot to approve/reject!");
+        return ERROR;
+        } catch (Exception e) {
+            logger.error("Exception caught: " + e.getMessage());
+            if (debugMode) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            request.setAttribute("error", "Error with UpdateBookingStatus: Escalate to developers!");
+            return ERROR;
+        }
+    }
+
+    //Getters and Setters
+    public String[] getApproveRejectArray() {
+        return approveRejectArray;
+    }
+
+    public void setApproveRejectArray(String[] approveRejectArray) {
+        this.approveRejectArray = approveRejectArray;
+    }
+
+    public String getApprove() {
+        return approve;
+    }
+
+    public void setApprove(String approve) {
+        this.approve = approve;
+    }
+
+    public String getReject() {
+        return reject;
+    }
+
+    public void setReject(String reject) {
+        this.reject = reject;
+    }
+
+    public void setServletRequest(HttpServletRequest hsr) {
+        this.request = hsr;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

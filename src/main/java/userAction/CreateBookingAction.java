@@ -35,13 +35,15 @@ import util.MiscUtil;
  */
 public class CreateBookingAction extends ActionSupport implements ServletRequestAware {
 
-	private String date;
-	private String startTime;
-	private String endTime;
-	private String termId;
-	private String milestoneStr;
-	private HttpServletRequest request;
-	private HashMap<String, Object> json = new HashMap<String, Object>();
+    private HttpServletRequest request;
+    private static Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
+    private final boolean debugMode = true;
+    private String date;
+    private String startTime;
+    private String endTime;
+    private String termId;
+    private String milestoneStr;
+    private HashMap<String, Object> json = new HashMap<String, Object>();
 
     public HttpServletRequest getRequest() {
         return request;
@@ -50,10 +52,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     public void setRequest(HttpServletRequest request) {
         this.request = request;
     }
-	static final Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
 
 	@Override
 	public String execute() throws Exception {
+		try{
 		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 		HttpSession session = request.getSession();
 
@@ -207,7 +209,17 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
 		json.put("success", true);
 		json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees. (Coming soon..)");
-		
+		} catch (Exception e) {
+            logger.error("Exception caught: " + e.getMessage());
+            if (debugMode) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            json.put("success", false);
+            json.put("exception", true);
+            json.put("message", "Error with SendEmail: Escalate to developers!");
+        }
 		return SUCCESS;
 	}
 
@@ -262,4 +274,5 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 	public void setServletRequest(HttpServletRequest hsr) {
 		request = hsr;
 	}
+
 }

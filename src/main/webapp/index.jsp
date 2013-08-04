@@ -30,19 +30,19 @@
             %>
         </h3>
     </div>
-		
-	<table class="legend">
-		<tr>
-			<!-- <td style="width:50px"><b>Legend:</b></td>-->
-			<td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;Available</td> 
-			<td style="width:15px"></td>
-			<td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
-			<td style="width:15px"></td>
-			<td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
-			<td style="width:15px"></td>
-			<td style="background-color:#D1D0CE;width:17px;"></td><td>&nbsp;Not Available</td> 
-		</tr>
-	</table>
+
+    <table class="legend">
+        <tr>
+            <!-- <td style="width:50px"><b>Legend:</b></td>-->
+            <td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;Available</td> 
+            <td style="width:15px"></td>
+            <td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
+            <td style="width:15px"></td>
+            <td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
+            <td style="width:15px"></td>
+            <td style="background-color:#D1D0CE;width:17px;"></td><td>&nbsp;Not Available</td> 
+        </tr>
+    </table>
 
     <!-- Main schedule navigation -->
     <div class="container page">
@@ -135,15 +135,19 @@
                     cache: false,
                     dataType: 'json'
                 }).done(function(response) {
+                    if (response.success) {
+                        //Draw the schedule table
+                        makeSchedule(response);
 
-                    //Draw the schedule table
-                    makeSchedule(response);
+                        //Setup mouse events
+                        setupMouseEvents();
 
-                    //Setup mouse events
-                    setupMouseEvents();
-
-                    //Setup Booking popover data
-                    setupPopovers();
+                        //Setup Booking popover data
+                        setupPopovers();
+                    } else {
+                        var eid = btoa(response.message);
+                        window.location = "error.jsp?eid=" + eid;
+                    }
                 });
             }
 
@@ -229,7 +233,12 @@
                             cache: false,
                             dataType: 'json'
                         }).done(function(response) {
-                            toReturn = response;
+                            if (response.success) {
+                                toReturn = response;
+                            } else {
+                                var eid = btoa(response.message);
+                                window.location = "error.jsp?eid=" + eid;
+                            }
                         }).fail(function(error) {
                             toReturn = "AJAX fail";
                         });
@@ -281,7 +290,7 @@
                                 return "View Booking <button type='button' class='close'>&times;</button>";
                             } else {
                                 //return "Error <button id='closeBookingBtn' class='btn btn-small btn-danger'>X</button>";
-								return "Error <button type='button' class='close'>&times;</button>";
+                                return "Error <button type='button' class='close'>&times;</button>";
                             }
                         }
                     });
@@ -391,37 +400,42 @@
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
-                        console.log('Destroying A');
-                        self.popover('destroy');
-                        var resultStr = "<table id='viewTimeslotTable' class='bookingResult'><tr><td>";
-                        resultStr += "<div id='responseBanner'";
-                        if (response.success) {
-                            resultStr += " class='alert-success'>";
+                        if (!response.exception) {
+                            console.log('Destroying A');
+                            self.popover('destroy');
+                            var resultStr = "<table id='viewTimeslotTable' class='bookingResult'><tr><td>";
+                            resultStr += "<div id='responseBanner'";
+                            if (response.success) {
+                                resultStr += " class='alert-success'>";
 
-                            //Update the timeslot to bookedTimeslot on the schedule
-                            self.html(teamName);
-                            self.removeClass('unbookedTimeslot');
-                            self.addClass('bookedTimeslot');
+                                //Update the timeslot to bookedTimeslot on the schedule
+                                self.html(teamName);
+                                self.removeClass('unbookedTimeslot');
+                                self.addClass('bookedTimeslot');
+                            } else {
+                                resultStr += " class='alert-error'>";
+                            }
+                            resultStr += "<span id='responseMessage'>";
+                            resultStr += response.message;
+                            resultStr += "</span>";
+                            resultStr += "</div>";
+                            resultStr += "</table>";
+
+                            self.popover({
+                                container: ".page",
+                                title: "Result <button type='button' class='close'>&times;</button>",
+                                placement: "right",
+                                content: resultStr,
+                                html: true
+                            });
+                            console.log('Toggling D');
+                            self.popover('toggle');
                         } else {
-                            resultStr += " class='alert-error'>";
+                            var eid = btoa(response.message);
+                            window.location = "error.jsp?eid=" + eid;
                         }
-                        resultStr += "<span id='responseMessage'>";
-                        resultStr += response.message;
-                        resultStr += "</span>";
-                        resultStr += "</div>";
-                        resultStr += "</table>";
-
-                        self.popover({
-                            container: ".page",
-                            title: "Result <button type='button' class='close'>&times;</button>",
-                            placement: "right",
-                            content: resultStr,
-                            html: true
-                        });
-                        console.log('Toggling D');
-                        self.popover('toggle');
-                    }).fail(function(response) {
-                        alert("Oops. There was an error");
+                    }).fail(function(error) {
+                        alert("Oops. There was an error: " + error);
                     });
                 }
             }
@@ -575,7 +589,7 @@
 
         addLoadEvent(viewScheduleLoad);
     </script>
-	<br/>
-	<%--<%@include file="navbar_footer.jsp" %>--%>
+    <br/>
+    <%--<%@include file="navbar_footer.jsp" %>--%>
 </body>
 </html>
