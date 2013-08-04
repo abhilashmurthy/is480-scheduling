@@ -93,31 +93,38 @@
 								<%--<th>Team Id</th>--%>
 								<th><input type="checkbox" name="checkall" onclick="checkedAll();"></th>
 								<th>Team Name</th>
-								<th>Presentation Type</th>
-								<th>Your Role</th>
+								<th>Presentation</th>
+								<th>My Role</th>
 								<th>Start Time</th>
 								<th>End Time</th>
 								<th>Venue</th>
-								<th>Your Status</th>
+								<th>My Status</th>
 							</tr>
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
-								<tr>
+								<s:if test="%{myStatus.equalsIgnoreCase('Pending')}"> 
+									<tr class="warning">
+								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Accepted')}">
+									<tr class="success">
+								</s:elseif><s:elseif test="%{myStatus.equalsIgnoreCase('Rejected')}">
+									<tr class="error">
+								</s:elseif>
 									<%--<td><s:property value="teamId"/></td> --%>
 									<s:if test='myStatus.equals("PENDING")'>
 										<td><input type="checkbox" id="approveRejectArray" name="approveRejectArray" value="<s:property value="timeslotId"/>"/></td>
 									</s:if><s:else>
-										<td>-</td>
+										<td><i class="icon-ok"></i></td>
 									</s:else>
 									<td><s:property value="teamName"/></td>
-									<td><s:property value="milestoneName"/></td>
+									<td><s:property value="milestone"/></td>
 									<td><s:property value="userRole"/></td>
 									<td><s:property value="startTime"/></td>
 									<td><s:property value="endTime"/></td>
 									<td><s:property value="venue"/></td>
 									<td><s:property value="myStatus"/></td>
 								</tr>
+							</s:iterator>
 							</tbody>
 						</table>
 						<table>
@@ -131,7 +138,6 @@
 								<!--<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td> -->
 							</tr>
 						</table>
-						</s:iterator>
 					</form>
 			</s:if><s:else>
 				<h4>No bookings available!</h4>

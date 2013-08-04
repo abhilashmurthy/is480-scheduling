@@ -36,9 +36,11 @@
             <!-- <td style="width:50px"><b>Legend:</b></td>-->
             <td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;Available</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
+			<td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
+			<td style="background-color:#F75D59;width:17px;"></td><td>&nbsp;Rejected</td> 
+            <td style="width:15px"></td>
+            <td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
             <td style="width:15px"></td>
             <td style="background-color:#D1D0CE;width:17px;"></td><td>&nbsp;Not Available</td> 
         </tr>

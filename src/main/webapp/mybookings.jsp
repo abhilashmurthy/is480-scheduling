@@ -37,7 +37,7 @@
 						<tr>
 							<th>#</th>
 							<th>My Team</th>
-							<th>Presentation Type</th>
+							<th>Presentation</th>
 							<th>Start Time</th>
 							<th>End Time</th>
 							<th>Venue</th>
@@ -48,7 +48,7 @@
 						<tr>
 							<th>#</th>
 							<th>Team Name</th>
-							<th>Presentation Type</th>
+							<th>Presentation</th>
 							<th>Start Time</th>
 							<th>End Time</th>
 							<th>Venue</th>
@@ -58,26 +58,52 @@
 					<% } %>
 				</thead>
 				<tbody> 
+					<% int count = 1; %>
 					<s:iterator value="data">
 						<% if (activeRole.equalsIgnoreCase("Student")) { %>
-						<tr>
-							<td>1</td>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
+							<tr class="warning">
+						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Accepted')}">
+							<tr class="success">
+						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
+							<tr class="error">
+						</s:elseif>
+								<td><%= count %></td>
+								<td><s:property value="teamName"/></td>
+								<td><s:property value="milestone"/></td>
+								<td><s:property value="startTime"/></td>
+								<td><s:property value="endTime"/></td>
+								<td><s:property value="venue"/></td>
+								<td>
+								<s:iterator value="individualBookingStatus">
+									<s:property value="status"/> by <s:property value="name"/> <br/>
+								</s:iterator>
+								</td>
+								<td><s:property value="overallBookingStatus"/></td>
+								<% count = count + 1; %>
+							</tr>
+						<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
+							<tr class="warning">
+						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Accepted')}">
+							<tr class="success">
+						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
+							<tr class="error">
+						</s:elseif>
+							<td><%= count %></td>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
 							<td><s:property value="startTime"/></td>
 							<td><s:property value="endTime"/></td>
 							<td><s:property value="venue"/></td>
 							<td><s:property value="myStatus"/></td>
-							<td>
-							<s:iterator value="overallBookingStatus">
-								<s:property value="status"/> by <s:property value="name"/> <br/>
-							</s:iterator>
-							</td>
+							<td><s:property value="overallBookingStatus"/></td>
+							<% count = count + 1; %>
 						</tr>
 						<% } %>
+					</s:iterator>
 					</tbody>
 				</table>
-				</s:iterator>
 		</s:if><s:else>
 			<h4>No bookings have been made!</h4>
 		</s:else>

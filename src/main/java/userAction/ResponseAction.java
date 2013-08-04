@@ -26,6 +26,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.servlet.RequestDispatcher;
 import manager.RoleManager;
+import manager.ScheduleManager;
 import model.Role;
 import model.Team;
 import model.Term;
@@ -90,27 +91,29 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 
             //Checking whether the user is a supervisor/reviewer. Only supervisor/reviewer can approve or reject a booking
             if (supervisorReviewerRoles.size() > 0) {
-                //Getting the current schedule based on term id
-                Schedule schedule = MiscUtil.getActiveSchedule(em);
+                //Getting all schedules for the active term
+                List<Schedule> listSchedules = ScheduleManager.findByTerm(em, activeTerm);
                 //Getting the current milestone
                 //Set<Timeslot> pendingList = null;
                 List<Timeslot> userTimeslots = new ArrayList<Timeslot>();
-                if (schedule != null) {
-                    Set<Timeslot> allTimeslots = schedule.getTimeslots();
-                    //Getting the pending timeslots for the particular user
-                    if (allTimeslots != null && allTimeslots.size() > 0) {
-                        //Iterating over the timeslots. Matching the user and checking if the status is pending.
-                        for (Timeslot currentTimeslot : allTimeslots) {
-                            HashMap<User, Status> statusList = currentTimeslot.getStatusList();
-                            Iterator iter = statusList.keySet().iterator();
-                            while (iter.hasNext()) {
-                                User userObj = (User) iter.next();
-                                if (userObj.equals(user)) {
-                                    userTimeslots.add(currentTimeslot);
-                                }
-                            }
-                        }
-                    }
+                if (listSchedules != null && listSchedules.size() > 0) {
+					for (Schedule schedule: listSchedules) {
+						Set<Timeslot> allTimeslots = schedule.getTimeslots();
+						//Getting the pending timeslots for the particular user
+						if (allTimeslots != null && allTimeslots.size() > 0) {
+							//Iterating over the timeslots. Matching the user.
+							for (Timeslot currentTimeslot : allTimeslots) {
+								HashMap<User, Status> statusList = currentTimeslot.getStatusList();
+								Iterator iter = statusList.keySet().iterator();
+								while (iter.hasNext()) {
+									User userObj = (User) iter.next();
+									if (userObj.equals(user)) {
+										userTimeslots.add(currentTimeslot);
+									}
+								}
+							}
+						}
+					} 
 
                     //Putting all the timeslot details for the user in hash map to display it 
                     //Sorting the timeslots list (Pending first, Approved/Rejected later)
@@ -125,7 +128,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
                             Team team = timeslot.getTeam();
                             teamId = team.getId();
                             teamName = team.getTeamName();
-                            milestoneName = schedule.getMilestone().getName();
+                            milestoneName = timeslot.getSchedule().getMilestone().getName();
                             startTime = sdf.format(timeslot.getStartTime());
                             endTime = sdf.format(timeslot.getEndTime());
                             myStatus = timeslot.getStatusList().get(user).toString();

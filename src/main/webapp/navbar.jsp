@@ -65,29 +65,28 @@
 						<li id="Report"><a href="#">Report</a></li>
 						
 				<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
-						<li class="dropdown">
-							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
-							</ul>
-						</li>
+						<!--<li class="dropdown">
+							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
+							<!--<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
+						<!--</ul>-->
+						<!--</li>-->
 						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
 				<% } else if (activeRole.equalsIgnoreCase("Student")) { %>
-						<li class="dropdown">
+<!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="booking.jsp">Create Booking</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
-							</ul>
-						</li>
+							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="booking.jsp">Create Booking</a></li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
+							<!--</ul>-->
+						<!--</li>-->
 						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
 				<% } else if (activeRole.equalsIgnoreCase("TA")) { %>	
 						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
 						<!--Nothing for now!-->
 				<% } %>
                 </ul>
-				<!--<li id="navKnockout"><a href="timeslots.jsp">Timeslot Test</a></li>-->
             </div>
 				
             <div class="btn-group userbox">

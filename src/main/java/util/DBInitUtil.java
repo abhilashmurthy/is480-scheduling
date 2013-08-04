@@ -195,9 +195,9 @@ public class DBInitUtil {
 		User u4 = new User();
 		u4.setUsername("prakhara.2010");
 		u4.setFullName("Prakhar AGARWAL");
-//		u4.addRole(student);
-		u4.addRole(reviewer);
-		u4.addRole(supervisor);
+		u4.addRole(student);
+//		u4.addRole(reviewer);
+//		u4.addRole(supervisor);
 		
 		User u5 = new User();
 		u5.setUsername("xuling.dai.2010");

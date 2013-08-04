@@ -118,12 +118,11 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                                 map.put("myStatus", myStatus);
                             }
 
-                            //For both students & supervisors/reviewers
-                            if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) {
-                                //Overall status only
-                                String overallBookingStatus = timeslot.getOverallBookingStatus().toString();
-                                map.put("overallBookingStatus", overallBookingStatus);
-                            } else if (activeRole.equalsIgnoreCase("Student")) {
+							//Overall status (will be seen by both students and supervisor/reviewer)
+							String overallBookingStatus = timeslot.getOverallBookingStatus().toString();
+							map.put("overallBookingStatus", overallBookingStatus);
+							
+                            if (activeRole.equalsIgnoreCase("Student")) {
                                 //Detailed status
                                 List<HashMap<String, String>> individualStatusList = new ArrayList<HashMap<String, String>>();
                                 HashMap<User, Status> members = null;
@@ -140,7 +139,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                                         individualStatusList.add(userMap);
                                     }
                                 }
-                                map.put("overallBookingStatus", individualStatusList);
+                                map.put("individualBookingStatus", individualStatusList);
                             }
 
                             map.put("teamName", teamName);
