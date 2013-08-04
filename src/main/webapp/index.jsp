@@ -363,7 +363,7 @@
                                     //var status = viewBookingData.attendees[i].status;
                                     if ($.trim(personnel) === '<%=fullName%>' && <%=isStudent == true%> || <%=isAdmin == true%>) {
                                         output += "<tr>";
-                                        output += "<td><button id='deleteBookingBtn' class='btn btn-primary'>Delete</button></td>";
+                                        output += "<td><button id='deleteBookingBtn' class='btn btn-danger'>Delete</button></td>";
                                         output += "</tr>";
                                         break;
                                     }
