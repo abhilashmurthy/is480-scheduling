@@ -17,7 +17,7 @@
         <!-- Navigation -->
         <%@include file="navbar.jsp" %>
         <div class="container page">
-            <h2>Create Booking</h2>
+            <h3>Create Booking</h3>
 
             <!-- SECTION: Timeslot Table -->
             <div>
