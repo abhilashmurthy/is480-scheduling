@@ -220,7 +220,8 @@
                 });
                 
                 //Popover for unbookedTimeslot
-                $(".unbookedTimeslot").on('click', function() {
+                $(".unbookedTimeslot").on('click', function() {    
+                
                     //Check if is student and has team first
                     teamName = "<%= team != null?team.getTeamName():null %>";
                     if (teamName !== null) {
