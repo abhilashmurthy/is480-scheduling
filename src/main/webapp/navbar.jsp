@@ -49,7 +49,6 @@
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
 							</ul>
 							<a id="scheduleDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Schedule<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
@@ -69,7 +68,6 @@
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
 							<!--<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
 						<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
-						<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
 						<!--</ul>-->
 						<!--</li>-->
 						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
@@ -77,8 +75,6 @@
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
-						<li role="presentation"><a role="menuitem" tabindex="-1" href="booking.jsp">Create Booking</a></li>
-						<li role="presentation"><a role="menuitem" tabindex="-1" href="viewBooking.jsp">View Booking</a></li>
 							<!--</ul>-->
 						<!--</li>-->
 						<li id="myBookings"><a href="myBookings">My Bookings</a></li>
@@ -90,7 +86,7 @@
             </div>
 				
             <div class="btn-group userbox">
-                <button class="btn" id="userDashboard"><i class="icon-user icon-black"></i>&nbsp;<%= user.getFullName().split(" ")[0]%> -  Dashboard</button>
+                <button class="btn" id="userDashboard"><i class="icon-user icon-black"></i>&nbsp;<%= user.getFullName()%></button>
                 <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
