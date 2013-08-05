@@ -1,3 +1,4 @@
+<%@page import="util.MiscUtil"%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -123,20 +124,24 @@
 		
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-            console.log("login init");
-            function blink(selector) {
-                $(selector).fadeOut('slow', function() {
-                    $(this).fadeIn('slow', function() {
-                        blink(this);
-                    });
-                });
-            }
-
+			<% if (MiscUtil.DEV_MODE) { %>
+			$("#ssoBtn").on('click', function() {
+                $(this).button('loading');
+				var userId = prompt('Please enter the User ID','');
+				if (userId !== null && userId !== '') {
+					window.location = 'http://localhost:8080/is480-scheduling/login?smu_username=' + userId;
+				} else {
+					alert('Invalid User ID');
+					$(this).button('reset');
+				}
+            });
+			<% } else { %>
             $("#ssoBtn").on('click', function() {
                 $(this).button('loading');
                 //blink(this);
                 window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
             });
+			<% } %>
         </script>
     </body>
 </html>

@@ -4,14 +4,11 @@
  */
 package util;
 
-import java.sql.Timestamp;
-import java.util.List;
 import javax.persistence.EntityManager;
 import manager.ScheduleManager;
 import manager.TermManager;
 import model.Schedule;
 import model.Term;
-import model.Timeslot;
 
 /**
  * Utility class to put miscellaneous code
@@ -22,6 +19,11 @@ public class MiscUtil {
 	 * Name of the Persistence Unit used application-wide
 	 */
 	public static final String PERSISTENCE_UNIT = "scheduler";
+	
+	/**
+	 * Boolean variable to check if the system is currently running in development mode
+	 */
+	public static final boolean DEV_MODE = true;
 	
 	public static Term getActiveTerm(EntityManager em) {
 		return TermManager.findByYearAndSemester(em, 2013, "Term 1");
