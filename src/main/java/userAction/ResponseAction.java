@@ -161,7 +161,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
                             if (i < pendingList.size()) {
                                 data.add(pendingList.get(i));
                             } else {
-                                data.add(approveRejectList.get(i));
+								int size = i - pendingList.size();
+                                data.add(approveRejectList.get(size));
                             }
                         } //end of loop
                     }
