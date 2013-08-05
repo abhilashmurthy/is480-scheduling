@@ -236,8 +236,8 @@ public class DBInitUtil {
 		Team t1 = new Team();
 		t1.setTerm(term12013);
 		t1.setTeamName("Thunderbolt");
-		t1.setSupervisor(u4);
-		t1.setReviewer1(u4);
+		t1.setSupervisor(u5);
+		t1.setReviewer1(u5);
 		t1.setReviewer2(u8);
 		HashSet<User> members = new HashSet<User>();
 		members.add(u1);
