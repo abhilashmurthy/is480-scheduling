@@ -115,6 +115,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 //TODO: Handle write error
                 t.setSchedule(acceptanceSchedule);
                 TimeslotManager.save(em, t, transaction);
+                acceptanceTimeslots.add(t);
             }
 
             logger.debug("Persisted acceptance timeslots: count " + acceptanceTimeslots.size());
@@ -137,6 +138,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setSchedule(midtermSchedule);
                 //TODO: Handle write error
                TimeslotManager.save(em, t, transaction);
+               midtermTimeslots.add(t);
             }
 
             logger.debug("Persisted midterm timeslots: count " + midtermTimeslots.size());
@@ -160,6 +162,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 //Save timeslot
                 //TODO: Handle write error
                 TimeslotManager.save(em, t, transaction);
+                finalTimeslots.add(t);
             }
         } catch (Exception e) {
             e.printStackTrace();
