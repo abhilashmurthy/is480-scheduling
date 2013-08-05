@@ -258,7 +258,7 @@
                         return false;
                     });
 
-                    //delete booking button
+                    //close booking button
                     $(".page").on('click', '#closeBookingBtn', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
