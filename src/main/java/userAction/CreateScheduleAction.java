@@ -35,7 +35,6 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(CreateScheduleAction.class);
-    private final boolean debugMode = true;
     private List<Schedule> scheduleList;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
@@ -153,7 +152,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         json.put("success", true);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

@@ -35,7 +35,6 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(DeleteBookingAction.class);
-    private final boolean debugMode = true;
     private String timeslotId;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
@@ -62,7 +61,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

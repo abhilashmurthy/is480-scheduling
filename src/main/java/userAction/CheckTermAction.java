@@ -27,7 +27,6 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
 
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(CheckTermAction.class);
-    private final boolean debugMode = true;
     private int year;
     private String semester;
     private boolean canAdd;
@@ -84,7 +83,7 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
             json.put("canAdd", true);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

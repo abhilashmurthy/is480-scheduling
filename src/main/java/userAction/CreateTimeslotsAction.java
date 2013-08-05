@@ -41,7 +41,6 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(CreateTimeslotsAction.class);
-    private final boolean debugMode = true;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     public HashMap<String, Object> getJson() {
@@ -173,7 +172,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         json.put("success", true);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

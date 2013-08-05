@@ -44,7 +44,6 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(BookingHistoryAction.class);
-    private final boolean debugMode = true;
     private Long termId;
     private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
     private HashMap<String, Object> json = new HashMap<String, Object>();
@@ -159,7 +158,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
             json.put("message", "You are not authorized to access this page!");
         } catch (Exception e) {
 //            logger.error("Exception caught: " + e.getMessage());
-//            if (debugMode) {
+//            if (MiscUtil.DEV_MODE) {
 //                for (StackTraceElement s : e.getStackTrace()) {
 //                    logger.debug(s.toString());
 //                }

@@ -40,7 +40,6 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(ResponseAction.class);
-    private final boolean debugMode = true;
     private long termId;
     private long userId;
     private String teamName;
@@ -174,7 +173,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
             return ERROR;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

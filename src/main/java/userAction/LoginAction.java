@@ -43,7 +43,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     //Request and Response
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(LoginAction.class);
-    private final boolean debugMode = true;
     private HttpServletResponse response;
     private List<Role> userRoles;
     private boolean isSupervisor;
@@ -152,7 +151,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

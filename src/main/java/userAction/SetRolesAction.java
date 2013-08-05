@@ -7,21 +7,10 @@ package userAction;
 import com.opensymphony.xwork2.ActionSupport;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import manager.MilestoneManager;
-import manager.ScheduleManager;
-import manager.TermManager;
-import model.Milestone;
 import model.Role;
-import model.Schedule;
-import model.Team;
-import model.Term;
-import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +24,6 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(SetRolesAction.class);
-    private final boolean debugMode = true;
     private HttpServletResponse response;
     private String administrator;
     private String supervisor;
@@ -105,7 +93,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
             }
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

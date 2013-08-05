@@ -13,6 +13,7 @@ import manager.MilestoneManager;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -22,7 +23,6 @@ public class SendSmsAction extends ActionSupport implements ServletRequestAware{
     
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(SendSmsAction.class);
-    private final boolean debugMode = true;
     
     @Override
     public String execute() throws ServletException, IOException {
@@ -30,7 +30,7 @@ public class SendSmsAction extends ActionSupport implements ServletRequestAware{
             //Code here
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

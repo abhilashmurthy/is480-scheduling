@@ -14,6 +14,7 @@ import manager.MilestoneManager;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -23,7 +24,6 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
     
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(UpdateScheduleAction.class);
-    private final boolean debugMode = true;
     
     @Override
     public String execute() throws ServletException, IOException {
@@ -31,7 +31,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
             //Code here
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

@@ -34,7 +34,6 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(UpdateBookingStatusAction.class);
-    private final boolean debugMode = true;
     private String approveRejectArray[];
     private String approve;
     private String reject;
@@ -100,7 +99,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
         return ERROR;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

@@ -38,7 +38,6 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(ViewBookingAction.class);
-    private final boolean debugMode = true;
     private String timeslotId;
 //	private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
     private HashMap<String, Object> json = new HashMap<String, Object>();
@@ -136,7 +135,7 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
             return SUCCESS;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

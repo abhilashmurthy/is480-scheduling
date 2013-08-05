@@ -6,13 +6,12 @@ package systemAction;
 
 import com.opensymphony.xwork2.ActionSupport;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import manager.MilestoneManager;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -22,7 +21,6 @@ public class SendEmailAction extends ActionSupport implements ServletRequestAwar
     
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(SendEmailAction.class);
-    private final boolean debugMode = true;
     
     @Override
     public String execute() throws ServletException, IOException {
@@ -30,7 +28,7 @@ public class SendEmailAction extends ActionSupport implements ServletRequestAwar
             //Code here
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

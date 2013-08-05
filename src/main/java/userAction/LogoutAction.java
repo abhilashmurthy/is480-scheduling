@@ -14,6 +14,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -24,7 +25,6 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
     //Request and Response
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(LogoutAction.class);
-    private final boolean debugMode = true;
     private HttpServletResponse response;
     
     @Override
@@ -36,7 +36,7 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
         logger.info("Logout successful");
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

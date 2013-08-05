@@ -35,7 +35,6 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
     private List<HashMap<String, String>> dataList;
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(GetTermsAction.class);
-    private final boolean debugMode = true;
 
     @Override
     public String execute() throws ServletException, IOException {
@@ -68,7 +67,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
             }
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }

@@ -37,7 +37,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
-    private final boolean debugMode = true;
     private String date;
     private String startTime;
     private String endTime;
@@ -211,7 +210,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees. (Coming soon..)");
 		} catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
+            if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }
