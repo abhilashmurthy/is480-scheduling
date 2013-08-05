@@ -158,16 +158,17 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
             json.put("error", true);
             json.put("message", "You are not authorized to access this page!");
         } catch (Exception e) {
-            logger.error("Exception caught: " + e.getMessage());
-            if (debugMode) {
-                for (StackTraceElement s : e.getStackTrace()) {
-                    logger.debug(s.toString());
-                }
-            }
-            json.put("success", false);
-            json.put("message", "Error with BookingHistory: Escalate to developers!");
+//            logger.error("Exception caught: " + e.getMessage());
+//            if (debugMode) {
+//                for (StackTraceElement s : e.getStackTrace()) {
+//                    logger.debug(s.toString());
+//                }
+//            }
+//            json.put("success", false);
+//            json.put("message", "Error with BookingHistory: Escalate to developers!");
+			request.setAttribute("error", "Error with BookingHistory: Escalate to developers!");
         }
-        return SUCCESS;
+        return ERROR;
     } //end of execute function
 
     public Long getTermId() {
