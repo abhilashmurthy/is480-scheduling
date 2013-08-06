@@ -218,6 +218,71 @@ public class DBInitUtil {
 		u8.setUsername("laiteecheok");
 		u8.setFullName("CHEOK Lai-Tee");
 		u8.addRole(reviewer);
+                
+                User u9 = new User();
+		u9.setUsername("henry.tang.2011");
+		u9.setFullName("Henry TANG Ji Rui");
+		u9.addRole(student);
+                
+                User u10 = new User();
+		u10.setUsername("ian.chan.2011");
+		u10.setFullName("Ian Clarence CHAN");
+		u10.addRole(student);
+                
+                User u11 = new User();
+		u11.setUsername("jeremyzhong.2011");
+		u11.setFullName("Jeremy ZHONG Jiahao");
+		u11.addRole(student);
+		
+                User u12 = new User();
+		u12.setUsername("xrlee.2011");
+		u12.setFullName("LEE Xiang Rui");
+		u12.addRole(student);
+                
+                User u13 = new User();
+		u13.setUsername("vivian.lai.2011");
+		u13.setFullName("Vivian LAI Wan Yin");
+		u13.addRole(student);
+                
+                User u14 = new User();
+		u14.setUsername("alvin.soh.2011");
+		u14.setFullName("Alvin SOH Wei Sheng");
+		u14.addRole(student);
+               
+                User u15 = new User();
+		u15.setUsername("benjamingan");
+		u15.setFullName("Benjamin GAN Kok Siew");
+		u15.addRole(supervisor);
+                
+                User u16 = new User();
+                u16.setUsername("mfaizal.s.2010");
+                u16.setFullName("Muhammad Faizal SUKIM");
+		u16.addRole(student);
+                
+                User u17 = new User();
+                u17.setUsername("huimin.hong.2011");
+                u17.setFullName("HONG Huimin");
+		u17.addRole(student);
+                
+                User u18 = new User();
+                u18.setUsername("shaorui.lei.2011");
+                u18.setFullName("LEI Shaorui");
+		u18.addRole(student);
+                
+                User u19 = new User();
+                u19.setUsername("zhuoran.li.2011");
+                u19.setFullName("LI Zhuoran");
+		u19.addRole(student);
+                
+                User u20 = new User();
+                u20.setUsername("jz.peng.2011");
+                u20.setFullName("PENG Jian Zhang");
+		u20.addRole(student);
+                
+                User u21 = new User();
+                u21.setUsername("cboesch");
+                u21.setFullName("Chris BOESCH");
+		u21.addRole(supervisor);
 		
 		// Persistence
 		em.persist(u1);
@@ -228,6 +293,19 @@ public class DBInitUtil {
 		em.persist(u6);
 		em.persist(u7);
 		em.persist(u8);
+                em.persist(u9);
+                em.persist(u10);
+                em.persist(u11);
+                em.persist(u12);
+                em.persist(u13);
+                em.persist(u14);
+                em.persist(u15);
+                em.persist(u16);
+                em.persist(u17);
+                em.persist(u18);
+                em.persist(u19);
+                em.persist(u20);
+                em.persist(u21);
 		logger.info("Users persisted");
 		
 		/*
@@ -246,9 +324,41 @@ public class DBInitUtil {
 		members.add(u4);
 		members.add(u5);
 		t1.setMembers(members);
+                
+                
+                Team t2 = new Team();
+                t2.setTerm(term12013);
+                t2.setTeamName("Acellence");
+                t2.setSupervisor(u15);
+		t2.setReviewer1(u8);
+		t2.setReviewer2(u6);
+                HashSet<User> t2members = new HashSet<User>();
+		t2members.add(u9);
+		t2members.add(u10);
+		t2members.add(u11);
+		t2members.add(u12);
+		t2members.add(u13);
+                t2members.add(u14);
+		t2.setMembers(t2members);
+                
+                Team t3 = new Team();
+		t3.setTerm(term12013);
+		t3.setTeamName("ironMEN");
+		t3.setSupervisor(u21);
+		t3.setReviewer1(u15);
+		t3.setReviewer2(u7);
+		HashSet<User> t3members = new HashSet<User>();
+		t3members.add(u16);
+		t3members.add(u17);
+		t3members.add(u18);
+		t3members.add(u19);
+		t3members.add(u20);
+		t3.setMembers(t3members);
 		
 		// Persistence
 		em.persist(t1);
+                em.persist(t2);
+                em.persist(t3);
 		logger.info("Teams persisted");
 		
 		/*
@@ -259,12 +369,38 @@ public class DBInitUtil {
 		u3.setTeam(t1);
 		u4.setTeam(t1);
 		u5.setTeam(t1);
+                
+                u9.setTeam(t2);
+		u10.setTeam(t2);
+		u11.setTeam(t2);
+		u12.setTeam(t2);
+		u13.setTeam(t2);
+                u14.setTeam(t2);
+                
+                u16.setTeam(t3);
+                u17.setTeam(t3);
+                u18.setTeam(t3);
+                u19.setTeam(t3);
+                u20.setTeam(t3);
 		
 		em.persist(u1);
 		em.persist(u2);
 		em.persist(u3);
 		em.persist(u4);
 		em.persist(u5);
+                em.persist(u9);
+                em.persist(u10);
+                em.persist(u11);
+                em.persist(u12);
+                em.persist(u13);
+                em.persist(u14);
+                em.persist(u15);
+                em.persist(u16);
+                em.persist(u17);
+                em.persist(u18);
+                em.persist(u19);
+                em.persist(u20);
+                em.persist(u21);
 		logger.info("User --> Team links persisted");
 		
 		/*
