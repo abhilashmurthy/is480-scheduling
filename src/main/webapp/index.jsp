@@ -164,6 +164,9 @@
             
             //Append popover data
             function appendPopovers() {
+            
+                //Delete all old popovers
+                $(".timeslotCell").popover('destroy');
                 
                 $(".bookedTimeslot").each(function(){
                    appendViewBookingPopover($(this));
@@ -323,10 +326,17 @@
                 });
                 
                 //Add clickedCell and initialize common variables
-                $(".timeslotCell").on('click', function(e){
+                $(".timeslotCell").on('click', function(e){                    
                     self = $(this);
                     e.stopPropagation();
                     console.log("clicked");
+                    
+                    //Hide other popovers
+                    $(".timeslotCell").each(function(){
+                       if (self.attr('value') !== $(this).attr('value')) {
+                           $(this).popover('hide');
+                       } 
+                    });
                     
                     //Add clickedCell class
                     $('td').removeClass("clickedCell");
@@ -361,6 +371,7 @@
                 $(".page").on('click', '#createBookingBtn', function(e) {
                     e.stopPropagation();
                     createBooking(self);
+                    appendPopovers(); //Refresh all popovers
                     return false;
                 });
 
@@ -368,6 +379,7 @@
                 $(".page").on('click', '#deleteBookingBtn', function(e) {
                     e.stopPropagation();
                     deleteBooking(self);
+                    appendPopovers(); //Refresh all popovers
                     return false;
                 });
             }
