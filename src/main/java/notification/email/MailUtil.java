@@ -18,6 +18,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -55,8 +56,14 @@ public class MailUtil {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress("is480.scheduling@gmail.com",
 					"IS480 Scheduling"));
-			message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse(parseRecipientArray(recipients)));
+			if (MiscUtil.DEV_MODE) {
+				message.setRecipients(Message.RecipientType.TO,
+						InternetAddress.parse(
+						MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
+			} else {
+				message.setRecipients(Message.RecipientType.TO,
+					InternetAddress.parse(parseRecipientArray(recipients)));	
+			}
 			message.setSubject(subject);
 			message.setContent(body, "text/html");
 
