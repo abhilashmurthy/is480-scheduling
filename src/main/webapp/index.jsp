@@ -87,11 +87,17 @@
     <script type="text/javascript">
         //Makes use of footer.jsp's jQuery and bootstrap imports
         viewScheduleLoad = function() {
-
+            
+            //Declare common variables
             //Default milestoneStr is ACCEPTANCE
             var milestoneStr = "ACCEPTANCE";
             var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
             var activeSemesterStr = "<%= activeTerm.getSemester()%>";
+            var self = null;
+            var teamName = null;
+            var date = null;
+            var startTime = null;
+            var termId = null;
 
             //Default schedule to see upon opening index page
             populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
@@ -155,6 +161,145 @@
                     alert("There was an error in retrieving schedule");
                 });
             }
+            
+            //Append popover data
+            function appendPopovers() {
+                
+                $(".bookedTimeslot").each(function(){
+                   appendViewBookingPopover($(this));
+                });
+                
+                function appendViewBookingPopover(bodyTd) {    
+                    //Get View Booking Data
+                    var cellId = bodyTd.attr('id').split("_")[1];
+                    var data = {timeslotId: cellId};
+                    var viewBookingData = getJson();
+
+                    function getJson() {
+                        var toReturn = null;
+                        $.ajax({
+                            type: 'GET',
+                            async: false,
+                            url: 'viewBookingJson',
+                            data: data,
+                            dataType: 'json'
+                        }).done(function(response){
+                            if (response.success) {
+                                toReturn = response;
+                            } else {
+                                var eid = btoa(response.message);
+                                window.location = "error.jsp?eid=" + eid;
+                            }
+                        }).fail(function(error){
+                            toReturn = "AJAX fail";
+                        });
+                        return toReturn;
+                    };
+
+                    //Create Popover
+                    bodyTd.popover({
+                        container: '.page', //This is important for the popover to overflow the schedule
+                        trigger: 'manual',
+                        html: 'true',
+                        content: function() {
+                            //Output in the form of a table
+                            var outputTable = $(document.createElement('table'));
+                            outputTable.attr('id', 'viewTimeslotTable');
+
+                            var outputData = [
+                                ["Team", viewBookingData.teamName],
+                                ["Date", viewBookingData.startDate],
+                                ["Start Time", viewBookingData.startTime],
+                                ["Team Wiki", viewBookingData.teamWiki],
+                                ["Attendees", viewBookingData.attendees],
+                                ["", "<button id='deleteBookingBtn' class='btn btn-danger'>Delete</button>"]
+                            ];
+                            for (var i = 0; i < outputData.length; i++) {
+                                var outputTr = $(document.createElement('tr'));
+                                var outputTdKey = $(document.createElement('td'))
+                                    .html('<b>' + outputData[i][0] + '</b>');
+                                var outputTdValue = $(document.createElement('td'))
+                                    .html(outputData[i][1]);
+                                outputTr.append(outputTdKey);
+                                outputTr.append(outputTdValue);
+                                outputTable.append(outputTr);
+                            }
+                            return outputTable;
+                        },
+                        placement: 'right',
+                        title: function() {
+                            if (viewBookingData.success) {
+                                return "View Booking <button type='button' class='close'>&times;</button>";
+                            } else {
+                                //return "Error <button id='closeBookingBtn' class='btn btn-small btn-danger'>X</button>";
+                                return "Error <button type='button' class='close'>&times;</button>";
+                            }
+                        }
+                    });
+                }
+                
+                teamName = "<%= team != null?team.getTeamName():null %>";
+                var bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
+                $(".unbookedTimeslot").each(function(){
+                   appendCreateBookingPopover($(this));
+                });
+                
+                function appendCreateBookingPopover(bodyTd) {
+                    if (teamName !== null) {
+                        //Is student and can book
+                        if (bookingExists) {
+                            bodyTd.popover({
+                               container: '.page',
+                               html: 'true',
+                               trigger: 'manual',
+                               placement: 'right',
+                               title: 'Result',
+                               content: 'Booking already exists!'
+                            });
+                        } else {
+                            //Initialize variables
+                            date = Date.parse(bodyTd.attr('value')).toString("yyyy-MM-dd");
+                            startTime = Date.parse(bodyTd.attr('value')).toString("HH:mm:ss");
+                            termId = activeAcademicYearStr + "," + activeSemesterStr;
+                            var dateToView = Date.parse(date).toString("dd MMM");
+                            var startTimeToView = Date.parse(startTime).toString("HH:mm");
+                            var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addHours(1).toString('HH:mm');
+                            
+                            //Create Booking outputTable
+                            var outputTable = $(document.createElement('table'));
+                            outputTable.attr('id', 'createTimeslotTable');                            
+
+                            var outputData = [
+                                ["Team", teamName],
+                                ["Date", dateToView],
+                                ["Start Time", startTimeToView],
+                                ["End Time", endTimeToView],
+                                ["Milestone", milestoneStr],
+                                ["", "<button id='createBookingBtn' class='btn btn-primary'>Create</button>"]
+                            ];
+                            for (var i = 0; i < outputData.length; i++) {
+                                var outputTr = $(document.createElement('tr'));
+                                var outputTdKey = $(document.createElement('td'))
+                                    .html('<b>' + outputData[i][0] + '</b>');
+                                var outputTdValue = $(document.createElement('td'))
+                                    .html(outputData[i][1]);
+                                outputTr.append(outputTdKey);
+                                outputTr.append(outputTdValue);
+                                outputTable.append(outputTr);
+                            }
+                            
+                            bodyTd.popover({
+                               container: '.page',
+                               html: 'true',
+                               trigger: 'manual',
+                               placement: 'right',
+                               content: outputTable,
+                               title: "Create Booking <button type='button' class='close'>&times;</button>"
+                            });
+                        }
+                    }
+                };
+            };
 
             //Function to create mouse UI events
             function setupMouseEvents() {
@@ -174,111 +319,32 @@
                 $(".page").on('click', function() {
                     console.log("page clicked");
                     //Close all timeslots
-                    $(".bookedTimeslot").each(function(){
-                        $(this).popover('hide');
-                    });
-                    $(".unbookedTimeslot").each(function(){
-                        $(this).popover('destroy');
-                    });
+                    $(".timeslotCell").popover('hide');
                 });
-                
-                //Declare common variables
-                var self = null;
-                var teamName = null;
-                var date = null;
-                var startTime = null;
-                var termId = null;
                 
                 //Add clickedCell and initialize common variables
                 $(".timeslotCell").on('click', function(e){
+                    self = $(this);
                     e.stopPropagation();
                     console.log("clicked");
                     
-                    //Close other popovers
-                    $(".bookedTimeslot").each(function(){
-                        $(this).popover('hide');
-                    });
-                    $(".unbookedTimeslot").each(function(){
-                        $(this).popover('destroy');
-                    });
-                    
                     //Add clickedCell class
                     $('td').removeClass("clickedCell");
-                    $(this).addClass("clickedCell");
-                    
-                    //Populate variables
-                    self = $(this);
-                    date = Date.parse($(this).attr('value')).toString("yyyy-MM-dd");
-                    startTime = Date.parse($(this).attr('value')).toString("HH:mm:ss");
-                    termId = activeAcademicYearStr + "," + activeSemesterStr;
+                    self.addClass("clickedCell");
                 });
                 
                 //Popover for booked timeslot
                 $(".bookedTimeslot").on('click', function() {
-                    console.log("Showing Y");
-                    $(this).popover('show');
+                    self = $(this);
+                    self.popover('show');
                 });
                 
-                //Popover for unbookedTimeslot
-                $(".unbookedTimeslot").on('click', function() {    
-                
-                    //Check if is student and has team first
-                    teamName = "<%= team != null?team.getTeamName():null %>";
-                    if (teamName !== null) {
-                        //Check if booking already exists
-                        var exists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
-                        if (exists) {
-                            $(this).popover({
-                               container: '.page',
-                               html: 'true',
-                               trigger: 'manual',
-                               placement: 'right',
-                               title: 'Result',
-                               content: 'Booking already exists!'
-                            });
-                        } else {
-                            //Create Booking popover
-                            $(this).popover({
-                                container: '.page', //This is important for the popover to overflow the schedule
-                                html: 'true',
-                                trigger: 'manual',
-                                placement: 'right',
-                                content: function() {
-                                    //Output in the form of a table
-                                    var outputTable = $(document.createElement('table'));
-                                    outputTable.attr('id', 'createTimeslotTable');
-
-                                    //There should be an error in viewBookingData for an unbookedTimeslot
-                                    //Create Booking
-                                    var dateToView = Date.parse(date).toString("dd MMM");
-                                    var startTimeToView = Date.parse(startTime).toString("HH:mm");
-                                    var endTimeToView = new Date(Date.parse(self.attr('value'))).addHours(1).toString('HH:mm');
-
-                                    var outputData = [
-                                        ["Team", teamName],
-                                        ["Date", dateToView],
-                                        ["Start Time", startTimeToView],
-                                        ["End Time", endTimeToView],
-                                        ["Milestone", milestoneStr],
-                                        ["", "<button id='createBookingBtn' class='btn btn-primary'>Create</button>"]
-                                    ];
-                                    for (var i = 0; i < outputData.length; i++) {
-                                        var outputTr = $(document.createElement('tr'));
-                                        var outputTdKey = $(document.createElement('td'))
-                                            .html('<b>' + outputData[i][0] + '</b>');
-                                        var outputTdValue = $(document.createElement('td'))
-                                            .html(outputData[i][1]);
-                                        outputTr.append(outputTdKey);
-                                        outputTr.append(outputTdValue);
-                                        outputTable.append(outputTr);
-                                    }
-                                    return outputTable;
-                                },
-                                title: "Create Booking <button type='button' class='close'>&times;</button>"
-                            });
-                        }
-                        $(this).popover('show');
-                    }
+                $(".unbookedTimeslot").on('click', function() {
+                    self = $(this);
+                    self.popover('show');
+                    date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
+                    startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
+                    termId = activeAcademicYearStr + "," + activeSemesterStr;
                 });
                 
                 //
@@ -286,7 +352,6 @@
                 //Use this kind of event trigger for dynamic buttons
                 //Close Booking Button
                 $(".page").on('click', '#closeBookingBtn', function(e) {
-                    e.preventDefault();
                     e.stopPropagation();
                     self.popover('hide');
                     return false;
@@ -294,15 +359,13 @@
                 
                 //Create Booking Button
                 $(".page").on('click', '#createBookingBtn', function(e) {
-                    e.preventDefault();
                     e.stopPropagation();
-                    createBooking(self, teamName);
+                    createBooking(self);
                     return false;
                 });
 
                 //Delete Booking Button
                 $(".page").on('click', '#deleteBookingBtn', function(e) {
-                    e.preventDefault();
                     e.stopPropagation();
                     deleteBooking(self);
                     return false;
@@ -310,10 +373,7 @@
             }
             
             //AJAX CALL functions
-            function createBooking(self, teamName) {
-                var date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
-                var startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
-                var termId = activeAcademicYearStr + "," + activeSemesterStr;
+            function createBooking(self) {
                 var data = {
                     date: date,
                     startTime: startTime,
@@ -367,7 +427,7 @@
                         window.location = "error.jsp?eid=" + eid;
                     }
                 }).fail(function(error) {
-                    alert("Oops. There was an error: " + error);
+                    alert("Oops. There was an error: " + JSON.stringify(error));
                 });
             }
             
@@ -559,81 +619,6 @@
                     }
                     return null;
                 }
-            }
-            
-            function appendPopovers() {
-                $(".bookedTimeslot").each(function(){
-                   appendViewBookingPopover($(this));
-                });
-            };
-
-            function appendViewBookingPopover(bodyTd) {    
-                //Get View Booking Data
-                var cellId = bodyTd.attr('id').split("_")[1];
-                var data = {timeslotId: cellId};
-                var viewBookingData = getJson();
-
-                function getJson() {
-                    var toReturn = null;
-                    $.ajax({
-                        type: 'GET',
-                        async: false,
-                        url: 'viewBookingJson',
-                        data: data,
-                        dataType: 'json'
-                    }).done(function(response){
-                        if (response.success) {
-                            toReturn = response;
-                        } else {
-                            var eid = btoa(response.message);
-                            window.location = "error.jsp?eid=" + eid;
-                        }
-                    }).fail(function(error){
-                        toReturn = "AJAX fail";
-                    });
-                    return toReturn;
-                };
-
-                //Create Popover
-                bodyTd.popover({
-                    container: '.page', //This is important for the popover to overflow the schedule
-                    trigger: 'manual',
-                    html: 'true',
-                    content: function() {
-                        //Output in the form of a table
-                        var outputTable = $(document.createElement('table'));
-                        outputTable.attr('id', 'viewTimeslotTable');
-
-                        var outputData = [
-                            ["Team", viewBookingData.teamName],
-                            ["Date", viewBookingData.startDate],
-                            ["Start Time", viewBookingData.startTime],
-                            ["Team Wiki", viewBookingData.teamWiki],
-                            ["Attendees", viewBookingData.attendees],
-                            ["", "<button id='deleteBookingBtn' class='btn btn-danger'>Delete</button>"]
-                        ];
-                        for (var i = 0; i < outputData.length; i++) {
-                            var outputTr = $(document.createElement('tr'));
-                            var outputTdKey = $(document.createElement('td'))
-                                .html('<b>' + outputData[i][0] + '</b>');
-                            var outputTdValue = $(document.createElement('td'))
-                                .html(outputData[i][1]);
-                            outputTr.append(outputTdKey);
-                            outputTr.append(outputTdValue);
-                            outputTable.append(outputTr);
-                        }
-                        return outputTable;
-                    },
-                    placement: 'right',
-                    title: function() {
-                        if (viewBookingData.success) {
-                            return "View Booking <button type='button' class='close'>&times;</button>";
-                        } else {
-                            //return "Error <button id='closeBookingBtn' class='btn btn-small btn-danger'>X</button>";
-                            return "Error <button type='button' class='close'>&times;</button>";
-                        }
-                    }
-                });
             }
 
         };
