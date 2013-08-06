@@ -4,6 +4,8 @@
  */
 package util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,26 +26,26 @@ import org.slf4j.LoggerFactory;
 public class MailUtil {
 
 	public static final Logger logger = LoggerFactory.getLogger(MailUtil.class);
-	private static final Properties props;
+	private static final Properties props = new Properties();
 	private static Session session;
 	private static final String USERNAME = "is480.scheduling@gmail.com";
 	private static final String PASSWORD = "fyp2013-14";
 
 	static {
-		props = new Properties();
-		props.put("mail.smtp.host", "smtp.gmail.com");
-		props.put("mail.smtp.socketFactory.port", "465");
-		props.put("mail.smtp.socketFactory.class",
-				"javax.net.ssl.SSLSocketFactory");
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.port", "465");
-		session = Session.getInstance(props,
-				new javax.mail.Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(USERNAME, PASSWORD);
-			}
-		});
+		try {
+			InputStream in = TestUtil.class.getClassLoader().getResourceAsStream("Properties/Mail.properties");
+			props.load(in);
+			session = Session.getInstance(props,
+					new javax.mail.Authenticator() {
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(USERNAME, PASSWORD);
+				}
+			});
+		} catch (IOException ex) {
+			logger.error("Mail Properties could not be loaded");
+			logger.error(ex.getMessage());
+		}
 	}
 
 	public static void sendEmail(List<String> recipients, String subject, String body) {
@@ -65,6 +67,17 @@ public class MailUtil {
 		}
 	}
 	
+	public static void sendEmail(String recipient, String subject, String body) {
+		List<String> recipientList = new ArrayList<String>();
+		recipientList.add(recipient);
+		sendEmail(recipientList, subject, body);
+	}
+	
+	/**
+	 * Generate a comma separated list of email addresses.
+	 * @param recipients List of recipients
+	 * @return Single String with all email addresses
+	 */
 	public static String parseRecipientArray(List<String> recipients) {
 		StringBuilder result = new StringBuilder();
 		Iterator<String> iter = recipients.iterator();
