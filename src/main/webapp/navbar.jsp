@@ -101,7 +101,7 @@
 				
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
-    <p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>
+    <!--<p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>-->
 	
 	 <% if (isStudent) { %>
 		<p><strong>Team<br/></strong><% out.print(user.getTeam().getTeamName());%></p>

@@ -37,7 +37,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
     private String approveRejectArray[];
     private String approve;
     private String reject;
-    private String value = "0";;
+    private String value = "0";
 
     @Override
     public String execute() throws Exception {

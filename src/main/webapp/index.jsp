@@ -232,7 +232,7 @@
                         placement: 'right',
                         title: function() {
                             if (viewBookingData.success) {
-                                return "View Booking <button type='button' class='close'>&times;</button>";
+                                return "<b>Your Booking <b><button type='button' class='close'>&times;</button>";
                             } else {
                                 //return "Error <button id='closeBookingBtn' class='btn btn-small btn-danger'>X</button>";
                                 return "Error <button type='button' class='close'>&times;</button>";
@@ -256,8 +256,8 @@
                                html: 'true',
                                trigger: 'manual',
                                placement: 'right',
-                               title: 'Result',
-                               content: 'Booking already exists!'
+                               title: '<b>Booking<b>',
+                               content: 'You already have a booking!'
                             });
                         } else {
                             //Initialize variables
@@ -309,7 +309,7 @@
                 //Highlight cell
                 $(".timeslotCell").mouseenter(function() {
                     $(this).css('border', '2px solid #1E647C');
-                    $(this).css('cursor', 'crosshair');
+                    $(this).css('cursor', 'pointer');
                 });
                 
                 //Unhighlight cell

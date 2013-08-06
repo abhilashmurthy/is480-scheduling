@@ -30,6 +30,7 @@ import javax.persistence.Persistence;
 import javax.servlet.RequestDispatcher;
 import manager.RoleManager;
 import manager.ScheduleManager;
+import manager.UserManager;
 import model.Role;
 import model.Team;
 import model.Term;
@@ -52,7 +53,6 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     public String execute() throws Exception {
         try {
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-
             HttpSession session = request.getSession();
             //Getting the active role of the user
             String activeRole = (String) session.getAttribute("activeRole");
@@ -65,10 +65,13 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                 Term term = MiscUtil.getActiveTerm(em);
                 long activeTermId = term.getId();
 
-                //Getting user object
-                User user = (User) session.getAttribute("user");
-
-                //Getting all the timeslots which the user is part of
+                //Getting updated user object from old user object in session
+                User oldUser = (User) session.getAttribute("user");
+				String username = oldUser.getUsername();
+				User user = UserManager.findByUsername(em, username);
+				session.setAttribute("user", user);
+				
+				//Getting all the timeslots which the user is part of
                 //This set includes all the timeslots the user has ever been ever part of (across semesters)
                 Set<Timeslot> userTimeslots = user.getTimeslots();
 

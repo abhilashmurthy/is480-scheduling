@@ -45,7 +45,7 @@
 </div>
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
-    <p><strong>Name</strong><br/> <% out.print(user.getFullName());%></p>
+    <!--<p><strong>Name</strong><br/> <% out.print(user.getFullName());%></p>-->
     <strong>Your Role(s)</strong>
 	<ul class="unstyled">
 		<% if (isAdmin) { %>
