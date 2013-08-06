@@ -4,11 +4,16 @@
  */
 package util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import javax.persistence.EntityManager;
 import manager.ScheduleManager;
 import manager.TermManager;
 import model.Schedule;
 import model.Term;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to put miscellaneous code
@@ -25,6 +30,8 @@ public class MiscUtil {
 	 */
 	public static final boolean DEV_MODE = true;
 	
+	private static Logger logger = LoggerFactory.getLogger(MiscUtil.class);
+	
 	public static Term getActiveTerm(EntityManager em) {
 		return TermManager.findByYearAndSemester(em, 2013, "Term 1");
 	}
@@ -34,21 +41,17 @@ public class MiscUtil {
 		return ScheduleManager.findActiveByTerm(em, activeTerm);
 	}
 	
-	// Gives the schedule based on the timeslot date (Each timeslot is part of 1 schedule)
-//	public static Schedule getScheduleByTimeslot (EntityManager em, Timeslot timeslot) {
-//		Timestamp timeslotTime = timeslot.getStartTime();
-//		List<Schedule> allSchedules = ScheduleManager.getAllSchedules(em);
-//		if (allSchedules.size() > 0) {
-//			for (Schedule schedule: allSchedules) {
-//				Timestamp startDate = schedule.getStartDate();
-//				Timestamp endDate = schedule.getEndDate();
-//				//Checking whether the timeslot date falls between the schedule dates
-//				if (timeslotTime.after(startDate) && timeslotTime.before(endDate)) {
-//					return schedule;
-//				}
-//			}
-//			return null;
-//		}
-//		return null;
-//	}
+	public static String getProperty(String fileName, String propertyName) {
+		try {
+			Properties p = new Properties();	
+			InputStream in = MiscUtil.class.getClassLoader().getResourceAsStream("Properties/" + fileName);
+			p.load(in);
+			return p.getProperty(propertyName);
+		} catch (IOException ex) {
+			logger.error("Error reading properties file");
+			logger.error(ex.getMessage());
+		}
+		
+		return null;
+	}
 }
