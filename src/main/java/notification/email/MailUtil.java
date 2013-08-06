@@ -18,7 +18,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.TestUtil;
 
 /**
  *
@@ -34,7 +33,8 @@ public class MailUtil {
 
 	static {
 		try {
-			InputStream in = TestUtil.class.getClassLoader().getResourceAsStream("Properties/Mail.properties");
+			InputStream in = MailUtil.class.getClassLoader()
+					.getResourceAsStream("Properties/Mail.properties");
 			props.load(in);
 			session = Session.getInstance(props,
 					new javax.mail.Authenticator() {
@@ -58,7 +58,7 @@ public class MailUtil {
 			message.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(parseRecipientArray(recipients)));
 			message.setSubject(subject);
-			message.setText(body);
+			message.setContent(body, "text/html");
 
 			Transport.send(message);
 			logger.info("Email sent successfully");
@@ -72,6 +72,11 @@ public class MailUtil {
 		Set<String> recipientList = new HashSet<String>();
 		recipientList.add(recipient);
 		sendEmail(recipientList, subject, body);
+	}
+	
+	public static void sendEmail(EmailTemplate template) {
+		sendEmail(template.generateRecipientList(),
+				template.generateEmailSubject(), template.generateEmailBody());
 	}
 	
 	/**

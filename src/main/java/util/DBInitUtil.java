@@ -180,7 +180,6 @@ public class DBInitUtil {
 		u1.setUsername("suresh.s.2010");
 		u1.setFullName("Suresh SUBRAMANIAM");
 		u1.addRole(student);
-		u1.addRole(admin);
 		
 		User u2 = new User();
 		u2.setUsername("abhilashm.2010");
@@ -209,7 +208,6 @@ public class DBInitUtil {
 		u6.setUsername("rcdavis");
 		u6.setFullName("Richard C. DAVIS");
 		u6.addRole(supervisor);
-                u6.addRole(reviewer);
 		
 		User u7 = new User();
 		u7.setUsername("yskim");
@@ -239,7 +237,7 @@ public class DBInitUtil {
 		t1.setTerm(term12013);
 		t1.setTeamName("Thunderbolt");
 		t1.setSupervisor(u6);
-		t1.setReviewer1(u6);
+		t1.setReviewer1(u7);
 		t1.setReviewer2(u8);
 		HashSet<User> members = new HashSet<User>();
 		members.add(u1);

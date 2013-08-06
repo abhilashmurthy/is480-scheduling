@@ -18,7 +18,7 @@ import util.MiscUtil;
  */
 public abstract class EmailTemplate {
 	private static final String BASE_PATH;
-	public String emailBody;
+	public String body;
 	private static Logger logger = LoggerFactory.getLogger(EmailTemplate.class);
 	
 	static {
@@ -28,7 +28,7 @@ public abstract class EmailTemplate {
 	public EmailTemplate(String fileName) {
 		try {
 			InputStream in = getClass().getClassLoader().getResourceAsStream(BASE_PATH + fileName);
-			emailBody = IOUtils.toString(in);
+			body = IOUtils.toString(in, "UTF-8");
 		} catch (IOException ex) {
 			logger.error("Could not read email template");
 			logger.error(ex.getMessage());
@@ -40,7 +40,5 @@ public abstract class EmailTemplate {
 	public abstract Set<String> generateRecipientList();
 	
 	public abstract String generateEmailBody();
-	
-	public abstract void sendEmail();
 	
 }

@@ -44,7 +44,7 @@ public class MiscUtil {
 	public static String getProperty(String fileName, String propertyName) {
 		try {
 			Properties p = new Properties();	
-			InputStream in = MiscUtil.class.getClassLoader().getResourceAsStream("Properties/" + fileName);
+			InputStream in = MiscUtil.class.getClassLoader().getResourceAsStream("Properties/" + fileName + ".properties");
 			p.load(in);
 			return p.getProperty(propertyName);
 		} catch (IOException ex) {
