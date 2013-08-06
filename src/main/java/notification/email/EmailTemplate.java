@@ -6,7 +6,7 @@ package notification.email;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public abstract class EmailTemplate {
 	
 	public abstract String generateEmailSubject();
 	
-	public abstract ArrayList<String> generateRecipientList();
+	public abstract Set<String> generateRecipientList();
 	
 	public abstract String generateEmailBody();
 	

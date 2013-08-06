@@ -2,14 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package util;
+package notification.email;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -18,6 +18,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.TestUtil;
 
 /**
  *
@@ -48,7 +49,7 @@ public class MailUtil {
 		}
 	}
 
-	public static void sendEmail(List<String> recipients, String subject, String body) {
+	public static void sendEmail(Set<String> recipients, String subject, String body) {
 
 		try {
 			Message message = new MimeMessage(session);
@@ -68,7 +69,7 @@ public class MailUtil {
 	}
 	
 	public static void sendEmail(String recipient, String subject, String body) {
-		List<String> recipientList = new ArrayList<String>();
+		Set<String> recipientList = new HashSet<String>();
 		recipientList.add(recipient);
 		sendEmail(recipientList, subject, body);
 	}
@@ -78,7 +79,7 @@ public class MailUtil {
 	 * @param recipients List of recipients
 	 * @return Single String with all email addresses
 	 */
-	public static String parseRecipientArray(List<String> recipients) {
+	public static String parseRecipientArray(Set<String> recipients) {
 		StringBuilder result = new StringBuilder();
 		Iterator<String> iter = recipients.iterator();
 		
