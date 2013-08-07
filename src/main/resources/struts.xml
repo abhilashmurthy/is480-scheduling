@@ -84,11 +84,11 @@
             <result name="success">/mybookings.jsp</result>
         </action>
 		
-<!--		<action name="pendingBookingStatus" class="systemAction.GetPendingStatusAction" method="execute">
-            <result type="success">
+		<action name="pendingBookingStatus" class="systemAction.GetPendingStatusAction" method="execute">
+<!--			<result name="success" type="stream">
 				<param name="pendingBookingCount">pendingBookingCount</param>
-		   </result>
-        </action>-->
+		   </result>-->
+        </action>
 		
     </package>
 

@@ -33,15 +33,18 @@
         </h3>
     </div>
 		
-	<%-- To display number of pending bookings for supervisor/reviewer 
+	<!-- To display number of pending bookings for supervisor/reviewer -->
 	<% if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
-	<s:action name="pendingBookingStatus"/>
-	<a href="approveReject">
-		<div class="pendingBookings well well-small alert" style="width: 210px; text-align: center">
-			You have <s:property value="pendingBookingCount"/> pending bookings!
-		</div>
-	</a>
-	<% } %>  --%>
+	<s:action name="pendingBookingStatus">
+		<s:if test="%{pendingBookingCount > 0}">
+		<a href="approveReject">
+			<div class="pendingBookings well well-small alert" style="width: 210px; text-align: center">
+				You have <s:property value="pendingBookingCount"/> pending bookings!
+			</div>
+		</a>
+		</s:if>
+	</s:action>
+	<% } %>  
 		
     <table class="legend">
         <tr>
