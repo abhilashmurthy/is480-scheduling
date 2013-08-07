@@ -51,6 +51,19 @@
             #timeColumn {
                 border-right: 1px solid black;
             }
+			
+			.start-marker {
+				width: 0;
+				height: 0;
+				border-left: 5px solid transparent;
+				border-right: 5px solid transparent;
+				border-top: 10px solid blue;
+				z-index: 1;
+			}
+			
+			.chosen {
+				background-color: #B8F79E !important ;
+			}
             
         </style>
     </head>
@@ -291,17 +304,17 @@
                 if (acceptanceDates.length > 0) {
                     $("#acceptanceTimeslotsTable").show();
                     $("#acceptanceTimeslotsTable").before("<h4>Acceptance</h4>");
-                    makeCheckboxTable("acceptanceTimeslotsTable", acceptanceDates);
+                    makeTimeslotTable("acceptanceTimeslotsTable", acceptanceDates);
                 }
                 if (midtermDates.length > 0) {
                     $("#midtermTimeslotsTable").show();
                     $("#midtermTimeslotsTable").before("<h4>Midterm</h4>");
-                    makeCheckboxTable("midtermTimeslotsTable", midtermDates);
+                    makeTimeslotTable("midtermTimeslotsTable", midtermDates);
                 }
                 if (finalDates.length > 0) {
                     $("#finalTimeslotsTable").show();
                     $("#finalTimeslotsTable").before("<h4>Final</h4>");
-                    makeCheckboxTable("finalTimeslotsTable", finalDates);
+                    makeTimeslotTable("finalTimeslotsTable", finalDates);
                 }
                 
                 //OVERALL SUBMIT TO SERVER
@@ -341,41 +354,68 @@
                     return false;
                 });
                 
-                function makeCheckboxTable(tableId, dateArray) {
-                    //Append checkbox header names
-                    var headerString = "<thead><tr><td></td>";
-                    for (i = 0; i < dateArray.length; i++) {
-                        headerString += "<td>" + new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd') + "</td>";
-                    }
-                    headerString += "</tr></thead>";
-                    $("#" + tableId).append(headerString);
-                    
-                    //Make the table name
-                    var tableName = tableId.split("Timeslots")[0];
-                    
-                    //Append checkbox 'ALL' checkboxes
-//                    var allChkString = "<tr id='allChkRow'><td>ALL</td>";
-//                    for (i = 0; i < dateArray.length; i++) {
-//                        var date = dateArray[i].toString('dd-MMM-yyyy');
-//                        allChkString += "<td>" + "<input class='chkALL_" + tableId + "' id='chkALL_" + tableId + "_" + date + "' type='checkbox' value='" + tableId + "_" + date + "' checked/></td>";
-//                    }
-//                    allChkString += "</tr>";
-//                    $("#" + tableId).append(allChkString);
-                    
-                    //Append checkbox data
-                    for (j = 0; j < timeArray.length; j++) {
-                        var htmlString = "<tr>";
-                        var time = timeArray[j];
-                        htmlString += "<td id='timeColumn'>" + time + "</td>";
-                        for (i = 0; i < dateArray.length; i++) {
-                            var date = dateArray[i].toString('yyyy-MM-dd');
-                            htmlString += "<td><input class='chkBox_" + tableName + "' id='chk_" + tableName + "_" + date + "_" + time.replace(/:/g, '-') +"' type='checkbox' checked name='timeslot_" + tableName +"[]' value='" + date + " " + time +"' /></td>";
-                        }
-                        htmlString += "</tr>";
-                        $("#" + tableId).append(htmlString);
-                    }
-                }
+                function makeTimeslotTable(tableId, dateArray) {
+					var thead = $(document.createElement("thead"));
+					var minTime = 9;
+					var maxTime = 19;
+
+					//Creating table header with dates
+					thead.append("<th></th>"); //Empty cell for time column
+					for (i = 0; i < dateArray.length ; i++) {
+						var th = $(document.createElement("th"));
+						var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
+						th.html(headerVal);
+						thead.append(th);
+					}
+					//Inserting constructed table header into table
+					$("#" + tableId).append(thead);
+
+					//Creating table body with times and empty cells
+					var tbody = $(document.createElement("tbody"));
+
+					//Generating list of times
+					var timesArray = new Array();
+					for (var i = minTime; i < maxTime; i++) {
+						var timeVal = Date.parse(i + ":00:00");
+						timesArray.push(timeVal.toString("HH:mm"));
+						timeVal.addMinutes(30);
+						timesArray.push(timeVal.toString("HH:mm"));
+					}
+
+					//Constructing table body
+					for (i = 0; i < timesArray.length; i++) {
+						var tr = $(document.createElement("tr"));
+						var timeTd = $(document.createElement("td"));
+						timeTd.html(timesArray[i]);
+						tr.append(timeTd);
+
+						for (j = 0; j < dateArray.length; j++) {
+							tr.append("<td class='timeslotcell'></td>");
+						}
+						tbody.append(tr);
+					}
+
+					//Inserting constructed table body into table
+					$("#" + tableId).append(tbody);
+				}
                 
+				$(".timeslotcell").on("click", function() {
+					var col = $(this).parent().children().index(this);
+					var tr = $(this).parent();
+					var row = $(tr).parent().children().index(tr);
+					var tbody = $(this).parents("tbody");
+					var slotSize = duration / 30;
+					
+					$(this).toggleClass("chosen");
+					var marker = document.createElement("div");
+					$(marker).addClass("start-marker");
+					$(this).append(marker);
+					for (i = 1; i < slotSize; i++) {
+						var nextRow = $(tbody).children().get(row + i);
+						var nextCell = $(nextRow).children().get(col);
+						$(nextCell).toggleClass("chosen");
+					}
+				});
                 
                 function getTimes(start, end, duration) {
                     var times = new Array();
