@@ -171,8 +171,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 		if (user != null) {
 			//Welcome to the system
 			session.setAttribute("user", user);
-			session.setAttribute("fullname", request.getParameter("smu_fullname"));
-			if (!MiscUtil.DEV_MODE) session.setAttribute("groups", request.getParameter("smu_groups").split(","));
+			if (!MiscUtil.DEV_MODE) {
+				session.setAttribute("fullname", request.getParameter("smu_fullname"));
+				session.setAttribute("groups", request.getParameter("smu_groups").split(","));	
+			}
 			ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
 			session.setAttribute("currentActiveTerm", activeTerms.get(0));
 
@@ -187,6 +189,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 			userRoles = new ArrayList<Role>();
 			Term activeTerm = activeTerms.get(0);
 			List<Role> activeRoles = RoleManager.getAllRolesByTerm(em, activeTerm);
+			activeRoles.addAll(RoleManager.getNonTermRoles(em));
 			for (Role role : activeRoles) {
 				List<User> listUsers = role.getUsers();
 				for (User userObj : listUsers) {

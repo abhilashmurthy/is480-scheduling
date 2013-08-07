@@ -37,4 +37,24 @@ public class RoleManager {
 		}
 		return rolesList;
 	}
+	
+	/**
+	 * Method to get roles not linked to any term. Eg. admin, course coordinator.
+	 * @param em
+	 * @return 
+	 */
+	public static List<Role> getNonTermRoles (EntityManager em) {
+		logger.info("Getting all roles not linked to any term");
+		List<Role> rolesList = null;
+		try {
+			em.getTransaction().begin();
+			Query q = em.createNativeQuery("Select * from Role where term_id IS NULL", Role.class);
+			rolesList = q.getResultList();
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback();
+		}
+		return rolesList;
+	}
 }
