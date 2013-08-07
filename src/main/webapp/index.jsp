@@ -1,7 +1,8 @@
-`<%@page import="model.Team"%>
+<%@page import="model.Team"%>
 <%@page import="model.Term"%>
 <%@page import="model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <!DOCTYPE HTML>
 <%
     Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
@@ -31,7 +32,17 @@
             %>
         </h3>
     </div>
-
+		
+	<%-- To display number of pending bookings for supervisor/reviewer 
+	<% if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
+	<s:action name="pendingBookingStatus"/>
+	<a href="approveReject">
+		<div class="pendingBookings well well-small alert" style="width: 210px; text-align: center">
+			You have <s:property value="pendingBookingCount"/> pending bookings!
+		</div>
+	</a>
+	<% } %>  --%>
+		
     <table class="legend">
         <tr>
             <!-- <td style="width:50px"><b>Legend:</b></td>-->
@@ -43,7 +54,7 @@
             <td style="width:15px"></td>
             <td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#D1D0CE;width:17px;"></td><td>&nbsp;Not Available</td> 
+            <td style="background-color:#f5f5f5;width:17px;border:1px solid gray"></td><td>&nbsp;Not Available</td> 
         </tr>
     </table>
 
@@ -231,7 +242,7 @@
                                             ["Start Time", viewBookingData.startTime],
                                             ["Team Wiki", viewBookingData.teamWiki],
                                             ["Attendees", viewBookingData.attendees],
-                                            ["", "<button id='deleteBookingBtn' class='btn btn-danger'>Delete</button>"]
+                                            ["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]
                                        ];
                                        break;
                                     }
@@ -299,7 +310,7 @@
                                 ["Start Time", startTimeToView],
                                 ["End Time", endTimeToView],
                                 ["Milestone", milestoneStr],
-                                ["", "<button id='createBookingBtn' class='btn btn-primary'>Create</button>"]
+                                ["", "<button id='createBookingBtn' class='btn btn-primary'><i class='icon-plus-sign icon-white'></i>Create</button>"]
                             ];
                             for (var i = 0; i < outputData.length; i++) {
                                 var outputTr = $(document.createElement('tr'));

@@ -98,6 +98,13 @@ body {
 	top:18%;
 }
 
+/* To display the number of pending bookings on index.jsp */
+.pendingBookings {
+	position: absolute;
+	left:75%;
+	top:10%;
+}
+
 .notification-drawer {  
 	position: absolute;
 	top:22%;

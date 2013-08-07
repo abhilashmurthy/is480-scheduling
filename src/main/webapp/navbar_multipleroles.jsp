@@ -46,7 +46,7 @@
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
     <!--<p><strong>Name</strong><br/> <% out.print(user.getFullName());%></p>-->
-    <strong>Your Role(s)</strong>
+    <strong>Role(s)</strong>
 	<ul class="unstyled">
 		<% if (isAdmin) { %>
 		   <li>Administrator</li>
@@ -72,7 +72,7 @@
         //Dashboard popover
         $('#userDashboard').popover({
             placement: 'bottom',
-            title: "Your Information",
+            title: '<b>Your Information</b>',
             html: true,
             content: function() {
                 return $('#userDashboardContent').html();

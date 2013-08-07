@@ -63,13 +63,10 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
             User user = (User) session.getAttribute("user");
             userId = user.getId();
 
-            //Getting the current term 
-//		Term term = MiscUtil.getActiveTerm();
-//		termId = term.getId();
-
             //Getting the user's roles for the active term
             List<Role> userAllRoles = new ArrayList<Role>();
-            Term activeTerm = MiscUtil.getActiveTerm(em);
+            //Term activeTerm = MiscUtil.getActiveTerm(em);
+			Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
             List<Role> activeRoles = RoleManager.getAllRolesByTerm(em, activeTerm);
             for (Role role : activeRoles) {
                 List<User> listUsers = role.getUsers();
@@ -92,8 +89,6 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
             if (supervisorReviewerRoles.size() > 0) {
                 //Getting all schedules for the active term
                 List<Schedule> listSchedules = ScheduleManager.findByTerm(em, activeTerm);
-                //Getting the current milestone
-                //Set<Timeslot> pendingList = null;
                 List<Timeslot> userTimeslots = new ArrayList<Timeslot>();
                 if (listSchedules != null && listSchedules.size() > 0) {
 					for (Schedule schedule: listSchedules) {
