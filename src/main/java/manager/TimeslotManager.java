@@ -6,6 +6,7 @@ package manager;
 
 import constant.Status;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -120,14 +121,17 @@ public class TimeslotManager {
         EntityTransaction transaction = em.getTransaction();
         try {
             HashMap<User, Status> statusList = new HashMap<User, Status>();
+            
             transaction.begin();
-            String sQuery = "UPDATE Timeslot t SET t.statusList = :statusList, t.team = :team "
-                    + "WHERE t.id = :id";
+            String sQuery = "UPDATE Timeslot t SET t.statusList = :statusList, t.team = :team"
+                   + "WHERE t.id = :id";
+           
             Query query = em.createQuery(sQuery);
 
             query.setParameter("statusList", statusList);
             query.setParameter("team", null);
             query.setParameter("id", ts.getId());
+            
             query.executeUpdate();
             transaction.commit();
 

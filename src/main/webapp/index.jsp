@@ -1,4 +1,4 @@
-<%@page import="model.Team"%>
+`<%@page import="model.Team"%>
 <%@page import="model.Term"%>
 <%@page import="model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -215,8 +215,29 @@
                                 ["Start Time", viewBookingData.startTime],
                                 ["Team Wiki", viewBookingData.teamWiki],
                                 ["Attendees", viewBookingData.attendees],
-                                ["", "<button id='deleteBookingBtn' class='btn btn-danger'>Delete</button>"]
                             ];
+                            
+                            //check if this timeslot belongs to logined in student or if the user is an admin
+                            if(viewBookingData.attendees!==null){
+                                 for (var i = 0; i < viewBookingData.attendees.length; i++) {
+                                    var personnel = viewBookingData.attendees[i].name;
+                                    //var status = viewBookingData.attendees[i].status;
+                                    if ($.trim(personnel) === '<%=fullName%>' && <%=isStudent == true%> || <%=isAdmin == true%>) {
+                                        //output += "<tr>";
+                                        //output += "<td><button id='deleteBookingBtn' class='btn btn-danger'>Delete</button></td>";
+                                       var outputData = [
+                                            ["Team", viewBookingData.teamName],
+                                            ["Date", viewBookingData.startDate],
+                                            ["Start Time", viewBookingData.startTime],
+                                            ["Team Wiki", viewBookingData.teamWiki],
+                                            ["Attendees", viewBookingData.attendees],
+                                            ["", "<button id='deleteBookingBtn' class='btn btn-danger'>Delete</button>"]
+                                       ];
+                                       break;
+                                    }
+                                  }
+                            }
+                            
                             for (var i = 0; i < outputData.length; i++) {
                                 var outputTr = $(document.createElement('tr'));
                                 var outputTdKey = $(document.createElement('td'))
