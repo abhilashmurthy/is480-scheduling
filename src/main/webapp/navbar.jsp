@@ -111,7 +111,7 @@
 		<p><strong>Team<br/></strong><% out.print(user.getTeam().getTeamName());%></p>
 	 <% } %>
     
-	<strong>Current Role</strong>
+	<strong>Role</strong>
 	<!-- For all roles -->
 	<%  activeRole = (String) session.getAttribute("activeRole"); %>
 		<ul class="unstyled">
@@ -153,7 +153,7 @@
         //Dashboard popover
         $('#userDashboard').popover({
             placement: 'bottom',
-            title: 'Your Information',
+            title: '<b>Your Information</b>',
 			trigger: 'click',
             html: true,
             content: function() {
