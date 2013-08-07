@@ -127,11 +127,11 @@
 			<% if (MiscUtil.DEV_MODE) { %>
 			$("#ssoBtn").on('click', function() {
                 $(this).button('loading');
-				var userId = prompt('Please enter the User ID','');
+				var userId = prompt('Please enter the Username','');
 				if (userId !== null && userId !== '') {
 					window.location = 'http://localhost:8080/is480-scheduling/login?smu_username=' + userId;
 				} else {
-					alert('Invalid User ID');
+					alert('Invalid Username');
 					$(this).button('reset');
 				}
             });

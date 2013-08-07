@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
  * @author suresh
  */
 public class MiscUtil {
+	private static Logger logger = LoggerFactory.getLogger(MiscUtil.class);
+	
 	/**
 	 * Name of the Persistence Unit used application-wide
 	 */
@@ -28,9 +30,12 @@ public class MiscUtil {
 	/**
 	 * Boolean variable to check if the system is currently running in development mode
 	 */
-	public static final boolean DEV_MODE = true;
+	public static final boolean DEV_MODE;
 	
-	private static Logger logger = LoggerFactory.getLogger(MiscUtil.class);
+	static {
+		DEV_MODE = Boolean.parseBoolean(getProperty("General", "DEV_MODE"));
+		logger.info("DEV_MODE: " + DEV_MODE);
+	}
 	
 	public static Term getActiveTerm(EntityManager em) {
 		return TermManager.findByYearAndSemester(em, 2013, "Term 1");
