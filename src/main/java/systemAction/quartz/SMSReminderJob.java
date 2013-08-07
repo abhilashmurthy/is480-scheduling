@@ -80,15 +80,22 @@ public class SMSReminderJob implements Job {
                                 
                                 //if user has mobile number
                                 if(eachU.getMobileNumber()!=null){
-                            
-                                    String msg = "Team: " + approvedBooking.getTeam().getTeamName() 
-                                                        + ", your presentation time today is at :" + approvedBooking.getTimeslot().getStartTime().toString()
-                                                             + ", thanks! From:IS480 scheduling System.";
+                                    
+                                    
+                                    String teamName = approvedBooking.getTeam().getTeamName();
+                                    teamName = teamName.replaceAll("\\s+", "+");
+                                    
+                                    String approvedTimeSlot = approvedBooking.getTimeslot().getStartTime().toString();
+                                    approvedTimeSlot = approvedTimeSlot.replaceAll("\\s+", "+");
+                                    
+                                    String msg = "Team:+" + teamName
+                                                        + "is+presenting+today:" + approvedTimeSlot
+                                                             + ".+See+you+there!+From:IS480+Scheduling+System.";
                                     
                                     String number = "65";
                                     number += eachU.getMobileNumber();
                                     
-                                    String appendURL = "http://smsc.vianett.no/v3/send.ashx?tel=" + number + "&msg=" + msg + "&username=tarlochan_gill%40ymail.com&password=x2jee&sourceaddr=IS480";
+                                    String appendURL = "http://smsc.vianett.no/v3/send.ashx?tel=" + number + "&msg=" + msg + "&username=tsgill.ps.2010@smu.edu.sg&password=h94c3";
 
                                     //code for HTTP request to send sms
                                     URL myURL = new URL(appendURL);
