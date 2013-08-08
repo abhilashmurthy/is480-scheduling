@@ -57,13 +57,13 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
         Map parameters = request.getParameterMap();
-        for (Object key : parameters.keySet()) {
-            logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[0]);
-            if (((String[]) parameters.get(key)).length > 1) {
-                logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[1]);
-                logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[2]);
-            }
-        }
+//        for (Object key : parameters.keySet()) {
+//            logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[0]);
+//            if (((String[]) parameters.get(key)).length > 1) {
+//                logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[1]);
+//                logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[2]);
+//            }
+//        }
 
         //Getting schedule id's
         int acceptanceId = Integer.parseInt(((String[]) parameters.get("acceptanceId"))[0]);

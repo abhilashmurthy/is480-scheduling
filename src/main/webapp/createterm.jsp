@@ -268,6 +268,10 @@
                 });
                 return false;
             });
+			
+			/*----------------------------------------
+			CREATE TIMESLOTS
+			------------------------------------------*/
             
             //Display create timeslots
             function displayCreateTimeslots() {
@@ -277,10 +281,6 @@
                 
                 //Scroll to the bottom
                 $("html, body").animate({ scrollTop: $(document).height() }, "slow");
-                
-                /*----------------------------------------
-                CREATE TIMESLOTS
-                ------------------------------------------*/
         
                 var acceptanceDates = $("#acceptanceDatePicker").multiDatesPicker('getDates');
                 var midtermDates = $("#midtermDatePicker").multiDatesPicker('getDates');
@@ -312,16 +312,33 @@
                 }
                 
                 //OVERALL SUBMIT TO SERVER
-                $("#timeslotsForm").on('submit', function(){
+                $("#createTimeslotsSubmitBtn").on('click', function(){
                     var scheduleIdData = { acceptanceId:acceptanceId, midtermId:midtermId, finalId:finalId };
                     //SerializeArray not functional for timeslots
-                    var data = $(this).serializeArray();
                     var timeslotsData = {};
+					var timeslot_acceptance = new Array(); var timeslot_midterm = new Array(); var timeslot_final = new Array();
                     
-                    for (var i = 0; i < data.length; i++){
-                        timeslotsData[data[i].name] = timeslotsData[data[i].name] || [];
-                        timeslotsData[data[i].name].push(Date.parse(data[i].value).toString('yyyy-MM-dd HH:mm:ss'));
+                    var accData = $("div.start-marker", "#acceptanceTimeslotsTable").get();
+                    for (var i = 0; i < accData.length; i++){
+                        var obj = accData[i];
+						timeslot_acceptance.push($(obj).parent().attr("value"));
                     }
+					
+					var midData = $("div.start-marker", "#midtermTimeslotsTable").get();
+                    for (var i = 0; i < midData.length; i++){
+                        var obj = midData[i];
+						timeslot_midterm.push($(obj).parent().attr("value"));
+                    }
+					
+					var finData = $("div.start-marker", "#finalTimeslotsTable").get();
+                    for (var i = 0; i < finData.length; i++){
+                        var obj = finData[i];
+						timeslot_final.push($(obj).parent().attr("value"));
+                    }
+					
+					timeslotsData["timeslot_acceptance[]"] = timeslot_acceptance;
+					timeslotsData["timeslot_midterm[]"] = timeslot_midterm;
+					timeslotsData["timeslot_final[]"] = timeslot_final;
                     
                     console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
                     var extendData = $.extend(scheduleIdData, timeslotsData);
@@ -338,7 +355,8 @@
                             console.log("createTimeslotsJson was successful");
                         } else {
                             var eid = btoa(response.message);
-                            window.location = "error.jsp?eid=" + eid;
+							console.log(response.message);
+//                            window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error){
                         console.log("createTimeslotsJson AJAX FAIL");
@@ -383,8 +401,14 @@
 						timeTd.html(timesArray[i]);
 						tr.append(timeTd);
 
-						for (j = 0; j < dateArray.length; j++) {
-							tr.append("<td class='timeslotcell'></td>");
+						for (var j = 0; j < dateArray.length; j++) {
+							var td = $(document.createElement("td"));
+							td.addClass("timeslotcell");
+							var date = dateArray[j];
+							date = new Date(date).toString("yyyy-MM-dd");
+							var datetimeString = date + " " + timesArray[i] + ":00";
+							td.attr("value",datetimeString);
+							tr.append(td);
 						}
 						tbody.append(tr);
 					}
@@ -440,9 +464,17 @@
 						}
 					}	
 				}
-                
+				
+				$("td.timeslotcell", "#acceptanceTimeslotsTable").on("click", function(){
+					triggerTimeslot(this, 60);
+				});
+				$("td.timeslotcell", "#midtermTimeslotsTable").on("click", function(){
+					triggerTimeslot(this, 90);
+				});
+				$("td.timeslotcell", "#finalTimeslotsTable").on("click", function(){
+					triggerTimeslot(this, 90);
+				});
             }
-
         });
     </script>
 </body>
