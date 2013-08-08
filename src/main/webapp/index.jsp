@@ -22,28 +22,48 @@
         %>
 
         <!-- Welcome Text -->
-        <div class="container page" />
-        <h3 id="activeTermName">
-            <%
-                String yearPlus1 = String.valueOf(activeTerm.getAcademicYear() + 1);
-                String termName = activeTerm.getAcademicYear()
-                        + "/" + yearPlus1.substring(2) + " " + activeTerm.getSemester();
-                out.print(termName);
-            %>
-        </h3>
-    </div>
-		
+        <div class="container page" >
+			<h3 id="activeTermName">
+				<%
+					String semester = activeTerm.getSemester();
+					int startAcademicYear = activeTerm.getAcademicYear();
+					int endAcademicYear = startAcademicYear + 1;
+					String academicYear = String.valueOf(startAcademicYear) + "-" + 
+							String.valueOf(endAcademicYear).substring(2); 
+					out.print(academicYear + " " + semester);
+				%>
+			</h3>
+		</div>
+	
+	<!-- To display the list of active terms -->
+	<div class="activeTerms">
+		<form id="activeTermForm" action="index" method="post">
+			<select name="termId" style="float:right" onchange="this.form.submit()"> 
+				<option value="">----- Choose Active Term ----</option>
+				<s:iterator value="data">
+					<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
+				</s:iterator>
+			</select>
+		</form>
+	</div>
+	
 	<!-- To display number of pending bookings for supervisor/reviewer -->
 	<% if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
 		<s:if test="%{pendingBookingCount > 0}">
-			<a href="approveReject">
-				<div class="pendingBookings alert" style="width: 230px; text-align: center">
-					<b>You have <s:property value="pendingBookingCount"/> pending booking(s) !</b>
-				</div>
-			</a>
+			<div class="pendingBookings alert" style="width: 230px; text-align: center">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<a href="approveReject" style="color:#B88A00;">
+					<s:if test="%{pendingBookingCount > 1}">
+						<b>You have <s:property value="pendingBookingCount"/> pending bookings !</b>
+					</s:if><s:else>
+						<b>You have <s:property value="pendingBookingCount"/> pending booking !</b>
+					</s:else>
+				</a>
+			</div>
 		</s:if>
 	<% } %>  
 		
+	<!-- To display legend for the calendar -->
     <table class="legend">
         <tr>
             <!-- <td style="width:50px"><b>Legend:</b></td>-->

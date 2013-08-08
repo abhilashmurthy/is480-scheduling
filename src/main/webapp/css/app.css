@@ -98,18 +98,26 @@ body {
 }
 
 .legend {  
-    font-size: 14px;
+    font-size: 13px;
 	position: absolute;
-	left:57%;
+	left:60%;
 	top:17.5%;
 }
 
 /* To display the number of pending bookings on index.jsp */
 .pendingBookings {
 	position: absolute;
-	left:74%;
+	left:40%;
+	top:9%;
+}
+
+	/* To display the number of pending bookings on index.jsp */
+.activeTerms {
+	position: absolute;
+	left:78%;
 	top:10%;
 }
+
 
 .notification-drawer {  
 	position: absolute;
