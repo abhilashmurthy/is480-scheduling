@@ -51,6 +51,18 @@
             #timeColumn {
                 border-right: 1px solid black;
             }
+			
+			.start-marker { /* Triangle marker for the start of a timeslot */
+				width: 0;
+				height: 0;
+				border-left: 5px solid transparent;
+				border-right: 5px solid transparent;
+				border-top: 10px solid #5C7AFF;
+				z-index: 1;
+			}
+			.chosen {
+				background-color: #B8F79E !important ;
+			}
             
         </style>
     </head>
@@ -256,6 +268,10 @@
                 });
                 return false;
             });
+			
+			/*----------------------------------------
+			CREATE TIMESLOTS
+			------------------------------------------*/
             
             //Display create timeslots
             function displayCreateTimeslots() {
@@ -265,10 +281,6 @@
                 
                 //Scroll to the bottom
                 $("html, body").animate({ scrollTop: $(document).height() }, "slow");
-                
-                /*----------------------------------------
-                CREATE TIMESLOTS
-                ------------------------------------------*/
         
                 var acceptanceDates = $("#acceptanceDatePicker").multiDatesPicker('getDates');
                 var midtermDates = $("#midtermDatePicker").multiDatesPicker('getDates');
@@ -282,39 +294,51 @@
                 var dayEnd = 16;
                 var duration = 60;
                 
-                //Get times
-                var timeArray = getTimes(dayStart, dayEnd, duration);
-                
-//                console.log('TimeArray: ' + timeArray);
-                
                 //Append timeslot form details
                 if (acceptanceDates.length > 0) {
                     $("#acceptanceTimeslotsTable").show();
                     $("#acceptanceTimeslotsTable").before("<h4>Acceptance</h4>");
-                    makeCheckboxTable("acceptanceTimeslotsTable", acceptanceDates);
+                    makeTimeslotTable("acceptanceTimeslotsTable", acceptanceDates);
                 }
                 if (midtermDates.length > 0) {
                     $("#midtermTimeslotsTable").show();
                     $("#midtermTimeslotsTable").before("<h4>Midterm</h4>");
-                    makeCheckboxTable("midtermTimeslotsTable", midtermDates);
+                    makeTimeslotTable("midtermTimeslotsTable", midtermDates);
                 }
                 if (finalDates.length > 0) {
                     $("#finalTimeslotsTable").show();
                     $("#finalTimeslotsTable").before("<h4>Final</h4>");
-                    makeCheckboxTable("finalTimeslotsTable", finalDates);
+                    makeTimeslotTable("finalTimeslotsTable", finalDates);
                 }
                 
                 //OVERALL SUBMIT TO SERVER
-                $("#timeslotsForm").on('submit', function(){
+                $("#createTimeslotsSubmitBtn").on('click', function(){
                     var scheduleIdData = { acceptanceId:acceptanceId, midtermId:midtermId, finalId:finalId };
                     //SerializeArray not functional for timeslots
-                    var data = $(this).serializeArray();
                     var timeslotsData = {};
+					var timeslot_acceptance = new Array(); var timeslot_midterm = new Array(); var timeslot_final = new Array();
                     
-                    for (var i = 0; i < data.length; i++){
-                        timeslotsData[data[i].name] = timeslotsData[data[i].name] || [];
-                        timeslotsData[data[i].name].push(Date.parse(data[i].value).toString('yyyy-MM-dd HH:mm:ss'));
+                    var accData = $("div.start-marker", "#acceptanceTimeslotsTable").get();
+                    for (var i = 0; i < accData.length; i++){
+                        var obj = accData[i];
+						timeslot_acceptance.push($(obj).parent().attr("value"));
                     }
+					
+					var midData = $("div.start-marker", "#midtermTimeslotsTable").get();
+                    for (var i = 0; i < midData.length; i++){
+                        var obj = midData[i];
+						timeslot_midterm.push($(obj).parent().attr("value"));
+                    }
+					
+					var finData = $("div.start-marker", "#finalTimeslotsTable").get();
+                    for (var i = 0; i < finData.length; i++){
+                        var obj = finData[i];
+						timeslot_final.push($(obj).parent().attr("value"));
+                    }
+					
+					timeslotsData["timeslot_acceptance[]"] = timeslot_acceptance;
+					timeslotsData["timeslot_midterm[]"] = timeslot_midterm;
+					timeslotsData["timeslot_final[]"] = timeslot_final;
                     
                     console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
                     var extendData = $.extend(scheduleIdData, timeslotsData);
@@ -331,7 +355,8 @@
                             console.log("createTimeslotsJson was successful");
                         } else {
                             var eid = btoa(response.message);
-                            window.location = "error.jsp?eid=" + eid;
+							console.log(response.message);
+//                            window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error){
                         console.log("createTimeslotsJson AJAX FAIL");
@@ -341,58 +366,115 @@
                     return false;
                 });
                 
-                function makeCheckboxTable(tableId, dateArray) {
-                    //Append checkbox header names
-                    var headerString = "<thead><tr><td></td>";
-                    for (i = 0; i < dateArray.length; i++) {
-                        headerString += "<td>" + new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd') + "</td>";
-                    }
-                    headerString += "</tr></thead>";
-                    $("#" + tableId).append(headerString);
-                    
-                    //Make the table name
-                    var tableName = tableId.split("Timeslots")[0];
-                    
-                    //Append checkbox 'ALL' checkboxes
-//                    var allChkString = "<tr id='allChkRow'><td>ALL</td>";
-//                    for (i = 0; i < dateArray.length; i++) {
-//                        var date = dateArray[i].toString('dd-MMM-yyyy');
-//                        allChkString += "<td>" + "<input class='chkALL_" + tableId + "' id='chkALL_" + tableId + "_" + date + "' type='checkbox' value='" + tableId + "_" + date + "' checked/></td>";
-//                    }
-//                    allChkString += "</tr>";
-//                    $("#" + tableId).append(allChkString);
-                    
-                    //Append checkbox data
-                    for (j = 0; j < timeArray.length; j++) {
-                        var htmlString = "<tr>";
-                        var time = timeArray[j];
-                        htmlString += "<td id='timeColumn'>" + time + "</td>";
-                        for (i = 0; i < dateArray.length; i++) {
-                            var date = dateArray[i].toString('yyyy-MM-dd');
-                            htmlString += "<td><input class='chkBox_" + tableName + "' id='chk_" + tableName + "_" + date + "_" + time.replace(/:/g, '-') +"' type='checkbox' checked name='timeslot_" + tableName +"[]' value='" + date + " " + time +"' /></td>";
-                        }
-                        htmlString += "</tr>";
-                        $("#" + tableId).append(htmlString);
-                    }
-                }
-                
-                
-                function getTimes(start, end, duration) {
-                    var times = new Array();
-                    var current = start;
-                    while (current <= end) {
-                        if (current%1 === 0) {
-                            times.push(current + ":00:00");
-                        } else {
-                            times.push(Math.floor(current) + ":30:00");
-                        }
-                        current += (duration / 60);
-                    }
-                    return times;
-                }
-                
-            }
+                function makeTimeslotTable(tableId, dateArray) {
+					var thead = $(document.createElement("thead"));
+					var minTime = 9;
+					var maxTime = 19;
 
+					//Creating table header with dates
+					thead.append("<th></th>"); //Empty cell for time column
+					for (i = 0; i < dateArray.length ; i++) {
+						var th = $(document.createElement("th"));
+						var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
+						th.html(headerVal);
+						thead.append(th);
+					}
+					//Inserting constructed table header into table
+					$("#" + tableId).append(thead);
+
+					//Creating table body with times and empty cells
+					var tbody = $(document.createElement("tbody"));
+
+					//Generating list of times
+					var timesArray = new Array();
+					for (var i = minTime; i < maxTime; i++) {
+						var timeVal = Date.parse(i + ":00:00");
+						timesArray.push(timeVal.toString("HH:mm"));
+						timeVal.addMinutes(30);
+						timesArray.push(timeVal.toString("HH:mm"));
+					}
+
+					//Constructing table body
+					for (i = 0; i < timesArray.length; i++) {
+						var tr = $(document.createElement("tr"));
+						var timeTd = $(document.createElement("td"));
+						timeTd.html(timesArray[i]);
+						tr.append(timeTd);
+
+						for (var j = 0; j < dateArray.length; j++) {
+							var td = $(document.createElement("td"));
+							td.addClass("timeslotcell");
+							var date = dateArray[j];
+							date = new Date(date).toString("yyyy-MM-dd");
+							var datetimeString = date + " " + timesArray[i] + ":00";
+							td.attr("value",datetimeString);
+							tr.append(td);
+						}
+						tbody.append(tr);
+					}
+
+					//Inserting constructed table body into table
+					$("#" + tableId).append(tbody);
+				}
+                
+				/*
+				 * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
+				 */
+				function triggerTimeslot(e, duration) {
+					var col = $(e).parent().children().index(e);
+					var tr = $(e).parent();
+					var row = $(tr).parent().children().index(tr);
+					var tbody = $(e).parents("tbody");
+					var slotSize = duration / 30;
+
+					if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
+						//Checking if the cell clicked is the start of the chosen timeslot (Important!)
+						if ($(e).children().index(".start-marker") !== -1) {
+							$(e).removeClass("chosen");
+							$(e).children().remove();
+							for (i = 1; i < slotSize; i++) {
+								var nextRow = $(tbody).children().get(row + i);
+								var nextCell = $(nextRow).children().get(col);
+								$(nextCell).removeClass("chosen");
+							}
+						}
+					} else { //Section for a non-highlighted cell
+						//Checking if there will be an overlap of timeslots
+						//Abort if there is going to be an overlap
+						for (i = 1; i < slotSize; i++) {
+							var nextRow = $(tbody).children().get(row + i);
+							var nextCell = $(nextRow).children().get(col);
+							if($(nextCell).hasClass("chosen")){
+								return;
+							}
+						}
+
+						var numRows = $(tbody).children().length;
+						//Checking if there are enough cells for the slot duration
+						if ((row + slotSize) <= numRows) {
+							$(e).addClass("chosen");
+							var marker = document.createElement("div");
+							$(marker).addClass("start-marker");
+							$(e).append(marker);
+							for (i = 1; i < slotSize; i++) {
+								var nextRow = $(tbody).children().get(row + i);
+								var nextCell = $(nextRow).children().get(col);
+								$(nextCell).addClass("chosen");
+							}
+						}
+					}	
+				}
+				
+				$("td.timeslotcell", "#acceptanceTimeslotsTable").on("click", function(){
+					triggerTimeslot(this, 60);
+				});
+				$("td.timeslotcell", "#midtermTimeslotsTable").on("click", function(){
+					triggerTimeslot(this, 90);
+				});
+				$("td.timeslotcell", "#finalTimeslotsTable").on("click", function(){
+					triggerTimeslot(this, 90);
+				});
+            }
         });
     </script>
 </body>

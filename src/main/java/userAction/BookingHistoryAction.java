@@ -34,7 +34,6 @@ import manager.UserManager;
 import model.Role;
 import model.Team;
 import model.Term;
-import systemAction.SendEmailAction;
 import util.MiscUtil;
 
 /**

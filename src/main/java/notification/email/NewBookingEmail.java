@@ -32,9 +32,10 @@ public class NewBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateRecipientList() {
 		Set<String> emails = new HashSet<String>();
-		for (User u : t.getTeam().getMembers()) {
+                for (User u : t.getTeam().getMembers()) {
 			emails.add(u.getUsername() + "@smu.edu.sg");
 		}
+                
 		
 		return emails;
 	}

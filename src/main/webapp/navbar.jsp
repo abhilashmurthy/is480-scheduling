@@ -50,11 +50,15 @@
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
 							</ul>
+						</li>
+						<li class="dropdown">
 							<a id="scheduleDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Schedule<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="newSchedule">Create Schedule</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="createterm.jsp">Create Term</a></li>
 							</ul>
+						</li>
+						<li class="dropdown">
 							<a id="adminConfigDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Admin Config<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>
@@ -107,7 +111,7 @@
 		<p><strong>Team<br/></strong><% out.print(user.getTeam().getTeamName());%></p>
 	 <% } %>
     
-	<strong>Current Role</strong>
+	<strong>Role</strong>
 	<!-- For all roles -->
 	<%  activeRole = (String) session.getAttribute("activeRole"); %>
 		<ul class="unstyled">
@@ -149,7 +153,7 @@
         //Dashboard popover
         $('#userDashboard').popover({
             placement: 'bottom',
-            title: 'Your Information',
+            title: '<b>Your Information</b>',
 			trigger: 'click',
             html: true,
             content: function() {
