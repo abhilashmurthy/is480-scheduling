@@ -101,13 +101,13 @@ body {
     font-size: 14px;
 	position: absolute;
 	left:57%;
-	top:18%;
+	top:17.5%;
 }
 
 /* To display the number of pending bookings on index.jsp */
 .pendingBookings {
 	position: absolute;
-	left:75%;
+	left:74%;
 	top:10%;
 }
 

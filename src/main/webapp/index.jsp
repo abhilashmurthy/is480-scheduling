@@ -35,15 +35,13 @@
 		
 	<!-- To display number of pending bookings for supervisor/reviewer -->
 	<% if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
-	<s:action name="pendingBookingStatus">
 		<s:if test="%{pendingBookingCount > 0}">
-		<a href="approveReject">
-			<div class="pendingBookings well well-small alert" style="width: 210px; text-align: center">
-				You have <s:property value="pendingBookingCount"/> pending bookings!
-			</div>
-		</a>
+			<a href="approveReject">
+				<div class="pendingBookings alert" style="width: 230px; text-align: center">
+					<b>You have <s:property value="pendingBookingCount"/> pending booking(s) !</b>
+				</div>
+			</a>
 		</s:if>
-	</s:action>
 	<% } %>  
 		
     <table class="legend">
@@ -314,7 +312,7 @@
                             outputTable.attr('id', 'createTimeslotTable');                            
 
                             var outputData = [
-                                ["Team", teamName],
+                                //["Team", teamName],
                                 ["Date", dateToView],
                                 ["Start Time", startTimeToView],
                                 ["End Time", endTimeToView],
@@ -458,7 +456,7 @@
                             trigger: "manual",
                             title: "Booking <button type='button' class='close'>&times;</button>",
                             placement: "right",
-                            content: "Booked <br/> Confirmation email sent",
+                            content: "Booked <br/> Confirmation email sent!",
                             html: true
                         });
                         console.log('Toggling D');
@@ -501,7 +499,7 @@
                             trigger: "manual",
                             title: "Booking <button type='button' class='close'>&times;</button>",
                             placement: "right",
-                            content: "Deleted <br/> Notification email sent (Coming soon...)",
+                            content: "Deleted <br/> Notification email sent!",
                             html: true
                         });
                         console.log('Toggling E');

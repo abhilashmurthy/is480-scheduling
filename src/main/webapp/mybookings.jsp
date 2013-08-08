@@ -23,11 +23,6 @@
 		<h3>Booking History</h3>
 		
 		<%-- Tab to view Accept/Reject Bookings --%>
-		<ul class="nav nav-tabs">
-			<li class="active">
-				<a data-toggle="tab">My Bookings</a>
-			</li>
-		</ul>
 			
 		<!-- SECTION: Booking History -->
 		<s:if test="%{data.size() > 0 && data != null}"> 

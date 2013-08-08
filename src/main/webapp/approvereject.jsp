@@ -14,7 +14,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Approve/Reject Booking</title>
+        <title>Accept/Reject Booking</title>
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
 		//To check/uncheck all boxes
@@ -62,7 +62,7 @@
     <body>
         <%@include file="navbar.jsp" %>
         <div class="container">
-        <h3>Approve/Reject Booking</h3>
+        <h3>Accept/Reject Booking</h3>
         <!--<form action="approveReject" method="post">
 			<!-- Putting default values for testing purposes 
             Choose Term <select name="termId"> 
@@ -76,13 +76,6 @@
         </form> -->
 		
 		<div id ="confirmBookings"> 
-			<%-- Tab to view Accept/Reject Bookings --%>
-			<ul id="approveBookingTab" class="nav nav-tabs">
-				<li class="active">
-					<a id="acceptReject" data-toggle="tab">Accept/Reject</a>
-				</li>
-			</ul>
-
 			<!-- SECTION: Approve/Reject Bookings -->
 			<s:if test="%{data.size() > 0 && data != null}"> 
 				<%--<s:if test="%{teamName != null}"> --%>

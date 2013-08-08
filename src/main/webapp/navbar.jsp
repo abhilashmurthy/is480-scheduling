@@ -41,49 +41,49 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="index.jsp">IS480 Scheduling</a>
+            <a class="brand" href="index">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
 				<%  if (activeRole.equalsIgnoreCase("Administrator")) { %>
 						<li class="dropdown">
-							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
+							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Booking</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
 							</ul>
 						</li>
 						<li class="dropdown">
-							<a id="scheduleDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Schedule<b class="caret"></b></a>
+							<a id="scheduleDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Schedule</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="newSchedule">Create Schedule</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="createterm.jsp">Create Term</a></li>
 							</ul>
 						</li>
 						<li class="dropdown">
-							<a id="adminConfigDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Admin Config<b class="caret"></b></a>
+							<a id="adminConfigDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Admin Config</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>
 							</ul>
 						</li>
-						<li id="Report"><a href="#">Report</a></li>
+						<li id="Report"><a href="#"><b>Report</b></a></li>
 						
 				<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
 						<!--<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
 							<!--<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
-						<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject"><b>Approve Booking</b></a></li>
 						<!--</ul>-->
 						<!--</li>-->
-						<li id="myBookings"><a href="myBookings">Booking History</a></li>
+						<li id="myBookings"><a href="myBookings"><b>Booking History</b></a></li>
 				<% } else if (activeRole.equalsIgnoreCase("Student")) { %>
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
 							<!--</ul>-->
 						<!--</li>-->
-						<li id="myBookings"><a href="myBookings">Booking History</a></li>
+						<li id="myBookings"><a href="myBookings"><b>Booking History</b></a></li>
 				<% } else if (activeRole.equalsIgnoreCase("TA")) { %>	
-						<li id="myBookings"><a href="myBookings">Booking History</a></li>
+						<li id="myBookings"><a href="myBookings"><b>Booking History</b></a></li>
 						<!--Nothing for now!-->
 				<% } %>
                 </ul>

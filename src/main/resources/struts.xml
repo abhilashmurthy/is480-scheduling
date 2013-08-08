@@ -35,8 +35,8 @@
 			<result name="login">/login.jsp</result>
         </global-results>
 		
-		<action name="index">
-			<result>/index.jsp</result>
+		<action name="index" class="systemAction.ShowIndexAction" method="execute">
+			<result name="success">/index.jsp</result>
 		</action>
         
         <action name="logout" class="userAction.LogoutAction" method="execute">
@@ -83,13 +83,7 @@
 		<action name="myBookings" class="userAction.BookingHistoryAction" method="execute">
             <result name="success">/mybookings.jsp</result>
         </action>
-		
-		<action name="pendingBookingStatus" class="systemAction.GetPendingStatusAction" method="execute">
-<!--			<result name="success" type="stream">
-				<param name="pendingBookingCount">pendingBookingCount</param>
-		   </result>-->
-        </action>
-		
+				
     </package>
 
 	<!-- JSON Package -->
