@@ -52,15 +52,14 @@
                 border-right: 1px solid black;
             }
 			
-			.start-marker {
+			.start-marker { /* Triangle marker for the start of a timeslot */
 				width: 0;
 				height: 0;
 				border-left: 5px solid transparent;
 				border-right: 5px solid transparent;
-				border-top: 10px solid blue;
+				border-top: 10px solid #5C7AFF;
 				z-index: 1;
 			}
-			
 			.chosen {
 				background-color: #B8F79E !important ;
 			}
@@ -295,11 +294,6 @@
                 var dayEnd = 16;
                 var duration = 60;
                 
-                //Get times
-                var timeArray = getTimes(dayStart, dayEnd, duration);
-                
-//                console.log('TimeArray: ' + timeArray);
-                
                 //Append timeslot form details
                 if (acceptanceDates.length > 0) {
                     $("#acceptanceTimeslotsTable").show();
@@ -399,37 +393,53 @@
 					$("#" + tableId).append(tbody);
 				}
                 
-				$(".timeslotcell").on("click", function() {
-					var col = $(this).parent().children().index(this);
-					var tr = $(this).parent();
+				/*
+				 * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
+				 */
+				function triggerTimeslot(e, duration) {
+					var col = $(e).parent().children().index(e);
+					var tr = $(e).parent();
 					var row = $(tr).parent().children().index(tr);
-					var tbody = $(this).parents("tbody");
+					var tbody = $(e).parents("tbody");
 					var slotSize = duration / 30;
-					
-					$(this).toggleClass("chosen");
-					var marker = document.createElement("div");
-					$(marker).addClass("start-marker");
-					$(this).append(marker);
-					for (i = 1; i < slotSize; i++) {
-						var nextRow = $(tbody).children().get(row + i);
-						var nextCell = $(nextRow).children().get(col);
-						$(nextCell).toggleClass("chosen");
-					}
-				});
-                
-                function getTimes(start, end, duration) {
-                    var times = new Array();
-                    var current = start;
-                    while (current <= end) {
-                        if (current%1 === 0) {
-                            times.push(current + ":00:00");
-                        } else {
-                            times.push(Math.floor(current) + ":30:00");
-                        }
-                        current += (duration / 60);
-                    }
-                    return times;
-                }
+
+					if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
+						//Checking if the cell clicked is the start of the chosen timeslot (Important!)
+						if ($(e).children().index(".start-marker") !== -1) {
+							$(e).removeClass("chosen");
+							$(e).children().remove();
+							for (i = 1; i < slotSize; i++) {
+								var nextRow = $(tbody).children().get(row + i);
+								var nextCell = $(nextRow).children().get(col);
+								$(nextCell).removeClass("chosen");
+							}
+						}
+					} else { //Section for a non-highlighted cell
+						//Checking if there will be an overlap of timeslots
+						//Abort if there is going to be an overlap
+						for (i = 1; i < slotSize; i++) {
+							var nextRow = $(tbody).children().get(row + i);
+							var nextCell = $(nextRow).children().get(col);
+							if($(nextCell).hasClass("chosen")){
+								return;
+							}
+						}
+
+						var numRows = $(tbody).children().length;
+						//Checking if there are enough cells for the slot duration
+						if ((row + slotSize) <= numRows) {
+							$(e).addClass("chosen");
+							var marker = document.createElement("div");
+							$(marker).addClass("start-marker");
+							$(e).append(marker);
+							for (i = 1; i < slotSize; i++) {
+								var nextRow = $(tbody).children().get(row + i);
+								var nextCell = $(nextRow).children().get(col);
+								$(nextCell).addClass("chosen");
+							}
+						}
+					}	
+				}
                 
             }
 
