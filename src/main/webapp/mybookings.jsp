@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-        <title>My Bookings</title>
+        <title>Booking History</title>
 		<%@include file="footer.jsp"%>
     </head>
     <body>

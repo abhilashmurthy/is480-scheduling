@@ -54,165 +54,166 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         this.request = request;
     }
 
-	@Override
-	public String execute() throws Exception {
-		try{
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-		HttpSession session = request.getSession();
+    @Override
+    public String execute() throws Exception {
+        try {
+            json.put("exception", false);
+            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            HttpSession session = request.getSession();
 
-		User user = (User) session.getAttribute("user");
-		String activeRole = (String) session.getAttribute("activeRole");
-		Team team = null;
-		
-		if (activeRole.equalsIgnoreCase("Student")) {
-			team = user.getTeam();
-		} else if (activeRole.equalsIgnoreCase("Administrator")) {
-			//TODO Get team input for Admin role
-		}
-		
-		// Checking if team information is found
-		if (team == null) {
-			logger.error("Team information not found or unauthorized user role");
-			json.put("success", false);
-			json.put("message", "Team not identified or you do not have required"
-					+ " permissions to make a booking.");
-			return SUCCESS;
-		}	
+            User user = (User) session.getAttribute("user");
+            String activeRole = (String) session.getAttribute("activeRole");
+            Team team = null;
 
-		//Validating milestone info
-		Milestone milestone = MilestoneManager.findByName(em, milestoneStr);
-		if (milestone == null) {
-			logger.error("Milestone not found");
-			json.put("success", false);
-			json.put("message", "Oops. Something went wrong on our end. Please try again!");
-			return SUCCESS;
-		}
+            if (activeRole.equalsIgnoreCase("Student")) {
+                team = user.getTeam();
+            } else if (activeRole.equalsIgnoreCase("Administrator")) {
+                //TODO Get team input for Admin role
+            }
 
-		//Retreiving the term
-		Term term;
-		try {
-			int academicYear = Integer.valueOf(termId.split(",")[0]);
-			String semester = termId.split(",")[1];
-			term = TermManager.findByYearAndSemester(em, academicYear, semester);
-			if (term == null) {
-				throw new Exception();
-			}
-		} catch (Exception e) {
-			logger.error("Term not found");
-			logger.error(e.getMessage());
-			json.put("success", false);
-			json.put("message", "Oops. Something went wrong on our end. Please try again!");
-			return SUCCESS;
-		}
+            // Checking if team information is found
+            if (team == null) {
+                logger.error("Team information not found or unauthorized user role");
+                json.put("success", false);
+                json.put("message", "Team not identified or you do not have required"
+                        + " permissions to make a booking.");
+                return SUCCESS;
+            }
+
+            //Validating milestone info
+            Milestone milestone = MilestoneManager.findByName(em, milestoneStr);
+            if (milestone == null) {
+                logger.error("Milestone not found");
+                json.put("success", false);
+                json.put("message", "Oops. Something went wrong on our end. Please try again!");
+                return SUCCESS;
+            }
+
+            //Retreiving the term
+            Term term;
+            try {
+                int academicYear = Integer.valueOf(termId.split(",")[0]);
+                String semester = termId.split(",")[1];
+                term = TermManager.findByYearAndSemester(em, academicYear, semester);
+                if (term == null) {
+                    throw new Exception();
+                }
+            } catch (Exception e) {
+                logger.error("Term not found");
+                logger.error(e.getMessage());
+                json.put("success", false);
+                json.put("message", "Oops. Something went wrong on our end. Please try again!");
+                return SUCCESS;
+            }
 
 
-		//Retrieve the corresponding schedule object and its timeslots
-		Schedule schedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
-		if (schedule == null || schedule.getTimeslots() == null) {
-			logger.error("Schedule not found");
-			json.put("success", false);
-			json.put("message", "Oops. Something went wrong on our end. Please try again!");
-			return SUCCESS;
-		}
-		Set<Timeslot> timeslots = schedule.getTimeslots();
+            //Retrieve the corresponding schedule object and its timeslots
+            Schedule schedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
+            if (schedule == null || schedule.getTimeslots() == null) {
+                logger.error("Schedule not found");
+                json.put("success", false);
+                json.put("message", "Oops. Something went wrong on our end. Please try again!");
+                return SUCCESS;
+            }
+            Set<Timeslot> timeslots = schedule.getTimeslots();
 
-		//Checking if the team already has a booking (pending/confirmed)
-		for (Timeslot t : timeslots) {
-			if (t.getTeam() != null && t.getTeam().equals(team)) {
-				logger.error("Team's already booked a timeslot for the milestone this term");
-				json.put("success", false);
-				json.put("message", "Seems like you already have a booking for this milestone."
-						+ " Can't let you make a booking!");
-				return SUCCESS;
-			}
-		}
+            //Checking if the team already has a booking (pending/confirmed)
+            for (Timeslot t : timeslots) {
+                if (t.getTeam() != null && t.getTeam().equals(team)) {
+                    logger.error("Team's already booked a timeslot for the milestone this term");
+                    json.put("success", false);
+                    json.put("message", "Seems like you already have a booking for this milestone."
+                            + " Can't let you make a booking!");
+                    return SUCCESS;
+                }
+            }
 
-		//Retrieve the corresponding booking slot
-		Timestamp bookingTime;
-		try {
-			String timestampStr = date + " " + startTime;
-			bookingTime = Timestamp.valueOf(timestampStr);
-		} catch (IllegalArgumentException e) {
-			logger.error("Start time could not be parsed");
-			json.put("success", false);
-			json.put("message", "Date information not entered correctly. Please try again!");
-			return SUCCESS;
-		}
-		Timeslot bookingSlot = null;
-		for (Timeslot t : timeslots) {
-			Timestamp tStartTime = t.getStartTime();
-			if (tStartTime.equals(bookingTime)) {
-				bookingSlot = t;
-				break;
-			}
-		}
+            //Retrieve the corresponding booking slot
+            Timestamp bookingTime;
+            try {
+                String timestampStr = date + " " + startTime;
+                bookingTime = Timestamp.valueOf(timestampStr);
+            } catch (IllegalArgumentException e) {
+                logger.error("Start time could not be parsed");
+                json.put("success", false);
+                json.put("message", "Date information not entered correctly. Please try again!");
+                return SUCCESS;
+            }
+            Timeslot bookingSlot = null;
+            for (Timeslot t : timeslots) {
+                Timestamp tStartTime = t.getStartTime();
+                if (tStartTime.equals(bookingTime)) {
+                    bookingSlot = t;
+                    break;
+                }
+            }
 
-		//Check if timeslot has been found
-		if (bookingSlot == null) {
-			logger.error("Chosen timeslot not found");
-			json.put("success", false);
-			json.put("message", "We can't find the timeslot you're trying to book."
-					+ " Please check the details entered!");
-			return SUCCESS;
-		}
+            //Check if timeslot has been found
+            if (bookingSlot == null) {
+                logger.error("Chosen timeslot not found");
+                json.put("success", false);
+                json.put("message", "We can't find the timeslot you're trying to book."
+                        + " Please check the details entered!");
+                return SUCCESS;
+            }
 
-		//Check if the timeslot is free
-		if (bookingSlot.getTeam() != null) { //Slot is full
-			logger.error("Chosen timeslot already booked");
-			json.put("success", false);
-			json.put("message", "Oops. This timeslot is already taken."
-					+ " Please book another slot!");
-			return SUCCESS;
-		}
+            //Check if the timeslot is free
+            if (bookingSlot.getTeam() != null) { //Slot is full
+                logger.error("Chosen timeslot already booked");
+                json.put("success", false);
+                json.put("message", "Oops. This timeslot is already taken."
+                        + " Please book another slot!");
+                return SUCCESS;
+            }
 
-		try {
-			em.getTransaction().begin();
+            try {
+                em.getTransaction().begin();
 
-			//Assign timeslot to team
-			bookingSlot.setTeam(team);
-			
-			//Add team members to attendees
-			HashSet<User> attendees = new HashSet<User>();
-			attendees.addAll(team.getMembers());
+                //Assign timeslot to team
+                bookingSlot.setTeam(team);
 
-			//Create timeslot status entries based on milestone
-			HashMap<User, Status> statusList = new HashMap<User, Status>();
-			if (milestone.getName().equalsIgnoreCase("acceptance")) {
-				statusList.put(team.getSupervisor(), Status.PENDING);
-				attendees.add(team.getSupervisor());
-			} else if (milestone.getName().equalsIgnoreCase("midterm")) {
-				statusList.put(team.getReviewer1(), Status.PENDING);
-				attendees.add(team.getReviewer1());
-				statusList.put(team.getReviewer2(), Status.PENDING);
-				attendees.add(team.getReviewer2());
-			} else if (milestone.getName().equalsIgnoreCase("final")) {
-				statusList.put(team.getSupervisor(), Status.PENDING);
-				attendees.add(team.getSupervisor());
-				statusList.put(team.getReviewer1(), Status.PENDING);
-				attendees.add(team.getReviewer1());
-			} else {
-				logger.error("FATAL ERROR: Code not to be reached!");
-				throw new Exception();
-			}
+                //Add team members to attendees
+                HashSet<User> attendees = new HashSet<User>();
+                attendees.addAll(team.getMembers());
 
-			bookingSlot.setStatusList(statusList);
-			bookingSlot.setAttendees(attendees);
-			NewBookingEmail newEmail = new NewBookingEmail(bookingSlot);
-			MailUtil.sendEmail(newEmail);
-			em.persist(bookingSlot);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			//Rolling back write operations
-			em.getTransaction().rollback();
-			logger.error("FATAL ERROR: Database Write Error. Code not to be reached!");
-			json.put("success", false);
-			json.put("message", "Oops. Something went wrong on our end. Please try again!");
-			return SUCCESS;
-		}
+                //Create timeslot status entries based on milestone
+                HashMap<User, Status> statusList = new HashMap<User, Status>();
+                if (milestone.getName().equalsIgnoreCase("acceptance")) {
+                    statusList.put(team.getSupervisor(), Status.PENDING);
+                    attendees.add(team.getSupervisor());
+                } else if (milestone.getName().equalsIgnoreCase("midterm")) {
+                    statusList.put(team.getReviewer1(), Status.PENDING);
+                    attendees.add(team.getReviewer1());
+                    statusList.put(team.getReviewer2(), Status.PENDING);
+                    attendees.add(team.getReviewer2());
+                } else if (milestone.getName().equalsIgnoreCase("final")) {
+                    statusList.put(team.getSupervisor(), Status.PENDING);
+                    attendees.add(team.getSupervisor());
+                    statusList.put(team.getReviewer1(), Status.PENDING);
+                    attendees.add(team.getReviewer1());
+                } else {
+                    logger.error("FATAL ERROR: Code not to be reached!");
+                    throw new Exception();
+                }
 
-		json.put("success", true);
-		json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees. (Coming soon..)");
-		} catch (Exception e) {
+                bookingSlot.setStatusList(statusList);
+                bookingSlot.setAttendees(attendees);
+                NewBookingEmail newEmail = new NewBookingEmail(bookingSlot);
+                MailUtil.sendEmail(newEmail);
+                em.persist(bookingSlot);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                //Rolling back write operations
+                em.getTransaction().rollback();
+                logger.error("FATAL ERROR: Database Write Error. Code not to be reached!");
+                json.put("success", false);
+                json.put("message", "Oops. Something went wrong on our end. Please try again!");
+                return SUCCESS;
+            }
+
+            json.put("success", true);
+            json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees. (Coming soon..)");
+        } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -223,59 +224,58 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("exception", true);
             json.put("message", "Error with CreateBooking: Escalate to developers!");
         }
-		return SUCCESS;
-	}
+        return SUCCESS;
+    }
 
-	public String getDate() {
-		return date;
-	}
+    public String getDate() {
+        return date;
+    }
 
-	public void setDate(String date) {
-		this.date = date;
-	}
+    public void setDate(String date) {
+        this.date = date;
+    }
 
-	public String getStartTime() {
-		return startTime;
-	}
+    public String getStartTime() {
+        return startTime;
+    }
 
-	public void setStartTime(String startTime) {
-		this.startTime = startTime;
-	}
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
 
-	public String getEndTime() {
-		return endTime;
-	}
+    public String getEndTime() {
+        return endTime;
+    }
 
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
-	}
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
-	public String getTermId() {
-		return termId;
-	}
+    public String getTermId() {
+        return termId;
+    }
 
-	public void setTermId(String termId) {
-		this.termId = termId;
-	}
+    public void setTermId(String termId) {
+        this.termId = termId;
+    }
 
-	public String getMilestoneStr() {
-		return milestoneStr;
-	}
+    public String getMilestoneStr() {
+        return milestoneStr;
+    }
 
-	public void setMilestoneStr(String milestoneStr) {
-		this.milestoneStr = milestoneStr;
-	}
-	
-	public HashMap<String, Object> getJson() {
-		return json;
-	}
+    public void setMilestoneStr(String milestoneStr) {
+        this.milestoneStr = milestoneStr;
+    }
 
-	public void setJson(HashMap<String, Object> json) {
-		this.json = json;
-	}
-	
-	public void setServletRequest(HttpServletRequest hsr) {
-		request = hsr;
-	}
+    public HashMap<String, Object> getJson() {
+        return json;
+    }
 
+    public void setJson(HashMap<String, Object> json) {
+        this.json = json;
+    }
+
+    public void setServletRequest(HttpServletRequest hsr) {
+        request = hsr;
+    }
 }

@@ -41,6 +41,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
     @Override
     public String execute() throws ServletException, IOException {
         try {
+            json.put("exception", false);
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
             //convert the chosen ID into long and get the corresponding Timeslot object

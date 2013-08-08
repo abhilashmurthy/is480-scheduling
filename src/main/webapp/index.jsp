@@ -166,7 +166,9 @@
             function appendPopovers() {
             
                 //Delete all old popovers
+                $(".timeslotCell").trigger('mouseleave');
                 $(".timeslotCell").popover('destroy');
+                
                 
                 $(".bookedTimeslot").each(function(){
                    appendViewBookingPopover($(this));
@@ -199,9 +201,9 @@
                         return toReturn;
                     };
 
-                    //Create Popover
+                    //Popover
                     bodyTd.popover({
-                        container: '.page', //This is important for the popover to overflow the schedule
+                        container: bodyTd, //This is important for the popover to overflow the schedule
                         trigger: 'manual',
                         html: 'true',
                         content: function() {
@@ -221,8 +223,19 @@
                                 var outputTr = $(document.createElement('tr'));
                                 var outputTdKey = $(document.createElement('td'))
                                     .html('<b>' + outputData[i][0] + '</b>');
-                                var outputTdValue = $(document.createElement('td'))
-                                    .html(outputData[i][1]);
+                                var outputTdValue = null;
+                                if (outputData[i][1] instanceof Array) {
+                                    var outputArray = outputData[i][1];
+                                    var outputArrayStr = "";
+                                    for (var j = 0; j < outputArray.length; j++) {
+                                        outputArrayStr += outputArray[j].name + "<br/>";
+                                    }
+                                    outputTdValue = $(document.createElement('td'))
+                                        .html(outputArrayStr);;
+                                } else {
+                                    outputTdValue = $(document.createElement('td'))
+                                        .html(outputData[i][1]);
+                                }
                                 outputTr.append(outputTdKey);
                                 outputTr.append(outputTdValue);
                                 outputTable.append(outputTr);
@@ -230,14 +243,7 @@
                             return outputTable;
                         },
                         placement: 'right',
-                        title: function() {
-                            if (viewBookingData.success) {
-                                return "<b>Your Booking <b><button type='button' class='close'>&times;</button>";
-                            } else {
-                                //return "Error <button id='closeBookingBtn' class='btn btn-small btn-danger'>X</button>";
-                                return "Error <button type='button' class='close'>&times;</button>";
-                            }
-                        }
+                        title: "<b>Your Booking <b><button type='button' class='close'>&times;</button>"
                     });
                 }
                 
@@ -252,11 +258,11 @@
                         //Is student and can book
                         if (bookingExists) {
                             bodyTd.popover({
-                               container: '.page',
+                               container: bodyTd,
                                html: 'true',
                                trigger: 'manual',
                                placement: 'right',
-                               title: '<b>Booking<b>',
+                               title: "Booking <button type='button' class='close'>&times;</button>",
                                content: 'You already have a booking!'
                             });
                         } else {
@@ -292,7 +298,7 @@
                             }
                             
                             bodyTd.popover({
-                               container: '.page',
+                               container: bodyTd,
                                html: 'true',
                                trigger: 'manual',
                                placement: 'right',
@@ -361,25 +367,26 @@
                 //Dynamic button bindings
                 //Use this kind of event trigger for dynamic buttons
                 //Close Booking Button
-                $(".page").on('click', '#closeBookingBtn', function(e) {
+                $("td").on('click', '.close', function(e) {
                     e.stopPropagation();
                     self.popover('hide');
+                    self.trigger('mouseleave');
                     return false;
                 });
                 
                 //Create Booking Button
-                $(".page").on('click', '#createBookingBtn', function(e) {
+                $("td").on('click', '#createBookingBtn', function(e) {
                     e.stopPropagation();
                     createBooking(self);
-                    appendPopovers(); //Refresh all popovers
+                    setTimeout(function(){appendPopovers();}, 3000); //Refresh all popovers
                     return false;
                 });
 
                 //Delete Booking Button
-                $(".page").on('click', '#deleteBookingBtn', function(e) {
+                $("td").on('click', '#deleteBookingBtn', function(e) {
                     e.stopPropagation();
                     deleteBooking(self);
-                    appendPopovers(); //Refresh all popovers
+                    setTimeout(function(){appendPopovers();}, 3000); //Refresh all popovers
                     return false;
                 });
             }
@@ -405,35 +412,22 @@
                     if (!response.exception) {
                         console.log('Destroying A');
                         self.popover('destroy');
-                        var outputTable = $(document.createElement('table'));
-                        outputTable.attr('id', 'createTimeslotTable');
-                        outputTable.addClass('bookingResult');
-                        var responseBannerDiv = $(document.createElement('div'));
-                        responseBannerDiv.attr('id', 'responseBanner');
-                        if (response.success) {
-                            responseBannerDiv.addClass('alert-success');
-                            //Update the timeslot to bookedTimeslot on the schedule
-                            self.html(teamName);
-                            self.removeClass('unbookedTimeslot');
-                            self.addClass('bookedTimeslot');
-                        } else {
-                            responseBannerDiv.addClass('alert-error');
-                        }
-                        var responseBannerSpan = $(document.createElement('span'));
-                        responseBannerSpan.attr('id', 'responseMessage');
-                        responseBannerSpan.html(response.message);
-                        responseBannerDiv.append(responseBannerSpan);
-                        outputTable.append(responseBannerDiv);
-
+                        
+                        self.html(teamName);
+                        self.removeClass("unbookedTimeslot");
+                        self.addClass("bookedTimeslot");
+                        
+                        //Popover to mention timeslot created successfully
                         self.popover({
-                            container: ".page",
-                            title: "Result <button type='button' class='close'>&times;</button>",
+                            container: self,
+                            trigger: "manual",
+                            title: "Booking <button type='button' class='close'>&times;</button>",
                             placement: "right",
-                            content: outputTable,
+                            content: "Booked <br/> Confirmation email sent",
                             html: true
                         });
                         console.log('Toggling D');
-                        self.popover('toggle');
+                        self.popover('show');
                     } else {
                         var eid = btoa(response.message);
                         window.location = "error.jsp?eid=" + eid;
@@ -459,35 +453,24 @@
                     dataType: 'json'
                 }).done(function(response) {
                     if (!response.exception) {
-                        console.log('Destroying A');
+                        console.log('Destroying C');
                         self.popover('destroy');
-                        var resultStr = "<table id='createTimeslotTable' class='bookingResult'><tr><td>";
-                        resultStr += "<div id='responseBanner'";
-                        if (response.success) {
-                            resultStr += " class='alert-success'>";
-
-                            //Update the timeslot to unbookedTimeslot on the schedule
-                            self.html('');
-                            self.removeClass('bookedTimeslot');
-                            self.addClass('unbookedTimeslot');
-                        } else {
-                            resultStr += " class='alert-error'>";
-                        }
-                        resultStr += "<span id='responseMessage'>";
-                        resultStr += response.message;
-                        resultStr += "</span>";
-                        resultStr += "</div>";
-                        resultStr += "</table>";
-
+                        
+                        self.html("");
+                        self.removeClass("bookedTimeslot");
+                        self.addClass("unbookedTimeslot");
+                        
+                        //Popover to mention timeslot created successfully
                         self.popover({
-                            container: ".page",
-                            title: "Result <button type='button' class='close'>&times;</button>",
+                            container: self,
+                            trigger: "manual",
+                            title: "Booking <button type='button' class='close'>&times;</button>",
                             placement: "right",
-                            content: resultStr,
+                            content: "Deleted <br/> Notification email sent (Coming soon...)",
                             html: true
                         });
-                        console.log('Toggling D');
-                        self.popover('toggle');
+                        console.log('Toggling E');
+                        self.popover('show');
                     } else {
                         var eid = btoa(response.message);
                         window.location = "error.jsp?eid=" + eid;

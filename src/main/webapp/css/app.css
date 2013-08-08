@@ -73,6 +73,10 @@ body {
     width: 100%;
 }
 
+.timeslotCell {
+    padding: 5px;
+}
+
 .noTimeslot {
     background-color: #f5f5f5 !important; 
     border: 1px solid #dddddd;
@@ -85,10 +89,12 @@ body {
 
 .bookedTimeslot {
     background-color: #F6EE4E !important; 
-    border: 1px solid #dddddd;
+    border: 2px solid #CD950C !important;
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
     text-align: center;
-    font-weight: bold;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .legend {  
@@ -106,14 +112,17 @@ body {
 
 .popover {
     max-width: 100% !important;
+    font-weight: normal;
 }
 
 #viewTimeslotTable {
     max-width: 300px;
+    font-weight: normal;
 }
 
 #createTimeslotTable {
     max-width: 300px;
+    font-weight: normal;
 }
 
 #closeBookingBtn {
