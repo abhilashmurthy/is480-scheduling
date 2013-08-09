@@ -45,11 +45,9 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     private static Logger logger = LoggerFactory.getLogger(LoginAction.class);
     private HttpServletResponse response;
     private List<Role> userRoles;
-    private boolean isSupervisor;
-    private boolean isReviewer;
-    private boolean isAdmin;
-    private boolean isStudent;
-    private boolean isTA;
+    private boolean isSupervisorReviewer;
+    private boolean isAdministrator;
+    private boolean isCourseCoordinator;
     // sorted in alphabetical order. ordering is important
     // when generating the signature
     private static final String[] keys = {
@@ -147,7 +145,23 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
             //To check if user has multiple roles (If yes, redirect to another page)
             if (userRoles.size() > 1) {
-                return "goToRoles";
+				isSupervisorReviewer = false;
+				isAdministrator = false;
+				isCourseCoordinator = false;
+				for (Role role: userRoles) {
+					if (role.getName().equalsIgnoreCase("Supervisor") || 
+							role.getName().equalsIgnoreCase("Reviewer")) {
+						isSupervisorReviewer = true;
+					} else if (role.getName().equalsIgnoreCase("Administrator")) {
+						isAdministrator = true;
+					} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
+						isCourseCoordinator = true;
+					}
+				}
+				//If user is just supervisor & reviewer then he wont go to the multiple roles page
+				if (isAdministrator == true || isCourseCoordinator == true) {
+					return "goToRoles";
+				}
             }
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
@@ -178,13 +192,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 			ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
 			session.setAttribute("currentActiveTerm", activeTerms.get(0));
 
-			//To check the user's role
-			isSupervisor = false;
-			isReviewer = false;
-			isStudent = false;
-			isAdmin = false;
-			isTA = false;
-
 			//Getting the users roles for active term
 			userRoles = new ArrayList<Role>();
 			Term activeTerm = activeTerms.get(0);
@@ -201,33 +208,9 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
 			//This is not for the active term
 			//userRoles = user.getRoles();
-
-			if (userRoles != null && userRoles.size() > 0) {
-				for (Role role : userRoles) {
-					if (role.getName().equalsIgnoreCase("Supervisor")) {
-						isSupervisor = true;
-						session.setAttribute("isSupervisor", isSupervisor);
-					} else if (role.getName().equalsIgnoreCase("Reviewer")) {
-						isReviewer = true;
-						session.setAttribute("isReviewer", isReviewer);
-					} else if (role.getName().equalsIgnoreCase("Student")) {
-						isStudent = true;
-						session.setAttribute("isStudent", isStudent);
-					} else if (role.getName().equalsIgnoreCase("TA")) {
-						isTA = true;
-						session.setAttribute("isTA", isTA);
-					} else if (role.getName().equalsIgnoreCase("Administrator")) {
-						isAdmin = true;
-						session.setAttribute("isAdmin", isAdmin);
-					}
-				}
-			}
-			session.setAttribute("isSupervisor", isSupervisor);
-			session.setAttribute("isReviewer", isReviewer);
-			session.setAttribute("isStudent", isStudent);
-			session.setAttribute("isTA", isTA);
-			session.setAttribute("isAdmin", isAdmin);
+			
 			session.setAttribute("userRoles", userRoles);  //Setting the list of roles for user
+			
 		} else {
 			//Kick user out
 			request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo!");
@@ -259,43 +242,27 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         this.userRoles = userRoles;
     }
 
-    public boolean isIsSupervisor() {
-        return isSupervisor;
-    }
+	public boolean isIsSupervisorReviewer() {
+		return isSupervisorReviewer;
+	}
 
-    public void setIsSupervisor(boolean isSupervisor) {
-        this.isSupervisor = isSupervisor;
-    }
+	public void setIsSupervisorReviewer(boolean isSupervisorReviewer) {
+		this.isSupervisorReviewer = isSupervisorReviewer;
+	}
 
-    public boolean isIsReviewer() {
-        return isReviewer;
-    }
+	public boolean isIsAdministrator() {
+		return isAdministrator;
+	}
 
-    public void setIsReviewer(boolean isReviewer) {
-        this.isReviewer = isReviewer;
-    }
+	public void setIsAdministrator(boolean isAdministrator) {
+		this.isAdministrator = isAdministrator;
+	}
 
-    public boolean isIsAdmin() {
-        return isAdmin;
-    }
+	public boolean isIsCourseCoordinator() {
+		return isCourseCoordinator;
+	}
 
-    public void setIsAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
-    }
-
-    public boolean isIsStudent() {
-        return isStudent;
-    }
-
-    public void setIsStudent(boolean isStudent) {
-        this.isStudent = isStudent;
-    }
-
-    public boolean isIsTA() {
-        return isTA;
-    }
-
-    public void setIsTA(boolean isTA) {
-        this.isTA = isTA;
-    }
+	public void setIsCourseCoordinator(boolean isCourseCoordinator) {
+		this.isCourseCoordinator = isCourseCoordinator;
+	}
 }

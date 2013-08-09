@@ -10,7 +10,7 @@
 <%@page contentType="text/html" pageEncoding="windows-1252"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 
-<% List<Role> userRoles = (List<Role>) session.getAttribute("userRoles"); 
+<% List<Role> userRoles = (List<Role>) session.getAttribute("userRoles");
    if (userRoles.size() > 1) {  %>
 <!DOCTYPE html>
 <html>
@@ -30,24 +30,26 @@
 				<form id="myform" action="setRole" method="post">
 				<table align="center">
 					<tr>
-					<% if (isAdmin) { %>
+					<s:if test="%{isAdministrator}">
  						<td>
-							<input type="submit" class="btn btn-large" value="Administrator" name="administrator"/>
+							<input type="submit" class="btn btn-large" value="Administrator" name="Administrator"/>
 							<!--<img src="img/administrator.jpg" class="img-polaroid" title="Administrator" height="200" width="150"/>-->
 						</td>
-					<% } %>
-					<% if (isSupervisor) { %>
+						<td style="width:20px"></td>
+					</s:if>
+					<s:if test="%{isSupervisorReviewer}">
 						<td>
-							<input type="submit" class="btn btn-large" value="Supervisor" name="supervisor"/>
+							<input type="submit" class="btn btn-large" value="Supervisor or Reviewer" name="Supervisor/Reviewer"/>
 							<!--<img src="img/supervisor.jpg" class="img-polaroid" title="Supervisor" height="210" width="150"/>-->
 						</td>
-					<% } %>
-					<% if (isReviewer) { %>
+						<td style="width:20px"></td>
+					</s:if>
+					<s:if test="%{isCourseCoordinator}">
 						<td>
-							<input type="submit" class="btn btn-large" value="Reviewer" name="reviewer"/>
+							<input type="submit" class="btn btn-large" value="Course Coordinator" name="Course Coordinator"/>
 							<!--<img src="img/reviewer.jpg" class="img-polaroid" title="Reviewer" height="220" width="170"/>-->
 						</td>
-					<% } %>
+					</s:if>
 					</tr>
 					
 				</table>
@@ -72,7 +74,7 @@
         </div>
     </body>
 </html>
-<% } else { 
-	response.sendRedirect("index.jsp"); 	
-   } %>
+<% } else { %>
+	<s:action name="index" executeResult="true"/> 	
+<% } %>
 

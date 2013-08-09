@@ -50,11 +50,7 @@
 		<action name="test" class="userAction.TestAction" method="execute">
             <result name="success">/Test.jsp</result>
         </action>
-        
-<!--        <action name="createBooking" class="userAction.CreateBorokingAction" method="execute">
-            <result name = "success">/index.jsp</result>
-        </action> -->
-       
+
 		<action name="approveReject" class="userAction.ResponseAction" method="execute">
 			<result name="success">/approvereject.jsp</result>
 		</action>

@@ -4,9 +4,12 @@
     Author     : Prakhar
 --%>
 
+<%@page import="model.Role"%>
+<%@page import="java.util.List"%>
 <%@page import="org.slf4j.LoggerFactory"%>
 <%@page import="org.slf4j.Logger"%>
 <%@page import="model.User"%>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <style type="text/css">
     i
     {
@@ -14,12 +17,7 @@
     }
 </style>
 <%@include file="imports.jsp"%>
-<% boolean isStudent = (Boolean)session.getAttribute("isStudent");
-   boolean isSupervisor = (Boolean)session.getAttribute("isSupervisor");
-   boolean isReviewer = (Boolean)session.getAttribute("isReviewer");
-   boolean isTA = (Boolean)session.getAttribute("isTA");
-   boolean isAdmin = (Boolean)session.getAttribute("isAdmin");
-%>
+
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -45,18 +43,17 @@
 </div>
 <!-- USER DASHBOARD POPOVER CONTENT -->
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
-    <!--<p><strong>Name</strong><br/> <% out.print(user.getFullName());%></p>-->
-    <strong>Role(s)</strong>
+    <strong>Roles</strong>
 	<ul class="unstyled">
-		<% if (isAdmin) { %>
+		<s:if test="%{isSupervisorReviewer}">
+		   <li>Supervisor/Reviewer</li>
+		</s:if>
+		<s:if test="%{isAdministrator}">
 		   <li>Administrator</li>
-		<% } %>
-		<% if (isSupervisor) { %>
-		   <li>Supervisor</li>
-		<% } %>
-		<% if (isReviewer) { %>
-		   <li>Reviewer</li>
-		<% } %>
+		</s:if>
+		<s:if test="%{isCourseCoordinator}">
+		   <li>Course Coordinator</li>
+		</s:if>
 	</ul>
 </div>
 <script type="text/javascript">
