@@ -93,7 +93,7 @@
         <div class="container">
             <div class="content">
 				<div>
-					<img src="img/full-logo.png"/>
+					<img src="img/IS480-logo.jpg"/>
 				</div>
                 <div class="row">
 
