@@ -378,42 +378,50 @@
                 });
                 
                 //Hide all popovers on page click
-                $(".page").on('click', function() {
+                $(".page").on('click', function(e) {
                     console.log("page clicked");
                     //Close all timeslots
                     $(".timeslotCell").popover('hide');
                 });
                 
                 //Add clickedCell and initialize common variables
-                $(".timeslotCell").on('click', function(e){                    
-                    self = $(this);
-                    e.stopPropagation();
-                    console.log("clicked");
-                    
-                    //Hide other popovers
-                    $(".timeslotCell").each(function(){
-                       if (self.attr('value') !== $(this).attr('value')) {
-                           $(this).popover('hide');
-                       } 
-                    });
-                    
-                    //Add clickedCell class
-                    $('td').removeClass("clickedCell");
-                    self.addClass("clickedCell");
+                $(".timeslotCell").on('click', function(e){
+                    if (e.target === this) {
+                        self = $(this);
+                        console.log(".clicked");
+                        //Hide other popovers
+                        $(".timeslotCell").each(function(){
+                           if (self.attr('value') !== $(this).attr('value')) {
+                               $(this).popover('hide');
+                           } 
+                        });
+                        //Add clickedCell class
+                        $('td').removeClass("clickedCell");
+                        self.addClass("clickedCell");
+                    }
+                    return false;
                 });
                 
                 //Popover for booked timeslot
-                $(".bookedTimeslot").on('click', function() {
-                    self = $(this);
-                    self.popover('show');
+                $(".bookedTimeslot").on('click', function(e) {
+                    if (e.target === this) {
+//                        console.log(".bookedTimeslot clicked");
+                        self = $(this);
+                        self.popover('show');
+                    }
+                    return false;
                 });
                 
-                $(".unbookedTimeslot").on('click', function() {
-                    self = $(this);
-                    self.popover('show');
-                    date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
-                    startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
-                    termId = activeAcademicYearStr + "," + activeSemesterStr;
+                $(".unbookedTimeslot").on('click', function(e) {
+                    if (e.target === this) {
+//                        console.log(".unbookedTimeslot clicked");
+                        self = $(this);
+                        self.popover('show');
+                        date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
+                        startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
+                        termId = activeAcademicYearStr + "," + activeSemesterStr;
+                    }
+                    return false;
                 });
                 
                 //
