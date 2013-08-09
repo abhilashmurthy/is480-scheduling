@@ -6,6 +6,7 @@ package notification.email;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
@@ -62,6 +63,7 @@ public class MailSender {
 				message.setRecipients(Message.RecipientType.TO,
 						InternetAddress.parse(
 						MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
+				body += "Sent from: " + InetAddress.getLocalHost().getHostName();
 			} else {
 				message.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(parseRecipientArray(recipients)));	

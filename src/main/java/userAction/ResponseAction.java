@@ -98,9 +98,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 							//Iterating over the timeslots. Matching the user.
 							for (Timeslot currentTimeslot : allTimeslots) {
 								HashMap<User, Status> statusList = currentTimeslot.getStatusList();
-								Iterator iter = statusList.keySet().iterator();
-								while (iter.hasNext()) {
-									User userObj = (User) iter.next();
+								for (User userObj : statusList.keySet()) {
 									if (userObj.equals(user)) {
 										userTimeslots.add(currentTimeslot);
 									}

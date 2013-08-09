@@ -47,7 +47,7 @@
 		}
 		
 		jQuery(document).ready(function(){
-			if(document.getElementById('approveRejectArray') == null) {
+			if(document.getElementById('approveRejectArray') === null) {
 				 document.getElementById("approveButton").style.visibility = "hidden";
 				 document.getElementById("rejectButton").style.visibility = "hidden";
 			} else {
