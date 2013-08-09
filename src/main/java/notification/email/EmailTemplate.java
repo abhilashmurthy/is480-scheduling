@@ -35,6 +35,17 @@ public abstract class EmailTemplate {
 		}
 	}
 	
+	public void sendEmail() {
+		Runnable r = new Runnable() {
+			public void run() {
+				MailSender.sendEmail(generateRecipientList(),
+				generateEmailSubject(), generateEmailBody());
+			}
+		};
+		Thread t = new Thread(r);
+		t.start();
+	}
+	
 	public abstract String generateEmailSubject();
 	
 	public abstract Set<String> generateRecipientList();

@@ -24,19 +24,21 @@ import util.MiscUtil;
  *
  * @author suresh
  */
-public class MailUtil {
+public class MailSender {
 
-	public static final Logger logger = LoggerFactory.getLogger(MailUtil.class);
-	private static final Properties props = new Properties();
+	public static Logger logger = LoggerFactory.getLogger(MailSender.class);
+	private static Properties props = new Properties();
 	private static Session session;
-	private static final String USERNAME = "is480.scheduling@gmail.com";
-	private static final String PASSWORD = "fyp2013-14";
+	private static String USERNAME;
+	private static String PASSWORD;
 
 	static {
 		try {
-			InputStream in = MailUtil.class.getClassLoader()
+			InputStream in = MailSender.class.getClassLoader()
 					.getResourceAsStream("Properties/Mail.properties");
 			props.load(in);
+			USERNAME = MiscUtil.getProperty("General", "USERNAME");
+			PASSWORD = MiscUtil.getProperty("General", "PASSWORD");
 			session = Session.getInstance(props,
 					new javax.mail.Authenticator() {
 				@Override
@@ -50,7 +52,7 @@ public class MailUtil {
 		}
 	}
 
-	public static void sendEmail(Set<String> recipients, String subject, String body) {
+	public synchronized static void sendEmail(Set<String> recipients, String subject, String body) {
 
 		try {
 			Message message = new MimeMessage(session);
@@ -75,15 +77,10 @@ public class MailUtil {
 		}
 	}
 	
-	public static void sendEmail(String recipient, String subject, String body) {
+	public synchronized static void sendEmail(String recipient, String subject, String body) {
 		Set<String> recipientList = new HashSet<String>();
 		recipientList.add(recipient);
 		sendEmail(recipientList, subject, body);
-	}
-	
-	public static void sendEmail(EmailTemplate template) {
-		sendEmail(template.generateRecipientList(),
-				template.generateEmailSubject(), template.generateEmailBody());
 	}
 	
 	/**

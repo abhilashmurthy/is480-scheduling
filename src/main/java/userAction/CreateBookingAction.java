@@ -24,7 +24,7 @@ import model.Team;
 import model.Term;
 import model.Timeslot;
 import model.User;
-import notification.email.MailUtil;
+import notification.email.MailSender;
 import notification.email.NewBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
@@ -199,7 +199,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 bookingSlot.setStatusList(statusList);
                 bookingSlot.setAttendees(attendees);
                 NewBookingEmail newEmail = new NewBookingEmail(bookingSlot);
-                MailUtil.sendEmail(newEmail);
+                newEmail.sendEmail();
                 em.persist(bookingSlot);
                 em.getTransaction().commit();
             } catch (Exception e) {
