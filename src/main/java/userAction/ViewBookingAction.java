@@ -77,6 +77,7 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
 
                     //This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
                     List<HashMap<String, String>> attendees = new ArrayList<HashMap<String, String>>();
+                    String finalStatus = "error";
 
                     //Getting all the team members associated with the timeslot
                     //First getting the team members
@@ -104,12 +105,23 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                             Status status = members.get(supervisorReviewer);
                             userMap.put("name", supervisorReviewer.getFullName());
                             userMap.put("status", status.toString());
-
+                            if (status.equals(Status.ACCEPTED)) {
+                                finalStatus = "Accepted";
+                            }
+                            if (status.equals(Status.REJECTED)) {
+                                finalStatus = "Rejected";
+                            }
+                            if (!finalStatus.equals("Rejected") && status.equals(Status.PENDING)) {
+                                finalStatus = "Pending";
+                            }
                             attendees.add(userMap);
                         }
                     }
                     //Setting the list of attendees
                     json.put("attendees", attendees);
+                    
+                    //Setting the final status of the booking
+                    json.put("status", finalStatus);
 
                     //Getting venue for timeslot
                     String venue = ts.getVenue();

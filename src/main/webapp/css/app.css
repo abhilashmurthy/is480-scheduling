@@ -88,13 +88,26 @@ body {
 }
 
 .bookedTimeslot {
-    background-color: #F6EE4E !important; 
-    border: 2px solid #CD950C !important;
     border-radius: 5px !important;
     -moz-border-radius: 5px !important;
     text-align: center;
     font-size: 14px;
     font-weight: bold;
+}
+
+.pendingTimeslot {
+    background-color: #F6EE4E !important;
+    border: 2px solid #CD950C !important;
+}
+
+.acceptedTimeslot {
+    background-color: #A9DBA9 !important;
+    border: 2px solid #415641 !important;
+}
+
+.rejectedTimeslot {
+    background-color: #F75D59 !important;
+    border: 2px solid #722A29 !important;
 }
 
 .legend {  
