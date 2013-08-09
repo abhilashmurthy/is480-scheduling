@@ -19,17 +19,20 @@
 <%@include file="imports.jsp"%>
 
 <% //Getting session objects
-   boolean isStudent = (Boolean)session.getAttribute("isStudent");
-   boolean isSupervisor = (Boolean)session.getAttribute("isSupervisor");
-   boolean isReviewer = (Boolean)session.getAttribute("isReviewer");
-   boolean isTA = (Boolean)session.getAttribute("isTA");
-   boolean isAdmin = (Boolean)session.getAttribute("isAdmin");
    List<Role> userRoles = (List<Role>) session.getAttribute("userRoles");
    String activeRole = (String) session.getAttribute("activeRole");  //Active Role can never be empty
-   
-   List<Role> inactiveRoles = null;
-   if (userRoles.size() > 1) {
-		inactiveRoles = (List<Role>) session.getAttribute("inactiveRolesList");
+   boolean isSupervisorReviewer = false;
+   boolean isAdministrator = false;
+   boolean isCourseCoordinator = false;
+   for (Role role: userRoles) {
+		if (role.getName().equalsIgnoreCase("Supervisor") || 
+				role.getName().equalsIgnoreCase("Reviewer")) {
+			isSupervisorReviewer = true;
+		} else if (role.getName().equalsIgnoreCase("Administrator")) {
+			isAdministrator = true;
+		} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
+			isCourseCoordinator = true;
+		}
    }
 %>
 
@@ -44,7 +47,7 @@
             <a class="brand" href="index">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
-				<%  if (activeRole.equalsIgnoreCase("Administrator")) { %>
+				<%  if (activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")) { %>
 						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Booking</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
@@ -67,7 +70,7 @@
 						</li>
 						<li id="Report"><a href="#"><b>Report</b></a></li>
 						
-				<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
+				<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<!--<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
 							<!--<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
@@ -107,36 +110,33 @@
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
     <!--<p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>-->
 	
-	 <% if (isStudent) { %>
-		<p><strong>Team<br/></strong><% out.print(user.getTeam().getTeamName());%></p>
+	 <% if (activeRole.equalsIgnoreCase("Student")) { %>
+		<p><strong>Team</strong><br/><% out.print(user.getTeam().getTeamName());%></p>
 	 <% } %>
     
 	<strong>Role</strong>
 	<!-- For all roles -->
-	<%  activeRole = (String) session.getAttribute("activeRole"); %>
-		<ul class="unstyled">
-			<li><%= activeRole %></li>
-		</ul>
+	<ul class="unstyled">
+		<li><%= activeRole %></li>
+	</ul>
 	<!-- For multiple roles -->
 	<%  if (userRoles.size() > 1) { %>
-		<strong>Other Role(s)</strong><br/>
-		<form id="myform" action="setRole" method="post">
-		<div class="btn-group">
-			<% for (Role role: inactiveRoles) { 
-					if (role.getName().equalsIgnoreCase("Administrator")) { %>
-						<button type="submit" class="btn" value="Administrator" name="administrator"><%= role.getName() %></button>
-						<!--<button class="btn"><%= role.getName() %></button>-->
-			<%		} else if (role.getName().equalsIgnoreCase("Supervisor")) { %>
-						<button type="submit" class="btn" value="Supervisor" name="supervisor"><%= role.getName() %></button>
-						<!--<button class="btn" onclick="document.location.href='index.jsp?role=sr';"><%= role.getName() %></button>-->
-			<%		} else if (role.getName().equalsIgnoreCase("Reviewer")) {  %>
-						<button type="submit" class="btn" value="Reviewer" name="reviewer"><%= role.getName() %></button>
-						<!--<button class="btn" onclick="document.location.href='index.jsp?role=rr';"><%= role.getName() %></button>-->
-			<%		}  %>
-					<!--<button type="button" class="btn btn-small" onClick="refreshPage()">Switch</button>-->
-			<% } %>
-		</div>
-		</form>
+		<%  if (isAdministrator == true || isCourseCoordinator == true) { %>
+			<strong>Other Role(s)</strong><br/>
+			<form id="myform" action="setRole" method="post">
+			<div class="btn-group">
+				<% if (isAdministrator && (!activeRole.equalsIgnoreCase("Administrator"))) { %>
+					<button type="submit" class="btn" value="Administrator" name="Administrator">Administrator</button>
+				<% } %>
+				<% if (isSupervisorReviewer && (!activeRole.equalsIgnoreCase("Supervisor/Reviewer"))) { %>
+					<button type="submit" class="btn" value="Supervisor or Reviewer" name="Supervisor/Reviewer">Supervisor/Reviewer</button>
+				<% } %>
+				<% if (isCourseCoordinator && (!activeRole.equalsIgnoreCase("Course Coordinator"))) {  %>
+					<button type="submit" class="btn" value="Course Coordinator" name="Course Coordinator">Course Coordinator</button>
+				<% } %>
+			</div>
+			</form>
+		<% } %>		
 	<% } %>
 </div>
 

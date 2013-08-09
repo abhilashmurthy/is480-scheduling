@@ -25,72 +25,97 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(SetRolesAction.class);
     private HttpServletResponse response;
+	//One of these variables will have a value if the user has multiple roles
     private String administrator;
-    private String supervisor;
-    private String reviewer;
+    private String supervisorReviewer;
+    private String courseCoordinator;
 
     @Override
     public String execute() throws Exception {
         try {
             //Getting the session object
             HttpSession session = request.getSession();
-            boolean isStudent = (Boolean) session.getAttribute("isStudent");
-            boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
-            boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
-            boolean isTA = (Boolean) session.getAttribute("isTA");
-            boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
             List<Role> userRoles = (List<Role>) session.getAttribute("userRoles");
-
-            if (userRoles.size() > 1) {
-                //Validation checking for user's roles and setting the active role (in case of multiple roles)
-                if (administrator != null) {
-                    if (administrator.equalsIgnoreCase("Administrator")) {
-                        if (isAdmin) {
-                            session.setAttribute("activeRole", "Administrator");
-                        } else {
-                            request.setAttribute("rolesError", "You are not authorized to access this page!");
-                            request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-                        }
-                    }
-                } else if (supervisor != null) {
-                    if (supervisor.equalsIgnoreCase("Supervisor")) {
-                        if (isSupervisor) {
-                            session.setAttribute("activeRole", "Supervisor");
-                        } else {
-                            request.setAttribute("rolesError", "You are not authorized to access this page!");
-                            request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-                        }
-                    }
-                } else if (reviewer != null) {
-                    if (reviewer.equalsIgnoreCase("Reviewer")) {
-                        if (isReviewer) {
-                            session.setAttribute("activeRole", "Reviewer");
-                        } else {
-                            request.setAttribute("rolesError", "You are not authorized to access this page!");
-                            request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-                        }
-                    }
-                } else {
-                    //send error message
-                    request.setAttribute("rolesError", "Error. Please select a correct role!");
-                    request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-                }
-
-                //Checking user's inactive role(s)
-                List<Role> inactiveRoles = new ArrayList<Role>();
-                String activeRole = (String) session.getAttribute("activeRole");
-                for (Role role : userRoles) {
-                    if (!role.getName().equalsIgnoreCase(activeRole)) {
-                        inactiveRoles.add(role);
-                    }
-                }
-                session.setAttribute("inactiveRolesList", inactiveRoles);   //Putting inactive roles in session
-
-            } else if (userRoles.size() == 1) {    //Setting active role if user has only 1 role
-                for (Role role : userRoles) {
-                    session.setAttribute("activeRole", role.getName());
-                }
-            }
+			
+			if (userRoles.size() > 1) {
+				
+				boolean isSupervisorReviewer = false;
+				boolean isAdministrator = false;
+				boolean isCourseCoordinator = false;
+				for (Role role: userRoles) {
+					if (role.getName().equalsIgnoreCase("Supervisor") || 
+							role.getName().equalsIgnoreCase("Reviewer")) {
+						isSupervisorReviewer = true;
+					} else if (role.getName().equalsIgnoreCase("Administrator")) {
+						isAdministrator = true;
+					} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
+						isCourseCoordinator = true;
+					}
+				}
+				//Checking whether the user is not just supervisor & reviewer 
+				if (isAdministrator == true || isCourseCoordinator == true) {
+					//Validation checking for user's roles and setting the active role (in case of multiple roles)
+					if (administrator != null) {
+						if (administrator.equalsIgnoreCase("Administrator")) {
+							if (isAdministrator) {
+								session.setAttribute("activeRole", "Administrator");
+							} else {
+								request.setAttribute("rolesError", "You are not authorized to access this page!");
+								request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
+							}
+						}
+					} else if (supervisorReviewer != null) {
+						if (supervisorReviewer.equalsIgnoreCase("Supervisor/Reviewer")) {
+							if (isSupervisorReviewer) {
+								session.setAttribute("activeRole", "Supervisor/Reviewer");
+							} else {
+								request.setAttribute("rolesError", "You are not authorized to access this page!");
+								request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
+							}
+						}
+					} else if (courseCoordinator != null) {
+						if (courseCoordinator.equalsIgnoreCase("Course Coordinator")) {
+							if (isCourseCoordinator) {
+								session.setAttribute("activeRole", "Course Coordinator");
+							} else {
+								request.setAttribute("rolesError", "You are not authorized to access this page!");
+								request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
+							}
+						}
+					} else {
+						//send error message
+						request.setAttribute("rolesError", "Error. Please select a role!");
+						request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
+					}
+				} else {
+					// This mean that user is both supervisor & reviewer only
+					if (isSupervisorReviewer) {
+						session.setAttribute("activeRole", "Supervisor/Reviewer");
+					}
+				}
+				//Checking user's inactive role(s)
+//				List<Role> inactiveRoles = new ArrayList<Role>();
+//				String activeRole = (String) session.getAttribute("activeRole");
+//				for (Role role : userRoles) {
+//					if (!role.getName().equalsIgnoreCase(activeRole)) {
+//						inactiveRoles.add(role);
+//					}
+//				}
+//				session.setAttribute("inactiveRolesList", inactiveRoles);   //Putting inactive roles in session
+				
+				return SUCCESS;
+			} 
+			
+			//Setting active role if user has only 1 role
+			for (Role role : userRoles) {
+				if (role.getName().equalsIgnoreCase("Supervisor") || role.getName().equalsIgnoreCase("Reviewer")) {
+					session.setAttribute("activeRole", "Supervisor/Reviewer");
+				} else {
+					session.setAttribute("activeRole", role.getName());
+				}
+			}
+			return SUCCESS;
+			
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -101,8 +126,8 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
             request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
             return ERROR;
         }
-        return SUCCESS;
-    }
+		
+    } //end of execute function
 
     public void setServletRequest(HttpServletRequest hsr) {
         this.request = hsr;
@@ -116,19 +141,19 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
         this.administrator = administrator;
     }
 
-    public String getSupervisor() {
-        return supervisor;
-    }
+	public String getSupervisorReviewer() {
+		return supervisorReviewer;
+	}
 
-    public void setSupervisor(String supervisor) {
-        this.supervisor = supervisor;
-    }
+	public void setSupervisorReviewer(String supervisorReviewer) {
+		this.supervisorReviewer = supervisorReviewer;
+	}
 
-    public String getReviewer() {
-        return reviewer;
-    }
+	public String getCourseCoordinator() {
+		return courseCoordinator;
+	}
 
-    public void setReviewer(String reviewer) {
-        this.reviewer = reviewer;
-    }
+	public void setCourseCoordinator(String courseCoordinator) {
+		this.courseCoordinator = courseCoordinator;
+	}
 } //end of class
