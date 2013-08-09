@@ -116,7 +116,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
                     if (userTimeslots.size() > 0) {
                         for (Timeslot timeslot : userTimeslots) {
                             HashMap<String, String> map = new HashMap<String, String>();
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
+                            //SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
+							SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy, EEE HH:mm aa");
                             venue = timeslot.getVenue();
                             timeslotId = timeslot.getId();
                             Team team = timeslot.getTeam();

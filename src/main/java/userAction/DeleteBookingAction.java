@@ -19,6 +19,7 @@ import javax.persistence.Persistence;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import manager.MilestoneManager;
 import manager.TimeslotManager;
 import manager.UserManager;
@@ -46,7 +47,8 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
         try {
             json.put("exception", false);
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-
+			HttpSession session = request.getSession();
+			
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
             Timeslot ts = TimeslotManager.findById(em, chosenID);
@@ -66,7 +68,13 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
                 em.persist(ts);
 
                 em.getTransaction().commit();
-
+				
+				//Setting the updated user object in session
+				User user = (User) session.getAttribute("user");
+				String username = user.getUsername();
+				User updatedUser = UserManager.findByUsername(em, username);
+				session.setAttribute("user", updatedUser);
+				
                 //if the booking has been removed successfully
                 json.put("message", "Booking deleted successfully! Deletion email has been sent to all attendees. (Coming soon..)");
                 

@@ -18,15 +18,6 @@
                 request.setAttribute("error", "Oops, something went wrong.<br/>");
             }
         %>
-        <style type="text/css">
-
-            div {
-                position: relative;
-                text-align: center;
-            }
-
-        </style>
-
     </head>
     <body>
         <%@include file="navbar.jsp"%>
@@ -45,7 +36,7 @@
         </div>-->
 
 
-        <div class="container">
+        <div class="container" style="position: relative; text-align: center">
             <div class="content">
                 <div class="row">
                     <h3><%= request.getAttribute("error")%></h3><br/>

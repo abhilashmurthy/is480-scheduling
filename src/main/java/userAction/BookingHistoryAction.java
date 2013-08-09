@@ -64,9 +64,9 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                 Term term = MiscUtil.getActiveTerm(em);
                 long activeTermId = term.getId();
 
-                //Getting updated user object from old user object in session
-                User oldUser = (User) session.getAttribute("user");
-				String username = oldUser.getUsername();
+                //Getting updated user object from session (this object is updated when booking status is updated)
+				User oldUser = (User) session.getAttribute("user");
+                String username = oldUser.getUsername();
 				User user = UserManager.findByUsername(em, username);
 				session.setAttribute("user", user);
 				
@@ -100,8 +100,12 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                     if (filteredTimeslots.size() > 0) {
                         for (Timeslot timeslot : filteredTimeslots) {
                             HashMap<String, Object> map = new HashMap<String, Object>();
-
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
+							SimpleDateFormat sdf = null;
+							if (activeRole.equalsIgnoreCase("Student")) {
+								sdf = new SimpleDateFormat("dd-MMM, EEE HH:mm aa");
+							} else {
+								sdf = new SimpleDateFormat("dd-MMM-yyyy, EEE HH:mm aa");
+							}
                             String venue = timeslot.getVenue();
                             String teamName = timeslot.getTeam().getTeamName();
                             //Getting the schedule based on timeslot (Each timeslot belongs to 1 unique schedule)

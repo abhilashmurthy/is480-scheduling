@@ -19,6 +19,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.TimeslotManager;
+import manager.UserManager;
 import model.Timeslot;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -90,7 +91,10 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
             boolean result = TimeslotManager.updateTimeslotStatus(em, timeslotsToUpdate, transaction);
             if (result == true) {
                 //em.close();
-                value = "1";
+				//Setting the updated user object in session
+                String username = user.getUsername();
+				User updatedUser = UserManager.findByUsername(em, username);
+				session.setAttribute("user", updatedUser);
                 return SUCCESS;
             }
         }

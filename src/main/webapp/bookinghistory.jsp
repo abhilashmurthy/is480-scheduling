@@ -4,6 +4,7 @@
     Author     : Prakhar
 --%>
 
+<!-- Booking History page -->
 <%@page import="com.opensymphony.xwork2.ActionContext"%>
 <%@page import="com.opensymphony.xwork2.util.ValueStack"%>
 <%@page import="model.*"%>
@@ -37,7 +38,7 @@
 							<th>End Time</th>
 							<th>Venue</th>
 							<th>Booking Status</th>
-							<th>Overall Status</th>
+							<th>Overall Booking Status</th>
 						</tr>
 					<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
 						<tr>
@@ -48,7 +49,7 @@
 							<th>End Time</th>
 							<th>Venue</th>
 							<th>My Status</th>
-							<th>Booking Status</th>
+							<th>Overall Booking Status</th>
 						</tr>
 					<% } %>
 				</thead>
