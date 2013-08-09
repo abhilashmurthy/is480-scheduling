@@ -2,7 +2,6 @@
 <html><head><title></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=320, target-densitydpi=device-dpi">
 <style type="text/css">
-{ 
 table[class=w30], td[class=w30], img[class=w30] { width:10px !important; }
 table[class=w580], td[class=w580], img[class=w580] { width:280px !important; }
 table[class=w640], td[class=w640], img[class=w640] { width:300px !important; }
@@ -10,8 +9,7 @@ table[class*=hide], td[class*=hide], img[class*=hide], p[class*=hide], span[clas
 p[class=footer-content-left] { text-align: center !important; }
 #headline p { font-size: 30px !important; }
 .article-content, #left-sidebar{ -webkit-text-size-adjust: 90% !important; -ms-text-size-adjust: 90% !important; }
-.header-content, .footer-content-left {-webkit-text-size-adjust: 80% !important; -ms-text-size-adjust: 80% !important;}
- } 
+.header-content, .footer-content-left {-webkit-text-size-adjust: 80% !important; -ms-text-size-adjust: 80% !important;} 
  /* Client-specific Styles */
 #outlook a { padding: 0; }	/* Force Outlook to provide a "view in browser" button. */
 body { width: 100% !important; }
@@ -49,8 +47,8 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
             <td class="w30" width="30"></td>
             <td class="w580" width="580">
                 <div align="center" id="headline">
-                    <p>
-                        <strong><singleline label="Title">IS480 Scheduling System</singleline></strong>
+                    <p style="font-weight: bold">
+                        <singleline label="Title">IS480 Scheduling System</singleline>
                     </p>
                 </div>
             </td>
@@ -72,43 +70,41 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
                                 <td class="w580" width="580">
                                     <p align="left" class="article-title"><singleline label="Title">[MILESTONE] Presentation Approval</singleline></p>
                                     <div align="left" class="article-content">
-                                        <multiline label="Detail">Hi, <p> A new booking by team [TEAM_NAME] for the [MILESTONE] milestone requires your approval.<p>
+                                        <multiline label="Detail">Hi, <p> A new booking by <b>Team [TEAM_NAME]</b> for the <b>[MILESTONE]</b> milestone requires your approval.<p>
 										Please login to the <a href="http://202.161.45.167/is480-scheduling/login">IS480 Scheduling System</a> to approve this booking.
 										<br><br>
 										<u>[MILESTONE] Presentation Details:</u>
 										<p>
 										<table>
 										<tr align="left">
-											<td><strong>Team Name:</td></strong>
+											<td><strong>Team Name:</strong></td>
 											<td>[TEAM_NAME]</td>
 										</tr>
 										<tr align="left">
-											<td><strong>Milestone:</td></strong>
+											<td><strong>Milestone:</strong></td>
 											<td>[MILESTONE]</td>
 										</tr>
 										<tr align="left">
-											<td><strong>Date:</td></strong>
+											<td><strong>Date:</strong></td>
 											<td>[DATE]</td>
 										</tr>
 										<tr align="left">
-											<td><strong>Start Time:</td></strong>
+											<td><strong>Start Time:</strong></td>
 											<td>[START_TIME]</td>
 										</tr>
 										<tr align="left">
-											<td><strong>End Time:</td></strong>
+											<td><strong>End Time:</strong></td>
 											<td>[END_TIME]</td>
 										</tr>
 										<tr align="left">
-											<td><strong>Venue:</td></strong>
+											<td><strong>Venue:</strong></td>
 											<td>[VENUE]</td>
 										</tr>
-										<tr align="left">
-											<td><strong>Required Attendees:</td></strong>
+										<tr align="left" style="vertical-align: text-top;" >
+											<td><strong>Required Attendees:</strong></td>
 											<td>[REQUIRED_ATTENDEES]</td>
 										</tr>
 										</table>
-										<br />
-										Click <a href="http://202.161.45.167/is480-scheduling/login">here</a> to go to IS480 Scheduling System
 										</multiline>
                                     </div>
                                 </td>
