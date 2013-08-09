@@ -126,7 +126,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             }
 
             json.put("success", true);
-            json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees. (Coming soon..)");
+            json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees.");
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
