@@ -67,15 +67,15 @@
     <table class="legend">
         <tr>
             <!-- <td style="width:50px"><b>Legend:</b></td>-->
-            <td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;Available</td> 
+            <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
+            <td class="pendingTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#F75D59;width:17px;"></td><td>&nbsp;Rejected</td> 
+            <td class="acceptedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Accepted</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
+            <td class="rejectedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#f5f5f5;width:17px;border:1px solid gray"></td><td>&nbsp;Not Available</td> 
+            <td style="background-color:#f5f5f5;width:17px;border:1px solid #1E647C;"></td><td>&nbsp;Not Available</td> 
         </tr>
     </table>
 
@@ -378,14 +378,15 @@
             //Function to create mouse UI events
             function setupMouseEvents() {
                 //Highlight cell
-                $(".timeslotCell").mouseenter(function() {
-                    $(this).css('border', '2px solid #1E647C');
-                    $(this).css('cursor', 'pointer');
-                });
+                //Changed this code to CSS:hover selector
+//                $(".timeslotCell").mouseenter(function() {
+//                    $(this).css('border', '2px solid #1E647C');
+//                    $(this).css('cursor', 'pointer');
+//                });
                 
-                //Unhighlight cell
+                //Removed clicked
                 $(".timeslotCell").mouseleave(function() {
-                    $(this).css('border', '1px solid #dddddd');
+//                    $(this).css('border', '1px solid #dddddd');
                     $(this).removeClass("clickedCell");
                 });
                 
