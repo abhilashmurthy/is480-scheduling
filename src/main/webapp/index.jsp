@@ -54,9 +54,9 @@
 				<button type="button" class="close" data-dismiss="alert">×</button>
 				<a href="approveReject" style="color:#B88A00;">
 					<s:if test="%{pendingBookingCount > 1}">
-						<b>You have <s:property value="pendingBookingCount"/> pending bookings !</b>
+						<b>You have <s:property value="pendingBookingCount"/> pending bookings!</b>
 					</s:if><s:else>
-						<b>You have <s:property value="pendingBookingCount"/> pending booking !</b>
+						<b>You have <s:property value="pendingBookingCount"/> pending booking!</b>
 					</s:else>
 				</a>
 			</div>

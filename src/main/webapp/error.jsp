@@ -20,7 +20,7 @@
         %>
         <style type="text/css">
 
-            h1 {
+            div {
                 position: relative;
                 text-align: center;
             }
@@ -48,8 +48,8 @@
         <div class="container">
             <div class="content">
                 <div class="row">
-                    <h1><%= request.getAttribute("error")%></h1><br/>
-                    <h1><a href="/is480-scheduling">Back to Home</a></h1>
+                    <h3><%= request.getAttribute("error")%></h3><br/>
+                    <button class="btn btn-warning btn-large" onclick="window.location = 'index'">Back to Home</button>
                 </div>
             </div>
         </div> <!-- /container -->
