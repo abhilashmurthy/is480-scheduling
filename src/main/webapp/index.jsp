@@ -67,15 +67,15 @@
     <table class="legend">
         <tr>
             <!-- <td style="width:50px"><b>Legend:</b></td>-->
-            <td style="background-color:#AEC7C9;width:17px;"></td><td>&nbsp;Available</td> 
+            <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#a9dba9;width:17px;"></td><td>&nbsp;Confirmed</td> 
+            <td class="pendingTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#F75D59;width:17px;"></td><td>&nbsp;Rejected</td> 
+            <td class="acceptedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Accepted</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#F6EE4E;width:17px;"></td><td>&nbsp;Pending</td> 
+            <td class="rejectedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
             <td style="width:15px"></td>
-            <td style="background-color:#f5f5f5;width:17px;border:1px solid gray"></td><td>&nbsp;Not Available</td> 
+            <td style="background-color:#f5f5f5;width:17px;border:1px solid #1E647C;"></td><td>&nbsp;Not Available</td> 
         </tr>
     </table>
 
@@ -206,6 +206,9 @@
                    appendViewBookingPopover($(this));
                 });
                 
+                //Logged in team name
+                teamName = "<%= team != null?team.getTeamName():null %>";
+                
                 function appendViewBookingPopover(bodyTd) {    
                     //Get View Booking Data
                     var cellId = bodyTd.attr('id').split("_")[1];
@@ -232,6 +235,15 @@
                         });
                         return toReturn;
                     };
+                    
+                    //Append bodyTd classes based on status
+                    if (viewBookingData.status === "Accepted") {
+                        bodyTd.addClass("acceptedTimeslot");
+                    } else if (viewBookingData.status === "Rejected") {
+                        bodyTd.addClass("rejectedTimeslot");
+                    } else {
+                        bodyTd.addClass("pendingTimeslot");
+                    }
 
                     //Popover
                     bodyTd.popover({
@@ -245,6 +257,7 @@
 
                             var outputData = [
                                 ["Team", viewBookingData.teamName],
+                                ["Status", viewBookingData.status],
                                 ["Date", viewBookingData.startDate],
                                 ["Start Time", viewBookingData.startTime],
                                 ["Team Wiki", viewBookingData.teamWiki],
@@ -259,14 +272,7 @@
                                     if ($.trim(personnel) === '<%=fullName%>' && <%=isStudent == true%> || <%=isAdmin == true%>) {
                                         //output += "<tr>";
                                         //output += "<td><button id='deleteBookingBtn' class='btn btn-danger'>Delete</button></td>";
-                                       var outputData = [
-                                            ["Team", viewBookingData.teamName],
-                                            ["Date", viewBookingData.startDate],
-                                            ["Start Time", viewBookingData.startTime],
-                                            ["Team Wiki", viewBookingData.teamWiki],
-                                            ["Attendees", viewBookingData.attendees],
-                                            ["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]
-                                       ];
+                                       outputData.push(["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]);
                                        break;
                                     }
                                   }
@@ -277,6 +283,7 @@
                                 var outputTdKey = $(document.createElement('td'))
                                     .html('<b>' + outputData[i][0] + '</b>');
                                 var outputTdValue = null;
+                                //Attendees list
                                 if (outputData[i][1] instanceof Array) {
                                     var outputArray = outputData[i][1];
                                     var outputArrayStr = "";
@@ -296,11 +303,16 @@
                             return outputTable;
                         },
                         placement: 'right',
-                        title: "<b>Your Booking <b><button type='button' class='close'>&times;</button>"
+                        title: function() {
+                            if (viewBookingData.teamName === teamName) {
+                                return "<b>Your Booking <b><button type='button' class='close'>&times;</button>";
+                            } else {
+                                return "<b>Team Booking <b><button type='button' class='close'>&times;</button>";
+                            }
+                        }
                     });
                 }
                 
-                teamName = "<%= team != null?team.getTeamName():null %>";
                 var bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
                 $(".unbookedTimeslot").each(function(){
                    appendCreateBookingPopover($(this));
@@ -332,7 +344,7 @@
                             outputTable.attr('id', 'createTimeslotTable');                            
 
                             var outputData = [
-                                //["Team", teamName],
+//                                ["Team", teamName],
                                 ["Date", dateToView],
                                 ["Start Time", startTimeToView],
                                 ["End Time", endTimeToView],
@@ -366,14 +378,15 @@
             //Function to create mouse UI events
             function setupMouseEvents() {
                 //Highlight cell
-                $(".timeslotCell").mouseenter(function() {
-                    $(this).css('border', '2px solid #1E647C');
-                    $(this).css('cursor', 'pointer');
-                });
+                //Changed this code to CSS:hover selector
+//                $(".timeslotCell").mouseenter(function() {
+//                    $(this).css('border', '2px solid #1E647C');
+//                    $(this).css('cursor', 'pointer');
+//                });
                 
-                //Unhighlight cell
+                //Removed clicked
                 $(".timeslotCell").mouseleave(function() {
-                    $(this).css('border', '1px solid #dddddd');
+//                    $(this).css('border', '1px solid #dddddd');
                     $(this).removeClass("clickedCell");
                 });
                 
@@ -388,7 +401,7 @@
                 $(".timeslotCell").on('click', function(e){
                     if (e.target === this) {
                         self = $(this);
-                        console.log(".clicked");
+                        console.log("clicked");
                         //Hide other popovers
                         $(".timeslotCell").each(function(){
                            if (self.attr('value') !== $(this).attr('value')) {
@@ -405,7 +418,7 @@
                 //Popover for booked timeslot
                 $(".bookedTimeslot").on('click', function(e) {
                     if (e.target === this) {
-//                        console.log(".bookedTimeslot clicked");
+                        console.log(".bookedTimeslot clicked");
                         self = $(this);
                         self.popover('show');
                     }
@@ -414,7 +427,7 @@
                 
                 $(".unbookedTimeslot").on('click', function(e) {
                     if (e.target === this) {
-//                        console.log(".unbookedTimeslot clicked");
+                        console.log(".unbookedTimeslot clicked");
                         self = $(this);
                         self.popover('show');
                         date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
@@ -475,8 +488,9 @@
                         self.popover('destroy');
                         
                         self.html(teamName);
-                        self.removeClass("unbookedTimeslot");
-                        self.addClass("bookedTimeslot");
+                        self.removeClass();
+                        self.addClass("timeslotCell bookedTimeslot");
+                        self.addClass("pendingTimeslot");
                         
                         //Popover to mention timeslot created successfully
                         self.popover({
@@ -518,8 +532,8 @@
                         self.popover('destroy');
                         
                         self.html("");
-                        self.removeClass("bookedTimeslot");
-                        self.addClass("unbookedTimeslot");
+                        self.removeClass();
+                        self.addClass("timeslotCell unbookedTimeslot");
                         
                         //Popover to mention timeslot created successfully
                         self.popover({
