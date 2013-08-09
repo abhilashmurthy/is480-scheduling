@@ -248,7 +248,7 @@
                                 ["Date", viewBookingData.startDate],
                                 ["Start Time", viewBookingData.startTime],
                                 ["Team Wiki", viewBookingData.teamWiki],
-                                ["Attendees", viewBookingData.attendees],
+                                ["Attendees", viewBookingData.attendees]
                             ];
                             
                             //check if this timeslot belongs to logined in student or if the user is an admin
