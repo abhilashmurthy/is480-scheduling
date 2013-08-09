@@ -5,6 +5,7 @@
 package notification.email;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -32,33 +33,34 @@ public class NewBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateRecipientList() {
 		Set<String> emails = new HashSet<String>();
-                for (User u : t.getTeam().getMembers()) {
+		for (User u : t.getTeam().getMembers()) {
 			emails.add(u.getUsername() + "@smu.edu.sg");
 		}
-                
 		
 		return emails;
 	}
 
 	@Override
-	public String generateEmailBody() {
+	public HashMap<String, String> prepareBodyData() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		
 		//Insert team name
-		body = body.replace("[TEAM_NAME]", t.getTeam().getTeamName());
+		map.put("[TEAM_NAME]", t.getTeam().getTeamName());
 		
 		//Insert milestone name
-		body = body.replace("[MILESTONE]", t.getSchedule().getMilestone().getName());
+		map.put("[MILESTONE]", t.getSchedule().getMilestone().getName());
 		
 		//Insert start date
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
-		body = body.replace("[DATE]", dateFormat.format(t.getStartTime()));
+		map.put("[DATE]", dateFormat.format(t.getStartTime()));
 		
 		//Insert start and end time
 		SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-		body = body.replace("[START_TIME]", timeFormat.format(t.getStartTime()));
-		body = body.replace("[END_TIME]", timeFormat.format(t.getEndTime()));
+		map.put("[START_TIME]", timeFormat.format(t.getStartTime()));
+		map.put("[END_TIME]", timeFormat.format(t.getEndTime()));
 		
 		//Insert venue
-		body = body.replace("[VENUE]", t.getVenue());
+		map.put("[VENUE]", t.getVenue());
 		
 		//Insert required attendees
 		Set<User> userList = t.getAttendees();
@@ -71,9 +73,9 @@ public class NewBookingEmail extends EmailTemplate{
 				result.append(",");
 			}
 		}
-		body = body.replace("[REQUIRED_ATTENDEES]", result);
+		map.put("[REQUIRED_ATTENDEES]", result.toString());
 		
-		return body;
+		return map;
 	}
 	
 }

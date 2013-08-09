@@ -6,6 +6,8 @@ package notification.email;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -46,10 +48,18 @@ public abstract class EmailTemplate {
 		t.start();
 	}
 	
+	public String generateEmailBody() {
+		HashMap<String, String> templateData = prepareBodyData();
+		for (Entry<String, String> e : templateData.entrySet()) {
+			body = body.replace(e.getKey(), e.getValue());
+		}
+		return body;
+	}
+	
 	public abstract String generateEmailSubject();
 	
 	public abstract Set<String> generateRecipientList();
 	
-	public abstract String generateEmailBody();
+	public abstract HashMap<String, String> prepareBodyData();
 	
 }
