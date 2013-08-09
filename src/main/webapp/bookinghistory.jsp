@@ -40,7 +40,7 @@
 							<th>Booking Status</th>
 							<th>Overall Booking Status</th>
 						</tr>
-					<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
+					<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<tr>
 							<th>#</th>
 							<th>Team Name</th>
@@ -78,7 +78,7 @@
 								<td><s:property value="overallBookingStatus"/></td>
 								<% count = count + 1; %>
 							</tr>
-						<% } else if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
+						<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Accepted')}">

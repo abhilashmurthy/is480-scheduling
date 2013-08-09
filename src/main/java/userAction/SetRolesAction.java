@@ -93,16 +93,6 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 						session.setAttribute("activeRole", "Supervisor/Reviewer");
 					}
 				}
-				//Checking user's inactive role(s)
-//				List<Role> inactiveRoles = new ArrayList<Role>();
-//				String activeRole = (String) session.getAttribute("activeRole");
-//				for (Role role : userRoles) {
-//					if (!role.getName().equalsIgnoreCase(activeRole)) {
-//						inactiveRoles.add(role);
-//					}
-//				}
-//				session.setAttribute("inactiveRolesList", inactiveRoles);   //Putting inactive roles in session
-				
 				return SUCCESS;
 			} 
 			

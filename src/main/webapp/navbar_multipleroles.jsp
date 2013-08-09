@@ -45,11 +45,11 @@
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
     <strong>Roles</strong>
 	<ul class="unstyled">
-		<s:if test="%{isSupervisorReviewer}">
-		   <li>Supervisor/Reviewer</li>
-		</s:if>
 		<s:if test="%{isAdministrator}">
 		   <li>Administrator</li>
+		</s:if>
+		<s:if test="%{isSupervisorReviewer}">
+		   <li>Supervisor/Reviewer</li>
 		</s:if>
 		<s:if test="%{isCourseCoordinator}">
 		   <li>Course Coordinator</li>

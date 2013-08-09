@@ -51,7 +51,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 			//<----- 1st Part: To get number of pending bookings ------>
 			//Checking whether user is supervisor/reviewer
 			String activeRole = (String) session.getAttribute("activeRole");
-			if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) {
+			if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { 
 				//Objective: Getting bookings with pending status (if any) for active term
 				Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
 

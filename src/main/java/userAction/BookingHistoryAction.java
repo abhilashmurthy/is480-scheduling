@@ -57,8 +57,8 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
             String activeRole = (String) session.getAttribute("activeRole");
 
             //Checking user's role 
-            if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Supervisor")
-                    || activeRole.equalsIgnoreCase("Reviewer") || activeRole.equalsIgnoreCase("TA")) {
+            if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Supervisor/Reviewer")
+                    || activeRole.equalsIgnoreCase("TA")) {
 
                 //Getting active term (to filter bookings by current term)
                 Term term = MiscUtil.getActiveTerm(em);
@@ -118,7 +118,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                             String endTime = sdf.format(timeslot.getEndTime());
 
                             //Only for supervisors/reviewers
-                            if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) {
+                            if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { 
                                 String myStatus = timeslot.getStatusList().get(user).toString();
                                 map.put("myStatus", myStatus);
                             }

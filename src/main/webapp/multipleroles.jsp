@@ -32,21 +32,21 @@
 					<tr>
 					<s:if test="%{isAdministrator}">
  						<td>
-							<input type="submit" class="btn btn-large" value="Administrator" name="Administrator"/>
+							<input type="submit" class="btn btn-large" value="Administrator" name="administrator"/>
 							<!--<img src="img/administrator.jpg" class="img-polaroid" title="Administrator" height="200" width="150"/>-->
 						</td>
 						<td style="width:20px"></td>
 					</s:if>
 					<s:if test="%{isSupervisorReviewer}">
 						<td>
-							<input type="submit" class="btn btn-large" value="Supervisor or Reviewer" name="Supervisor/Reviewer"/>
+							<input type="submit" class="btn btn-large" value="Supervisor/Reviewer" name="supervisorReviewer"/>
 							<!--<img src="img/supervisor.jpg" class="img-polaroid" title="Supervisor" height="210" width="150"/>-->
 						</td>
 						<td style="width:20px"></td>
 					</s:if>
 					<s:if test="%{isCourseCoordinator}">
 						<td>
-							<input type="submit" class="btn btn-large" value="Course Coordinator" name="Course Coordinator"/>
+							<input type="submit" class="btn btn-large" value="Course Coordinator" name="courseCoordinator"/>
 							<!--<img src="img/reviewer.jpg" class="img-polaroid" title="Reviewer" height="220" width="170"/>-->
 						</td>
 					</s:if>

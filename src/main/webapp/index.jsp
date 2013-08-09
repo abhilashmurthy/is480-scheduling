@@ -48,7 +48,7 @@
 	</div>
 	
 	<!-- To display number of pending bookings for supervisor/reviewer -->
-	<% if (activeRole.equalsIgnoreCase("Supervisor") || activeRole.equalsIgnoreCase("Reviewer")) { %>
+	<% if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 		<s:if test="%{pendingBookingCount > 0}">
 			<div class="pendingBookings alert" style="width: 230px; text-align: center">
 				<button type="button" class="close" data-dismiss="alert">×</button>
@@ -269,7 +269,7 @@
                                  for (var i = 0; i < viewBookingData.attendees.length; i++) {
                                     var personnel = viewBookingData.attendees[i].name;
                                     //var status = viewBookingData.attendees[i].status;
-                                    if ($.trim(personnel) === '<%=fullName%>' && <%=isStudent == true%> || <%=isAdmin == true%>) {
+                                    if ($.trim(personnel) === '<%=fullName%>') {//&& activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator")) {
                                         //output += "<tr>";
                                         //output += "<td><button id='deleteBookingBtn' class='btn btn-danger'>Delete</button></td>";
                                        outputData.push(["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]);
