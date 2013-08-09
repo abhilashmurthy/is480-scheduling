@@ -69,7 +69,7 @@ public class NewBookingEmail extends EmailTemplate{
 		
 		int numBullet = 1;
 		while (iter.hasNext()) {
-			result.append(numBullet).append(". ")
+			result.append(numBullet++).append(". ")
 					.append(iter.next().getFullName());
 			if (iter.hasNext()) {
 				result.append("<br />");
