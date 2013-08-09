@@ -4,6 +4,7 @@
  */
 package notification.email;
 
+import constant.Status;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,24 +17,25 @@ import model.User;
  *
  * @author suresh
  */
-public class NewBookingEmail extends EmailTemplate{
+public class RespondToBookingEmail extends EmailTemplate{
 	
 	private Timeslot t;
 	
-	public NewBookingEmail(Timeslot t) {
-		super("new_booking.html");
+	public RespondToBookingEmail(Timeslot t) {
+		super("respond_to_booking.html");
 		this.t = t;
 	}
 
 	@Override
 	public String generateEmailSubject() {
-		return t.getSchedule().getMilestone().getName() + " - New Booking";
+		return t.getSchedule().getMilestone().getName() + " - Approve Booking";
 	}
 
 	@Override
 	public Set<String> generateRecipientList() {
-		Set<String> emails = new HashSet<String>();
-		for (User u : t.getTeam().getMembers()) {
+		HashSet<String> emails = new HashSet<String>();
+		HashMap<User, Status> map = t.getStatusList();
+		for (User u : map.keySet()) {
 			emails.add(u.getUsername() + "@smu.edu.sg");
 		}
 		
@@ -44,11 +46,11 @@ public class NewBookingEmail extends EmailTemplate{
 	public HashMap<String, String> prepareBodyData() {
 		HashMap<String, String> map = new HashMap<String, String>();
 		
+		//Insert milestone
+		map.put("[MILESTONE]", t.getSchedule().getMilestone().getName());
+		
 		//Insert team name
 		map.put("[TEAM_NAME]", t.getTeam().getTeamName());
-		
-		//Insert milestone name
-		map.put("[MILESTONE]", t.getSchedule().getMilestone().getName());
 		
 		//Insert start date
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
