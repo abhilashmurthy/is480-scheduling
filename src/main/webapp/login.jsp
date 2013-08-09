@@ -129,7 +129,7 @@
                 $(this).button('loading');
 				var userId = prompt('Please enter the Username','');
 				if (userId !== null && userId !== '') {
-					window.location = 'http://localhost:8080/is480-scheduling/login?smu_username=' + userId;
+					window.location = 'login?smu_username=' + userId;
 				} else {
 					alert('Invalid Username');
 					$(this).button('reset');
