@@ -45,6 +45,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     private String termId;
     private String milestoneStr;
     private HashMap<String, Object> json = new HashMap<String, Object>();
+	private Milestone milestone = null;
+	private Timeslot bookingSlot = null;
 
     public HttpServletRequest getRequest() {
         return request;
@@ -70,101 +72,11 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             } else if (activeRole.equalsIgnoreCase("Administrator")) {
                 //TODO Get team input for Admin role
             }
-
-            // Checking if team information is found
-            if (team == null) {
-                logger.error("Team information not found or unauthorized user role");
-                json.put("success", false);
-                json.put("message", "Team not identified or you do not have required"
-                        + " permissions to make a booking.");
-                return SUCCESS;
-            }
-
-            //Validating milestone info
-            Milestone milestone = MilestoneManager.findByName(em, milestoneStr);
-            if (milestone == null) {
-                logger.error("Milestone not found");
-                json.put("success", false);
-                json.put("message", "Oops. Something went wrong on our end. Please try again!");
-                return SUCCESS;
-            }
-
-            //Retreiving the term
-            Term term;
-            try {
-                int academicYear = Integer.valueOf(termId.split(",")[0]);
-                String semester = termId.split(",")[1];
-                term = TermManager.findByYearAndSemester(em, academicYear, semester);
-                if (term == null) {
-                    throw new Exception();
-                }
-            } catch (Exception e) {
-                logger.error("Term not found");
-                logger.error(e.getMessage());
-                json.put("success", false);
-                json.put("message", "Oops. Something went wrong on our end. Please try again!");
-                return SUCCESS;
-            }
-
-
-            //Retrieve the corresponding schedule object and its timeslots
-            Schedule schedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
-            if (schedule == null || schedule.getTimeslots() == null) {
-                logger.error("Schedule not found");
-                json.put("success", false);
-                json.put("message", "Oops. Something went wrong on our end. Please try again!");
-                return SUCCESS;
-            }
-            Set<Timeslot> timeslots = schedule.getTimeslots();
-
-            //Checking if the team already has a booking (pending/confirmed)
-            for (Timeslot t : timeslots) {
-                if (t.getTeam() != null && t.getTeam().equals(team)) {
-                    logger.error("Team's already booked a timeslot for the milestone this term");
-                    json.put("success", false);
-                    json.put("message", "Seems like you already have a booking for this milestone."
-                            + " Can't let you make a booking!");
-                    return SUCCESS;
-                }
-            }
-
-            //Retrieve the corresponding booking slot
-            Timestamp bookingTime;
-            try {
-                String timestampStr = date + " " + startTime;
-                bookingTime = Timestamp.valueOf(timestampStr);
-            } catch (IllegalArgumentException e) {
-                logger.error("Start time could not be parsed");
-                json.put("success", false);
-                json.put("message", "Date information not entered correctly. Please try again!");
-                return SUCCESS;
-            }
-            Timeslot bookingSlot = null;
-            for (Timeslot t : timeslots) {
-                Timestamp tStartTime = t.getStartTime();
-                if (tStartTime.equals(bookingTime)) {
-                    bookingSlot = t;
-                    break;
-                }
-            }
-
-            //Check if timeslot has been found
-            if (bookingSlot == null) {
-                logger.error("Chosen timeslot not found");
-                json.put("success", false);
-                json.put("message", "We can't find the timeslot you're trying to book."
-                        + " Please check the details entered!");
-                return SUCCESS;
-            }
-
-            //Check if the timeslot is free
-            if (bookingSlot.getTeam() != null) { //Slot is full
-                logger.error("Chosen timeslot already booked");
-                json.put("success", false);
-                json.put("message", "Oops. This timeslot is already taken."
-                        + " Please book another slot!");
-                return SUCCESS;
-            }
+			
+			//Validating information provided by the front end
+			if (!validateInformation(em, team)) {
+				return SUCCESS;
+			}
 
             try {
                 em.getTransaction().begin();
@@ -228,6 +140,105 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         }
         return SUCCESS;
     }
+	
+	private boolean validateInformation(EntityManager em, Team team) {
+		// Checking if team information is found
+		if (team == null) {
+			logger.error("Team information not found or unauthorized user role");
+			json.put("success", false);
+			json.put("message", "Team not identified or you do not have required"
+					+ " permissions to make a booking.");
+			return false;
+		}
+
+		//Validating milestone info
+		milestone = MilestoneManager.findByName(em, milestoneStr);
+		if (milestone == null) {
+			logger.error("Milestone not found");
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+			return false;
+		}
+
+		//Retreiving the term
+		Term term;
+		try {
+			int academicYear = Integer.valueOf(termId.split(",")[0]);
+			String semester = termId.split(",")[1];
+			term = TermManager.findByYearAndSemester(em, academicYear, semester);
+			if (term == null) {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			logger.error("Term not found");
+			logger.error(e.getMessage());
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+			return false;
+		}
+
+
+		//Retrieve the corresponding schedule object and its timeslots
+		Schedule schedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
+		if (schedule == null || schedule.getTimeslots() == null) {
+			logger.error("Schedule not found");
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+			return false;
+		}
+		Set<Timeslot> timeslots = schedule.getTimeslots();
+
+		//Checking if the team already has a booking (pending/confirmed)
+		for (Timeslot t : timeslots) {
+			if (t.getTeam() != null && t.getTeam().equals(team)) {
+				logger.error("Team's already booked a timeslot for the milestone this term");
+				json.put("success", false);
+				json.put("message", "Seems like you already have a booking for this milestone."
+						+ " Can't let you make a booking!");
+				return false;
+			}
+		}
+
+		//Retrieve the corresponding booking slot
+		Timestamp bookingTime;
+		try {
+			String timestampStr = date + " " + startTime;
+			bookingTime = Timestamp.valueOf(timestampStr);
+		} catch (IllegalArgumentException e) {
+			logger.error("Start time could not be parsed");
+			json.put("success", false);
+			json.put("message", "Date information not entered correctly. Please try again!");
+			return false;
+		}
+
+		for (Timeslot t : timeslots) {
+			Timestamp tStartTime = t.getStartTime();
+			if (tStartTime.equals(bookingTime)) {
+				bookingSlot = t;
+				break;
+			}
+		}
+
+		//Check if timeslot has been found
+		if (bookingSlot == null) {
+			logger.error("Chosen timeslot not found");
+			json.put("success", false);
+			json.put("message", "We can't find the timeslot you're trying to book."
+					+ " Please check the details entered!");
+			return false;
+		}
+
+		//Check if the timeslot is free
+		if (bookingSlot.getTeam() != null) { //Slot is full
+			logger.error("Chosen timeslot already booked");
+			json.put("success", false);
+			json.put("message", "Oops. This timeslot is already taken."
+					+ " Please book another slot!");
+			return false;
+		}
+		
+		return true;
+	}
 
     public String getDate() {
         return date;
