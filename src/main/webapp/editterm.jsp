@@ -181,10 +181,11 @@
                 $("#acceptanceDatePicker").datepicker('destroy');
                 $("#acceptanceDatePicker").multiDatesPicker({
                     dateFormat: "yy-mm-dd",
-                    minDate: distinctDates[0],
+                    defaultDate: new Date(scheduleData.startDate),
+                    maxPicks: 2,
                     beforeShowDay: $.datepicker.noWeekends
                 });
-                $("#acceptanceDatePicker").multiDatesPicker('addDates', distinctDates);
+                $("#acceptanceDatePicker").multiDatesPicker('addDates', [new Date(scheduleData.startDate), new Date(scheduleData.endDate)]);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get midterm schedule data
@@ -195,10 +196,11 @@
                 $("#midtermDatePicker").datepicker('destroy');
                 $("#midtermDatePicker").multiDatesPicker({
                     dateFormat: "yy-mm-dd",
-                    minDate: distinctDates[0],
+                    defaultDate: new Date(scheduleData.startDate),
+                    maxPicks: 2,
                     beforeShowDay: $.datepicker.noWeekends
                 });
-                $("#midtermDatePicker").multiDatesPicker('addDates', distinctDates);
+                $("#midtermDatePicker").multiDatesPicker('addDates', [new Date(scheduleData.startDate), new Date(scheduleData.endDate)]);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get final schedule data
@@ -209,10 +211,11 @@
                 $("#finalDatePicker").datepicker('destroy');
                 $("#finalDatePicker").multiDatesPicker({
                     dateFormat: "yy-mm-dd",
-                    minDate: distinctDates[0],
+                    defaultDate: new Date(scheduleData.startDate),
+                    maxPicks: 2,
                     beforeShowDay: $.datepicker.noWeekends
                 });
-                $("#finalDatePicker").multiDatesPicker('addDates', distinctDates);
+                $("#finalDatePicker").multiDatesPicker('addDates', [new Date(scheduleData.startDate), new Date(scheduleData.endDate)]);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
             }
             
@@ -220,9 +223,22 @@
                 var tableId = milestoneStr.toLowerCase() + "TimeslotsTable";
                 var table = $("#" + tableId);
                 var dates = $("#" + milestoneStr.toLowerCase() + "DatePicker").multiDatesPicker('getDates');
+                var dateArray = getDatesBetween(dates[0], dates[1]);
                 table.before("<h4>" + milestoneStr.toUpperCase() + "</h4>"); //Add milestone title
-                makeTimeslotTable(tableId, scheduleData, dates);
+                makeTimeslotTable(tableId, scheduleData, dateArray);
                 populateTimeslotsTable(tableId, scheduleData);
+            }
+            
+            function getDatesBetween(startDate, endDate) {
+                var dateArray = new Array();
+                var currentDate = Date.parse(startDate);
+                while (currentDate <= Date.parse(endDate)) {
+                    if (currentDate.isWeekday()) {
+                        dateArray.push(new Date(currentDate));
+                    }
+                    currentDate = currentDate.addDays(1);
+                }
+                return dateArray;
             }
             
             function getScheduleData(milestoneString, academicYearString, semesterString) {
@@ -434,7 +450,7 @@
                 return false;
             });
             
-            //Update Term AJAX Call
+            //Update Schedule AJAX Call
             $("#editScheduleForm").on('submit', function() {
                 console.log('clicked');
                 editScheduleData = {
@@ -468,6 +484,61 @@
                 }).fail(function(error) {
                     console.log("Edit Term Form AJAX Fail");
                 });
+                return false;
+            });
+            
+            //Update Timeslots AJAX Call            
+            $("#editTimeslotsSubmitBtn").on('click', function() {
+                //SerializeArray not functional for timeslots
+                var timeslotsData = {};
+                var timeslot_acceptance = new Array();
+                var timeslot_midterm = new Array();
+                var timeslot_final = new Array();
+
+                var accData = $("div.start-marker", "#acceptanceTimeslotsTable").get();
+                for (var i = 0; i < accData.length; i++) {
+                    var obj = accData[i];
+                    timeslot_acceptance.push($(obj).parent().attr("value"));
+                }
+
+                var midData = $("div.start-marker", "#midtermTimeslotsTable").get();
+                for (var i = 0; i < midData.length; i++) {
+                    var obj = midData[i];
+                    timeslot_midterm.push($(obj).parent().attr("value"));
+                }
+
+                var finData = $("div.start-marker", "#finalTimeslotsTable").get();
+                for (var i = 0; i < finData.length; i++) {
+                    var obj = finData[i];
+                    timeslot_final.push($(obj).parent().attr("value"));
+                }
+
+                timeslotsData["timeslot_acceptance[]"] = timeslot_acceptance;
+                timeslotsData["timeslot_midterm[]"] = timeslot_midterm;
+                timeslotsData["timeslot_final[]"] = timeslot_final;
+                timeslotsData["acceptanceId"] = acceptanceId;
+                timeslotsData["midtermId"] = midtermId;
+                timeslotsData["finalId"] = finalId;
+                
+                console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
+                $.ajax({
+                    type: 'POST',
+                    url: 'updateTimeslotsJson',
+                    data: timeslotsData,
+                    dataType: 'json'
+                }).done(function(response) {
+                    if (response.success) {
+                        console.log("createTimeslotsJson was successful");
+                    } else {
+                        var eid = btoa(response.message);
+                        console.log(response.message);
+                        window.location = "error.jsp?eid=" + eid;
+                    }
+                }).fail(function(error) {
+                    console.log("createTimeslotsJson AJAX FAIL");
+                    displayMessage("Oops.. something went wrong", true);
+                });
+
                 return false;
             });
             
