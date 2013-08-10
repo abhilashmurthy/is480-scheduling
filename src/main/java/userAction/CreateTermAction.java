@@ -8,6 +8,7 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import model.Term;
 import org.slf4j.Logger;
@@ -23,10 +24,10 @@ import util.MiscUtil;
  *
  * @author Prakhar
  */
-public class CheckTermAction extends ActionSupport implements ServletRequestAware {
+public class CreateTermAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
-    static final Logger logger = LoggerFactory.getLogger(CheckTermAction.class);
+    static final Logger logger = LoggerFactory.getLogger(CreateTermAction.class);
     private int year;
     private String semester;
     private boolean canAdd;
@@ -60,27 +61,21 @@ public class CheckTermAction extends ActionSupport implements ServletRequestAwar
 
             Term existingTerm = TermManager.findByYearAndSemester(em, year, semester);
             if (existingTerm != null) {
-                request.setAttribute("error", "This term has already been created. Please try again!");
-                logger.error("Term already created");
+                logger.error("Term already exists");
+                json.put("message", "Term already exists");
                 json.put("canAdd", false);
                 return SUCCESS;
-//            return ERROR;
             }
-
-            //Don't add Term yet. Add it after Term + Schedule + Timeslots have all been set
-//        EntityTransaction transaction = null;
-//        Term term = new Term();
-//        term.setAcademicYear(year);
-//        term.setSemester(semester);
-//        boolean result = TermManager.save(term, transaction);
-//        if (result == false) {
-//            request.setAttribute("error", "Oops. Something went wrong on our end. Please try again later.");
-//            logger.error("Error while creating new term");
-//            json.put("canAdd", false);
-//            return SUCCESS;
-////            return ERROR;
-//        }
+            
+            //Save Term in DB
+            EntityTransaction transaction = null;
+            Term newTerm = new Term();
+            newTerm.setAcademicYear(year);
+            newTerm.setSemester(semester);
+            TermManager.save(em, newTerm, transaction);
+            json.put("message", "Term added");
             json.put("canAdd", true);
+            
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {

@@ -66,15 +66,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         //Initate scheduleList
         scheduleList = new ArrayList<Schedule>();
 
-        //Save Term in DB
-        EntityTransaction transaction = null;
-        Term newTerm = new Term();
-        newTerm.setAcademicYear(year);
-        newTerm.setSemester(semester);
-        //TODO Handle write error
-        TermManager.save(em, newTerm, transaction);
-
-        logger.debug("Saved term");
+        EntityTransaction transaction = null;;
 
         //Save schedule in DB
         String[] acceptanceDates = acceptanceDatesString.split(",");

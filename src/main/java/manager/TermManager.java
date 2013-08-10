@@ -20,6 +20,30 @@ import org.slf4j.LoggerFactory;
 public class TermManager {
 
     private static Logger logger = LoggerFactory.getLogger(TermManager.class);
+    
+    public static boolean update(EntityManager em, Term term, EntityTransaction transaction) {
+        logger.info("Updating term: " + term);
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+            if (term != null) {
+                em.merge(term);
+            }
+            transaction.commit();
+            return true;
+        } catch (PersistenceException ex) {
+            //Rolling back data transactions
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            logger.error("Error making database call for Create Term Details");
+            ex.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     public static boolean save(EntityManager em, Term term, EntityTransaction transaction) {
         logger.info("Creating new term");

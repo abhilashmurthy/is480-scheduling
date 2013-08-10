@@ -5,6 +5,7 @@
 package manager;
 
 import constant.Status;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import model.Schedule;
 import model.Team;
 import model.Timeslot;
 import model.User;
@@ -41,6 +43,24 @@ public class TimeslotManager {
             return timeslot;
         } catch (Exception e) {
             logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return null;
+    }
+    
+    public static List<Timeslot> findBySchedule(EntityManager em, Schedule schedule) {
+        logger.info("Getting timeslot based on Schedule ID: " + schedule);
+        List<Timeslot> timeslots;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createQuery("select t from Timeslot t where t.schedule = :schedule")
+                    .setParameter("schedule", schedule);
+            timeslots = (List<Timeslot>) q.getResultList();
+            em.getTransaction().commit();
+            return timeslots;
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            logger.error(e.getMessage());
             em.getTransaction().rollback();
         }
         return null;
@@ -115,6 +135,29 @@ public class TimeslotManager {
             e.printStackTrace();
         }
         return null;
+    }
+    
+    public static boolean delete(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
+        logger.info("Deleting timeslot: " + timeslot);
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+            em.remove(timeslot);
+            logger.debug("All timeslots have been saved");
+            transaction.commit();
+            return true;
+        } catch (PersistenceException ex) {
+            //Rolling back data transactions
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            logger.error("Error making database call for update timeslot status");
+            ex.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static boolean deleteTimeslotBooking(EntityManager em, Timeslot ts) {

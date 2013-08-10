@@ -168,17 +168,24 @@
     <script type="text/javascript">
         $(document).ready(function() {
             
+            var termData = null;
+            var scheduleData = null;
+            var timeslotsData = null;
+            var acceptanceId = null;
+            var midtermId = null;
+            var finalId = null;
+            
             /*----------------------------------------
             CREATE TERM
             ------------------------------------------*/
             
             //Create Term AJAX Call
             $("#createTermForm").on('submit', function() {
-                var formData = $("#createTermForm").serialize();
+                termData = $("#createTermForm").serializeArray();
                 $.ajax({
                     type: 'GET',
-                    url: 'checkTermJson',
-                    data: formData,
+                    url: 'createTermJson',
+                    data: termData,
                     dataType: 'json'
                 }).done(function(response) {
 
@@ -190,12 +197,12 @@
                         if (response.canAdd) {
                             //Remove Create Button - Brought it back
 //                            $("#createTermSubmitRow").fadeTo('slow', 0);
-                            displayMessage("Term selected", false);
+                            displayMessage("Term added", false);
                             displayCreateSchedule();
 
                         } else {
                             //Display error message
-                            displayMessage("Term already exists", true);
+                            displayMessage(response.message, true);
                         }
                     } else {
                         var eid = btoa(response.message);
@@ -264,10 +271,6 @@
                     }
                 });
             }
-            
-            var acceptanceId = null;
-            var midtermId = null;
-            var finalId = null;
 
             //Create Schedule Submit - Show timeslots panel
             $("#createScheduleForm").on('submit', function() {
@@ -275,8 +278,7 @@
                 //TODO: Check to ensure that all acceptance, midterm, and final dates have values
                 
                 //AJAX call to save term and schedule dates
-                var termData = $("#createTermForm").serializeArray();
-                var scheduleData = $("#createScheduleForm").serializeArray();
+                scheduleData = $("#createScheduleForm").serializeArray();
                 var createScheduleData = $.merge(termData, scheduleData);
                 console.log('\n\nData to be sent to create schedule and term: ' + createScheduleData);
                 $.ajax({
@@ -303,9 +305,9 @@
                 return false;
             });
 			
-			/*----------------------------------------
-			CREATE TIMESLOTS
-			------------------------------------------*/
+            /*----------------------------------------
+            CREATE TIMESLOTS
+            ------------------------------------------*/
             
             //Display create timeslots
             function displayCreateTimeslots() {
@@ -347,9 +349,9 @@
                 
                 //OVERALL SUBMIT TO SERVER
                 $("#createTimeslotsSubmitBtn").on('click', function(){
-                    var scheduleIdData = { acceptanceId:acceptanceId, midtermId:midtermId, finalId:finalId };
+                    var scheduleIdData = {acceptanceId:acceptanceId, midtermId:midtermId, finalId:finalId};
                     //SerializeArray not functional for timeslots
-                    var timeslotsData = {};
+                    timeslotsData = {};
 					var timeslot_acceptance = new Array(); var timeslot_midterm = new Array(); var timeslot_final = new Array();
                     
                     var accData = $("div.start-marker", "#acceptanceTimeslotsTable").get();

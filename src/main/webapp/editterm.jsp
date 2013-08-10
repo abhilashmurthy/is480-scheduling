@@ -83,14 +83,14 @@
                     <tr id="editTermRow"><td></td><td><input type="submit" class="btn btn-primary" value="Save"/></td></tr>
                 </table>
             </form>
-            <h4 id="resultMessage"/></h4>
+            <h4 id="termResult" class="resultMessage"/></h4>
 
         <div class="line-separator"></div>
 
-        <!-- Create Schedule -->
-        <div id="createSchedulePanel">
+        <!-- Edit Schedule -->
+        <div id="editSchedulePanel">
             <h3>Edit Schedule</h3>
-            <form id="createScheduleForm">
+            <form id="editScheduleForm">
                 <table>
                     <th>Milestone</th><th>Dates</th>
                     <tr>
@@ -105,18 +105,19 @@
                         <td class="formLabelTd">Final</td>
                         <td><input type="text" id="finalDatePicker" class="input-medium datepicker" name="finalDates"/></td>
                     </tr>
-                    <tr class="createScheduleSubmitRow">
+                    <tr class="editScheduleSubmitRow">
                         <td></td>
-                        <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create"/></td>
+                        <td><input id="editScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Save"/></td>
                     </tr>
                 </table>
             </form>
+            <h4 id="scheduleResult" class="resultMessage"/></h4>
         </div>
 
         <div class="line-separator"></div>
 
         <!-- Edit Timeslots -->
-        <div id="createTimeslotsPanel">
+        <div id="editTimeslotsPanel">
             <h3>Edit Timeslots</h3>
             <div id="timeslotsTableSection">
                 <table id="acceptanceTimeslotsTable" class="table-condensed table-hover table-bordered table-striped">
@@ -128,9 +129,10 @@
                 <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped">
                 </table>
                 <br/>
-                <button id="createTimeslotsSubmitBtn" class="btn btn-primary">Create</button>
+                <button id="editTimeslotsSubmitBtn" class="btn btn-primary">Save</button>
                 <br />
             </div>
+            <h4 id="timeslotsResult" class="resultMessage"/></h4>
         </div>
 
     </div>
@@ -142,6 +144,10 @@
     <script type="text/javascript">
         //Makes use of footer.jsp's jQuery and bootstrap imports
         editScheduleLoad = function() {
+            
+            //------------------------------------------//
+            // View Schedule Data
+            //------------------------------------------//
             
             //Declare common variables
             //Default milestoneStr is ACCEPTANCE
@@ -213,8 +219,9 @@
             function loadScheduleTimeslots(milestoneStr, scheduleData) {
                 var tableId = milestoneStr.toLowerCase() + "TimeslotsTable";
                 var table = $("#" + tableId);
+                var dates = $("#" + milestoneStr.toLowerCase() + "DatePicker").multiDatesPicker('getDates');
                 table.before("<h4>" + milestoneStr.toUpperCase() + "</h4>"); //Add milestone title
-                makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeDate"));
+                makeTimeslotTable(tableId, scheduleData, dates);
                 populateTimeslotsTable(tableId, scheduleData);
             }
             
@@ -389,6 +396,89 @@
                     }
                 }
                 return timeslot;
+            }
+            
+            //------------------------------------------//
+            // Change Schedule Data
+            //------------------------------------------//
+            
+            //Update Term AJAX Call
+            $("#editTermForm").on('submit', function() {
+                console.log('clicked');
+                var editTermData = {
+                    year: $("#yearInput").val(), 
+                    semester: $("#semesterInput").val(), 
+                    activeYear:activeAcademicYearStr, 
+                    activeSemester:activeSemesterStr
+                };
+                $.ajax({
+                    type: 'GET',
+                    url: 'updateTermJson',
+                    data: editTermData,
+                    dataType: 'json'
+                }).done(function(response) {
+                    if (!response.exception) {
+                        if (response.success) {
+                            displayMessage("termResult", response.message, false);
+                        } else {
+                            displayMessage("termResult", response.message, true);
+                        }
+                        setTimeout(function(){window.location.reload();}, 2000);
+                    } else {
+                        var eid = btoa(response.message);
+                        window.location="error.jsp?eid=" + eid;
+                    }
+                }).fail(function(error) {
+                    console.log("Edit Term Form AJAX Fail");
+                });
+                return false;
+            });
+            
+            //Update Term AJAX Call
+            $("#editScheduleForm").on('submit', function() {
+                console.log('clicked');
+                editScheduleData = {
+                    year:activeAcademicYearStr, 
+                    semester:activeSemesterStr,
+                    acceptanceId:acceptanceId,
+                    midtermId:midtermId,
+                    finalId:finalId,
+                    acceptanceDates:$("#acceptanceDatePicker").multiDatesPicker('getDates'),
+                    midtermDates:$("#midtermDatePicker").multiDatesPicker('getDates'),
+                    finalDates:$("#finalDatePicker").multiDatesPicker('getDates')
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'updateScheduleJson',
+                    data: editScheduleData,
+                    async: false,
+                    dataType: 'json'
+                }).done(function(response) {
+                    if (!response.exception) {
+                        if (response.success) {
+                            displayMessage("scheduleResult", response.message, false);
+                        } else {
+                            displayMessage("scheduleResult", response.message, true);
+                        }
+                        setTimeout(function(){window.location.reload();}, 1000);
+                    } else {
+                        var eid = btoa(response.message);
+                        window.location="error.jsp?eid=" + eid;
+                    }
+                }).fail(function(error) {
+                    console.log("Edit Term Form AJAX Fail");
+                });
+                return false;
+            });
+            
+            //Display termMessage
+            function displayMessage(id, msg, fade) {
+                //Dislay result
+                $("#" + id).fadeTo('slow', 100);
+                $("#" + id).css('color', 'darkgreen').html(msg);
+                if (fade) {
+                    $("#" + id).css('color', 'darkred').html(msg).fadeTo('slow', 0);
+                }
             }
 
         };

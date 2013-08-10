@@ -8,126 +8,142 @@
     <constant name="struts.enable.DynamicMethodInvocation" value="false" />
     <constant name="struts.devMode" value="true" />
 	
-	<!-- UNPROTECTED ACTIONS -->
-	<package name="unsafe" namespace="/" extends="struts-default">
-		<global-results>
+    <!-- UNPROTECTED ACTIONS -->
+    <package name="unsafe" namespace="/" extends="struts-default">
+        <global-results>
             <result name="error">/error.jsp</result>
         </global-results>
-		<action name="login" class="userAction.LoginAction" method="execute">
+        <action name="login" class="userAction.LoginAction" method="execute">
             <result name="success" type="chain">setRole</result>
-			<result name="goToRoles">/multipleroles.jsp</result>
+            <result name="goToRoles">/multipleroles.jsp</result>
         </action>
-	</package>
+    </package>
 	
     <package name="default" namespace="/" extends="struts-default">
 
-		<interceptors>
-			<interceptor name="userValidator" class="interceptor.UserValidator" />
-			<interceptor-stack name="customStack">
+        <interceptors>
+            <interceptor name="userValidator" class="interceptor.UserValidator" />
+            <interceptor-stack name="customStack">
                 <interceptor-ref name="userValidator"/>
                 <interceptor-ref name="defaultStack"/>
             </interceptor-stack>
-		</interceptors>
-		<default-interceptor-ref name="customStack"/>
+        </interceptors>
+        <default-interceptor-ref name="customStack"/>
 
         <global-results>
             <result name="error">/error.jsp</result>
-			<result name="login">/login.jsp</result>
+            <result name="login">/login.jsp</result>
         </global-results>
 		
-		<action name="index" class="systemAction.ShowIndexAction" method="execute">
-			<result name="success">/index.jsp</result>
-		</action>
+        <action name="index" class="systemAction.ShowIndexAction" method="execute">
+            <result name="success">/index.jsp</result>
+        </action>
         
         <action name="logout" class="userAction.LogoutAction" method="execute">
             <result name="success">/login.jsp</result>
         </action>
 		
-		<action name="test" class="userAction.TestAction" method="execute">
+        <action name="test" class="userAction.TestAction" method="execute">
             <result name="success">/Test.jsp</result>
         </action>
 
-		<action name="approveReject" class="userAction.ResponseAction" method="execute">
-			<result name="success">/approvereject.jsp</result>
-		</action>
+        <action name="approveReject" class="userAction.ResponseAction" method="execute">
+            <result name="success">/approvereject.jsp</result>
+        </action>
 		
-		<!-- This action class calls another action class through chaining -->
-		<action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
-			<result name="success" type="chain">approveReject</result>
-		</action>
+        <!-- This action class calls another action class through chaining -->
+        <action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
+            <result name="success" type="chain">approveReject</result>
+        </action>
 		
-		<action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
-			<result name="success">/schedule.jsp</result>
-		</action>
+        <action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
+            <result name="success">/schedule.jsp</result>
+        </action>
 		
-		<action name="createSchedule" class="userAction.CreateScheduleAction" method="execute">
+        <action name="createSchedule" class="userAction.CreateScheduleAction" method="execute">
             <result name="success">/scheduleconfirmation.jsp</result>
         </action>
 		
-		<action name="setRole" class="userAction.SetRolesAction" method="execute">
+        <action name="setRole" class="userAction.SetRolesAction" method="execute">
             <result name="success" type="redirect">
-				<param name="location">/index</param>
-			</result>
+                <param name="location">/index</param>
+            </result>
         </action>
 		
-		<action name="myBookings" class="userAction.BookingHistoryAction" method="execute">
+        <action name="myBookings" class="userAction.BookingHistoryAction" method="execute">
             <result name="success">/bookinghistory.jsp</result>
         </action>
 				
     </package>
 
-	<!-- JSON Package -->
-	<package name="json" namespace="/" extends="json-default">
-		<interceptors>
-			<interceptor name="userValidator" class="interceptor.UserValidator" />
-			<interceptor-stack name="customStack">
+    <!-- JSON Package -->
+    <package name="json" namespace="/" extends="json-default">
+        <interceptors>
+            <interceptor name="userValidator" class="interceptor.UserValidator" />
+            <interceptor-stack name="customStack">
                 <interceptor-ref name="userValidator"/>
                 <interceptor-ref name="defaultStack"/>
             </interceptor-stack>
-		</interceptors>
-		<default-interceptor-ref name="customStack"/>
+        </interceptors>
+        <default-interceptor-ref name="customStack"/>
 		
-		<global-results>
+        <global-results>
             <result name="error">/error.jsp</result>
-			<result name="login">/login.jsp</result>
+            <result name="login">/login.jsp</result>
         </global-results>
 		
-		<action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
-			<result type="json" >
-				<param name="root">json</param>
-			</result>
-		</action>
-		<action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
-			<result type="json">
-				<param name="root">json</param>
-			</result>
-		</action>
-		<action name="checkTermJson" class="userAction.CheckTermAction" method="execute">
-			<result type="json">
-				<param name="root">json</param>
-			</result>
-		</action>
-		<action name="createScheduleJson" class="userAction.CreateScheduleAction" method="execute">
-			<result type="json">
-				<param name="root">json</param>
-			</result>
-		</action>
-		<action name="createTimeslotsJson" class="userAction.CreateTimeslotsAction" method="execute">
-			<result type="json">
-				<param name="root">json</param>
-			</result>
-		</action>
-		<action name="viewBookingJson" class="userAction.ViewBookingAction" method="execute">
-			<result type="json">
-				<param name="root">json</param>
-			</result>
-		</action>
-                <action name="deleteBookingJson" class="userAction.DeleteBookingAction" method="execute">
-			<result type="json">
-				<param name="root">json</param>
-			</result>
-		</action>
+        <action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
+            <result type="json" >
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="createTermJson" class="userAction.CreateTermAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="createScheduleJson" class="userAction.CreateScheduleAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="createTimeslotsJson" class="userAction.CreateTimeslotsAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="updateTermJson" class="userAction.UpdateTermAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="updateScheduleJson" class="userAction.UpdateScheduleAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        
+        <action name="updateTimeslotsJson" class="userAction.UpdateTimeslotsAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="viewBookingJson" class="userAction.ViewBookingAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+        <action name="deleteBookingJson" class="userAction.DeleteBookingAction" method="execute">
+            <result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
 		
-	</package>
+    </package>
 
 </struts>
