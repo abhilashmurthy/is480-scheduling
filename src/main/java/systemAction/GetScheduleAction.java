@@ -89,6 +89,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             Milestone milestone = MilestoneManager.findByName(em, milestoneString);
             
             Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
+            json.put("id", activeSchedule.getId());
             json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
             json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
             json.put("duration", milestone.getSlotDuration());

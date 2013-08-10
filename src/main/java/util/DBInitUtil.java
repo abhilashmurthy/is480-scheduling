@@ -146,6 +146,7 @@ public class DBInitUtil {
 		/*
 		 * TIMESLOT TABLE POPULATION
 		 */
+                //Acceptance
 		for (int a = 7; a <= 20; a++) {
 			// Skipping weekends
 			if (a == 10 || a == 11 || a == 17 || a == 18) {
@@ -161,7 +162,8 @@ public class DBInitUtil {
 				em.persist(t);
 			}	
 		}
-		
+                
+		//Midterm
 		for (int a = 19; a <= 30; a++) {
 			// Skipping weekends
 			if (a == 20 || a == 21 || a == 27 || a == 28) {
