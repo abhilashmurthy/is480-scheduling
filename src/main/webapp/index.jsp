@@ -644,9 +644,18 @@
 
                             //If timeslot is available
                             if (id !== -1) {
-                                bodyTd.attr('rowspan', '2');
-                                var temp = new Date(Date.parse(datetimeString)).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
-                                rowspanArr.push(temp);
+                                var temp = null;
+                                if (milestoneStr === "ACCEPTANCE") {
+                                    bodyTd.attr('rowspan', '2'); //If acceptance, set 2
+                                    temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
+                                    rowspanArr.push(temp);
+                                } else {
+                                    bodyTd.attr('rowspan', '3'); //else, set 3
+                                    temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
+                                    rowspanArr.push(temp);
+                                    temp = Date.parse(datetimeString).addHours(1).toString("yyyy-MM-dd HH:mm:ss");
+                                    rowspanArr.push(temp);
+                                }
                                 bodyTd.attr('id', 'timeslot_' + id);
                                 bodyTd.attr('value', datetimeString);
 

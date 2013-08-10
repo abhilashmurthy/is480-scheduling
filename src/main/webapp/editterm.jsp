@@ -171,22 +171,43 @@
                 var milestoneStr = "ACCEPTANCE";
                 var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
                 acceptanceId = scheduleData.id;
-                $("#acceptanceDatePicker").multiDatesPicker('addDates', getDistinctDates(scheduleData, "typeDate"));
+                var distinctDates = getDistinctDates(scheduleData, "typeDate");
+                $("#acceptanceDatePicker").datepicker('destroy');
+                $("#acceptanceDatePicker").multiDatesPicker({
+                    dateFormat: "yy-mm-dd",
+                    minDate: distinctDates[0],
+                    beforeShowDay: $.datepicker.noWeekends
+                });
+                $("#acceptanceDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get midterm schedule data
                 var milestoneStr = "MIDTERM";
                 var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
                 midtermId = scheduleData.id;
-                $("#midtermDatePicker").multiDatesPicker('addDates', getDistinctDates(scheduleData, "typeDate"));
+                var distinctDates = getDistinctDates(scheduleData, "typeDate");
+                $("#midtermDatePicker").datepicker('destroy');
+                $("#midtermDatePicker").multiDatesPicker({
+                    dateFormat: "yy-mm-dd",
+                    minDate: distinctDates[0],
+                    beforeShowDay: $.datepicker.noWeekends
+                });
+                $("#midtermDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get final schedule data
-//                var milestoneStr = "FINAL";
-//                var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
-//                finalId = scheduleData.id;
-//                $("#finalDatePicker").multiDatesPicker('addDates', getDistinctDates(scheduleData, "typeDate"));
-//                loadScheduleTimeslots(milestoneStr, scheduleData);
+                var milestoneStr = "FINAL";
+                var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                finalId = scheduleData.id;
+                var distinctDates = getDistinctDates(scheduleData, "typeDate");
+                $("#finalDatePicker").datepicker('destroy');
+                $("#finalDatePicker").multiDatesPicker({
+                    dateFormat: "yy-mm-dd",
+                    minDate: distinctDates[0],
+                    beforeShowDay: $.datepicker.noWeekends
+                });
+                $("#finalDatePicker").multiDatesPicker('addDates', distinctDates);
+                loadScheduleTimeslots(milestoneStr, scheduleData);
             }
             
             function loadScheduleTimeslots(milestoneStr, scheduleData) {

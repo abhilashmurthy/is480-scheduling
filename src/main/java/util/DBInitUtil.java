@@ -136,11 +136,18 @@ public class DBInitUtil {
 		midterm12013.setTerm(term12013);
 		midterm12013.setMilestone(midterm);
 		midterm12013.setStartDate(new Timestamp(2013 - 1900, 9, 19, 0, 0, 0, 0));
-		midterm12013.setEndDate(new Timestamp(2013 - 1900, 10, 30, 0, 0, 0, 0));
+		midterm12013.setEndDate(new Timestamp(2013 - 1900, 9, 30, 0, 0, 0, 0));
+                
+		Schedule final12013 = new Schedule();
+		final12013.setTerm(term12013);
+		final12013.setMilestone(finalMilestone);
+		final12013.setStartDate(new Timestamp(2013 - 1900, 11, 1, 0, 0, 0, 0));
+		final12013.setEndDate(new Timestamp(2013 - 1900, 11, 15, 0, 0, 0, 0));
 		
 		// Persistence
 		em.persist(acceptance12013);
 		em.persist(midterm12013);
+		em.persist(final12013);
 		logger.info("Schedule persisted");
 		
 		/*
@@ -166,17 +173,50 @@ public class DBInitUtil {
 		//Midterm
 		for (int a = 19; a <= 30; a++) {
 			// Skipping weekends
-			if (a == 20 || a == 21 || a == 27 || a == 28) {
+			if (a == 19 || a == 20 || a == 26 || a == 27) {
 				continue;
 			}
 			
-			for (int b = 9; b <= 18; b++) {
+                        boolean change = true;
+			for (int b = 9; (b + 2) <= 18; b++) {
 				Timeslot t = new Timeslot();
-				t.setStartTime(new Timestamp(2013 - 1900, 7, a, b, 0, 0, 0));
-				t.setEndTime(new Timestamp(2013 - 1900, 7, a, b + 1, 0, 0, 0));
+                                if (change) {
+                                    t.setStartTime(new Timestamp(2013 - 1900, 9, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 9, a, b + 1, 30, 0, 0));
+                                } else {
+                                    t.setStartTime(new Timestamp(2013 - 1900, 9, a, b, 30, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 9, a, b + 2, 00, 0, 0));
+                                    b++;
+                                }
 				t.setVenue("SIS Seminar Room 2-1");
 				t.setSchedule(midterm12013);
 				em.persist(t);
+                                change = !change;
+			}	
+		}
+                
+		//Final
+		for (int a = 1; a <= 15; a++) {
+			// Skipping weekends
+			if (a == 1 || a == 7 || a == 8 || a == 14 || a == 15) {
+				continue;
+			}
+			
+                        boolean change = true;
+			for (int b = 9; (b + 2) <= 18; b++) {
+				Timeslot t = new Timeslot();
+                                if (change) {
+                                    t.setStartTime(new Timestamp(2013 - 1900, 11, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 11, a, b + 1, 30, 0, 0));
+                                } else {
+                                    t.setStartTime(new Timestamp(2013 - 1900, 11, a, b, 30, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 11, a, b + 2, 00, 0, 0));
+                                    b++;
+                                }
+				t.setVenue("SIS Seminar Room 2-1");
+				t.setSchedule(final12013);
+				em.persist(t);
+                                change = !change;
 			}	
 		}
 		/*
