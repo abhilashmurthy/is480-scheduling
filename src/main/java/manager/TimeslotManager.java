@@ -5,6 +5,7 @@
 package manager;
 
 import constant.Status;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import model.Team;
 import model.Timeslot;
 import model.User;
@@ -149,4 +151,23 @@ public class TimeslotManager {
         }
         return false;
     }
+    
+     public static List<Timeslot> getAllTimeslots(EntityManager em) {
+        logger.info("Getting all timeslots");
+        List<Timeslot> result = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createQuery("select o from Timeslot o");
+            result = q.getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return result;
+    }
+    
+
+    
+    
 }

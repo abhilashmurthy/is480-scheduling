@@ -268,8 +268,8 @@
                             if(viewBookingData.attendees!==null){
                                  for (var i = 0; i < viewBookingData.attendees.length; i++) {
                                     var personnel = viewBookingData.attendees[i].name;
-                                    //var status = viewBookingData.attendees[i].status;
-                                    if ($.trim(personnel) === '<%=fullName%>') {//&& activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator")) {
+                                    var status = viewBookingData.attendees[i].status;
+                                    if ($.trim(personnel) === '<%=fullName%>' && typeof status === 'undefined') {//&& activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator")) {
                                         //output += "<tr>";
                                         //output += "<td><button id='deleteBookingBtn' class='btn btn-danger'>Delete</button></td>";
                                        outputData.push(["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]);
@@ -278,28 +278,96 @@
                                   }
                             }
                             
-                            for (var i = 0; i < outputData.length; i++) {
-                                var outputTr = $(document.createElement('tr'));
-                                var outputTdKey = $(document.createElement('td'))
-                                    .html('<b>' + outputData[i][0] + '</b>');
-                                var outputTdValue = null;
-                                //Attendees list
-                                if (outputData[i][1] instanceof Array) {
-                                    var outputArray = outputData[i][1];
-                                    var outputArrayStr = "";
-                                    for (var j = 0; j < outputArray.length; j++) {
-                                        outputArrayStr += outputArray[j].name + "<br/>";
-                                    }
-                                    outputTdValue = $(document.createElement('td'))
-                                        .html(outputArrayStr);;
-                                } else {
-                                    outputTdValue = $(document.createElement('td'))
-                                        .html(outputData[i][1]);
-                                }
-                                outputTr.append(outputTdKey);
-                                outputTr.append(outputTdValue);
-                                outputTable.append(outputTr);
+                            //if user is admin
+                            if (<%=activeRole.equalsIgnoreCase("Administrator")%>) {
+                                    //viewBookingData.startDate
+
+                                    var outputData = [
+                                            ["Team", viewBookingData.teamName],
+                                            ["Status", viewBookingData.status],
+                                            ["Date",  viewBookingData.startDate],
+                                            ["Start Time", viewBookingData.startTime],
+                                            ["Team Wiki", viewBookingData.teamWiki],
+                                            ["Attendees", viewBookingData.attendees],
+                                            ["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"
+                                                                    + "<button id='updateBookingBtn' class='btn btn-inverse'><i class='icon-edit icon-white'></i>Save</button>"]
+                                    ];
+
+
                             }
+                            
+                            if (<%=!activeRole.equalsIgnoreCase("Administrator")%>) {
+			
+                                for (var i = 0; i < outputData.length; i++) {
+                                    var outputTr = $(document.createElement('tr'));
+                                    var outputTdKey = $(document.createElement('td'))
+                                                    .html('<b>' + outputData[i][0] + '</b>');
+                                    var outputTdValue = null;
+                                    if (outputData[i][1] instanceof Array) {
+                                            var outputArray = outputData[i][1];
+                                            var outputArrayStr = "";
+                                            for (var j = 0; j < outputArray.length; j++) {
+                                                    outputArrayStr += outputArray[j].name + "<br/>";
+                                            }
+                                            outputTdValue = $(document.createElement('td'))
+                                                            .html(outputArrayStr);
+                                            ;
+                                    } else {
+                                            outputTdValue = $(document.createElement('td'))
+                                                            .html(outputData[i][1]);
+                                    }
+                                    outputTr.append(outputTdKey);
+                                    outputTr.append(outputTdValue);
+                                    outputTable.append(outputTr);
+                                }
+                            } else {
+                                var updateForm = "updateForm";
+
+                                for (var i = 0; i < outputData.length; i++) {
+                                        var outputTr = $(document.createElement('tr'));
+                                        var outputTdKey = $(document.createElement('td'))
+                                                        .html('<b>' + outputData[i][0] + '</b>');
+                                        var outputTdValue = null;
+                                        if (outputData[i][1] instanceof Array) {
+                                                var outputArray = outputData[i][1];
+                                                var outputArrayStr = "";
+                                                for (var j = 0; j < outputArray.length; j++) {
+                                                   outputArrayStr += outputArray[j].name + "<br/>";
+                                                }
+                                                   outputTdValue = $(document.createElement('td'))
+                                                         .html(outputArrayStr);
+                                                ;
+                                        } else {
+                                                if(outputData[i][0] === 'Date' || outputData[i][0] === 'Start Time'){
+
+                                                        if(outputData[i][0] === 'Date'){
+
+                                                           updateForm = "updateForm" + 'Date';
+                                                           outputTdValue = $(document.createElement('td'))
+                                                              .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='click to edit..(YYYY-MM-DD format)' /input>");
+                                                      
+                                                        }else{
+
+                                                                updateForm = "updateForm" + 'StartTime';
+                                                                outputTdValue = $(document.createElement('td'))
+                                                                        .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='click to edit..(HH:MM format)' /input>");     
+
+                                                        }
+
+                                                }else{
+                                                        outputTdValue = $(document.createElement('td'))
+                                                         .html(outputData[i][1]);
+                                                }
+                                        }
+                                        
+                                        outputTr.append(outputTdKey);
+                                        outputTr.append(outputTdValue);
+                                        outputTable.append(outputTr);
+
+                                }
+
+                            }
+
                             return outputTable;
                         },
                         placement: 'right',
@@ -463,6 +531,17 @@
                     setTimeout(function(){appendPopovers();}, 3000); //Refresh all popovers
                     return false;
                 });
+                
+                //Update Booking Button
+                $("td").on('click', '#updateBookingBtn', function(e) {
+                    e.stopPropagation();
+                    updateBooking(self);
+                    setTimeout(function() {
+                            appendPopovers();
+                    }, 3000); //Refresh all popovers
+                    //window.location.reload()
+                    return false;
+                });
             }
             
             //AJAX CALL functions
@@ -546,6 +625,101 @@
                         });
                         console.log('Toggling E');
                         self.popover('show');
+                    } else {
+                        var eid = btoa(response.message);
+                        window.location = "error.jsp?eid=" + eid;
+                    }
+                }).fail(function(error) {
+                    alert("Oops. There was an error: " + error);
+                });
+            }
+            
+            //update booking function
+            function updateBooking(self) {
+                //getfunction up the timeslotID for that cell and send as request
+                var cellId = $(self).attr('id').split("_")[1];
+                console.log("data");
+
+                var startDate = document.getElementById('updateFormDate').value;
+                var startTime = document.getElementById('updateFormStartTime').value;
+                var concatStart = "";
+                if(startDate!== null && startTime!== null){
+                         concatStart = startDate + " " + startTime + ":00";
+                }
+                console.log(concatStart + " this is concat start");
+                //Delete Booking AJAX
+                //var test = "2013-08-07 09:00:00";
+
+                //var viewBookingData = appendPopovers();
+
+                //var arrAttendees = "";
+                //var oldAttendees = "";
+
+                /*for (var i = 0; i < viewBookingData.attendees.length; i++) {
+                         //var personnel = viewBookingData.attendees[i].name;
+                         var val2 = document.getElementById('updateFormAttendee'+i).value;
+
+                         oldAttendees += viewBookingData.attendees[i].name + ",";
+                         arrAttendees  += val2 + ",";
+
+                     //console.log(arrAttendees.);
+                }*/
+
+                var data = {timeslotId: cellId, changedDate: concatStart};
+
+                console.log("Submitting update booking data: " + JSON.stringify(data));
+
+                $.ajax({
+                    
+                    type: 'POST',
+                    async: false,
+                    url: 'updateBookingJson',
+                    data: data,
+                    cache: false,
+                    dataType: 'json'
+                    
+                }).done(function(response) {
+                    if (!response.exception) {
+                            console.log('Destroying C');
+                            var msg = response.message + "";
+                            console.log(msg);
+
+                            if(msg === ('Booking updated successfully! Update email has been sent to all attendees. (Coming soon..)')){
+
+                               self.popover('destroy');
+                               self.html("");
+                               self.removeClass("bookedTimeslot");
+                               self.addClass("unbookedTimeslot");
+
+                               //Popover to mention timeslot updated successfully
+                                self.popover({
+                                    container: self,
+                                    trigger: "manual",
+                                    title: "Booking <button type='button' class='close'>&times;</button>",
+                                    placement: "right",
+                                    content: "Edited <br/> Notification email sent!",
+                                    html: true
+                                });
+                                
+                                console.log('Toggling E');
+
+                                self.popover('show');
+                                window.location.reload();
+                            }else{
+                                //Popover to mention updating problem
+                                self.popover('destroy');
+                                //self.html("");
+
+                                self.popover({
+                                    container: self,
+                                    trigger: "manual",
+                                    title: "Booking <button type='button' class='close'>&times;</button>",
+                                    placement: "right",
+                                    content: "Error!<br/>" + response.message,
+                                    html: true
+                                });
+                                self.popover('show');
+                            }
                     } else {
                         var eid = btoa(response.message);
                         window.location = "error.jsp?eid=" + eid;
