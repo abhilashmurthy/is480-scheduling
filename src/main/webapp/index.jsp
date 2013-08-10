@@ -290,7 +290,8 @@
                                             ["Team Wiki", viewBookingData.teamWiki],
                                             ["Attendees", viewBookingData.attendees],
                                             ["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"
-                                                                    + "<button id='updateBookingBtn' class='btn btn-inverse'><i class='icon-edit icon-white'></i>Save</button>"]
+												+ "&nbsp&nbsp&nbsp&nbsp&nbsp;" 
+												+ "<button id='updateBookingBtn' class='btn btn-info'><i class='icon-edit icon-white'></i>Save</button>"]
                                     ];
 
 
@@ -344,13 +345,13 @@
 
                                                            updateForm = "updateForm" + 'Date';
                                                            outputTdValue = $(document.createElement('td'))
-                                                              .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='click to edit..(YYYY-MM-DD format)' /input>");
+                                                              .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='Enter date in YYYY-MM-DD format (e.g. 2013-01-10)' /input>");
                                                       
                                                         }else{
 
                                                                 updateForm = "updateForm" + 'StartTime';
                                                                 outputTdValue = $(document.createElement('td'))
-                                                                        .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='click to edit..(HH:MM format)' /input>");     
+                                                                        .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='Enter time in HH:MM format (e.g. 10:00)' /input>");     
 
                                                         }
 
