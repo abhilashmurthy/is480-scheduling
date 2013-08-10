@@ -4,7 +4,6 @@
  */
 package userAction;
 
-import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Status;
@@ -15,12 +14,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import manager.TimeslotManager;
 import model.Team;
 import model.Timeslot;
@@ -77,7 +75,6 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
 
                     //This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
                     List<HashMap<String, String>> attendees = new ArrayList<HashMap<String, String>>();
-                    String finalStatus = "error";
 
                     //Getting all the team members associated with the timeslot
                     //First getting the team members
@@ -95,25 +92,11 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     }
 
                     //Second getting the supervisor/reviewer for the timeslot
-                    HashMap<User, Status> members = null;
                     if (ts.getStatusList() != null) {
-                        members = ts.getStatusList();
-                        Iterator iter = members.keySet().iterator();
-                        while (iter.hasNext()) {
+                        for (Entry<User, Status> e : ts.getStatusList().entrySet()) {
                             HashMap<String, String> userMap = new HashMap<String, String>();
-                            User supervisorReviewer = (User) iter.next();
-                            Status status = members.get(supervisorReviewer);
-                            userMap.put("name", supervisorReviewer.getFullName());
-                            userMap.put("status", status.toString());
-                            if (status.equals(Status.ACCEPTED)) {
-                                finalStatus = "Accepted";
-                            }
-                            if (status.equals(Status.REJECTED)) {
-                                finalStatus = "Rejected";
-                            }
-                            if (!finalStatus.equals("Rejected") && status.equals(Status.PENDING)) {
-                                finalStatus = "Pending";
-                            }
+                            userMap.put("name", e.getKey().getFullName());
+                            userMap.put("status", e.getValue().toString());
                             attendees.add(userMap);
                         }
                     }
@@ -121,7 +104,7 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     json.put("attendees", attendees);
                     
                     //Setting the final status of the booking
-                    json.put("status", finalStatus);
+                    json.put("status", ts.getOverallBookingStatus().toString());
 
                     //Getting venue for timeslot
                     String venue = ts.getVenue();
