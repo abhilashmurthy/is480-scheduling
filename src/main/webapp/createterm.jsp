@@ -118,14 +118,48 @@
         
         <!-- Create Schedule -->
         <div id="createSchedulePanel" hidden>
-            <%@include file="createterm_createschedule.jsp" %>
+            <h3>Create Schedule</h3>
+            <form id="createScheduleForm">
+                <table>
+                    <th>Milestone</th><th>Dates</th>
+                    <tr>
+                        <td class="formLabelTd">Acceptance</td>
+                        <td><input type="text" id="acceptanceDatePicker" class="input-medium datepicker" name="acceptanceDates"/></td>
+                    </tr>
+                    <tr>
+                        <td class="formLabelTd">Midterm</td>
+                        <td><input type="text" id="midtermDatePicker" class="input-medium datepicker" name="midtermDates"/></td>
+                    </tr>
+                    <tr>
+                        <td class="formLabelTd">Final</td>
+                        <td><input type="text" id="finalDatePicker" class="input-medium datepicker" name="finalDates"/></td>
+                    </tr>
+                    <tr class="createScheduleSubmitRow">
+                        <td></td>
+                        <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create"/></td>
+                    </tr>
+                </table>
+            </form>
         </div>
         
         <div class="line-separator"></div>
         
         <!-- Create Timeslots -->
         <div id="createTimeslotsPanel" hidden>
-            <%@include file="createterm_createtimeslots.jsp" %>
+            <h3>Create Timeslots</h3>
+            <div id="timeslotsTableSection">
+                <table id="acceptanceTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
+                </table> 
+                <br/>
+                <table id="midtermTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
+                </table>
+                <br/>
+                <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
+                </table>
+                <br/>
+                <button id="createTimeslotsSubmitBtn" class="btn btn-primary">Create</button>
+                <br />
+            </div>
         </div>
         
     </div>
