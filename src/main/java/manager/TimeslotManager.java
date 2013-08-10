@@ -192,4 +192,23 @@ public class TimeslotManager {
         }
         return false;
     }
+    
+     public static List<Timeslot> getAllTimeslots(EntityManager em) {
+        logger.info("Getting all timeslots");
+        List<Timeslot> result = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createQuery("select o from Timeslot o");
+            result = q.getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return result;
+    }
+    
+
+    
+    
 }
