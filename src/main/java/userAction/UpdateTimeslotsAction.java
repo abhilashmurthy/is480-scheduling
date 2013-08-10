@@ -54,6 +54,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
     @Override
     public String execute() throws Exception {
         try {
+            json.put("exception", false);
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
             Map parameters = request.getParameterMap();
@@ -193,6 +194,8 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
             logger.debug("Persisted final timeslots: count " + finalTimeslots.size());
 
             json.put("success", true);
+            json.put("message", "Timeslots udpated");
+            return SUCCESS;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {

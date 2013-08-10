@@ -513,6 +513,18 @@
                     triggerTimeslot(this, 90);
                 });
             }
+            
+            function populateTimeslotsTable(tableId) {
+                $("#" + tableId).find("td").each(function(){
+                    var milestone = tableId.split("TimeslotsTable")[0];
+                    if (milestone === "acceptance") {
+                        triggerTimeslot(this, 60);
+                    } else {
+                        triggerTimeslot(this, 90);
+                    }
+                });
+            }
+            
         });
     </script>
 </body>

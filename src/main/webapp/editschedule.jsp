@@ -439,7 +439,7 @@
                         } else {
                             displayMessage("termResult", response.message, true);
                         }
-                        setTimeout(function(){window.location.reload();}, 2000);
+                        setTimeout(function(){window.location.reload();}, 1000);
                     } else {
                         var eid = btoa(response.message);
                         window.location="error.jsp?eid=" + eid;
@@ -527,12 +527,16 @@
                     data: timeslotsData,
                     dataType: 'json'
                 }).done(function(response) {
-                    if (response.success) {
-                        console.log("createTimeslotsJson was successful");
+                    if (!response.exception) {
+                        if (response.success) {
+                            displayMessage("timeslotsResult", response.message, false);
+                        } else {
+                            displayMessage("timeslotsResult", response.message, true);
+                        }
+                        setTimeout(function(){window.location.reload();}, 1000);
                     } else {
                         var eid = btoa(response.message);
-                        console.log(response.message);
-                        window.location = "error.jsp?eid=" + eid;
+                        window.location="error.jsp?eid=" + eid;
                     }
                 }).fail(function(error) {
                     console.log("createTimeslotsJson AJAX FAIL");
