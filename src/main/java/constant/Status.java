@@ -9,5 +9,5 @@ package constant;
  * @author suresh
  */
 public enum Status {
-	PENDING, ACCEPTED, REJECTED
+	AVAILABLE, PENDING, ACCEPTED, REJECTED
 }

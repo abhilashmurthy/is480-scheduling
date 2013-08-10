@@ -237,9 +237,9 @@
                     };
                     
                     //Append bodyTd classes based on status
-                    if (viewBookingData.status === "Accepted") {
+                    if (viewBookingData.status === "ACCEPTED") {
                         bodyTd.addClass("acceptedTimeslot");
-                    } else if (viewBookingData.status === "Rejected") {
+                    } else if (viewBookingData.status === "REJECTED") {
                         bodyTd.addClass("rejectedTimeslot");
                     } else {
                         bodyTd.addClass("pendingTimeslot");

@@ -48,22 +48,26 @@ public class Timeslot implements Serializable {
 	 * @return
 	 */
 	public Status getOverallBookingStatus() {
-		int counter = 0;
 		Collection<Status> values = statusList.values();
-		for (Status s: statusList.values()) {
-			if (s == Status.REJECTED) {
-				// Reject the booking if any one person has rejected it
-				return Status.REJECTED;
-			} else if (s == Status.ACCEPTED) {
-				counter++;
+		if (values.size() > 0) {
+			int counter = 0;
+			for (Status s: statusList.values()) {
+				if (s == Status.REJECTED) {
+					// Reject the booking if any one person has rejected it
+					return Status.REJECTED;
+				} else if (s == Status.ACCEPTED) {
+					counter++;
+				}
 			}
+
+			// Check if everyone has approved the booking
+			if (counter == values.size()) {
+				return Status.ACCEPTED;
+			}
+			return Status.PENDING;
 		}
 		
-		// Check if everyone has approved the booking
-		if (counter == values.size()) {
-			return Status.ACCEPTED;
-		}
-		return Status.PENDING;
+		return Status.AVAILABLE;
 	}
 	
 	public Timestamp getStartTime() {
