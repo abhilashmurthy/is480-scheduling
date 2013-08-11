@@ -22,6 +22,7 @@ import manager.TimeslotManager;
 import manager.UserManager;
 import model.Timeslot;
 import model.User;
+import notification.email.ApprovedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +75,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                     if (iter.next().equals(user)) {
                         if (status.equalsIgnoreCase("ACCEPTED")) {
                             statusList.put(user, Status.ACCEPTED);
+							ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(timeslot, user);
+							approvedEmail.sendEmail();
                         } else if (status.equalsIgnoreCase("REJECTED")) {
                             statusList.put(user, Status.REJECTED);
                         }
