@@ -5,10 +5,15 @@
 package util;
 
 import com.google.gson.Gson;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.Level;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import model.Milestone;
@@ -30,16 +35,24 @@ import org.slf4j.LoggerFactory;
 public class DBInitUtil {
 	
 	static Logger logger = LoggerFactory.getLogger(DBInitUtil.class);
+        static {
+            try {
+		logger.info("DB Creation started");     
+                resetDB();
+                logger.info("DB Creation complete");
+            } catch (Exception ex) {
+                java.util.logging.Logger.getLogger(DBInitUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 	
 	/**
 	 * Method to initialize data in a new database.
 	 * WARNING! Please run this file only on a blank database!
 	 */
 	public static void main(String[] args) {
-		
 		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 		try {
-			logger.info("DB Initialization started");
+                        logger.info("DB Initialization started");   
 			em.getTransaction().begin();
 			initDB(em);
 			em.getTransaction().commit();
@@ -50,6 +63,36 @@ public class DBInitUtil {
 		}
 		
 	}
+        
+        private static void resetDB() throws Exception {
+            String url = "jdbc:mysql://localhost:3306/";
+            String username = "root";
+            String password = null;
+            String dbName = "is480-scheduling";
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                logger.debug("Connecting to phpmyadmin..");
+                conn = DriverManager.getConnection(url, username, password);
+                stmt = conn.createStatement();
+                try {
+                    stmt.executeUpdate("CREATE DATABASE `" + dbName + "`");
+                } catch (SQLException s) {
+                    logger.debug("Database exists. Dropping and creating again.");
+                    stmt.executeUpdate("DROP DATABASE `" + dbName + "`");
+                    stmt.executeUpdate("CREATE DATABASE `" + dbName + "`");
+                }
+                logger.debug("Database created successfully");
+            } catch (Exception e) {
+                logger.error("Exception caught! " + e.getMessage());
+            } finally {
+                if (stmt != null) {
+                    stmt.close();
+                    conn.close();
+                }
+            }
+        }
 	
 	private static void initDB(EntityManager em) throws Exception {
 		/*
