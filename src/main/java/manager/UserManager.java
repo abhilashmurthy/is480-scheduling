@@ -4,20 +4,12 @@
  */
 package manager;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import model.Timeslot;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.MiscUtil;
 
 /**
  *
@@ -70,5 +62,19 @@ public class UserManager {
         return result;
     }
     
-    
+	public static User getCourseCoordinator(EntityManager em) {
+        logger.info("Getting Course Coordinator");
+        User user = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createQuery("select o from User o inner join o.roles r where r.name = :name")
+                    .setParameter("name", "Course Coordinator");
+            user = (User) q.getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return user;
+    }
 }

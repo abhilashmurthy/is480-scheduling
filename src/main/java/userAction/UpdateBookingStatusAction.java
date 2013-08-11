@@ -23,6 +23,7 @@ import manager.UserManager;
 import model.Timeslot;
 import model.User;
 import notification.email.ApprovedBookingEmail;
+import notification.email.ConfirmedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +89,11 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                     timeslot.setStatusList(statusList);
                     timeslotsToUpdate.add(timeslot);
                 }
+				
+				if (timeslot.getOverallBookingStatus() == Status.ACCEPTED) {
+					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(timeslot);
+					confirmationEmail.sendEmail();
+				}
             }
             //Updating the time slot 
             EntityTransaction transaction = em.getTransaction();

@@ -4,31 +4,34 @@
  */
 package notification.email;
 
+import constant.Status;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
+import manager.UserManager;
 import model.Timeslot;
 import model.User;
+import util.MiscUtil;
 
 /**
  *
  * @author suresh
  */
-public class ApprovedBookingEmail extends EmailTemplate{
-	Timeslot t;
-	User approver;
+public class ConfirmedBookingEmail extends EmailTemplate{
+	private Timeslot t;
 	
-	public ApprovedBookingEmail(Timeslot t, User approver) {
-		super("approved_booking.html");
+	public ConfirmedBookingEmail(Timeslot t) {
+		super("confirmed_booking.html");
 		this.t = t;
-		this.approver = approver;
 	}
 
 	@Override
 	public String generateEmailSubject() {
-		return t.getSchedule().getMilestone().getName() + " - Booking Approval";
+		return t.getSchedule().getMilestone().getName() + " - Booking Confirmed";
 	}
 
 	@Override
@@ -43,8 +46,17 @@ public class ApprovedBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		Set<String> emails = new HashSet<String>();
-		emails.add(approver.getId() + "@smu.edu.sg");
+		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		HashMap<User, Status> statusList = t.getStatusList();
+		HashSet<String> emails = new HashSet<String>();
+		
+		//Adding required attendees
+		for (User u : statusList.keySet()) {
+			emails.add(u.getUsername() + "@smu.edu.sg");
+		}
+		//Adding the course coordinator
+		emails.add(UserManager.getCourseCoordinator(em).getUsername() + "@smu.edu.sg");
+		
 		return emails;
 	}
 
@@ -52,14 +64,11 @@ public class ApprovedBookingEmail extends EmailTemplate{
 	public HashMap<String, String> prepareBodyData() {
 		HashMap<String, String> map = new HashMap<String, String>();
 		
-		//Inserting milestone
-		map.put("[MILESTONE]", t.getSchedule().getMilestone().getName());
-		
-		//Inserting approver name
-		map.put("[APPROVER_NAME]", approver.getFullName());
-		
 		//Insert team name
 		map.put("[TEAM_NAME]", t.getTeam().getTeamName());
+		
+		//Insert milestone name
+		map.put("[MILESTONE]", t.getSchedule().getMilestone().getName());
 		
 		//Insert start date
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
@@ -86,7 +95,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 				result.append("<br />");
 			}
 		}
-		map.put("[REQUIRED_ATTENDEES]", result.toString());
+		map.put("[CONFIRMED_ATTENDEES]", result.toString());
 		
 		return map;
 	}
