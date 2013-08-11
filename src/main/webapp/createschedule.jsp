@@ -69,6 +69,15 @@
     <body>
         <!-- Navbar -->
         <%@include file="navbar.jsp" %>
+        
+        <!-- Kick unauthorized user -->
+        <%
+            if (!activeRole.equals("Administrator")) {
+                request.setAttribute("error", "You need administrator privileges for this page");
+                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+                rd.forward(request, response);
+            }
+         %>
 
         <!-- Create Term -->
         <div id="createTermPanel" class="container">
