@@ -40,7 +40,7 @@ public abstract class EmailTemplate {
 	public void sendEmail() {
 		Runnable r = new Runnable() {
 			public void run() {
-				MailSender.sendEmail(generateRecipientList(),
+				MailSender.sendEmail(generateToAddressList(), generateCCAddressList(),
 				generateEmailSubject(), generateEmailBody());
 			}
 		};
@@ -58,7 +58,9 @@ public abstract class EmailTemplate {
 	
 	public abstract String generateEmailSubject();
 	
-	public abstract Set<String> generateRecipientList();
+	public abstract Set<String> generateToAddressList();
+	
+	public abstract Set<String> generateCCAddressList();
 	
 	public abstract HashMap<String, String> prepareBodyData();
 	

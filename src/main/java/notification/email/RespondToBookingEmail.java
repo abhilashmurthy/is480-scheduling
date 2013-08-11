@@ -32,7 +32,7 @@ public class RespondToBookingEmail extends EmailTemplate{
 	}
 
 	@Override
-	public Set<String> generateRecipientList() {
+	public Set<String> generateToAddressList() {
 		HashSet<String> emails = new HashSet<String>();
 		HashMap<User, Status> map = t.getStatusList();
 		for (User u : map.keySet()) {
@@ -80,6 +80,11 @@ public class RespondToBookingEmail extends EmailTemplate{
 		map.put("[REQUIRED_ATTENDEES]", result.toString());
 		
 		return map;
+	}
+
+	@Override
+	public Set<String> generateCCAddressList() {
+		return null;
 	}
 	
 }

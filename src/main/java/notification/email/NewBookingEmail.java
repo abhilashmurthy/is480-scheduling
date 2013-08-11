@@ -31,7 +31,7 @@ public class NewBookingEmail extends EmailTemplate{
 	}
 
 	@Override
-	public Set<String> generateRecipientList() {
+	public Set<String> generateToAddressList() {
 		Set<String> emails = new HashSet<String>();
 		for (User u : t.getTeam().getMembers()) {
 			emails.add(u.getUsername() + "@smu.edu.sg");
@@ -78,6 +78,11 @@ public class NewBookingEmail extends EmailTemplate{
 		map.put("[REQUIRED_ATTENDEES]", result.toString());
 		
 		return map;
+	}
+
+	@Override
+	public Set<String> generateCCAddressList() {
+		return null;
 	}
 	
 }

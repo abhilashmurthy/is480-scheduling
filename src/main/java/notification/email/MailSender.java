@@ -53,12 +53,14 @@ public class MailSender {
 		}
 	}
 
-	public synchronized static void sendEmail(Set<String> recipients, String subject, String body) {
+	public synchronized static void sendEmail(Set<String> toEmails, Set<String> ccEmails, String subject, String body) {
 
 		try {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress("is480.scheduling@gmail.com",
 					"IS480 Scheduling"));
+			
+			//Setting TO emails
 			if (MiscUtil.DEV_MODE) {
 				message.setRecipients(Message.RecipientType.TO,
 						InternetAddress.parse(
@@ -66,8 +68,22 @@ public class MailSender {
 				body += "Sent from: " + InetAddress.getLocalHost().getHostName();
 			} else {
 				message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse(parseRecipientArray(recipients)));	
+					InternetAddress.parse(parseRecipientArray(toEmails)));	
 			}
+			
+			//Setting CC emails
+			if (ccEmails != null) {
+				if (MiscUtil.DEV_MODE) {
+					message.setRecipients(Message.RecipientType.CC,
+							InternetAddress.parse(
+							MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
+					body += "Sent from: " + InetAddress.getLocalHost().getHostName();
+				} else {
+					message.setRecipients(Message.RecipientType.CC,
+						InternetAddress.parse(parseRecipientArray(ccEmails)));	
+				}
+			}
+			
 			message.setSubject(subject);
 			message.setContent(body, "text/html");
 
@@ -77,12 +93,6 @@ public class MailSender {
 			logger.error("Send Mail Error");
 			logger.error(e.getMessage());
 		}
-	}
-	
-	public synchronized static void sendEmail(String recipient, String subject, String body) {
-		Set<String> recipientList = new HashSet<String>();
-		recipientList.add(recipient);
-		sendEmail(recipientList, subject, body);
 	}
 	
 	/**
