@@ -176,3 +176,6 @@ body {
     border-top: 1px solid #D1D0CE;
 }
 
+#createTeamSelect {
+    width: 150px;
+}

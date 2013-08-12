@@ -130,6 +130,10 @@
             var date = null;
             var startTime = null;
             var termId = null;
+            
+            //All teams data if for admins
+            var teams = null;
+            var teamsPendingBooking = new Array();
 
             //Default schedule to see upon opening index page
             populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
@@ -160,7 +164,6 @@
 
             //View Schedule stuff
             //Function to populate schedule data based on ACTIVE TERM
-            //TODO: Change this to populate schedule based on dropdown select
             function populateSchedule(milestone, year, semester) {
                 //Generate schedule table
                 var data = {
@@ -177,6 +180,26 @@
                     dataType: 'json'
                 }).done(function(response) {
                     if (response.success) {
+                        
+                        //Get Teams data if user is administrator
+                        if (<%= activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator") %>) {
+                            teams = null;
+                            $.ajax({
+                                type: 'GET',
+                                url: 'getTeams',
+                                data: data,
+                                async: false,
+                                dataType: 'json'
+                            }).done(function(response){
+                                if (response.success) {
+                                    teams = response.teamList;
+                                } else {
+                                    var eid = btoa(response.message);
+                                    window.location = "error.jsp?eid=" + eid;
+                                }
+                            });
+                        }
+                        
                         //Draw the schedule table
                         makeSchedule(response);
                         
@@ -201,7 +224,7 @@
                 $(".timeslotCell").trigger('mouseleave');
                 $(".timeslotCell").popover('destroy');
                 
-                
+                //Add View Booking popovers
                 $(".bookedTimeslot").each(function(){
                    appendViewBookingPopover($(this));
                 });
@@ -209,7 +232,7 @@
                 //Logged in team name
                 teamName = "<%= team != null?team.getTeamName():null %>";
                 
-                function appendViewBookingPopover(bodyTd) {    
+                function appendViewBookingPopover(bodyTd) {
                     //Get View Booking Data
                     var cellId = bodyTd.attr('id').split("_")[1];
                     var data = {timeslotId: cellId};
@@ -264,24 +287,14 @@
                                 ["Attendees", viewBookingData.attendees]
                             ];
                             
-                            //check if this timeslot belongs to logined in student or if the user is an admin
-                            if(viewBookingData.attendees!==null){
-                                 for (var i = 0; i < viewBookingData.attendees.length; i++) {
-                                    var personnel = viewBookingData.attendees[i].name;
-                                    var status = viewBookingData.attendees[i].status;
-                                    if ($.trim(personnel) === '<%=fullName%>' && typeof status === 'undefined') {//&& activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator")) {
-                                        //output += "<tr>";
-                                        //output += "<td><button id='deleteBookingBtn' class='btn btn-danger'>Delete</button></td>";
-                                       outputData.push(["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]);
-                                       break;
-                                    }
-                                  }
+                            //Add delete button if user if part of team
+                            if (viewBookingData.teamName === teamName) {
+                                outputData.push(["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]);
                             }
                             
-                            //if user is admin
-                            if (<%=activeRole.equalsIgnoreCase("Administrator")%>) {
+                            //Add Update and Delete buttons if user is admin
+                            if (<%=activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
                                     //viewBookingData.startDate
-
                                     var outputData = [
                                             ["Team", viewBookingData.teamName],
                                             ["Status", viewBookingData.status],
@@ -293,11 +306,10 @@
 												+ "&nbsp&nbsp&nbsp&nbsp&nbsp;" 
 												+ "<button id='updateBookingBtn' class='btn btn-info'><i class='icon-edit icon-white'></i>Save</button>"]
                                     ];
-
-
                             }
                             
-                            if (<%=!activeRole.equalsIgnoreCase("Administrator")%>) {
+                            //Make fields editable is user is admin
+                            if (<%=!(activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator"))%>) {
 			
                                 for (var i = 0; i < outputData.length; i++) {
                                     var outputTr = $(document.createElement('tr'));
@@ -382,6 +394,7 @@
                     });
                 }
                 
+                //Add Create Booking Popovers
                 var bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
                 $(".unbookedTimeslot").each(function(){
                    appendCreateBookingPopover($(this));
@@ -410,10 +423,30 @@
                             
                             //Create Booking outputTable
                             var outputTable = $(document.createElement('table'));
-                            outputTable.attr('id', 'createTimeslotTable');                            
+                            outputTable.attr('id', 'createTimeslotTable');
+                            
+                            //Make a dropdown of all teams that have not booked yet if user is admin
+                            if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator") %>) {                               
+                                if (teams.length !== 0) {
+                                    var teamDropDownSelect = $(document.createElement('select'));
+                                    teamDropDownSelect.attr('name', 'team');
+                                    teamDropDownSelect.attr('id', 'createTeamSelect');
+                                    for (var t = 0; t < teams.length; t++) {
+                                        //Append only teams without bookings
+                                        if (!$("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teams[t].teamName + ")").length) {
+                                            var teamDropDownOption = $(document.createElement('option'));
+                                            teamDropDownOption.attr('value', teams[t].teamName);
+                                            teamDropDownOption.html(teams[t].teamName);
+                                            teamDropDownSelect.append(teamDropDownOption);
+                                            teamsPendingBooking.push(teams[t].teamName);
+                                        }
+                                    }
+                                    teamName = teamDropDownSelect;
+                                }
+                            }
 
                             var outputData = [
-//                                ["Team", teamName],
+                                ["Team", teamName],
                                 ["Date", dateToView],
                                 ["Start Time", startTimeToView],
                                 ["End Time", endTimeToView],
@@ -431,14 +464,27 @@
                                 outputTable.append(outputTr);
                             }
                             
-                            bodyTd.popover({
-                               container: bodyTd,
-                               html: 'true',
-                               trigger: 'manual',
-                               placement: 'right',
-                               content: outputTable,
-                               title: "Create Booking <button type='button' class='close'>&times;</button>"
-                            });
+                            //Make a notification popover saying all teams have booked if no more teams pending booking
+                            if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator") %> && teamsPendingBooking.length === 0) {
+                                bodyTd.popover({
+                                   container: bodyTd,
+                                   html: 'true',
+                                   trigger: 'manual',
+                                   placement: 'right',
+                                   title: "Booking <button type='button' class='close'>&times;</button>",
+                                   content: 'All teams have made bookings!'
+                                });
+                            } else {
+                                bodyTd.popover({
+                                   container: bodyTd,
+                                   html: 'true',
+                                   trigger: 'manual',
+                                   placement: 'right',
+                                   content: outputTable,
+                                   title: "Create Booking <button type='button' class='close'>&times;</button>"
+                                });
+                            }
+
                         }
                     }
                 };
@@ -446,16 +492,9 @@
 
             //Function to create mouse UI events
             function setupMouseEvents() {
-                //Highlight cell
-                //Changed this code to CSS:hover selector
-//                $(".timeslotCell").mouseenter(function() {
-//                    $(this).css('border', '2px solid #1E647C');
-//                    $(this).css('cursor', 'pointer');
-//                });
                 
                 //Removed clicked
                 $(".timeslotCell").mouseleave(function() {
-//                    $(this).css('border', '1px solid #dddddd');
                     $(this).removeClass("clickedCell");
                 });
                 
@@ -497,11 +536,14 @@
                 $(".unbookedTimeslot").on('click', function(e) {
                     if (e.target === this) {
                         console.log(".unbookedTimeslot clicked");
-                        self = $(this);
-                        self.popover('show');
-                        date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
-                        startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
-                        termId = activeAcademicYearStr + "," + activeSemesterStr;
+                        //Only display if user is student or admin
+                        if (<%= activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator") %>) {
+                            self = $(this);
+                            self.popover('show');
+                            date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
+                            startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
+                            termId = activeAcademicYearStr + "," + activeSemesterStr;
+                        }
                     }
                     return false;
                 });
@@ -520,6 +562,9 @@
                 //Create Booking Button
                 $("td").on('click', '#createBookingBtn', function(e) {
                     e.stopPropagation();
+                    if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator") %>) {
+                        teamName = $("#createTeamSelect").val();
+                    }
                     createBooking(self);
                     setTimeout(function(){appendPopovers();}, 3000); //Refresh all popovers
                     return false;
@@ -551,7 +596,8 @@
                     date: date,
                     startTime: startTime,
                     termId: termId,
-                    milestoneStr: milestoneStr.toLowerCase()
+                    milestoneStr: milestoneStr.toLowerCase(),
+                    teamName: teamName
                 };
                 console.log("Submitting create booking data: " + JSON.stringify(data));
                 //Create Booking AJAX
