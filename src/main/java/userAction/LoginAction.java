@@ -242,27 +242,27 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         this.userRoles = userRoles;
     }
 
-	public boolean isIsSupervisorReviewer() {
-		return isSupervisorReviewer;
-	}
-
-	public void setIsSupervisorReviewer(boolean isSupervisorReviewer) {
-		this.isSupervisorReviewer = isSupervisorReviewer;
-	}
-
-	public boolean isIsAdministrator() {
-		return isAdministrator;
-	}
-
-	public void setIsAdministrator(boolean isAdministrator) {
-		this.isAdministrator = isAdministrator;
-	}
-
-	public boolean isIsCourseCoordinator() {
-		return isCourseCoordinator;
-	}
-
-	public void setIsCourseCoordinator(boolean isCourseCoordinator) {
-		this.isCourseCoordinator = isCourseCoordinator;
-	}
+//	public boolean isIsSupervisorReviewer() {
+//		return isSupervisorReviewer;
+//	}
+//
+//	public void setIsSupervisorReviewer(boolean isSupervisorReviewer) {
+//		this.isSupervisorReviewer = isSupervisorReviewer;
+//	}
+//
+//	public boolean isIsAdministrator() {
+//		return isAdministrator;
+//	}
+//
+//	public void setIsAdministrator(boolean isAdministrator) {
+//		this.isAdministrator = isAdministrator;
+//	}
+//
+//	public boolean isIsCourseCoordinator() {
+//		return isCourseCoordinator;
+//	}
+//
+//	public void setIsCourseCoordinator(boolean isCourseCoordinator) {
+//		this.isCourseCoordinator = isCourseCoordinator;
+//	}
 }

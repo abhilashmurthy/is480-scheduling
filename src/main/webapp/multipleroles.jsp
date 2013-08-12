@@ -10,8 +10,6 @@
 <%@page contentType="text/html" pageEncoding="windows-1252"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 
-<% List<Role> userRoles = (List<Role>) session.getAttribute("userRoles");
-   if (userRoles.size() > 1) {  %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -21,6 +19,7 @@
     </head>
     <body>
         <%@include file="navbar_multipleroles.jsp" %>
+		
         <div class="container">
 			<h3>Choose your Role</h3>
 				
@@ -30,26 +29,32 @@
 				<form id="myform" action="setRole" method="post">
 				<table align="center">
 					<tr>
-					<s:if test="%{isAdministrator}">
+					<%--<s:if test="%{isAdministrator}">--%>
+					<% if (isAdministrator) { %>
  						<td>
 							<input type="submit" class="btn btn-large" value="Administrator" name="administrator"/>
 							<!--<img src="img/administrator.jpg" class="img-polaroid" title="Administrator" height="200" width="150"/>-->
 						</td>
 						<td style="width:20px"></td>
-					</s:if>
-					<s:if test="%{isSupervisorReviewer}">
+					<% } %>
+					<%--</s:if>--%>
+					<%--<s:if test="%{isSupervisorReviewer}">--%>
+					<% if (isSupervisorReviewer) { %>
 						<td>
 							<input type="submit" class="btn btn-large" value="Supervisor/Reviewer" name="supervisorReviewer"/>
 							<!--<img src="img/supervisor.jpg" class="img-polaroid" title="Supervisor" height="210" width="150"/>-->
 						</td>
 						<td style="width:20px"></td>
-					</s:if>
-					<s:if test="%{isCourseCoordinator}">
+					<% } %>
+					<%--</s:if>--%>
+					<%--<s:if test="%{isCourseCoordinator}">--%>
+					<% if (isCourseCoordinator) { %>
 						<td>
 							<input type="submit" class="btn btn-large" value="Course Coordinator" name="courseCoordinator"/>
 							<!--<img src="img/reviewer.jpg" class="img-polaroid" title="Reviewer" height="220" width="170"/>-->
 						</td>
-					</s:if>
+					<% } %>	
+					<%--</s:if>--%>
 					</tr>
 					
 				</table>
@@ -74,7 +79,4 @@
         </div>
     </body>
 </html>
-<% } else { %>
-	<s:action name="index" executeResult="true"/> 	
-<% } %>
 

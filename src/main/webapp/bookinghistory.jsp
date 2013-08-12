@@ -19,12 +19,20 @@
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
-        
+		
+		 <!-- Kick unauthorized user -->
+        <%
+            if (!activeRole.equalsIgnoreCase("TA") || !activeRole.equalsIgnoreCase("Student") ||
+					!activeRole.equalsIgnoreCase("Supervisor/Reviewer")) {
+                request.setAttribute("error", "Oops. You are not authorized to access this page!");
+                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+                rd.forward(request, response);
+            }
+         %>
+		 
 		<div class="container">
 		<h3>Booking History</h3>
 		
-		<%-- Tab to view Accept/Reject Bookings --%>
-			
 		<!-- SECTION: Booking History -->
 		<s:if test="%{data.size() > 0 && data != null}"> 
 			<table class="table table-hover zebra-striped">

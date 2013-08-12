@@ -16,6 +16,34 @@
         padding-right:2px;
     }
 </style>
+<%  List<Role> userRoles = (List<Role>) session.getAttribute("userRoles");
+	boolean isSupervisorReviewer = false;
+	boolean isAdministrator = false;
+	boolean isCourseCoordinator = false;
+	//Kicking user out
+	if (userRoles.size() > 1) {
+		for (Role role: userRoles) {
+			if (role.getName().equalsIgnoreCase("Supervisor") || 
+					role.getName().equalsIgnoreCase("Reviewer")) {
+				isSupervisorReviewer = true;
+			} else if (role.getName().equalsIgnoreCase("Administrator")) {
+				isAdministrator = true;
+			} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
+				isCourseCoordinator = true;
+			}
+		}
+		//If user is just supervisor && reviewer, kick him out 
+		if (isAdministrator == false && isCourseCoordinator == false) {
+			request.setAttribute("error", "Oops. You are not authorized to access this page!");
+			RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+			rd.forward(request, response);
+		}
+	} else {
+		request.setAttribute("error", "Oops. You are not authorized to access this page!");
+		RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+		rd.forward(request, response);
+	}
+%>
 <%@include file="imports.jsp"%>
 
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -45,15 +73,21 @@
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
     <strong>Roles</strong>
 	<ul class="unstyled">
-		<s:if test="%{isAdministrator}">
+		<%--<s:if test="%{isAdministrator}">--%>
+		<% if (isAdministrator) { %>
 		   <li>Administrator</li>
-		</s:if>
-		<s:if test="%{isSupervisorReviewer}">
+		<% } %>
+		<%--</s:if>--%>
+		<%--<s:if test="%{isSupervisorReviewer}">--%>
+		<% if (isSupervisorReviewer) { %>
 		   <li>Supervisor/Reviewer</li>
-		</s:if>
-		<s:if test="%{isCourseCoordinator}">
+		<% } %>
+		<%--</s:if>--%>
+		<%--<s:if test="%{isCourseCoordinator}">--%>
+		<% if (isCourseCoordinator) { %>
 		   <li>Course Coordinator</li>
-		</s:if>
+		<% } %>
+		<%--</s:if>--%>
 	</ul>
 </div>
 <script type="text/javascript">

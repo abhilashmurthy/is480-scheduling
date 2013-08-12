@@ -61,6 +61,16 @@
     </head>
     <body>
         <%@include file="navbar.jsp" %>
+		
+		 <!-- Kick unauthorized user -->
+        <%
+            if (!activeRole.equals("Supervisor/Reviewer")) {
+                request.setAttribute("error", "Oops. You are not authorized to access this page!");
+                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+                rd.forward(request, response);
+            }
+         %>
+		 
         <div class="container">
         <h3>Accept/Reject Booking</h3>
         <!--<form action="approveReject" method="post">
