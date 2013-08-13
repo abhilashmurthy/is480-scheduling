@@ -62,14 +62,14 @@
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="editschedule.jsp">Edit Schedule</a></li>
 							</ul>
 						</li>
-						<li class="dropdown">
+<!--						<li class="dropdown">
 							<a id="adminConfigDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Admin Config</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>
 							</ul>
-						</li>
-						<li id="Report"><a href="#"><b>Report</b></a></li>
+						</li>-->
+						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						
 				<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<!--<li class="dropdown">
