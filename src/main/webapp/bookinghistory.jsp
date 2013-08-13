@@ -1,5 +1,5 @@
 <%-- 
-    Document   : mybookings
+    Document   : bookinghistory
     Created on : Aug 2, 2013, 10:09:25 PM
     Author     : Prakhar
 --%>
@@ -42,8 +42,8 @@
 							<th>#</th>
 							<th>My Team</th>
 							<th>Presentation</th>
-							<th>Start Time</th>
-							<th>End Time</th>
+							<th>Date</th>
+							<th>Time</th>
 							<th>Venue</th>
 							<th>Booking Status</th>
 							<th>Overall Booking Status</th>
@@ -53,8 +53,8 @@
 							<th>#</th>
 							<th>Team Name</th>
 							<th>Presentation</th>
-							<th>Start Time</th>
-							<th>End Time</th>
+							<th>Date</th>
+							<th>Time</th>
 							<th>Venue</th>
 							<th>My Status</th>
 							<th>Overall Booking Status</th>
@@ -75,8 +75,8 @@
 								<td><%= count %></td>
 								<td><s:property value="teamName"/></td>
 								<td><s:property value="milestone"/></td>
-								<td><s:property value="startTime"/></td>
-								<td><s:property value="endTime"/></td>
+								<td><s:property value="date"/></td>
+								<td><s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
 								<td>
 								<s:iterator value="individualBookingStatus">
@@ -97,8 +97,8 @@
 							<td><%= count %></td>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
-							<td><s:property value="startTime"/></td>
-							<td><s:property value="endTime"/></td>
+							<td><s:property value="date"/></td>
+							<td><s:property value="time"/></td>
 							<td><s:property value="venue"/></td>
 							<td><s:property value="myStatus"/></td>
 							<td><s:property value="overallBookingStatus"/></td>
@@ -111,5 +111,6 @@
 		</s:if><s:else>
 			<h4>No bookings have been made!</h4>
 		</s:else>
+		</div>
     </body>
 </html>

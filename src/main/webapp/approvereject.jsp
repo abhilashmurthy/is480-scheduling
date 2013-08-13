@@ -14,7 +14,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Accept/Reject Booking</title>
+        <title>Approve Booking</title>
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
 		//To check/uncheck all boxes
@@ -72,7 +72,7 @@
          %>
 		 
         <div class="container">
-        <h3>Accept/Reject Booking</h3>
+        <h3>Approve Booking</h3>
         <!--<form action="approveReject" method="post">
 			<!-- Putting default values for testing purposes 
             Choose Term <select name="termId"> 
@@ -98,8 +98,8 @@
 								<th>Team Name</th>
 								<th>Presentation</th>
 								<th>My Role</th>
-								<th>Start Time</th>
-								<th>End Time</th>
+								<th>Date</th>
+								<th>Time</th>
 								<th>Venue</th>
 								<th>My Status</th>
 							</tr>
@@ -122,8 +122,8 @@
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestone"/></td>
 									<td><s:property value="userRole"/></td>
-									<td><s:property value="startTime"/></td>
-									<td><s:property value="endTime"/></td>
+									<td><s:property value="date"/></td>
+									<td><s:property value="time"/></td>
 									<td><s:property value="venue"/></td>
 									<td><s:property value="myStatus"/></td>
 								</tr>

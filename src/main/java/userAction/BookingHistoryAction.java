@@ -100,13 +100,10 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                     if (filteredTimeslots.size() > 0) {
                         for (Timeslot timeslot : filteredTimeslots) {
                             HashMap<String, Object> map = new HashMap<String, Object>();
-							SimpleDateFormat sdf = null;
-							if (activeRole.equalsIgnoreCase("Student")) {
-								sdf = new SimpleDateFormat("dd-MMM, EEE HH:mm aa");
-							} else {
-								sdf = new SimpleDateFormat("dd-MMM-yyyy, EEE HH:mm aa");
-							}
-                            String venue = timeslot.getVenue();
+							SimpleDateFormat sdfForDate = new SimpleDateFormat("EEE, dd MMM yyyy");
+							SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
+							
+							String venue = timeslot.getVenue();
                             String teamName = timeslot.getTeam().getTeamName();
                             //Getting the schedule based on timeslot (Each timeslot belongs to 1 unique schedule)
                             Schedule schedule = timeslot.getSchedule();
@@ -114,8 +111,9 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
                             if (schedule != null) {
                                 milestoneName = schedule.getMilestone().getName();
                             }
-                            String startTime = sdf.format(timeslot.getStartTime());
-                            String endTime = sdf.format(timeslot.getEndTime());
+                            String date = sdfForDate.format(timeslot.getStartTime());
+                            String time = sdfForTime.format(timeslot.getStartTime()) + " - " + 
+									sdfForTime.format(timeslot.getEndTime());
 
                             //Only for supervisors/reviewers
                             if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { 
@@ -149,8 +147,8 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 
                             map.put("teamName", teamName);
                             map.put("milestone", milestoneName);
-                            map.put("startTime", startTime);
-                            map.put("endTime", endTime);
+                            map.put("date", date);
+                            map.put("time", time);
                             map.put("venue", venue);
 
                             data.add(map);
