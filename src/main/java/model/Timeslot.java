@@ -55,14 +55,14 @@ public class Timeslot implements Serializable {
 				if (s == Status.REJECTED) {
 					// Reject the booking if any one person has rejected it
 					return Status.REJECTED;
-				} else if (s == Status.ACCEPTED) {
+				} else if (s == Status.APPROVED) {
 					counter++;
 				}
 			}
 
 			// Check if everyone has approved the booking
 			if (counter == values.size()) {
-				return Status.ACCEPTED;
+				return Status.APPROVED;
 			}
 			return Status.PENDING;
 		}

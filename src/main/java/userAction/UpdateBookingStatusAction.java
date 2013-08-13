@@ -75,7 +75,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                 while (iter.hasNext()) {
                     if (iter.next().equals(user)) {
                         if (status.equalsIgnoreCase("ACCEPTED")) {
-                            statusList.put(user, Status.ACCEPTED);
+                            statusList.put(user, Status.APPROVED);
 							ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(timeslot, user);
 							approvedEmail.sendEmail();
                         } else if (status.equalsIgnoreCase("REJECTED")) {
@@ -90,7 +90,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                     timeslotsToUpdate.add(timeslot);
                 }
 				
-				if (timeslot.getOverallBookingStatus() == Status.ACCEPTED) {
+				if (timeslot.getOverallBookingStatus() == Status.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(timeslot);
 					confirmationEmail.sendEmail();
 				}
