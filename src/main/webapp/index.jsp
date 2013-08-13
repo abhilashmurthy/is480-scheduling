@@ -829,7 +829,7 @@
                     headerTr.attr('id', 'scheduleHeader');
                     headerTr.append(headerTd);
                     for (i = 0; i < datesArray.length; i++) {
-                        var headerVal = new Date(datesArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(datesArray[i]).toString('ddd');
+                        var headerVal = new Date(datesArray[i]).toString('dd MMM') + "<br/>" + new Date(datesArray[i]).toString('ddd');
                         headerTd = $(document.createElement('th'));
                         headerTd.html(headerVal);
                         headerTr.append(headerTd);

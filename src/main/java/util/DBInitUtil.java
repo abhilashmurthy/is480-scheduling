@@ -649,7 +649,7 @@ public class DBInitUtil {
 		t1.setTerm(term12013);
 		t1.setTeamName("Thunderbolt");
 		t1.setSupervisor(u6);
-		t1.setReviewer1(u7);
+		t1.setReviewer1(u15);
 		t1.setReviewer2(u8);
 		HashSet<User> members = new HashSet<User>();
 		members.add(u1);
