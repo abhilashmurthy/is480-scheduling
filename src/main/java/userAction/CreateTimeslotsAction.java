@@ -4,6 +4,7 @@
  */
 package userAction;
 
+import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.sql.Timestamp;
@@ -21,10 +22,13 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
+import manager.SettingsManager;
+import static manager.SettingsManager.getByName;
 import manager.TermManager;
 import manager.TimeslotManager;
 import model.Milestone;
 import model.Schedule;
+import model.Settings;
 import model.Term;
 import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -169,6 +173,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 
         logger.debug("Persisted final timeslots: count " + finalTimeslots.size());
 
+		//Setting newly created term as active
+		setTermAsActive(em, acceptanceSchedule.getTerm());
+		
         json.put("success", true);
 		json.put("message", "Timeslots stored successfully. Schedule creation complete!");
         } catch (Exception e) {
@@ -187,4 +194,17 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
     public void setServletRequest(HttpServletRequest hsr) {
         request = hsr;
     }
+
+	private void setTermAsActive(EntityManager em, Term newTerm) {
+		em.getTransaction().begin();
+		Settings result = getByName(em, "activeTerms");
+		ArrayList<Long> activeTermIds = new ArrayList<Long>();
+		for (Term t : SettingsManager.getActiveTerms(em)) {
+			activeTermIds.add(t.getId());
+		}
+		activeTermIds.add(newTerm.getId());
+		result.setValue(new Gson().toJson(activeTermIds));
+		em.persist(result);
+		em.getTransaction().commit();
+	}
 }

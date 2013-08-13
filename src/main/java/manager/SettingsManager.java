@@ -25,8 +25,7 @@ public class SettingsManager {
 	 * @return List of terms that are active
 	 */
 	public static ArrayList<Term> getActiveTerms(EntityManager em) {
-		Query q = em.createQuery("select s from Settings s where name = :name ");
-		Settings result = (Settings) q.setParameter("name", "activeTerms").getSingleResult();
+		Settings result = getByName(em, "activeTerms");
 		Type listType = new TypeToken<ArrayList<Long>>(){}.getType();
 		ArrayList<Long> termIds = new Gson().fromJson(result.getValue(), listType);
 		ArrayList<Term> activeTerms = new ArrayList<Term>();
@@ -34,5 +33,10 @@ public class SettingsManager {
 			activeTerms.add(TermManager.findTermById(em, l));
 		}
 		return activeTerms;
+	}
+	
+	public static Settings getByName(EntityManager em, String name) {
+		Query q = em.createQuery("select s from Settings s where name = :name");
+		return (Settings) q.setParameter("name", name).getSingleResult();
 	}
 }
