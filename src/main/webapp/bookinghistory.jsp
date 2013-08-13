@@ -67,7 +67,7 @@
 						<% if (activeRole.equalsIgnoreCase("Student")) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Accepted')}">
+						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
@@ -89,7 +89,7 @@
 						<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Accepted')}">
+						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">

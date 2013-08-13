@@ -77,7 +77,7 @@
             <td style="width:15px"></td>
             <td class="pendingTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
             <td style="width:15px"></td>
-            <td class="acceptedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Accepted</td> 
+            <td class="approvedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
             <td style="width:15px"></td>
             <td class="rejectedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
             <td style="width:15px"></td>
@@ -266,8 +266,8 @@
                     };
                     
                     //Append bodyTd classes based on status
-                    if (viewBookingData.status === "ACCEPTED") {
-                        bodyTd.addClass("acceptedTimeslot");
+                    if (viewBookingData.status === "APPROVED") {
+                        bodyTd.addClass("approvedTimeslot");
                     } else if (viewBookingData.status === "REJECTED") {
                         bodyTd.addClass("rejectedTimeslot");
                     } else {

@@ -108,7 +108,7 @@
 							<s:iterator value="data">
 								<s:if test="%{myStatus.equalsIgnoreCase('Pending')}"> 
 									<tr class="warning">
-								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Accepted')}">
+								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Approved')}">
 									<tr class="success">
 								</s:elseif><s:elseif test="%{myStatus.equalsIgnoreCase('Rejected')}">
 									<tr class="error">
