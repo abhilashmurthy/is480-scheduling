@@ -29,22 +29,28 @@
 					int startAcademicYear = activeTerm.getAcademicYear();
 					int endAcademicYear = startAcademicYear + 1;
 					String academicYear = String.valueOf(startAcademicYear) + "-" + 
-							String.valueOf(endAcademicYear).substring(2); 
+							String.valueOf(endAcademicYear); 
 					out.print(academicYear + " " + semester);
 				%>
 			</h3>
 		</div>
 	
 	<!-- To display the list of active terms -->
+	
 	<div class="activeTerms">
-		<form id="activeTermForm" action="index" method="post">
+	<table>
+		<tr>
+		<td style="width:90px; padding-bottom:11px"><b>Select Term</b></td>
+		<td><form id="activeTermForm" action="index" method="post">
 			<select name="termId" style="float:right" onchange="this.form.submit()"> 
-				<option value="">----- Choose Active Term ----</option>
+				<option value=""><% out.print(academicYear + " " + semester);%></option>
 				<s:iterator value="data">
 					<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
 				</s:iterator>
 			</select>
-		</form>
+		</form></td>
+		</tr>
+	</table>
 	</div>
 	
 	<!-- To display number of pending bookings for supervisor/reviewer -->
