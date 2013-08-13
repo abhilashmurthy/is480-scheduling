@@ -18,16 +18,13 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
 		//To check/uncheck all boxes
-		checked = false;
-		function checkedAll () {
-		  if (checked == false) {
-			  checked = true
-		  } else {
-			  checked = false
-		  }
-		  for (var i = 0; i < document.getElementById('myform').elements.length; i++) {
-			document.getElementById('myform').elements[i].checked = checked;
-		  }
+		function toggle(oInput) {
+			var aInputs = document.getElementsByTagName('input');
+			for (var i=0;i<aInputs.length;i++) {
+				if (aInputs[i] != oInput) {
+					aInputs[i].checked = oInput.checked;
+				}
+			}
 		}
 		
 		//To validate the form (Make sure all checkboxes have been checked
@@ -55,6 +52,23 @@
 				document.getElementById("rejectButton").style.visibility = "visible";
 			}
 		});
+		
+		//Disabling buttons when checkboxes are unchecked and vice-versa
+//		$(document).ready(function (){
+//			$('#approveButton').attr('disabled','disabled');
+//			$('#rejectButton').attr('disabled','disabled');
+//			$('#approveRejectArray').change(function(){
+//			if($(this).is(':checked')){
+//				$('#approveButton').removeAttr('disabled');                
+//				$('#rejectButton').removeAttr('disabled');
+//			}
+//			else {
+//				// remove
+//				$('#approveButton').attr('disabled','disabled');
+//				$('#rejectButton').attr('disabled','disabled');
+//			}
+//		})
+//		});
 		//To show/hide buttons if checkbox exists or not
 		</script>
 		
@@ -94,7 +108,7 @@
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
-								<th><input type="checkbox" name="checkall" onclick="checkedAll();"></th>
+								<th><input type="checkbox" name="checkall" onClick="toggle(this);"></th>
 								<th>Team Name</th>
 								<th>Presentation</th>
 								<th>My Role</th>
