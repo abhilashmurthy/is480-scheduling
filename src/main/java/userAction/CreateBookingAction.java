@@ -12,7 +12,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.MilestoneManager;
@@ -44,6 +46,15 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     private String endTime;
     private String termId;
     private String milestoneStr;
+    private String teamName;
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
     private HashMap<String, Object> json = new HashMap<String, Object>();
 	private Milestone milestone = null;
 	private Timeslot bookingSlot = null;
@@ -70,13 +81,23 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             if (activeRole.equalsIgnoreCase("Student")) {
                 team = user.getTeam();
             } else if (activeRole.equalsIgnoreCase("Administrator")) {
-                //TODO Get team input for Admin role
+                EntityTransaction transaction = em.getTransaction();
+                try {
+                    transaction.begin();
+                    Query q = em.createQuery("Select t from Team t where teamName = :teamName")
+                            .setParameter("teamName", teamName);
+                    team = (Team) q.getSingleResult();
+                    transaction.commit();
+                } catch (Exception e) {
+                    logger.error("Database Operation Error");
+                    throw new Exception("Unable to find team");
+                }
             }
 			
-			//Validating information provided by the front end
-			if (!validateInformation(em, team)) {
-				return SUCCESS;
-			}
+            //Validating information provided by the front end
+            if (!validateInformation(em, team)) {
+                    return SUCCESS;
+            }
 
             try {
                 em.getTransaction().begin();

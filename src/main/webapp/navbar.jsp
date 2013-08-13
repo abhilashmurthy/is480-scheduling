@@ -95,7 +95,7 @@
 				
             <div class="btn-group userbox">
                 <button class="btn" id="userDashboard"><i class="icon-user icon-black"></i>&nbsp;<%= user.getFullName()%></button>
-                <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                <button class="btn btn-success dropdown-toggle" id="userAccess" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
@@ -153,6 +153,7 @@
         
         //Dashboard popover
         $('#userDashboard').popover({
+            container: '#userDashboard',
             placement: 'bottom',
             title: '<b>Your Information</b>',
 			trigger: 'click',
@@ -165,6 +166,12 @@
         //Logout link
         $("#logoutLink").on('click', function() {
             document.location.href = '/is480-scheduling/logout';
+        });
+        
+        $("#userAccess").on('click', function(){
+            if ($('#userDashboard > .popover').hasClass("in")) {
+                $('#userDashboard').popover('hide');
+            }
         });
         
     };
