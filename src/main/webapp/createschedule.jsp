@@ -121,7 +121,7 @@
                     <tr id="createTermSubmitRow"><td></td><td><input type="submit" class="btn btn-primary" value="Create"/></td></tr>
                 </table>
             </form>
-            <h4 id="resultMessage"/></h4>
+            <h4 id="termResultMessage"></h4>
 
         <div class="line-separator"></div>
 
@@ -149,6 +149,7 @@
                     </tr>
                 </table>
             </form>
+			<h4 id="scheduleResultMessage"></h4>
         </div>
 
         <div class="line-separator"></div>
@@ -166,9 +167,11 @@
                 <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
                 </table>
                 <br/>
-                <button id="createTimeslotsSubmitBtn" class="btn btn-primary">Create</button>
+                <button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Waiting...">Create</button>
+				<h4 id="timeslotResultMessage"></h4>
                 <br />
             </div>
+			
         </div>
 
     </div>
@@ -206,7 +209,7 @@
                         if (response.canAdd) {
                             //Remove Create Button - Brought it back
 //                            $("#createTermSubmitRow").fadeTo('slow', 0);
-                            displayMessage("Term added", false);
+                            displayMessage("termResultMessage", "Term added", false);
                             displayCreateSchedule();
 
                         } else {
@@ -232,16 +235,6 @@
 
                 //Scroll to the bottom
                 $("html, body").animate({scrollTop: $(document).height()}, "slow");
-            }
-
-            //Display termMessage
-            function displayMessage(msg, fade) {
-                //Dislay result
-                $("#resultMessage").fadeTo('slow', 100);
-                $("#resultMessage").css('color', 'darkgreen').html(msg);
-                if (fade) {
-                    $("#resultMessage").css('color', 'darkred').html(msg).fadeTo('slow', 0);
-                }
             }
 
             /*----------------------------------------
@@ -309,7 +302,7 @@
                     }
                 }).fail(function(error) {
                     console.log("createScheduleData AJAX FAIL");
-                    displayMessage("Oops.. something went wrong", true);
+                    displayMessage("scheduleResultMessage", "Oops.. something went wrong", true);
                 });
                 return false;
             });
@@ -361,6 +354,7 @@
 
                 //OVERALL SUBMIT TO SERVER
                 $("#createTimeslotsSubmitBtn").on('click', function() {
+					$("#createTimeslotsSubmitBtn").button('loading');
                     var scheduleIdData = {acceptanceId: acceptanceId, midtermId: midtermId, finalId: finalId};
                     //SerializeArray not functional for timeslots
                     timeslotsData = {};
@@ -401,16 +395,19 @@
                         data: mergeData,
                         dataType: 'json'
                     }).done(function(response) {
+						$("#createTimeslotsSubmitBtn").button('reset');
                         if (response.success) {
                             console.log("createTimeslotsJson was successful");
+							displayMessage("timeslotResultMessage", response.message, false);
                         } else {
                             var eid = btoa(response.message);
                             console.log(response.message);
-//                            window.location = "error.jsp?eid=" + eid;
+                            window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error) {
+						$("#createTimeslotsSubmitBtn").button('reset');
                         console.log("createTimeslotsJson AJAX FAIL");
-                        displayMessage("Oops.. something went wrong", true);
+                        displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
                     });
 
                     return false;
@@ -539,6 +536,17 @@
 					triggerTimeslot(this, 90);
 				}
 			});
+		}
+		
+		//Display termMessage
+		function displayMessage(id, msg, fade) {
+			//Dislay result
+			var e = $("#" + id);
+			$(e).fadeTo('slow', 100);
+			$(e).css('color', 'darkgreen').html(msg);
+			if (fade) {
+				$(e).css('color', 'darkred').html(msg).fadeTo('slow', 0);
+			}
 		}
     </script>
 </body>

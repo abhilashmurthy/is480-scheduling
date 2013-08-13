@@ -170,6 +170,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         logger.debug("Persisted final timeslots: count " + finalTimeslots.size());
 
         json.put("success", true);
+		json.put("message", "Timeslots stored successfully. Schedule creation complete!");
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
