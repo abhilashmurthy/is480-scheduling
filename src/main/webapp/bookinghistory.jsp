@@ -19,17 +19,6 @@
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
-		
-		 <!-- Kick unauthorized user -->
-        <%
-            if (!activeRole.equalsIgnoreCase("TA") && !activeRole.equalsIgnoreCase("Student") &&
-					!activeRole.equalsIgnoreCase("Supervisor/Reviewer")) {
-                request.setAttribute("error", "Oops. You are not authorized to access this page!");
-                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-                rd.forward(request, response);
-            }
-         %>
-		 
 		<div class="container">
 		<h3>Booking History</h3>
 		
@@ -37,10 +26,17 @@
 		<s:if test="%{data.size() > 0 && data != null}"> 
 			<table class="table table-hover zebra-striped">
 				<thead>
-					<% if (activeRole.equalsIgnoreCase("Student")) { %>
+					<% if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") 
+							|| activeRole.equalsIgnoreCase("Course Coordinator")) { %>
 						<tr>
 							<th>#</th>
-							<th>My Team</th>
+							<th>
+							<% if (activeRole.equalsIgnoreCase("Student")) { %>
+								My Team
+							<% } else { %>
+								Team
+							<% } %>
+							</th>
 							<th>Presentation</th>
 							<th>Date</th>
 							<th>Time</th>
@@ -51,7 +47,7 @@
 					<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<tr>
 							<th>#</th>
-							<th>Team Name</th>
+							<th>Team</th>
 							<th>Presentation</th>
 							<th>Date</th>
 							<th>Time</th>
@@ -64,7 +60,8 @@
 				<tbody> 
 					<% int count = 1; %>
 					<s:iterator value="data">
-						<% if (activeRole.equalsIgnoreCase("Student")) { %>
+						<% if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") 
+							|| activeRole.equalsIgnoreCase("Course Coordinator")) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">

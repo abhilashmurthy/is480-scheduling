@@ -70,7 +70,7 @@
 							</ul>
 						</li>-->
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
-						
+						<li id="bookingHistory"><a href="bookingHistory"><b>Booking History</b></a></li>
 				<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<!--<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
