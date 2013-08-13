@@ -22,7 +22,7 @@
 		
 		 <!-- Kick unauthorized user -->
         <%
-            if (!activeRole.equalsIgnoreCase("TA") || !activeRole.equalsIgnoreCase("Student") ||
+            if (!activeRole.equalsIgnoreCase("TA") && !activeRole.equalsIgnoreCase("Student") &&
 					!activeRole.equalsIgnoreCase("Supervisor/Reviewer")) {
                 request.setAttribute("error", "Oops. You are not authorized to access this page!");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
