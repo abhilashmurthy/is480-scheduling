@@ -289,6 +289,7 @@
                                 ["Status", viewBookingData.status],
                                 ["Date", viewBookingData.startDate],
                                 ["Start Time", viewBookingData.startTime],
+                                ["End Time", viewBookingData.endTime],
                                 ["Team Wiki", viewBookingData.teamWiki],
                                 ["Attendees", viewBookingData.attendees]
                             ];
@@ -306,6 +307,7 @@
                                             ["Status", viewBookingData.status],
                                             ["Date",  viewBookingData.startDate],
                                             ["Start Time", viewBookingData.startTime],
+                                            ["End Time", viewBookingData.endTime],
                                             ["Team Wiki", viewBookingData.teamWiki],
                                             ["Attendees", viewBookingData.attendees],
                                             ["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"
@@ -326,18 +328,75 @@
                                             var outputArray = outputData[i][1];
                                             var outputArrayStr = "";
                                             for (var j = 0; j < outputArray.length; j++) {
-                                                    outputArrayStr += outputArray[j].name + "<br/>";
+                                                 
+                                                 //if teamname of this user is similiar to the booking but attendee has no status
+                                                 if (viewBookingData.teamName === teamName && typeof outputArray[j].status !== 'undefined' ) {  
+                                                    //outputTdKey = $(document.createElement('td'))
+                                                     //   .html('<b>' + "Faculty" + '</b>');
+                                                    outputArrayStr += outputArray[j].name +  ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>";
+                                                 
+                                                 }else if(viewBookingData.teamName !== teamName){
+                                                     
+                                                     if(typeof outputArray[j].status !== 'undefined'){
+                                                       // outputTdKey = $(document.createElement('td'))
+                                                         //   .html('<b>' + "Faculty" + '</b>');
+                                                        outputArrayStr += outputArray[j].name +  ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>"; 
+                                                       
+                                                     }
+                                                 }
                                             }
+                                            
+                                            //for faculties (print out)
                                             outputTdValue = $(document.createElement('td'))
                                                             .html(outputArrayStr);
-                                            ;
+                                           //      ;
+                                            outputTdKey = $(document.createElement('td'))
+                                                 .html('<b>' + "Faculty" + '</b>');
+
+                                            outputTr.append(outputTdKey);
+                                            outputTr.append(outputTdValue);
+                                            outputTable.append(outputTr);
+                                            
+                                            //reset the string to null
+                                            outputArrayStr = "";
+                                            var otherBookings = false;
+                                            
+                                            //now edit for students
+                                            for (var j = 0; j < outputArray.length; j++) {
+                                                 
+                                                 //if there is no status and this user's team does not belong to any team
+                                                 if(typeof outputArray[j].status === 'undefined' && viewBookingData.teamName !== teamName){
+                                                       outputArrayStr += outputArray[j].name + "<br/>"; 
+                                                       otherBookings = true;
+                                                       
+                                                 }
+                                                 
+                                            }
+                                            if(otherBookings === true){
+                                                outputTdValue = $(document.createElement('td'))
+                                                             .html(outputArrayStr);
+                                                     //;
+
+                                                outputTdKey = $(document.createElement('td'))
+                                                     .html('<b>' + "Students" + '</b>');
+                                                var outputTr = $(document.createElement('tr'));
+                                                outputTr.append(outputTdKey);
+                                                outputTr.append(outputTdValue);
+                                                outputTable.append(outputTr);
+                                            }
+                                           
+                                            
                                     } else {
                                             outputTdValue = $(document.createElement('td'))
                                                             .html(outputData[i][1]);
+                                            outputTr.append(outputTdKey);
+                                            outputTr.append(outputTdValue);
+                                            outputTable.append(outputTr);
+                                           
                                     }
-                                    outputTr.append(outputTdKey);
-                                    outputTr.append(outputTdValue);
-                                    outputTable.append(outputTr);
+                                    
+                                     
+                                    
                                 }
                             } else {
                                 var updateForm = "updateForm";
@@ -348,14 +407,65 @@
                                                         .html('<b>' + outputData[i][0] + '</b>');
                                         var outputTdValue = null;
                                         if (outputData[i][1] instanceof Array) {
-                                                var outputArray = outputData[i][1];
-                                                var outputArrayStr = "";
-                                                for (var j = 0; j < outputArray.length; j++) {
-                                                   outputArrayStr += outputArray[j].name + "<br/>";
-                                                }
-                                                   outputTdValue = $(document.createElement('td'))
-                                                         .html(outputArrayStr);
-                                                ;
+                                                  var outputArray = outputData[i][1];
+                                            var outputArrayStr = "";
+                                            for (var j = 0; j < outputArray.length; j++) {
+                                                 
+                                                 //if teamname of this user is similiar to the booking but attendee has no status
+                                                 if (viewBookingData.teamName === teamName && typeof outputArray[j].status !== 'undefined' ) {  
+                                                    //outputTdKey = $(document.createElement('td'))
+                                                     //   .html('<b>' + "Faculty" + '</b>');
+                                                    outputArrayStr += outputArray[j].name +  ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>";
+                                                 
+                                                 }else if(viewBookingData.teamName !== teamName){
+                                                     
+                                                     if(typeof outputArray[j].status !== 'undefined'){
+                                                       // outputTdKey = $(document.createElement('td'))
+                                                         //   .html('<b>' + "Faculty" + '</b>');
+                                                        outputArrayStr += outputArray[j].name +  ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>"; 
+                                                       
+                                                     }
+                                                 }
+                                            }
+                                            
+                                            //for faculties (print out)
+                                            outputTdValue = $(document.createElement('td'))
+                                                            .html(outputArrayStr);
+                                           //      ;
+                                            outputTdKey = $(document.createElement('td'))
+                                                 .html('<b>' + "Faculty" + '</b>');
+
+                                            outputTr.append(outputTdKey);
+                                            outputTr.append(outputTdValue);
+                                            outputTable.append(outputTr);
+                                            
+                                            //reset the string to null
+                                            outputArrayStr = "";
+                                            var otherBookings = false;
+                                            
+                                            //now edit for students
+                                            for (var j = 0; j < outputArray.length; j++) {
+                                                 
+                                                 //if there is no status and this user's team does not belong to any team
+                                                 if(typeof outputArray[j].status === 'undefined' && viewBookingData.teamName !== teamName){
+                                                       outputArrayStr += outputArray[j].name + "<br/>"; 
+                                                       otherBookings = true;
+                                                       
+                                                 }
+                                                 
+                                            }
+                                            if(otherBookings === true){
+                                                outputTdValue = $(document.createElement('td'))
+                                                             .html(outputArrayStr);
+                                                     //;
+
+                                                outputTdKey = $(document.createElement('td'))
+                                                     .html('<b>' + "Students" + '</b>');
+                                                var outputTr = $(document.createElement('tr'));
+                                                outputTr.append(outputTdKey);
+                                                outputTr.append(outputTdValue);
+                                                outputTable.append(outputTr);
+                                            }
                                         } else {
                                                 if(outputData[i][0] === 'Date' || outputData[i][0] === 'Start Time'){
 
@@ -377,11 +487,13 @@
                                                         outputTdValue = $(document.createElement('td'))
                                                          .html(outputData[i][1]);
                                                 }
+                                                
+                                                outputTr.append(outputTdKey);
+                                                outputTr.append(outputTdValue);
+                                                outputTable.append(outputTr);
                                         }
                                         
-                                        outputTr.append(outputTdKey);
-                                        outputTr.append(outputTdValue);
-                                        outputTable.append(outputTr);
+                                       
 
                                 }
 
