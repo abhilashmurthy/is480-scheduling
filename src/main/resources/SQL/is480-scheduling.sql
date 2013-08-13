@@ -127,7 +127,7 @@ CREATE TABLE `time_slot_status` (
   `milestone` varchar(50) NOT NULL COMMENT 'Enum column storing ACCEPTANCE, MIDTERM, FINAL',
   `startTime` datetime NOT NULL,
   `user_id` bigint(11) NOT NULL,
-  `status` varchar(50) NOT NULL COMMENT 'Enum column storing PENDING, ACCEPTED, REJECTED',
+  `status` varchar(50) NOT NULL COMMENT 'Enum column storing PENDING, APPROVED, REJECTED',
   PRIMARY KEY (`term_id`,`milestone`,`startTime`,`user_id`),
   KEY `FK_time_slot` (`milestone`,`term_id`,`startTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

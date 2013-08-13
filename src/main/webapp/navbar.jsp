@@ -78,16 +78,16 @@
 						<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject"><b>Approve Booking</b></a></li>
 						<!--</ul>-->
 						<!--</li>-->
-						<li id="myBookings"><a href="myBookings"><b>Booking History</b></a></li>
+						<li id="bookingHistory"><a href="bookingHistory"><b>Booking History</b></a></li>
 				<% } else if (activeRole.equalsIgnoreCase("Student")) { %>
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
 							<!--</ul>-->
 						<!--</li>-->
-						<li id="myBookings"><a href="myBookings"><b>Booking History</b></a></li>
+						<li id="bookingHistory"><a href="bookingHistory"><b>Booking History</b></a></li>
 				<% } else if (activeRole.equalsIgnoreCase("TA")) { %>	
-						<li id="myBookings"><a href="myBookings"><b>Booking History</b></a></li>
+						<li id="bookingHistory"><a href="bookingHistory"><b>Booking History</b></a></li>
 						<!--Nothing for now!-->
 				<% } %>
                 </ul>

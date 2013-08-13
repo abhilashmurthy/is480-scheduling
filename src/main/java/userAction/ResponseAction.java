@@ -46,8 +46,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
     private long teamId;
     private long timeslotId;
     private String milestoneName;
-    private String startTime;
-    private String endTime;
+    private String time;
+    private String date;
     private String venue;
     private String myStatus;
     private String userRole;
@@ -115,15 +115,17 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
                         for (Timeslot timeslot : userTimeslots) {
                             HashMap<String, String> map = new HashMap<String, String>();
                             //SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
-							SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy, EEE HH:mm aa");
+							SimpleDateFormat sdfForDate = new SimpleDateFormat("EEE, dd MMM yyyy");
+							SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
                             venue = timeslot.getVenue();
                             timeslotId = timeslot.getId();
                             Team team = timeslot.getTeam();
                             teamId = team.getId();
                             teamName = team.getTeamName();
                             milestoneName = timeslot.getSchedule().getMilestone().getName();
-                            startTime = sdf.format(timeslot.getStartTime());
-                            endTime = sdf.format(timeslot.getEndTime());
+                            time = sdfForTime.format(timeslot.getStartTime()) + " - " + 
+									sdfForTime.format(timeslot.getEndTime());
+							date = sdfForDate.format(timeslot.getStartTime());
                             myStatus = timeslot.getStatusList().get(user).toString();
                             //A user can only have 1 role in a team (Supervisor and Reviewer cannot be same for the same team)
                             if (team.getSupervisor().equals(user)) {
@@ -138,8 +140,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
                             map.put("teamName", teamName);
                             map.put("milestone", milestoneName);
                             map.put("userRole", userRole);
-                            map.put("startTime", startTime);
-                            map.put("endTime", endTime);
+                            map.put("time", time);
+                            map.put("date", date);
                             map.put("venue", venue);
                             map.put("myStatus", myStatus);
 
@@ -217,20 +219,12 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
         this.milestoneName = milestoneName;
     }
 
-    public String getStartTime() {
-        return startTime;
+    public String getTime() {
+        return time;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public ArrayList<HashMap<String, String>> getData() {
@@ -276,4 +270,12 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
     public void setUserRole(String userRole) {
         this.userRole = userRole;
     }
-}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+}  //end of class
