@@ -70,15 +70,31 @@ body {
 }
 
 .scheduleTable {
-/*    margin: auto;
-    width: 100%;*/
+    /*margin: auto;*/
+    display: table;
+}
+
+.timeDisplayCell {
+    white-space: nowrap;
+    width: 50px;
+    max-width: 70px;
 }
 
 .timeslotCell {
     padding: 5px;
+    width: 100px;
 }
 
-.bookedTimeslot:hover .unbookedTimeslot:hover {
+.popover {
+    z-index: 1031 !important;
+}
+
+#updateFormDate, #updateFormStartTime {
+    width: 150px;
+}
+
+.bookedTimeslot:hover, .unbookedTimeslot:hover {
+    box-sizing: border-box;
     border: 2px solid #1E647C !important;
     cursor: pointer !important;
 }
@@ -89,11 +105,13 @@ body {
 }
 
 .unbookedTimeslot {
+    box-sizing: border-box;
     background-color: #AEC7C9 !important; 
     border: 1px solid #dddddd;
 }
 
 .bookedTimeslot {
+    box-sizing: border-box;
     border-radius: 5px !important;
     -moz-border-radius: 5px !important;
     text-align: center;
@@ -102,16 +120,19 @@ body {
 }
 
 .pendingTimeslot {
+    box-sizing: border-box;
     background-color: #F6EE4E !important;
     border: 2px solid #CD950C !important;
 }
 
 .approvedTimeslot {
+    box-sizing: border-box;
     background-color: #A9DBA9 !important;
     border: 2px solid #415641 !important;
 }
 
 .rejectedTimeslot {
+    box-sizing: border-box;
     background-color: #F75D59 !important;
     border: 2px solid #722A29 !important;
 }
