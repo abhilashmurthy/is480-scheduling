@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -30,7 +31,7 @@ public abstract class EmailTemplate {
 	public EmailTemplate(String fileName) {
 		try {
 			InputStream in = getClass().getClassLoader().getResourceAsStream(BASE_PATH + fileName);
-			body = IOUtils.toString(in, "UTF-8");
+			body = Jsoup.parse(in, "UTF-8", "").toString();
 		} catch (IOException ex) {
 			logger.error("Could not read email template");
 			logger.error(ex.getMessage());

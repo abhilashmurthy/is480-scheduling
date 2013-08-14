@@ -14,20 +14,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Accept/Reject Booking</title>
+        <title>Approve Booking</title>
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
 		//To check/uncheck all boxes
-		checked = false;
-		function checkedAll () {
-		  if (checked == false) {
-			  checked = true
-		  } else {
-			  checked = false
-		  }
-		  for (var i = 0; i < document.getElementById('myform').elements.length; i++) {
-			document.getElementById('myform').elements[i].checked = checked;
-		  }
+		function toggle(oInput) {
+			var aInputs = document.getElementsByTagName('input');
+			for (var i=0;i<aInputs.length;i++) {
+				if (aInputs[i] != oInput) {
+					aInputs[i].checked = oInput.checked;
+				}
+			}
 		}
 		
 		//To validate the form (Make sure all checkboxes have been checked
@@ -55,6 +52,23 @@
 				document.getElementById("rejectButton").style.visibility = "visible";
 			}
 		});
+		
+		//Disabling buttons when checkboxes are unchecked and vice-versa
+//		$(document).ready(function (){
+//			$('#approveButton').attr('disabled','disabled');
+//			$('#rejectButton').attr('disabled','disabled');
+//			$('#approveRejectArray').change(function(){
+//			if($(this).is(':checked')){
+//				$('#approveButton').removeAttr('disabled');                
+//				$('#rejectButton').removeAttr('disabled');
+//			}
+//			else {
+//				// remove
+//				$('#approveButton').attr('disabled','disabled');
+//				$('#rejectButton').attr('disabled','disabled');
+//			}
+//		})
+//		});
 		//To show/hide buttons if checkbox exists or not
 		</script>
 		
@@ -72,7 +86,7 @@
          %>
 		 
         <div class="container">
-        <h3>Accept/Reject Booking</h3>
+        <h3>Approve Booking</h3>
         <!--<form action="approveReject" method="post">
 			<!-- Putting default values for testing purposes 
             Choose Term <select name="termId"> 
@@ -94,12 +108,12 @@
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
-								<th><input type="checkbox" name="checkall" onclick="checkedAll();"></th>
+								<th><input type="checkbox" name="checkall" onClick="toggle(this);"></th>
 								<th>Team Name</th>
 								<th>Presentation</th>
 								<th>My Role</th>
-								<th>Start Time</th>
-								<th>End Time</th>
+								<th>Date</th>
+								<th>Time</th>
 								<th>Venue</th>
 								<th>My Status</th>
 							</tr>
@@ -108,7 +122,7 @@
 							<s:iterator value="data">
 								<s:if test="%{myStatus.equalsIgnoreCase('Pending')}"> 
 									<tr class="warning">
-								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Accepted')}">
+								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Approved')}">
 									<tr class="success">
 								</s:elseif><s:elseif test="%{myStatus.equalsIgnoreCase('Rejected')}">
 									<tr class="error">
@@ -122,8 +136,8 @@
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestone"/></td>
 									<td><s:property value="userRole"/></td>
-									<td><s:property value="startTime"/></td>
-									<td><s:property value="endTime"/></td>
+									<td><s:property value="date"/></td>
+									<td><s:property value="time"/></td>
 									<td><s:property value="venue"/></td>
 									<td><s:property value="myStatus"/></td>
 								</tr>

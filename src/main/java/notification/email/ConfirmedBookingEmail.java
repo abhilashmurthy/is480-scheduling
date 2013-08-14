@@ -87,10 +87,8 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 		Iterator<User> iter = userList.iterator();
 		StringBuilder result = new StringBuilder();
 		
-		int numBullet = 1;
 		while (iter.hasNext()) {
-			result.append(numBullet++).append(". ")
-					.append(iter.next().getFullName());
+			result.append("&nbsp;").append(iter.next().getFullName());
 			if (iter.hasNext()) {
 				result.append("<br />");
 			}

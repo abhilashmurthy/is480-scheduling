@@ -77,7 +77,6 @@ public class MailSender {
 					message.setRecipients(Message.RecipientType.CC,
 							InternetAddress.parse(
 							MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
-					body += "Sent from: " + InetAddress.getLocalHost().getHostName();
 				} else {
 					message.setRecipients(Message.RecipientType.CC,
 						InternetAddress.parse(parseRecipientArray(ccEmails)));	

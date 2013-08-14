@@ -80,7 +80,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
             if (activeRole.equalsIgnoreCase("Student")) {
                 team = user.getTeam();
-            } else if (activeRole.equalsIgnoreCase("Administrator")) {
+            } else if (activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")) {
                 EntityTransaction transaction = em.getTransaction();
                 try {
                     transaction.begin();
@@ -110,6 +110,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 attendees.addAll(team.getMembers());
 
                 //Create timeslot status entries based on milestone
+				//TODO Remove hardcoding after milestone management is implemented
                 HashMap<User, Status> statusList = new HashMap<User, Status>();
                 if (milestone.getName().equalsIgnoreCase("acceptance")) {
                     statusList.put(team.getSupervisor(), Status.PENDING);

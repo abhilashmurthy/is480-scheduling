@@ -1,5 +1,5 @@
 <%-- 
-    Document   : mybookings
+    Document   : bookinghistory
     Created on : Aug 2, 2013, 10:09:25 PM
     Author     : Prakhar
 --%>
@@ -19,17 +19,6 @@
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
-		
-		 <!-- Kick unauthorized user -->
-        <%
-            if (!activeRole.equalsIgnoreCase("TA") && !activeRole.equalsIgnoreCase("Student") &&
-					!activeRole.equalsIgnoreCase("Supervisor/Reviewer")) {
-                request.setAttribute("error", "Oops. You are not authorized to access this page!");
-                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-                rd.forward(request, response);
-            }
-         %>
-		 
 		<div class="container">
 		<h3>Booking History</h3>
 		
@@ -37,13 +26,20 @@
 		<s:if test="%{data.size() > 0 && data != null}"> 
 			<table class="table table-hover zebra-striped">
 				<thead>
-					<% if (activeRole.equalsIgnoreCase("Student")) { %>
+					<% if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") 
+							|| activeRole.equalsIgnoreCase("Course Coordinator")) { %>
 						<tr>
 							<th>#</th>
-							<th>My Team</th>
+							<th>
+							<% if (activeRole.equalsIgnoreCase("Student")) { %>
+								My Team
+							<% } else { %>
+								Team
+							<% } %>
+							</th>
 							<th>Presentation</th>
-							<th>Start Time</th>
-							<th>End Time</th>
+							<th>Date</th>
+							<th>Time</th>
 							<th>Venue</th>
 							<th>Booking Status</th>
 							<th>Overall Booking Status</th>
@@ -51,10 +47,10 @@
 					<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<tr>
 							<th>#</th>
-							<th>Team Name</th>
+							<th>Team</th>
 							<th>Presentation</th>
-							<th>Start Time</th>
-							<th>End Time</th>
+							<th>Date</th>
+							<th>Time</th>
 							<th>Venue</th>
 							<th>My Status</th>
 							<th>Overall Booking Status</th>
@@ -64,10 +60,11 @@
 				<tbody> 
 					<% int count = 1; %>
 					<s:iterator value="data">
-						<% if (activeRole.equalsIgnoreCase("Student")) { %>
+						<% if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") 
+							|| activeRole.equalsIgnoreCase("Course Coordinator")) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Accepted')}">
+						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
@@ -75,8 +72,8 @@
 								<td><%= count %></td>
 								<td><s:property value="teamName"/></td>
 								<td><s:property value="milestone"/></td>
-								<td><s:property value="startTime"/></td>
-								<td><s:property value="endTime"/></td>
+								<td><s:property value="date"/></td>
+								<td><s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
 								<td>
 								<s:iterator value="individualBookingStatus">
@@ -89,7 +86,7 @@
 						<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Accepted')}">
+						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
@@ -97,8 +94,8 @@
 							<td><%= count %></td>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
-							<td><s:property value="startTime"/></td>
-							<td><s:property value="endTime"/></td>
+							<td><s:property value="date"/></td>
+							<td><s:property value="time"/></td>
 							<td><s:property value="venue"/></td>
 							<td><s:property value="myStatus"/></td>
 							<td><s:property value="overallBookingStatus"/></td>
@@ -111,5 +108,6 @@
 		</s:if><s:else>
 			<h4>No bookings have been made!</h4>
 		</s:else>
+		</div>
     </body>
 </html>

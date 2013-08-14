@@ -121,7 +121,7 @@
                     <tr id="createTermSubmitRow"><td></td><td><input type="submit" class="btn btn-primary" value="Create"/></td></tr>
                 </table>
             </form>
-            <h4 id="resultMessage"/></h4>
+            <h4 id="termResultMessage"></h4>
 
         <div class="line-separator"></div>
 
@@ -149,6 +149,7 @@
                     </tr>
                 </table>
             </form>
+			<h4 id="scheduleResultMessage"></h4>
         </div>
 
         <div class="line-separator"></div>
@@ -166,9 +167,11 @@
                 <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
                 </table>
                 <br/>
-                <button id="createTimeslotsSubmitBtn" class="btn btn-primary">Create</button>
+                <button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Waiting...">Create</button>
+				<h4 id="timeslotResultMessage"></h4>
                 <br />
             </div>
+			
         </div>
 
     </div>
@@ -206,7 +209,7 @@
                         if (response.canAdd) {
                             //Remove Create Button - Brought it back
 //                            $("#createTermSubmitRow").fadeTo('slow', 0);
-                            displayMessage("Term added", false);
+                            displayMessage("termResultMessage", "Term added", false);
                             displayCreateSchedule();
 
                         } else {
@@ -232,16 +235,6 @@
 
                 //Scroll to the bottom
                 $("html, body").animate({scrollTop: $(document).height()}, "slow");
-            }
-
-            //Display termMessage
-            function displayMessage(msg, fade) {
-                //Dislay result
-                $("#resultMessage").fadeTo('slow', 100);
-                $("#resultMessage").css('color', 'darkgreen').html(msg);
-                if (fade) {
-                    $("#resultMessage").css('color', 'darkred').html(msg).fadeTo('slow', 0);
-                }
             }
 
             /*----------------------------------------
@@ -309,7 +302,7 @@
                     }
                 }).fail(function(error) {
                     console.log("createScheduleData AJAX FAIL");
-                    displayMessage("Oops.. something went wrong", true);
+                    displayMessage("scheduleResultMessage", "Oops.. something went wrong", true);
                 });
                 return false;
             });
@@ -344,20 +337,24 @@
                     $("#acceptanceTimeslotsTable").show();
                     $("#acceptanceTimeslotsTable").before("<h4>Acceptance</h4>");
                     makeTimeslotTable("acceptanceTimeslotsTable", acceptanceDates);
+					populateTimeslotsTable("acceptanceTimeslotsTable");
                 }
                 if (midtermDates.length > 0) {
                     $("#midtermTimeslotsTable").show();
                     $("#midtermTimeslotsTable").before("<h4>Midterm</h4>");
                     makeTimeslotTable("midtermTimeslotsTable", midtermDates);
+					populateTimeslotsTable("midtermTimeslotsTable");
                 }
                 if (finalDates.length > 0) {
                     $("#finalTimeslotsTable").show();
                     $("#finalTimeslotsTable").before("<h4>Final</h4>");
                     makeTimeslotTable("finalTimeslotsTable", finalDates);
+					populateTimeslotsTable("finalTimeslotsTable");
                 }
 
                 //OVERALL SUBMIT TO SERVER
                 $("#createTimeslotsSubmitBtn").on('click', function() {
+					$("#createTimeslotsSubmitBtn").button('loading');
                     var scheduleIdData = {acceptanceId: acceptanceId, midtermId: midtermId, finalId: finalId};
                     //SerializeArray not functional for timeslots
                     timeslotsData = {};
@@ -398,16 +395,19 @@
                         data: mergeData,
                         dataType: 'json'
                     }).done(function(response) {
+						$("#createTimeslotsSubmitBtn").button('reset');
                         if (response.success) {
                             console.log("createTimeslotsJson was successful");
+							displayMessage("timeslotResultMessage", response.message, false);
                         } else {
                             var eid = btoa(response.message);
                             console.log(response.message);
-//                            window.location = "error.jsp?eid=" + eid;
+                            window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error) {
+						$("#createTimeslotsSubmitBtn").button('reset');
                         console.log("createTimeslotsJson AJAX FAIL");
-                        displayMessage("Oops.. something went wrong", true);
+                        displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
                     });
 
                     return false;
@@ -464,53 +464,7 @@
                     $("#" + tableId).append(tbody);
                 }
 
-                /*
-                 * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
-                 */
-                function triggerTimeslot(e, duration) {
-                    var col = $(e).parent().children().index(e);
-                    var tr = $(e).parent();
-                    var row = $(tr).parent().children().index(tr);
-                    var tbody = $(e).parents("tbody");
-                    var slotSize = duration / 30;
-
-                    if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
-                        //Checking if the cell clicked is the start of the chosen timeslot (Important!)
-                        if ($(e).children().index(".start-marker") !== -1) {
-                            $(e).removeClass("chosen");
-                            $(e).children().remove();
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).removeClass("chosen");
-                            }
-                        }
-                    } else { //Section for a non-highlighted cell
-                        //Checking if there will be an overlap of timeslots
-                        //Abort if there is going to be an overlap
-                        for (i = 1; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            if ($(nextCell).hasClass("chosen")) {
-                                return;
-                            }
-                        }
-
-                        var numRows = $(tbody).children().length;
-                        //Checking if there are enough cells for the slot duration
-                        if ((row + slotSize) <= numRows) {
-                            $(e).addClass("chosen");
-                            var marker = document.createElement("div");
-                            $(marker).addClass("start-marker");
-                            $(e).append(marker);
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).addClass("chosen");
-                            }
-                        }
-                    }
-                }
+                
 
                 $("td.timeslotcell", "#acceptanceTimeslotsTable").on("click", function() {
                     triggerTimeslot(this, 60);
@@ -523,18 +477,77 @@
                 });
             }
             
-            function populateTimeslotsTable(tableId) {
-                $("#" + tableId).find("td").each(function(){
-                    var milestone = tableId.split("TimeslotsTable")[0];
-                    if (milestone === "acceptance") {
-                        triggerTimeslot(this, 60);
-                    } else {
-                        triggerTimeslot(this, 90);
-                    }
-                });
-            }
-            
         });
+		
+		/*
+		* METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
+		*/
+		function triggerTimeslot(e, duration) {
+			var col = $(e).parent().children().index(e);
+			var tr = $(e).parent();
+			var row = $(tr).parent().children().index(tr);
+			var tbody = $(e).parents("tbody");
+			var slotSize = duration / 30;
+
+			if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
+				//Checking if the cell clicked is the start of the chosen timeslot (Important!)
+				if ($(e).children().index(".start-marker") !== -1) {
+					$(e).removeClass("chosen");
+					$(e).children().remove();
+					for (i = 1; i < slotSize; i++) {
+						var nextRow = $(tbody).children().get(row + i);
+						var nextCell = $(nextRow).children().get(col);
+						$(nextCell).removeClass("chosen");
+					}
+				}
+			} else { //Section for a non-highlighted cell
+				//Checking if there will be an overlap of timeslots
+				//Abort if there is going to be an overlap
+				for (i = 1; i < slotSize; i++) {
+					var nextRow = $(tbody).children().get(row + i);
+					var nextCell = $(nextRow).children().get(col);
+					if ($(nextCell).hasClass("chosen")) {
+						return;
+					}
+				}
+
+				var numRows = $(tbody).children().length;
+				//Checking if there are enough cells for the slot duration
+				if ((row + slotSize) <= numRows) {
+					$(e).addClass("chosen");
+					var marker = document.createElement("div");
+					$(marker).addClass("start-marker");
+					$(e).append(marker);
+					for (i = 1; i < slotSize; i++) {
+						var nextRow = $(tbody).children().get(row + i);
+						var nextCell = $(nextRow).children().get(col);
+						$(nextCell).addClass("chosen");
+					}
+				}
+			}
+		}
+	   
+		function populateTimeslotsTable(tableId) {
+			$("#" + tableId).find("td.timeslotcell").each(function(){
+				var milestone = tableId.split("TimeslotsTable")[0];
+				if (milestone === "acceptance") {
+					triggerTimeslot(this, 60);
+				} else {
+					triggerTimeslot(this, 90);
+				}
+			});
+		}
+		
+		//Display termMessage
+		function displayMessage(id, msg, fade) {
+			//Dislay result
+			var e = $("#" + id);
+			$(e).fadeTo('slow', 100);
+			$(e).css('color', 'darkgreen').html(msg);
+			if (fade) {
+				$(e).css('color', 'darkred').html(msg).fadeTo('slow', 0);
+			}
+		}
     </script>
 </body>
 </html>

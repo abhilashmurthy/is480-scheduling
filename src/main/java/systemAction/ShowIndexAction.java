@@ -17,6 +17,7 @@ import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.ScheduleManager;
+import manager.SettingsManager;
 import manager.TermManager;
 import model.Schedule;
 import model.Term;
@@ -76,10 +77,26 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 				}
 			}  //end of outer if
 			
-			//<----- 2nd Part: Displaying all the terms for the user to choose from ------>
-			List<Term> allTerms = TermManager.getAllTerms(em);
-			if (allTerms.size() > 0) {
-				for (Term term: allTerms) {
+			//<----- 2rd Part: To set the current active term based on users response ------>
+			//Active term is first set during login. Only if user selects another term from UI will the new active term be set
+			if (termId != 0) {
+				ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+				for (Term term: activeTerms) {
+					if (term.getId() == termId) {
+						session.setAttribute("currentActiveTerm", term);
+					}
+				}
+			}
+			
+			//<----- 3rd Part: Displaying all active terms for the user to choose from ------>
+			ArrayList<Term> allActiveTerms = SettingsManager.getActiveTerms(em);
+			//Removing the active term set during login or in the above code from the list to be displayed
+			Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
+			if (activeTerm != null) {
+				allActiveTerms.remove(activeTerm);
+			}
+			if (allActiveTerms.size() > 0) {
+				for (Term term: allActiveTerms) {
 					HashMap<String, String> map = new HashMap<String, String>();
 					long idOfTerm = term.getId();
 					String semester = term.getSemester();
@@ -91,15 +108,6 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 					map.put("termId", String.valueOf(idOfTerm));
 					
 					data.add(map);
-				}
-			}
-			
-			//<----- 3rd Part: To set the current active term based on users response ------>
-			//Active term is set during login. Only if user selects a term from UI will the new active term be set
-			if (termId != 0) {
-				Term activeTerm = TermManager.findTermById(em, termId);
-				if (activeTerm != null) {
-					session.setAttribute("currentActiveTerm", activeTerm);
 				}
 			}
 			

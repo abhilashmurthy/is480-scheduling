@@ -49,7 +49,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 
         String status = null;
         if (approve != null) {
-            status = "ACCEPTED";
+            status = "APPROVED";
         } else if (reject != null) {
             status = "REJECTED";
         } else {
@@ -74,8 +74,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                 Iterator iter = statusList.keySet().iterator();
                 while (iter.hasNext()) {
                     if (iter.next().equals(user)) {
-                        if (status.equalsIgnoreCase("ACCEPTED")) {
-                            statusList.put(user, Status.ACCEPTED);
+                        if (status.equalsIgnoreCase("APPROVED")) {
+                            statusList.put(user, Status.APPROVED);
 							ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(timeslot, user);
 							approvedEmail.sendEmail();
                         } else if (status.equalsIgnoreCase("REJECTED")) {
@@ -90,7 +90,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                     timeslotsToUpdate.add(timeslot);
                 }
 				
-				if (timeslot.getOverallBookingStatus() == Status.ACCEPTED) {
+				if (timeslot.getOverallBookingStatus() == Status.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(timeslot);
 					confirmationEmail.sendEmail();
 				}
