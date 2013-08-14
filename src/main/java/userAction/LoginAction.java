@@ -143,26 +143,26 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				}
 			} //END OF CODE FOR PRODUCTION SERVER
 
-            //To check if user has multiple roles (If yes, redirect to another page)
-            if (userRoles.size() > 1) {
-				isSupervisorReviewer = false;
-				isAdministrator = false;
-				isCourseCoordinator = false;
-				for (Role role: userRoles) {
-					if (role.getName().equalsIgnoreCase("Supervisor") || 
-							role.getName().equalsIgnoreCase("Reviewer")) {
-						isSupervisorReviewer = true;
-					} else if (role.getName().equalsIgnoreCase("Administrator")) {
-						isAdministrator = true;
-					} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
-						isCourseCoordinator = true;
-					}
-				}
-				//If user is just supervisor & reviewer then he wont go to the multiple roles page
-				if (isAdministrator == true || isCourseCoordinator == true) {
-					return "goToRoles";
-				}
-            }
+            //To check if user has multiple roles 
+//            if (userRoles.size() > 1) {
+//				isSupervisorReviewer = false;
+//				isAdministrator = false;
+//				isCourseCoordinator = false;
+//				for (Role role: userRoles) {
+//					if (role.getName().equalsIgnoreCase("Supervisor") || 
+//							role.getName().equalsIgnoreCase("Reviewer")) {
+//						isSupervisorReviewer = true;
+//					} else if (role.getName().equalsIgnoreCase("Administrator")) {
+//						isAdministrator = true;
+//					} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
+//						isCourseCoordinator = true;
+//					}
+//				}
+//				//If user is just supervisor & reviewer then he wont go to the multiple roles page
+//				if (isAdministrator == true || isCourseCoordinator == true) {
+//					return "goToRoles";
+//				}
+//            }
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -241,28 +241,4 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     public void setUserRoles(List<Role> userRoles) {
         this.userRoles = userRoles;
     }
-
-//	public boolean isIsSupervisorReviewer() {
-//		return isSupervisorReviewer;
-//	}
-//
-//	public void setIsSupervisorReviewer(boolean isSupervisorReviewer) {
-//		this.isSupervisorReviewer = isSupervisorReviewer;
-//	}
-//
-//	public boolean isIsAdministrator() {
-//		return isAdministrator;
-//	}
-//
-//	public void setIsAdministrator(boolean isAdministrator) {
-//		this.isAdministrator = isAdministrator;
-//	}
-//
-//	public boolean isIsCourseCoordinator() {
-//		return isCourseCoordinator;
-//	}
-//
-//	public void setIsCourseCoordinator(boolean isCourseCoordinator) {
-//		this.isCourseCoordinator = isCourseCoordinator;
-//	}
-}
+} //end of class

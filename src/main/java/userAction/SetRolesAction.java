@@ -4,6 +4,7 @@
  */
 package userAction;
 
+import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,9 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
     private String administrator;
     private String supervisorReviewer;
     private String courseCoordinator;
-
+	//Checking whether its users first login or not
+	private String firstLogin;
+	
     @Override
     public String execute() throws Exception {
         try {
@@ -52,6 +55,22 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 						isCourseCoordinator = true;
 					}
 				}
+				
+				//Setting default role during first login for users with multiple roles
+				if (firstLogin != null) {
+					if (firstLogin.equalsIgnoreCase("Yes")) {
+						if (isSupervisorReviewer) {
+							if (isAdministrator || isCourseCoordinator) {
+								session.setAttribute("activeRole", "Supervisor/Reviewer");
+								return SUCCESS;
+							}
+						} else if(isAdministrator && isCourseCoordinator) {
+							session.setAttribute("activeRole", "Course Coordinator");
+							return SUCCESS;
+						}
+					}
+				}
+				
 				//Checking whether the user is not just supervisor & reviewer 
 				if (isAdministrator == true || isCourseCoordinator == true) {
 					//Validation checking for user's roles and setting the active role (in case of multiple roles)
@@ -145,5 +164,13 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 
 	public void setCourseCoordinator(String courseCoordinator) {
 		this.courseCoordinator = courseCoordinator;
+	}
+
+	public String isFirstLogin() {
+		return firstLogin;
+	}
+
+	public void setFirstLogin(String firstLogin) {
+		this.firstLogin = firstLogin;
 	}
 } //end of class
