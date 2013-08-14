@@ -152,15 +152,22 @@
         $(".dropdown-toggle").dropdown();
         
         //Dashboard popover
-        $('#userDashboard').popover({
-            container: '#userDashboard',
-            placement: 'bottom',
-            title: '<b>Your Information</b>',
-			trigger: 'click',
-            html: true,
-            content: function() {
-                return $('#userDashboardContent').html();
+        $('#userDashboard').on('click', function(e) {
+            e.stopPropagation();
+            if ($(".userbox").hasClass('open')) {
+                $(".userbox").removeClass('open');
             }
+            $(this).popover({
+                container: '#userDashboard',
+                placement: 'bottom',
+                title: '<b>Your Information</b>',
+                trigger: 'manual',
+                html: true,
+                content: function() {
+                    return $('#userDashboardContent').html();
+                }
+            });
+            $(this).popover('show');
         });
         
         //Logout link
@@ -168,9 +175,10 @@
             document.location.href = '/is480-scheduling/logout';
         });
         
+        //Hide all popovers on other button click
         $("#userAccess").on('click', function(){
-            if ($('#userDashboard > .popover').hasClass("in")) {
-                $('#userDashboard').popover('hide');
+            if ($('.popover').hasClass("in")) {
+                $('.popover').parent().popover('hide');
             }
         });
         
