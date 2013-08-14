@@ -507,7 +507,7 @@
                                 return outputTable;
                             },
                             placement: function() {
-                                if (datesArray.length > 10 && (bodyTd.is(':last-child') || bodyTd.next('td').is(':last-child'))) {
+                                if (bodyTd.parent().children().index(bodyTd) > 9) {
                                     return 'left';
                                 } else {
                                     return 'right';
@@ -538,7 +538,7 @@
                                     html: 'true',
                                     trigger: 'manual',
                                     placement: function() {
-                                        if (datesArray.length > 10 && (bodyTd.is(':last-child') || bodyTd.next('td').is(':last-child'))) {
+                                        if (bodyTd.parent().children().index(bodyTd) > 9) {
                                             return 'left';
                                         } else {
                                             return 'right';
@@ -598,39 +598,27 @@
                                     outputTr.append(outputTdValue);
                                     outputTable.append(outputTr);
                                 }
-
-                                //Make a notification popover saying all teams have booked if no more teams pending booking
-                                if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teamsPendingBooking.length === 0) {
-                                    bodyTd.popover({
-                                        container: bodyTd,
-                                        html: 'true',
-                                        trigger: 'manual',
-                                        placement: function() {
-                                            if (datesArray.length > 10 && (bodyTd.is(':last-child') || bodyTd.next('td').is(':last-child'))) {
-                                                return 'left';
-                                            } else {
-                                                return 'right';
-                                            }
-                                        },
-                                        title: "Booking <button type='button' class='close'>&times;</button>",
-                                        content: 'All teams have made bookings!'
-                                    });
-                                } else {
-                                    bodyTd.popover({
-                                        container: bodyTd,
-                                        html: 'true',
-                                        trigger: 'manual',
-                                        placement: function() {
-                                            if (datesArray.length > 10 && (bodyTd.is(':last-child') || bodyTd.next('td').is(':last-child'))) {
-                                                return 'left';
-                                            } else {
-                                                return 'right';
-                                            }
-                                        },
-                                        content: outputTable,
-                                        title: "Create Booking <button type='button' class='close'>&times;</button>"
-                                    });
+                                
+                                if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teams.length === 0) {
+                                    outputTable = "No teams exist for this term!";
+                                } else if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teamsPendingBooking.length === 0) {
+                                    outputTable = "All teams have made bookings!";
                                 }
+
+                                bodyTd.popover({
+                                    container: bodyTd,
+                                    html: 'true',
+                                    trigger: 'manual',
+                                    placement: function() {
+                                        if (bodyTd.parent().children().index(bodyTd) > 9) {
+                                            return 'left';
+                                        } else {
+                                            return 'right';
+                                        }
+                                    },
+                                    content: outputTable,
+                                    title: "Create Booking <button type='button' class='close'>&times;</button>"
+                                });
 
                             }
                         }
@@ -646,7 +634,7 @@
                     $(".timeslotCell").mouseleave(function() {
                         $(this).removeClass("clickedCell");
                     });
-
+                    
                     //Hide all popovers on page click
                     $("body").on('click', function(){
                         if ($('.popover').hasClass("in")) {
@@ -751,7 +739,7 @@
                         container: self,
                         trigger: "manual",
                         placement: function() {
-                            if (datesArray.length > 10 && (self.is(':last-child') || self.next('td').is(':last-child'))) {
+                            if (self.parent().children().index(self) > 9) {
                                 return 'left';
                             } else {
                                 return 'right';
@@ -877,7 +865,7 @@
                                     trigger: "manual",
                                     title: "Booking <button type='button' class='close'>&times;</button>",
                                     placement: function() {
-                                        if (datesArray.length > 10 && (self.is(':last-child') || self.next('td').is(':last-child'))) {
+                                        if (self.parent().children().index(self) > 9) {
                                             return 'left';
                                         } else {
                                             return 'right';

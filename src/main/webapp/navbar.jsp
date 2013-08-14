@@ -182,6 +182,13 @@
             }
         });
         
+        //Hide all popovers on page click
+        $("body").on('click', function(){
+            if ($('.popover').hasClass("in")) {
+                $('.popover').parent().popover('hide');
+            }
+        });
+        
     };
     
     addLoadEvent(navbarLoad);

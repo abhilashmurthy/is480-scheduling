@@ -67,14 +67,19 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
                 return SUCCESS;
             }
             
-            //Save Term in DB
-            EntityTransaction transaction = null;
-            Term newTerm = new Term();
-            newTerm.setAcademicYear(year);
-            newTerm.setSemester(semester);
-            TermManager.save(em, newTerm, transaction);
-            json.put("message", "Term added");
-            json.put("canAdd", true);
+            if (year != 0 && semester != null && !semester.equals("")) {
+                //Save Term in DB
+                EntityTransaction transaction = null;
+                Term newTerm = new Term();
+                newTerm.setAcademicYear(year);
+                newTerm.setSemester(semester);
+                TermManager.save(em, newTerm, transaction);
+                json.put("message", "Term added");
+                json.put("canAdd", true);
+            } else {
+                json.put("message", "No term name detected");
+                json.put("canAdd", false);
+            }
             
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());

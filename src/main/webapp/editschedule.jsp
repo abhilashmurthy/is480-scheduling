@@ -88,12 +88,12 @@
             <h3>Edit Term</h3>
             <form id="editTermForm">
                 <table>
-                    <tr><td class="formLabelTd">Edit Year</td><td><input id="yearInput" type="text" name="year" /></td></tr>
+                    <tr><td class="formLabelTd">Year</td><td><input id="yearInput" type="text" name="year" disabled/></td></tr>
                     <tr><td class="formLabelTd">Edit Semester</td><td><input id="semesterInput" type="text" name="semester" /></td></tr>
-                    <tr id="editTermRow"><td></td><td><input type="submit" class="btn btn-primary" value="Save"/></td></tr>
+                    <tr id="editTermRow"><td></td><td><button id="editTermSubmitBtn" type="submit" class="btn btn-primary" data-loading-text="Waiting...">Save</button></td></tr>
                 </table>
             </form>
-            <h4 id="termResult" class="resultMessage"/></h4>
+            <h4 id="termResultMessage" class="resultMessage"/></h4>
 
         <div class="line-separator"></div>
 
@@ -117,11 +117,11 @@
                     </tr>
                     <tr class="editScheduleSubmitRow">
                         <td></td>
-                        <td><input id="editScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Save"/></td>
+                        <td><button id="editScheduleSubmitBtn" type="submit" class="btn btn-primary" data-loading-text="Waiting...">Save</button></td>
                     </tr>
                 </table>
             </form>
-            <h4 id="scheduleResult" class="resultMessage"/></h4>
+            <h4 id="scheduleResultMessage" class="resultMessage"/></h4>
         </div>
 
         <div class="line-separator"></div>
@@ -139,10 +139,10 @@
                 <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped">
                 </table>
                 <br/>
-                <button id="editTimeslotsSubmitBtn" class="btn btn-primary">Save</button>
+                <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Waiting...">Save</button>
                 <br />
             </div>
-            <h4 id="timeslotsResult" class="resultMessage"/></h4>
+            <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
         </div>
 
     </div>
@@ -172,7 +172,6 @@
             /* Datepicker validation */
             $(".datepicker").multiDatesPicker({
                 dateFormat: "yy-mm-dd",
-                minDate: Date.today(),
                 beforeShowDay: $.datepicker.noWeekends
             });
             
@@ -192,10 +191,9 @@
                 $("#acceptanceDatePicker").multiDatesPicker({
                     dateFormat: "yy-mm-dd",
                     defaultDate: new Date(scheduleData.startDate),
-                    maxPicks: 2,
                     beforeShowDay: $.datepicker.noWeekends
                 });
-                $("#acceptanceDatePicker").multiDatesPicker('addDates', [new Date(scheduleData.startDate), new Date(scheduleData.endDate)]);
+                $("#acceptanceDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get midterm schedule data
@@ -207,10 +205,9 @@
                 $("#midtermDatePicker").multiDatesPicker({
                     dateFormat: "yy-mm-dd",
                     defaultDate: new Date(scheduleData.startDate),
-                    maxPicks: 2,
                     beforeShowDay: $.datepicker.noWeekends
                 });
-                $("#midtermDatePicker").multiDatesPicker('addDates', [new Date(scheduleData.startDate), new Date(scheduleData.endDate)]);
+                $("#midtermDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get final schedule data
@@ -222,10 +219,9 @@
                 $("#finalDatePicker").multiDatesPicker({
                     dateFormat: "yy-mm-dd",
                     defaultDate: new Date(scheduleData.startDate),
-                    maxPicks: 2,
                     beforeShowDay: $.datepicker.noWeekends
                 });
-                $("#finalDatePicker").multiDatesPicker('addDates', [new Date(scheduleData.startDate), new Date(scheduleData.endDate)]);
+                $("#finalDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
             }
             
@@ -233,9 +229,9 @@
                 var tableId = milestoneStr.toLowerCase() + "TimeslotsTable";
                 var table = $("#" + tableId);
                 var dates = $("#" + milestoneStr.toLowerCase() + "DatePicker").multiDatesPicker('getDates');
-                var dateArray = getDatesBetween(dates[0], dates[1]);
+//                var dateArray = getDatesBetween(dates[0], dates[dates.length - 1]);
                 table.before("<h4>" + milestoneStr.toUpperCase() + "</h4>"); //Add milestone title
-                makeTimeslotTable(tableId, scheduleData, dateArray);
+                makeTimeslotTable(tableId, scheduleData, dates);
                 populateTimeslotsTable(tableId, scheduleData);
             }
             
@@ -430,6 +426,7 @@
             
             //Update Term AJAX Call
             $("#editTermForm").on('submit', function() {
+                $("#editTermSubmitBtn").button('loading');
                 console.log('clicked');
                 var editTermData = {
                     year: $("#yearInput").val(), 
@@ -445,9 +442,9 @@
                 }).done(function(response) {
                     if (!response.exception) {
                         if (response.success) {
-                            displayMessage("termResult", response.message, false);
+                            displayMessage("termResultMessage", response.message, false);
                         } else {
-                            displayMessage("termResult", response.message, true);
+                            displayMessage("termResultMessage", response.message, true);
                         }
                         setTimeout(function(){window.location.reload();}, 1000);
                     } else {
@@ -462,6 +459,7 @@
             
             //Update Schedule AJAX Call
             $("#editScheduleForm").on('submit', function() {
+                $("#editScheduleSubmitBtn").button('loading');
                 console.log('clicked');
                 editScheduleData = {
                     year:activeAcademicYearStr, 
@@ -469,9 +467,9 @@
                     acceptanceId:acceptanceId,
                     midtermId:midtermId,
                     finalId:finalId,
-                    acceptanceDates:$("#acceptanceDatePicker").multiDatesPicker('getDates'),
-                    midtermDates:$("#midtermDatePicker").multiDatesPicker('getDates'),
-                    finalDates:$("#finalDatePicker").multiDatesPicker('getDates')
+                    acceptanceDates:$("#acceptanceDatePicker").multiDatesPicker('getDates').sort(),
+                    midtermDates:$("#midtermDatePicker").multiDatesPicker('getDates').sort(),
+                    finalDates:$("#finalDatePicker").multiDatesPicker('getDates').sort()
                 };
                 $.ajax({
                     type: 'POST',
@@ -482,9 +480,9 @@
                 }).done(function(response) {
                     if (!response.exception) {
                         if (response.success) {
-                            displayMessage("scheduleResult", response.message, false);
+                            displayMessage("scheduleResultMessage", response.message, false);
                         } else {
-                            displayMessage("scheduleResult", response.message, true);
+                            displayMessage("scheduleResultMessage", response.message, true);
                         }
                         setTimeout(function(){window.location.reload();}, 1000);
                     } else {
@@ -499,6 +497,7 @@
             
             //Update Timeslots AJAX Call            
             $("#editTimeslotsSubmitBtn").on('click', function() {
+                $("#editTimeslotsSubmitBtn").button('loading');
                 //SerializeArray not functional for timeslots
                 var timeslotsData = {};
                 var timeslot_acceptance = new Array();
@@ -539,9 +538,12 @@
                 }).done(function(response) {
                     if (!response.exception) {
                         if (response.success) {
-                            displayMessage("timeslotsResult", response.message, false);
+                            console.log("editTimeslotsJson was successful");
+                            displayMessage("timeslotsResultMessage", response.message, false);
                         } else {
-                            displayMessage("timeslotsResult", response.message, true);
+                            var eid = btoa(response.message);
+                            console.log(response.message);
+                            window.location = "error.jsp?eid=" + eid;
                         }
                         setTimeout(function(){window.location.reload();}, 1000);
                     } else {
@@ -549,8 +551,9 @@
                         window.location="error.jsp?eid=" + eid;
                     }
                 }).fail(function(error) {
+                    $("#editTimeslotsSubmitBtn").button('reset');
                     console.log("createTimeslotsJson AJAX FAIL");
-                    displayMessage("Oops.. something went wrong", true);
+                    displayMessage("timeslotsResultMessage", "Oops.. something went wrong", true);
                 });
 
                 return false;
