@@ -70,22 +70,22 @@ body {
 }
 
 .scheduleTable {
-    margin: auto;
-    width: 100%;
+/*    margin: auto;
+    width: 100%;*/
 }
 
 .timeslotCell {
     padding: 5px;
 }
 
-.timeslotCell:hover {
+.bookedTimeslot:hover .unbookedTimeslot:hover {
     border: 2px solid #1E647C !important;
     cursor: pointer !important;
 }
 
 .noTimeslot {
     background-color: #f5f5f5 !important; 
-    border: 1px solid #dddddd;
+    border: none !important;
 }
 
 .unbookedTimeslot {
