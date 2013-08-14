@@ -55,7 +55,7 @@
 							</ul>
 						</li>-->
 						<li class="dropdown">
-							<a id="scheduleDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Schedule</b><b class="caret"></b></a>
+							<a href="#" id="scheduleDropDown" class="dropdown-toggle" data-toggle="dropdown"><b>Schedule</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href="newSchedule">Create Schedule</a></li>-->
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="createschedule.jsp">Create Schedule</a></li>
@@ -92,7 +92,7 @@
 				<% } %>
                 </ul>
             </div>
-				
+			
             <div class="btn-group userbox">
                 <button class="btn" id="userDashboard"><i class="icon-user icon-black"></i>&nbsp;<%= user.getFullName()%></button>
                 <button class="btn btn-success dropdown-toggle" id="userAccess" data-toggle="dropdown">
@@ -127,13 +127,13 @@
 			<form id="myform" action="setRole" method="post">
 			<div class="btn-group">
 				<% if (isAdministrator && (!activeRole.equalsIgnoreCase("Administrator"))) { %>
-					<button type="submit" class="btn" value="Administrator" name="administrator">Administrator</button><br/>
+					<button type="submit" class="btn btn-small" value="Administrator" name="administrator">Administrator</button><br/>
 				<% } %>
 				<% if (isSupervisorReviewer && (!activeRole.equalsIgnoreCase("Supervisor/Reviewer"))) { %>
-					<button type="submit" class="btn" value="Supervisor/Reviewer" name="supervisorReviewer">Supervisor/Reviewer</button><br/>
+					<button type="submit" class="btn btn-small" value="Supervisor/Reviewer" name="supervisorReviewer">Supervisor/Reviewer</button><br/>
 				<% } %>
 				<% if (isCourseCoordinator && (!activeRole.equalsIgnoreCase("Course Coordinator"))) {  %>
-					<button type="submit" class="btn" value="Course Coordinator" name="courseCoordinator">Course Coordinator</button>
+					<button type="submit" class="btn btn-small" value="Course Coordinator" name="courseCoordinator">Course Coordinator</button>
 				<% } %>
 			</div>
 			</form>
