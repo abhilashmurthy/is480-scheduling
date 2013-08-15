@@ -83,7 +83,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
             logger.info("Reached LoginAction");
 			
-			if (MiscUtil.DEV_MODE) { //CODE FOR LOCALHOST TESTING
+			if (true) { //CODE FOR LOCALHOST TESTING
 				initializeUser(em);
 			} else { //CODE FOR PRODUCTION SERVER
 				//return to login
@@ -185,7 +185,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 		if (user != null) {
 			//Welcome to the system
 			session.setAttribute("user", user);
-			if (!MiscUtil.DEV_MODE) {
+			if (false) {
 				session.setAttribute("fullname", request.getParameter("smu_fullname"));
 				session.setAttribute("groups", request.getParameter("smu_groups").split(","));	
 			}
