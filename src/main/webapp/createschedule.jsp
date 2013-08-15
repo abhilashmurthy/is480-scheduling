@@ -139,7 +139,7 @@
                             <input type="text" name="semester" placeholder="<%= nextSem %>"/>
                         </td>
                     </tr>
-                    <tr id="createTermSubmitRow"><td></td><td><input type="submit" class="btn btn-primary" value="Create"/></td></tr>
+                    <tr id="createTermSubmitRow"><td></td><td><input id="createTermSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td></tr>
                 </table>
             </form>
             <h4 id="termResultMessage"></h4>
@@ -166,7 +166,7 @@
                         </tr>
                         <tr class="createScheduleSubmitRow">
                             <td></td>
-                            <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create"/></td>
+                            <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td>
                         </tr>
                     </table>
                 </form>
@@ -188,7 +188,7 @@
                     <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
                     </table>
                     <br/>
-                    <button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Waiting...">Create</button>
+                    <button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button>
                     <h4 id="timeslotResultMessage"></h4>
                     <br />
                 </div>
@@ -241,6 +241,7 @@
                             if (response.canAdd) {
                                 //Remove Create Button - Brought it back
                                 displayMessage("termResultMessage", "Term added", false);
+								$("#createTermSubmitBtn").button('loading');
                                 displayCreateSchedule();
                             } else {
                                 //Display error message
@@ -325,6 +326,7 @@
                             acceptanceId = response.acceptanceScheduleId;
                             midtermId = response.midtermScheduleId;
                             finalId = response.finalScheduleId;
+							$("#createScheduleSubmitBtn").button('loading');
                             //Display create timeslots forms
                             displayCreateTimeslots();
                         } else {
@@ -436,7 +438,6 @@
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         }).fail(function(error) {
-                            $("#createTimeslotsSubmitBtn").button('reset');
                             console.log("createTimeslotsJson AJAX FAIL");
                             displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
                         });
