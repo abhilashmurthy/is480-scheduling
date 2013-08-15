@@ -4,28 +4,22 @@
  */
 package userAction;
 
-import systemAction.*;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Status;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import manager.MilestoneManager;
 import manager.TimeslotManager;
 import manager.UserManager;
-import model.Team;
 import model.Timeslot;
 import model.User;
+import notification.email.DeletedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +42,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
             json.put("exception", false);
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 			HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("user");
 			
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
@@ -56,7 +51,12 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
             try {
                 em.getTransaction().begin();
                 //this is the line to remove a timeslot
-                //em.remove(ts);          
+                //em.remove(ts);
+				
+				//Sending email
+				//TODO Bad code. Change after booking and timeslot have been separated!
+				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(ts, user, ts.getTeam(), ts.getStatusList());
+				deletedEmail.sendEmail();
 
                 //set the statuslist, team and attendees for that timeslot
                 HashMap<User, Status> statusList = new HashMap<User, Status>();
@@ -70,7 +70,6 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
                 em.getTransaction().commit();
 				
 				//Setting the updated user object in session
-				User user = (User) session.getAttribute("user");
 				String username = user.getUsername();
 				User updatedUser = UserManager.findByUsername(em, username);
 				session.setAttribute("user", updatedUser);
