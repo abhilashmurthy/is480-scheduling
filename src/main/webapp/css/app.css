@@ -200,3 +200,8 @@ body {
 #createTeamSelect {
     width: 150px;
 }
+
+/* COLORS FOR NAVBAR ITEMS */
+.navbar-title {
+	color: white !important;
+}
