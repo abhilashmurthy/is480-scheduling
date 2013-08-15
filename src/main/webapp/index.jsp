@@ -420,14 +420,14 @@
                                                 if (viewBookingData.teamName === teamName && typeof outputArray[j].status !== 'undefined') {
                                                     //outputTdKey = $(document.createElement('td'))
                                                     //   .html('<b>' + "Faculty" + '</b>');
-                                                    outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>";
+                                                    outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status + ')' + "<br/>";
 
                                                 } else if (viewBookingData.teamName !== teamName) {
 
                                                     if (typeof outputArray[j].status !== 'undefined') {
                                                         // outputTdKey = $(document.createElement('td'))
                                                         //   .html('<b>' + "Faculty" + '</b>');
-                                                        outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>";
+                                                        outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status + ')' + "<br/>";
 
                                                     }
                                                 }
@@ -544,7 +544,7 @@
                                             return 'right';
                                         }
                                     },
-                                    title: "Booking <button type='button' class='close'>&times;</button>",
+                                    title: "Warning <button type='button' class='close'>&times;</button>",
                                     content: 'You already have a booking!'
                                 });
                             } else {
@@ -598,11 +598,14 @@
                                     outputTr.append(outputTdValue);
                                     outputTable.append(outputTr);
                                 }
+                                var title = "Create Booking <button type='button' class='close'>&times;</button>";
                                 
                                 if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teams.length === 0) {
                                     outputTable = "No teams exist for this term!";
+                                    title = "Warning <button type='button' class='close'>&times;</button>";
                                 } else if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teamsPendingBooking.length === 0) {
                                     outputTable = "All teams have made bookings!";
+                                    title = "Warning <button type='button' class='close'>&times;</button>";
                                 }
 
                                 bodyTd.popover({
@@ -617,7 +620,7 @@
                                         }
                                     },
                                     content: outputTable,
-                                    title: "Create Booking <button type='button' class='close'>&times;</button>"
+                                    title: title
                                 });
 
                             }
