@@ -201,6 +201,12 @@ body {
     width: 150px;
 }
 
+#scheduleProgressBar {
+	width: 50%;
+	margin: auto;
+	margin-top: 50px;
+}
+
 /* COLORS FOR NAVBAR ITEMS */
 .navbar-title {
 	color: white !important;

@@ -99,7 +99,7 @@
                     <a id="final" href="#final" data-toggle="tab">Final</a>
                 </li>
             </ul>
-            <div id="milestoneTabContent" class="tab-content">
+            <div id="milestoneTabContent" class="tab-content" hidden="">
                 <div class="tab-pane fade active in" id="acceptanceContent">
                     <table id="acceptanceScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
                     </table>
@@ -113,6 +113,9 @@
                     </table>
                 </div>
             </div>
+			<div id="scheduleProgressBar" class="progress progress-striped active">
+				<div class="bar" style="width: 100%;"></div>
+			</div>
             <br />
         </div>
 
@@ -175,7 +178,10 @@
                 //View Schedule stuff
                 //Function to populate schedule data based on ACTIVE TERM
                 function populateSchedule(milestone, year, semester) {
-                    //Generate schedule table
+                    //Hide schedule tab and show progress bar
+					$("#milestoneTabContent").hide();
+					$("#scheduleProgressBar").show();
+					//Generate schedule table
                     var data = {
                         milestoneString: milestone,
                         academicYearString: year,
@@ -189,7 +195,8 @@
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
-                        if (response.success) {
+						
+						if (response.success) {
 
                             //Get Teams data if user is administrator
                             if (<%= activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
@@ -218,11 +225,21 @@
 
                             //Setup mouse events
                             setupMouseEvents();
+							
+							//Unhide progressbar and show schedule
+							$("#scheduleProgressBar").hide();
+							$("#milestoneTabContent").show();
                         } else {
+							//Unhide progressbar and show schedule
+							$("#scheduleProgressBar").hide();
+							$("#milestoneTabContent").show();
                             var eid = btoa(response.message);
                             window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error) {
+						//Unhide progressbar and show schedule
+						$("#scheduleProgressBar").hide();
+						$("#milestoneTabContent").show();
                         alert("There was an error in retrieving schedule");
                     });
                 }
