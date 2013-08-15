@@ -269,6 +269,7 @@ public class DBInitUtil {
 		u0.setUsername("fionalee");
 		u0.setFullName("Fiona LEE");
 		u0.addRole(admin);
+		u0.addRole(reviewer);
 		
 		User u1 = new User();
 		u1.setUsername("suresh.s.2010");
@@ -650,7 +651,7 @@ public class DBInitUtil {
 		t1.setTeamName("Thunderbolt");
 		t1.setSupervisor(u6);
 		t1.setReviewer1(u15);
-		t1.setReviewer2(u8);
+		t1.setReviewer2(u0);
 		HashSet<User> members = new HashSet<User>();
 		members.add(u1);
 		members.add(u2);
