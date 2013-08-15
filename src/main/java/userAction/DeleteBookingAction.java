@@ -55,8 +55,8 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 				
 				//Sending email
 				//TODO Bad code. Change after booking and timeslot have been separated!
-				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(ts, user, ts.getTeam(), ts.getStatusList());
-				deletedEmail.sendEmail();
+//				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(ts, user, ts.getTeam(), ts.getStatusList());
+//				deletedEmail.sendEmail();
 
                 //set the statuslist, team and attendees for that timeslot
                 HashMap<User, Status> statusList = new HashMap<User, Status>();
