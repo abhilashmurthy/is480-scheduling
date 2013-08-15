@@ -124,7 +124,7 @@
 		
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-			<% if (MiscUtil.DEV_MODE) { %>
+			<% if (true) { %>
 			$("#ssoBtn").on('click', function() {
                 $(this).button('loading');
 				var userId = prompt('Please enter the Username','');
@@ -139,7 +139,7 @@
             $("#ssoBtn").on('click', function() {
                 $(this).button('loading');
                 //blink(this);
-                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
+                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480psas';
             });
 			<% } %>
         </script>
