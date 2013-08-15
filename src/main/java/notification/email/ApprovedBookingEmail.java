@@ -44,7 +44,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateCCAddressList() {
 		Set<String> emails = new HashSet<String>();
-		emails.add(approver.getId() + "@smu.edu.sg");
+		emails.add(approver.getUsername() + "@smu.edu.sg");
 		return emails;
 	}
 

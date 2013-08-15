@@ -44,7 +44,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateCCAddressList() {
 		Set<String> emails = new HashSet<String>();
-		emails.add(rejector.getId() + "@smu.edu.sg");
+		emails.add(rejector.getUsername() + "@smu.edu.sg");
 		return emails;
 	}
 

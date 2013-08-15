@@ -124,7 +124,7 @@
 		
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-			<% if (true) { %>
+			<% if (MiscUtil.DEV_MODE) { %>
 			$("#ssoBtn").on('click', function() {
                 $(this).button('loading');
 				var userId = prompt('Please enter the Username','');
