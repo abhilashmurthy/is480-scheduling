@@ -124,8 +124,8 @@
 		
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-			<% if (true) { %>
-			$("#ssoBtn").on('click', function() {
+            <% if (!true) {%>
+		$("#ssoBtn").on('click', function() {
                 $(this).button('loading');
 				var userId = prompt('Please enter the Username','');
 				if (userId !== null && userId !== '') {
@@ -135,13 +135,13 @@
 					$(this).button('reset');
 				}
             });
-			<% } else { %>
+            <% } else {%>
             $("#ssoBtn").on('click', function() {
                 $(this).button('loading');
                 //blink(this);
-                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480psasVM';
+                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
             });
-			<% } %>
+            <% }%>
         </script>
     </body>
 </html>

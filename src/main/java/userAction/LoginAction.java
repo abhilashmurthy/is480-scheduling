@@ -83,7 +83,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
             logger.info("Reached LoginAction");
 			
-			if (true) { //CODE FOR LOCALHOST TESTING
+			if (!true) { //CODE FOR LOCALHOST TESTING
 				initializeUser(em);
 			} else { //CODE FOR PRODUCTION SERVER
 				//return to login
@@ -97,7 +97,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				}
 
 				//Get callback URL
-				String callbackUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI();
+                                String callbackUrl = null;
+                                if (request.getServerName().equals("localhost")) {
+                                    callbackUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI();
+                                } else {
+                                    callbackUrl = "http://" + request.getServerName() + request.getRequestURI();
+                                }
+
 				String uri = "POST&" + encode(callbackUrl) + "&";
 				String pairs = "";
 				for (int i = 0; i < keys.length - 1; i++) {
