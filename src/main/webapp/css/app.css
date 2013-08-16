@@ -210,4 +210,13 @@ body {
 /* COLORS FOR NAVBAR ITEMS */
 .navbar-title {
 	color: white !important;
+        border: 2px solid black !important;
+        border-radius: 5px;
+        box-sizing: border-box;
+}
+
+.navbar-title:hover {
+        border: 2px solid white !important;
+        border-radius: 5px;
+        box-sizing: border-box;
 }
