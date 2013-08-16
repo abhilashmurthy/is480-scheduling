@@ -139,7 +139,7 @@
             $("#ssoBtn").on('click', function() {
                 $(this).button('loading');
                 //blink(this);
-                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480psas';
+                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480psasVM';
             });
 			<% } %>
         </script>
