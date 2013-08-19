@@ -373,104 +373,110 @@
 
                     //Add Create Booking Popovers
                     var bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
-                    $(".unbookedTimeslot").each(function() {
-                        appendCreateBookingPopover($(this));
-                    });
+                    if (bookingExists) {
+                        //Add warning popover for all timeslots
+                        $(".unbookedTimeslot").each(function(){
+                           var bodyTd = $(this); 
+                            bodyTd.popover({
+                                container: bodyTd,
+                                html: 'true',
+                                trigger: 'manual',
+                                placement: function() {
+                                    if (bodyTd.parent().children().index(bodyTd) > 9) {
+                                        return 'left';
+                                    } else {
+                                        return 'right';
+                                    }
+                                },
+                                title: "Warning <button type='button' class='close'>&times;</button>",
+                                content: 'You already have a booking!'
+                            });
+                        });
+                    } else {
+                        //Add Create Booking popover for all timeslots
+                        $(".unbookedTimeslot").each(function() {
+                            appendCreateBookingPopover($(this));
+                        });
+                    }
 
                     function appendCreateBookingPopover(bodyTd) {
                         if (teamName !== null) {
                             //Is student and can book
-                            if (bookingExists) {
-                                bodyTd.popover({
-                                    container: bodyTd,
-                                    html: 'true',
-                                    trigger: 'manual',
-                                    placement: function() {
-                                        if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                            return 'left';
-                                        } else {
-                                            return 'right';
-                                        }
-                                    },
-                                    title: "Warning <button type='button' class='close'>&times;</button>",
-                                    content: 'You already have a booking!'
-                                });
-                            } else {
-                                //Initialize variables
-                                date = Date.parse(bodyTd.attr('value')).toString("yyyy-MM-dd");
-                                startTime = Date.parse(bodyTd.attr('value')).toString("HH:mm:ss");
-                                termId = activeAcademicYearStr + "," + activeSemesterStr;
-                                var dateToView = Date.parse(date).toString("dd MMM");
-                                var startTimeToView = Date.parse(startTime).toString("HH:mm");
-                                var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addHours(1).toString('HH:mm');
+                            //Initialize variables
+                            date = Date.parse(bodyTd.attr('value')).toString("yyyy-MM-dd");
+                            startTime = Date.parse(bodyTd.attr('value')).toString("HH:mm:ss");
+                            termId = activeAcademicYearStr + "," + activeSemesterStr;
+                            var dateToView = Date.parse(date).toString("dd MMM");
+                            var startTimeToView = Date.parse(startTime).toString("HH:mm");
+                            var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addHours(1).toString('HH:mm');
 
-                                //Create Booking outputTable
-                                var outputTable = $(document.createElement('table'));
-                                outputTable.attr('id', 'createTimeslotTable');
+                            //Create Booking outputTable
+                            var outputTable = $(document.createElement('table'));
+                            outputTable.attr('id', 'createTimeslotTable');
 
-                                //Make a dropdown of all teams that have not booked yet if user is admin
-                                if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
-                                    if (teams.length !== 0) {
-                                        var teamDropDownSelect = $(document.createElement('select'));
-                                        teamDropDownSelect.attr('name', 'team');
-                                        teamDropDownSelect.attr('id', 'createTeamSelect');
-                                        for (var t = 0; t < teams.length; t++) {
-                                            //Append only teams without bookings
-                                            if (!$("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teams[t].teamName + ")").length) {
-                                                var teamDropDownOption = $(document.createElement('option'));
-                                                teamDropDownOption.attr('value', teams[t].teamName);
-                                                teamDropDownOption.html(teams[t].teamName);
-                                                teamDropDownSelect.append(teamDropDownOption);
-                                                teamsPendingBooking.push(teams[t].teamName);
-                                            }
+                            //Make a dropdown of all teams that have not booked yet if user is admin
+                            if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
+                                if (teams.length !== 0) {
+                                    var teamDropDownSelect = $(document.createElement('select'));
+                                    teamDropDownSelect.attr('name', 'team');
+                                    teamDropDownSelect.attr('id', 'createTeamSelect');
+                                    for (var t = 0; t < teams.length; t++) {
+                                        //Append only teams without bookings
+                                        if (!$("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teams[t].teamName + ")").length) {
+                                            var teamDropDownOption = $(document.createElement('option'));
+                                            teamDropDownOption.attr('value', teams[t].teamName);
+                                            teamDropDownOption.html(teams[t].teamName);
+                                            teamDropDownSelect.append(teamDropDownOption);
+                                            teamsPendingBooking.push(teams[t].teamName);
                                         }
-                                        teamName = teamDropDownSelect;
                                     }
+                                    teamName = teamDropDownSelect;
                                 }
-
-                                var outputData = [
-                                    ["Team", teamName],
-                                    ["Date", dateToView],
-                                    ["Time", startTimeToView + " - " + endTimeToView],
-                                    ["Milestone", milestoneStr],
-                                    ["", "<button id='createBookingBtn' class='btn btn-primary'><i class='icon-plus-sign icon-white'></i>Create</button>"]
-                                ];
-                                for (var i = 0; i < outputData.length; i++) {
-                                    var outputTr = $(document.createElement('tr'));
-                                    var outputTdKey = $(document.createElement('td'))
-                                            .html('<b>' + outputData[i][0] + '</b>');
-                                    var outputTdValue = $(document.createElement('td'))
-                                            .html(outputData[i][1]);
-                                    outputTr.append(outputTdKey);
-                                    outputTr.append(outputTdValue);
-                                    outputTable.append(outputTr);
-                                }
-                                var title = "Create Booking <button type='button' class='close'>&times;</button>";
-
-                                if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teams.length === 0) {
-                                    outputTable = "No teams exist for this term!";
-                                    title = "Warning <button type='button' class='close'>&times;</button>";
-                                } else if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teamsPendingBooking.length === 0) {
-                                    outputTable = "All teams have made bookings!";
-                                    title = "Warning <button type='button' class='close'>&times;</button>";
-                                }
-
-                                bodyTd.popover({
-                                    container: bodyTd,
-                                    html: 'true',
-                                    trigger: 'manual',
-                                    placement: function() {
-                                        if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                            return 'left';
-                                        } else {
-                                            return 'right';
-                                        }
-                                    },
-                                    content: outputTable,
-                                    title: title
-                                });
-
                             }
+
+                            //Print data
+                            var outputData = [
+                                ["Team", teamName],
+                                ["Date", dateToView],
+                                ["Time", startTimeToView + " - " + endTimeToView],
+                                ["Milestone", milestoneStr],
+                                ["", "<button id='createBookingBtn' class='btn btn-primary'><i class='icon-plus-sign icon-white'></i>Create</button>"]
+                            ];
+                            for (var i = 0; i < outputData.length; i++) {
+                                var outputTr = $(document.createElement('tr'));
+                                var outputTdKey = $(document.createElement('td'))
+                                        .html('<b>' + outputData[i][0] + '</b>');
+                                var outputTdValue = $(document.createElement('td'))
+                                        .html(outputData[i][1]);
+                                outputTr.append(outputTdKey);
+                                outputTr.append(outputTdValue);
+                                outputTable.append(outputTr);
+                            }
+                            
+                            //Change to warning popovers if teams pending booking are 0
+                            var title = "Create Booking <button type='button' class='close'>&times;</button>";
+                            if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teams.length === 0) {
+                                outputTable = "No teams exist for this term!";
+                                title = "Warning <button type='button' class='close'>&times;</button>";
+                            } else if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teamsPendingBooking.length === 0) {
+                                outputTable = "All teams have made bookings!";
+                                title = "Warning <button type='button' class='close'>&times;</button>";
+                            }
+
+                            bodyTd.popover({
+                                container: bodyTd,
+                                html: 'true',
+                                trigger: 'manual',
+                                placement: function() {
+                                    if (bodyTd.parent().children().index(bodyTd) > 9) {
+                                        return 'left';
+                                    } else {
+                                        return 'right';
+                                    }
+                                },
+                                content: outputTable,
+                                title: title
+                            });                            
                         }
                     }
                     ;
