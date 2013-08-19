@@ -113,9 +113,9 @@
                     </table>
                 </div>
             </div>
-			<div id="scheduleProgressBar" class="progress progress-striped active">
-				<div class="bar" style="width: 100%;"></div>
-			</div>
+            <div id="scheduleProgressBar" class="progress progress-striped active">
+                <div class="bar" style="width: 100%;"></div>
+            </div>
             <br />
         </div>
 
@@ -143,7 +143,7 @@
                 //All teams data if for admins
                 var teams = null;
                 var teamsPendingBooking = new Array();
-                
+
                 //Make schedule rows and columns
                 var datesArray = new Array();
                 var timesArray = new Array();
@@ -179,9 +179,9 @@
                 //Function to populate schedule data based on ACTIVE TERM
                 function populateSchedule(milestone, year, semester) {
                     //Hide schedule tab and show progress bar
-					$("#milestoneTabContent").hide();
-					$("#scheduleProgressBar").show();
-					//Generate schedule table
+                    $("#milestoneTabContent").hide();
+                    $("#scheduleProgressBar").show();
+                    //Generate schedule table
                     var data = {
                         milestoneString: milestone,
                         academicYearString: year,
@@ -195,8 +195,8 @@
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
-						
-						if (response.success) {
+
+                        if (response.success) {
 
                             //Get Teams data if user is administrator
                             if (<%= activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
@@ -220,32 +220,33 @@
                             //Draw the schedule table
                             makeSchedule(response);
 
-                            //Append popovers after schedule load
-                            appendPopovers();
+                            appendPopovers(response);
 
                             //Setup mouse events
                             setupMouseEvents();
-							
-							//Unhide progressbar and show schedule
-							$("#scheduleProgressBar").hide();
-							$("#milestoneTabContent").show();
+
+                            //Unhide progressbar and show schedule
+                            $("#scheduleProgressBar").hide();
+                            $("#milestoneTabContent").show();
                         } else {
-							//Unhide progressbar and show schedule
-							$("#scheduleProgressBar").hide();
-							$("#milestoneTabContent").show();
+                            //Unhide progressbar and show schedule
+                            $("#scheduleProgressBar").hide();
+                            $("#milestoneTabContent").show();
                             var eid = btoa(response.message);
                             window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error) {
-						//Unhide progressbar and show schedule
-						$("#scheduleProgressBar").hide();
-						$("#milestoneTabContent").show();
+                        //Unhide progressbar and show schedule
+                        $("#scheduleProgressBar").hide();
+                        $("#milestoneTabContent").show();
                         alert("There was an error in retrieving schedule");
                     });
                 }
 
                 //Append popover data
-                function appendPopovers() {
+                function appendPopovers(scheduleData) {
+                
+                    var timeslots = scheduleData.timeslots;
 
                     //Delete all old popovers
                     $(".timeslotCell").trigger('mouseleave');
@@ -262,30 +263,16 @@
                     function appendViewBookingPopover(bodyTd) {
                         //Get View Booking Data
                         var cellId = bodyTd.attr('id').split("_")[1];
-                        var data = {timeslotId: cellId};
-                        var viewBookingData = getJson();
-
-                        function getJson() {
-                            var toReturn = null;
-                            $.ajax({
-                                type: 'GET',
-                                async: false,
-                                url: 'viewBookingJson',
-                                data: data,
-                                dataType: 'json'
-                            }).done(function(response) {
-                                if (response.success) {
-                                    toReturn = response;
-                                } else {
-                                    var eid = btoa(response.message);
-                                    window.location = "error.jsp?eid=" + eid;
-                                }
-                            }).fail(function(error) {
-                                toReturn = "AJAX fail";
-                            });
-                            return toReturn;
+                        var viewBookingData = null;
+                        
+                        for (var i = 0; i < timeslots.length; i++) {
+                            var timeslot = timeslots[i];
+                            if (timeslot.team && parseInt(timeslot.id) === parseInt(cellId)) {
+                                console.log("Found!");
+                                viewBookingData = timeslot;
+                                break;
+                            }
                         }
-                        ;
 
                         //Append bodyTd classes based on status
                         if (viewBookingData.status === "APPROVED") {
@@ -307,220 +294,64 @@
                                 outputTable.attr('id', 'viewTimeslotTable');
 
                                 var outputData = [
-                                    ["Team", viewBookingData.teamName],
+                                    ["Team", viewBookingData.team],
                                     ["Status", viewBookingData.status],
                                     ["Date", viewBookingData.startDate],
-                                    ["Start Time", viewBookingData.startTime],
-                                    ["End Time", viewBookingData.endTime],
+                                    ["Time", viewBookingData.time],
                                     ["Team Wiki", viewBookingData.teamWiki],
-                                    ["Attendees", viewBookingData.attendees]
+                                    ["Students", viewBookingData.students],
+                                    ["Faculty", viewBookingData.faculties],
                                 ];
 
-                                //Add delete button if user if part of team
-                                if (viewBookingData.teamName === teamName) {
-                                    outputData.push(["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]);
+                                //Add Delete button if user if part of team
+                                if (viewBookingData.team === teamName) {
+                                    outputData.push(["", "<button id='deleteBookingBtn' class='popoverBtn btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"]);
                                 }
 
-                                //Add Update and Delete buttons if user is admin
+                                //Make fields editable and add Update and Delete buttons if user is admin
                                 if (<%=activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
-                                    //viewBookingData.startDate
-                                    var outputData = [
-                                        ["Team", viewBookingData.teamName],
-                                        ["Status", viewBookingData.status],
-                                        ["Date", viewBookingData.startDate],
-                                        ["Start Time", viewBookingData.startTime],
-                                        ["End Time", viewBookingData.endTime],
-                                        ["Team Wiki", viewBookingData.teamWiki],
-                                        ["Attendees", viewBookingData.attendees],
-                                        ["", "<button id='deleteBookingBtn' class='btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"
-                                                    + "&nbsp&nbsp&nbsp&nbsp&nbsp;"
-                                                    + "<button id='updateBookingBtn' class='btn btn-info'><i class='icon-edit icon-white'></i>Save</button>"]
-                                    ];
-                                }
-
-                                //Make fields editable is user is admin
-                                if (<%=!(activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator"))%>) {
-
+                                    //Replace startDate and startTime with editable fields
                                     for (var i = 0; i < outputData.length; i++) {
-                                        var outputTr = $(document.createElement('tr'));
-                                        var outputTdKey = $(document.createElement('td'))
-                                                .html('<b>' + outputData[i][0] + '</b>');
-                                        var outputTdValue = null;
-                                        if (outputData[i][1] instanceof Array) {
-                                            var outputArray = outputData[i][1];
-                                            var outputArrayStr = "";
-                                            for (var j = 0; j < outputArray.length; j++) {
-
-                                                //if teamname of this user is similiar to the booking but attendee has no status
-                                                if (viewBookingData.teamName === teamName && typeof outputArray[j].status !== 'undefined') {
-                                                    //outputTdKey = $(document.createElement('td'))
-                                                    //   .html('<b>' + "Faculty" + '</b>');
-                                                    outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>";
-
-                                                } else if (viewBookingData.teamName !== teamName) {
-
-                                                    if (typeof outputArray[j].status !== 'undefined') {
-                                                        // outputTdKey = $(document.createElement('td'))
-                                                        //   .html('<b>' + "Faculty" + '</b>');
-                                                        outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status.toLowerCase() + ')' + "<br/>";
-
-                                                    }
-                                                }
-                                            }
-
-                                            //for faculties (print out)
-                                            outputTdValue = $(document.createElement('td'))
-                                                    .html(outputArrayStr);
-                                            //      ;
-                                            outputTdKey = $(document.createElement('td'))
-                                                    .html('<b>' + "Faculty" + '</b>');
-
-                                            outputTr.append(outputTdKey);
-                                            outputTr.append(outputTdValue);
-                                            outputTable.append(outputTr);
-
-                                            //reset the string to null
-                                            outputArrayStr = "";
-                                            var otherBookings = false;
-
-                                            //now edit for students
-                                            for (var j = 0; j < outputArray.length; j++) {
-
-                                                //if there is no status and this user's team does not belong to any team
-                                                if (typeof outputArray[j].status === 'undefined' && viewBookingData.teamName !== teamName) {
-                                                    outputArrayStr += outputArray[j].name + "<br/>";
-                                                    otherBookings = true;
-
-                                                }
-
-                                            }
-                                            if (otherBookings === true) {
-                                                outputTdValue = $(document.createElement('td'))
-                                                        .html(outputArrayStr);
-                                                //;
-
-                                                outputTdKey = $(document.createElement('td'))
-                                                        .html('<b>' + "Students" + '</b>');
-                                                var outputTr = $(document.createElement('tr'));
-                                                outputTr.append(outputTdKey);
-                                                outputTr.append(outputTdValue);
-                                                outputTable.append(outputTr);
-                                            }
-
-
-                                        } else {
-                                            outputTdValue = $(document.createElement('td'))
-                                                    .html(outputData[i][1]);
-                                            outputTr.append(outputTdKey);
-                                            outputTr.append(outputTdValue);
-                                            outputTable.append(outputTr);
-
+                                        if (outputData[i][0] === "Date") {
+                                            outputData[i][1] = "<input type='text' id='updateFormDate'" + " placeholder='" + outputData[i][1] + "' title='Enter date in YYYY-MM-DD format (e.g. 2013-01-10)' /input>";
                                         }
-
-
-
-                                    }
-                                } else {
-                                    var updateForm = "updateForm";
-
-                                    for (var i = 0; i < outputData.length; i++) {
-                                        var outputTr = $(document.createElement('tr'));
-                                        var outputTdKey = $(document.createElement('td'))
-                                                .html('<b>' + outputData[i][0] + '</b>');
-                                        var outputTdValue = null;
-                                        if (outputData[i][1] instanceof Array) {
-                                            var outputArray = outputData[i][1];
-                                            var outputArrayStr = "";
-                                            for (var j = 0; j < outputArray.length; j++) {
-
-                                                //if teamname of this user is similiar to the booking but attendee has no status
-                                                if (viewBookingData.teamName === teamName && typeof outputArray[j].status !== 'undefined') {
-                                                    //outputTdKey = $(document.createElement('td'))
-                                                    //   .html('<b>' + "Faculty" + '</b>');
-                                                    outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status + ')' + "<br/>";
-
-                                                } else if (viewBookingData.teamName !== teamName) {
-
-                                                    if (typeof outputArray[j].status !== 'undefined') {
-                                                        // outputTdKey = $(document.createElement('td'))
-                                                        //   .html('<b>' + "Faculty" + '</b>');
-                                                        outputArrayStr += outputArray[j].name + ' (' + outputArray[j].status + ')' + "<br/>";
-
-                                                    }
-                                                }
-                                            }
-
-                                            //for faculties (print out)
-                                            outputTdValue = $(document.createElement('td'))
-                                                    .html(outputArrayStr);
-                                            //      ;
-                                            outputTdKey = $(document.createElement('td'))
-                                                    .html('<b>' + "Faculty" + '</b>');
-
-                                            outputTr.append(outputTdKey);
-                                            outputTr.append(outputTdValue);
-                                            outputTable.append(outputTr);
-
-                                            //reset the string to null
-                                            outputArrayStr = "";
-                                            var otherBookings = false;
-
-                                            //now edit for students
-                                            for (var j = 0; j < outputArray.length; j++) {
-
-                                                //if there is no status and this user's team does not belong to any team
-                                                if (typeof outputArray[j].status === 'undefined' && viewBookingData.teamName !== teamName) {
-                                                    outputArrayStr += outputArray[j].name + "<br/>";
-                                                    otherBookings = true;
-
-                                                }
-
-                                            }
-                                            if (otherBookings === true) {
-                                                outputTdValue = $(document.createElement('td'))
-                                                        .html(outputArrayStr);
-                                                //;
-
-                                                outputTdKey = $(document.createElement('td'))
-                                                        .html('<b>' + "Students" + '</b>');
-                                                var outputTr = $(document.createElement('tr'));
-                                                outputTr.append(outputTdKey);
-                                                outputTr.append(outputTdValue);
-                                                outputTable.append(outputTr);
-                                            }
-                                        } else {
-                                            if (outputData[i][0] === 'Date' || outputData[i][0] === 'Start Time') {
-
-                                                if (outputData[i][0] === 'Date') {
-
-                                                    updateForm = "updateForm" + 'Date';
-                                                    outputTdValue = $(document.createElement('td'))
-                                                            .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='Enter date in YYYY-MM-DD format (e.g. 2013-01-10)' /input>");
-
-                                                } else {
-
-                                                    updateForm = "updateForm" + 'StartTime';
-                                                    outputTdValue = $(document.createElement('td'))
-                                                            .html("<input type='text' id='" + updateForm + "'" + " placeholder='" + outputData[i][1] + "' title='Enter time in HH:MM format (e.g. 10:00)' /input>");
-
-                                                }
-
-                                            } else {
-                                                outputTdValue = $(document.createElement('td'))
-                                                        .html(outputData[i][1]);
-                                            }
-
-                                            outputTr.append(outputTdKey);
-                                            outputTr.append(outputTdValue);
-                                            outputTable.append(outputTr);
+                                        if (outputData[i][0] === "Time") {
+                                            outputData[i][1] = "<input type='text' id='updateFormStartTime'" + " placeholder='" + outputData[i][1] + "' title='Enter time in HH:mm format (e.g. 10:00)' /input>";
                                         }
-
-
-
                                     }
-
+                                    //Add Update AND Delete button
+                                    outputData.push(["", "<button id='deleteBookingBtn' class='popoverBtn btn btn-danger'><i class='icon-trash icon-white'></i>Delete</button>"
+                                                            + "<button id='updateBookingBtn' class='popoverBtn btn btn-info'><i class='icon-edit icon-white'></i>Save</button>"]);
                                 }
-
+                                
+                                //Append all fields
+                                for (var i = 0; i < outputData.length; i++) {
+                                    var outputTr = $(document.createElement('tr'));
+                                    var outputTdKey = $(document.createElement('td')).html('<b>' + outputData[i][0] + '</b>');
+                                    var outputTdValue = null;
+                                    if (outputData[i][1] instanceof Array) {
+                                        var outputArray = outputData[i][1];
+                                        var outputArrayStr = "";
+                                        //If print students
+                                        if (outputData[i][0] === "Students") {
+                                            for (var j = 0; j < outputArray.length; j++) {
+                                                outputArrayStr += outputArray[j].name + "<br/>";
+                                            }
+                                        }
+                                        //If print faculty
+                                        if (outputData[i][0] === "Faculty") {
+                                            for (var j = 0; j < outputArray.length; j++) {
+                                                outputArrayStr += outputArray[j].name + " (" + outputArray[j].status.toLowerCase() + ")" + "<br/>";
+                                            }
+                                        }
+                                        outputTdValue = $(document.createElement('td')).html(outputArrayStr);
+                                    } else {
+                                            outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
+                                    }
+                                    outputTr.append(outputTdKey);
+                                    outputTr.append(outputTdValue);
+                                    outputTable.append(outputTr);
+                                }
                                 return outputTable;
                             },
                             placement: function() {
@@ -600,8 +431,7 @@
                                 var outputData = [
                                     ["Team", teamName],
                                     ["Date", dateToView],
-                                    ["Start Time", startTimeToView],
-                                    ["End Time", endTimeToView],
+                                    ["Time", startTimeToView + " - " + endTimeToView],
                                     ["Milestone", milestoneStr],
                                     ["", "<button id='createBookingBtn' class='btn btn-primary'><i class='icon-plus-sign icon-white'></i>Create</button>"]
                                 ];
@@ -616,7 +446,7 @@
                                     outputTable.append(outputTr);
                                 }
                                 var title = "Create Booking <button type='button' class='close'>&times;</button>";
-                                
+
                                 if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%> && teams.length === 0) {
                                     outputTable = "No teams exist for this term!";
                                     title = "Warning <button type='button' class='close'>&times;</button>";
@@ -654,9 +484,9 @@
                     $(".timeslotCell").mouseleave(function() {
                         $(this).removeClass("clickedCell");
                     });
-                    
+
                     //Hide all popovers on page click
-                    $("body").on('click', function(){
+                    $("body").on('click', function() {
                         if ($('.popover').hasClass("in")) {
                             $('.popover').parent().popover('hide');
                         }
@@ -752,7 +582,7 @@
                         return false;
                     });
                 }
-                
+
                 function showResult(self, message) {
                     //Result popover
                     self.popover({
@@ -852,7 +682,7 @@
                         concatStart = startDate + " " + startTime + ":00";
                     }
                     console.log(concatStart + " this is concat start");
-                    
+
                     var data = {timeslotId: cellId, changedDate: concatStart};
 
                     console.log("Submitting update booking data: " + JSON.stringify(data));

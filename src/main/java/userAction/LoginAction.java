@@ -83,7 +83,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
             logger.info("Reached LoginAction");
 			
-			if (!true) { //CODE FOR LOCALHOST TESTING
+			if (true) { //CODE FOR LOCALHOST TESTING
 				initializeUser(em);
 			} else { //CODE FOR PRODUCTION SERVER
 				//return to login

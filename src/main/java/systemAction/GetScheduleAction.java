@@ -10,6 +10,7 @@ import constant.Status;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -84,6 +85,8 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat viewDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
+            SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
             
             Term term = TermManager.findByYearAndSemester(em, Integer.parseInt(academicYearString), semesterString);
             Milestone milestone = MilestoneManager.findByName(em, milestoneString);
@@ -107,45 +110,47 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 map.put("venue", venue);
                 
                 if (t.getTeam() != null) {
+                    Date startDate = new Date(t.getStartTime().getTime());
+                    Date endDate = new Date(t.getEndTime().getTime());
                     map.put("team", t.getTeam().getTeamName());
+                    
+                    //View start date (DDD, dd MMM YYYY)
+                    map.put("startDate", viewDateFormat.format(startDate));
+                    
+                    //Overall status
+                    map.put("status", t.getOverallBookingStatus().toString());
+                    
+                    //Start Time - End Time
+                    map.put("time", viewTimeFormat.format(startDate) + " - " + viewTimeFormat.format(endDate));
 
                     //This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
-                    List<HashMap<String, String>> attendees = new ArrayList<HashMap<String, String>>();
+                    List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>();
+                    List<HashMap<String, String>> faculties = new ArrayList<HashMap<String, String>>();
 
-                    //Getting all the team members associated with the timeslot
-                    //First getting the team members
-                    Team team = t.getTeam();
-                    if (team != null) {
-                        Set<User> teamMembers = team.getMembers();
-                        Iterator it = teamMembers.iterator();
-                        while (it.hasNext()) {
-                            HashMap<String, String> userMap = new HashMap<String, String>();
-                            User teamMember = (User) it.next();
-                            userMap.put("name", teamMember.getFullName());
-                            
-                            attendees.add(userMap);
+                    //Adding all students
+                    Set<User> teamMembers = t.getTeam().getMembers();
+                    for (User student : teamMembers) {
+                        HashMap<String, String> studentMap = new HashMap<String, String>();
+                        studentMap.put("name", student.getFullName());
+                        students.add(studentMap);
+                    }
+                    
+                    //Adding all faculty and their status
+                    HashMap<User, Status> statusList = t.getStatusList();
+                    if (statusList != null) {
+                        for (User faculty : statusList.keySet()) {
+                            HashMap<String, String> facultyMap = new HashMap<String, String>();
+                            facultyMap.put("name", faculty.getFullName());
+                            facultyMap.put("status", statusList.get(faculty).toString());
+                            faculties.add(facultyMap);
                         }
                     }
-
-                    //Second getting the supervisor/reviewer for the timeslot
-                    HashMap<User, Status> members = null;
-                    if (t.getStatusList() != null) {
-                        members = t.getStatusList();
-                        Iterator iter = members.keySet().iterator();
-                        while (iter.hasNext()) {
-                            HashMap<String, String> userMap = new HashMap<String, String>();
-                            User supervisorReviewer = (User) iter.next();
-                            Status status = members.get(supervisorReviewer);
-                            userMap.put("name", supervisorReviewer.getFullName());
-                            userMap.put("status", status.toString());
-                            
-                            attendees.add(userMap);
-                        }
-                    }
+                    
                     //Setting the list of attendees
-                    map.put("attendees", attendees);
+                    map.put("students", students);
+                    map.put("faculties", faculties);
 
-                    //Things this code cannot get as of now (can only do this when database has values)
+                    //TODO: Things this code cannot get as of now (can only do this when database has values)
                     String TA = "-";
                     map.put("TA", TA);
                     String teamWiki = "-";

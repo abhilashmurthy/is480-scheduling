@@ -92,9 +92,9 @@
 
         <div class="container">
             <div class="content">
-				<div>
-					<img src="img/IS480-logo.jpg"/>
-				</div>
+                <div>
+                    <img src="img/IS480-logo.jpg"/>
+                </div>
                 <div class="row">
 
                     <h2>IS480 Scheduling System</h2>
@@ -106,34 +106,34 @@
             <div class="loadingContainer">
             </div>
         </div>
-		
-		<!-- To display the login message error -->
-		<div class="container">
-			<div class="row">
-				<% Object loginMsg = request.getAttribute("error");
-				   String loginError = "";
-				   if (loginMsg != null) {
-					   loginError = loginMsg.toString();
-				   }
-				%>
-				<p class="text-error" style="text-align:center">
-					<strong><%= loginError %></strong>
-				</p>
-			</div>
+
+        <!-- To display the login message error -->
+        <div class="container">
+            <div class="row">
+                <% Object loginMsg = request.getAttribute("error");
+                    String loginError = "";
+                    if (loginMsg != null) {
+                        loginError = loginMsg.toString();
+                    }
+                %>
+                <p class="text-error" style="text-align:center">
+                    <strong><%= loginError%></strong>
+                </p>
+            </div>
         </div> <!-- /container -->
-		
+
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-            <% if (!true) {%>
-		$("#ssoBtn").on('click', function() {
+            <% if (true) {%>
+            $("#ssoBtn").on('click', function() {
                 $(this).button('loading');
-				var userId = prompt('Please enter the Username','');
-				if (userId !== null && userId !== '') {
-					window.location = 'login?smu_username=' + userId;
-				} else {
-					alert('Invalid Username');
-					$(this).button('reset');
-				}
+                var userId = prompt('Please enter the Username', '');
+                if (userId !== null && userId !== '') {
+                    window.location = 'login?smu_username=' + userId;
+                } else {
+                    alert('Invalid Username');
+                    $(this).button('reset');
+                }
             });
             <% } else {%>
             $("#ssoBtn").on('click', function() {
