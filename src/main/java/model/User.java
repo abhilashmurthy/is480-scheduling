@@ -17,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 import org.hibernate.annotations.Cascade;
 
 /**
@@ -33,12 +34,12 @@ public class User implements Serializable {
 	@Column(unique = true)
 	private String username;
 	private String fullName;
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	private List<Role> roles = new ArrayList<Role>();
-	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 

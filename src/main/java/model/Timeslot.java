@@ -17,6 +17,7 @@ import javax.persistence.ManyToMany;
 import constant.Status;
 import java.util.Collection;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
 /**
@@ -36,11 +37,11 @@ public class Timeslot implements Serializable {
 	@Column(length=19000000)
 	private HashMap<User, Status> statusList = new HashMap<User, Status>();
 	private String venue;
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	private Set<User> attendees = new HashSet<User>();
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Team team;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Schedule schedule;
 
 	/**

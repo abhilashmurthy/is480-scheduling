@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,14 +32,14 @@ public class Schedule implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Milestone milestone;
 	private Timestamp startDate;
 	private Timestamp endDate;
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
 	public Term getTerm() {
