@@ -8,3 +8,5 @@
 <script type="text/javascript" src="js/plugins/bootstrap.js"></script>
 <!-- DateJS -->
 <script type="text/javascript" src="js/plugins/date.js"></script>
+<!-- OuterHTML -->
+<script type="text/javascript" src="js/plugins/outerHTML-2.1.0-min.js"></script>
