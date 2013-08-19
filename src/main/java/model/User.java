@@ -19,12 +19,17 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 /**
  *
  * @author suresh
  */
 @Entity
+@FilterDef(name = "activeTermFilter",
+		parameters = @ParamDef(name = "termId", type = "long"))
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -71,6 +76,10 @@ public class User implements Serializable {
 		this.team = team;
 	}
 
+	@Filter(
+		name = "activeTermFilter",
+		condition = "term.id = :termId"
+	)
 	public List<Role> getRoles() {
 		return roles;
 	}
