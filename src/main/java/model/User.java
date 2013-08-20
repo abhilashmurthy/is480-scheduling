@@ -50,7 +50,9 @@ public class User implements Serializable {
 	private List<Role> roles = new ArrayList<Role>();
 	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
+	private Set<Booking> bookings = new HashSet<Booking>();
+	@ManyToMany(mappedBy = "optionalAttendees")
+	private Set<Booking> optionalBookings;
 
 	public void addRole(Role role) {
 		roles.add(role);
@@ -88,14 +90,22 @@ public class User implements Serializable {
 		this.roles = roles;
 	}
 
-	public Set<Timeslot> getTimeslots() {
-		return timeslots;
+	public Set<Booking> getBookings() {
+		return bookings;
 	}
 
-	public void setTimeslots(Set<Timeslot> timeslots) {
-		this.timeslots = timeslots;
+	public void setBookings(Set<Booking> bookings) {
+		this.bookings = bookings;
 	}
 
+	public Set<Booking> getOptionalBookings() {
+		return optionalBookings;
+	}
+
+	public void setOptionalBookings(Set<Booking> optionalBookings) {
+		this.optionalBookings = optionalBookings;
+	}
+	
 	public Long getId() {
 		return id;
 	}

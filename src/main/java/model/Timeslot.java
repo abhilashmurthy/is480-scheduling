@@ -6,19 +6,13 @@ package model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import constant.Status;
-import java.util.Collection;
-import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -34,43 +28,12 @@ public class Timeslot implements Serializable {
 	private Long id;
 	private Timestamp startTime;
 	private Timestamp endTime;
-	@Column(length=19000000)
-	private HashMap<User, Status> statusList = new HashMap<User, Status>();
 	private String venue;
-	@ManyToMany(fetch = FetchType.LAZY)
-	private Set<User> attendees = new HashSet<User>();
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Team team;
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Schedule schedule;
+	@OneToOne //Stores the current active booking for the timeslot. If null, then the timeslot is available
+	private Booking currentBooking;
 
-	/**
-	 * This method returns the overall status of the booking.
-	 * @return
-	 */
-	public Status getOverallBookingStatus() {
-		Collection<Status> values = statusList.values();
-		if (values.size() > 0) {
-			int counter = 0;
-			for (Status s: statusList.values()) {
-				if (s == Status.REJECTED) {
-					// Reject the booking if any one person has rejected it
-					return Status.REJECTED;
-				} else if (s == Status.APPROVED) {
-					counter++;
-				}
-			}
-
-			// Check if everyone has approved the booking
-			if (counter == values.size()) {
-				return Status.APPROVED;
-			}
-			return Status.PENDING;
-		}
-		
-		return Status.AVAILABLE;
-	}
-	
 	public Timestamp getStartTime() {
 		return startTime;
 	}
@@ -87,14 +50,6 @@ public class Timeslot implements Serializable {
 		this.endTime = endTime;
 	}
 
-	public HashMap<User, Status> getStatusList() {
-		return statusList;
-	}
-
-	public void setStatusList(HashMap<User, Status> statusList) {
-		this.statusList = statusList;
-	}
-
 	public String getVenue() {
 		return venue;
 	}
@@ -103,28 +58,20 @@ public class Timeslot implements Serializable {
 		this.venue = venue;
 	}
 
-	public Set<User> getAttendees() {
-		return attendees;
-	}
-
-	public void setAttendees(Set<User> attendees) {
-		this.attendees = attendees;
-	}
-
-	public Team getTeam() {
-		return team;
-	}
-
-	public void setTeam(Team team) {
-		this.team = team;
-	}
-
 	public Schedule getSchedule() {
 		return schedule;
 	}
 
 	public void setSchedule(Schedule schedule) {
 		this.schedule = schedule;
+	}
+	
+	public Booking getCurrentBooking() {
+		return currentBooking;
+	}
+
+	public void setCurrentBooking(Booking currentBooking) {
+		this.currentBooking = currentBooking;
 	}
 	
 	public Long getId() {
