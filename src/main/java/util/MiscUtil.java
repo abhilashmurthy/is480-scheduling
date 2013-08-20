@@ -12,6 +12,8 @@ import manager.ScheduleManager;
 import manager.TermManager;
 import model.Schedule;
 import model.Term;
+import org.hibernate.Session;
+import org.hibernate.ejb.HibernateEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,5 +60,19 @@ public class MiscUtil {
 		}
 		
 		return null;
+	}
+	
+	public static void toggleTermRoleFilter(boolean activate, EntityManager em, Long termId) {
+		 Session session;
+		if (em instanceof HibernateEntityManager) {
+			HibernateEntityManager hem = (HibernateEntityManager) em;
+			session = hem.getSession();
+		} else { return; }
+		
+		if (activate) {
+			session.enableFilter("activeTermFilter").setParameter("termId", termId);
+		} else {
+			session.disableFilter("activeTermFilter");
+		}
 	}
 }

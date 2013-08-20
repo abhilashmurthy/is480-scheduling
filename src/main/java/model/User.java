@@ -17,13 +17,19 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 /**
  *
  * @author suresh
  */
 @Entity
+@FilterDef(name = "activeTermFilter",
+		parameters = @ParamDef(name = "termId", type = "long"))
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -33,12 +39,16 @@ public class User implements Serializable {
 	@Column(unique = true)
 	private String username;
 	private String fullName;
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
+	@Filter(
+		name = "activeTermFilter",
+		condition = "term_id = :termId OR term_id IS NULL"
+	)
 	private List<Role> roles = new ArrayList<Role>();
-	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
 
@@ -69,7 +79,7 @@ public class User implements Serializable {
 	public void setTeam(Team team) {
 		this.team = team;
 	}
-
+	
 	public List<Role> getRoles() {
 		return roles;
 	}
