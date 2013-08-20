@@ -251,14 +251,14 @@
                     //Delete all old popovers
                     $(".timeslotCell").trigger('mouseleave');
                     $(".timeslotCell").popover('destroy');
+                    
+                    //Logged in team name
+                    teamName = "<%= team != null ? team.getTeamName() : null%>";
 
                     //Add View Booking popovers
                     $(".bookedTimeslot").each(function() {
                         appendViewBookingPopover($(this));
                     });
-
-                    //Logged in team name
-                    teamName = "<%= team != null ? team.getTeamName() : null%>";
 
                     function appendViewBookingPopover(bodyTd) {
                         //Get View Booking Data
@@ -300,7 +300,7 @@
                                     ["Time", viewBookingData.time],
                                     ["Team Wiki", viewBookingData.teamWiki],
                                     ["Students", viewBookingData.students],
-                                    ["Faculty", viewBookingData.faculties],
+                                    ["Faculty", viewBookingData.faculties]
                                 ];
 
                                 //Add Delete button if user if part of team
@@ -436,6 +436,7 @@
                                         content: createBookingOutput
                                     });
                                 });
+                                console.log("Not adding create bookings!");
                                 return; //Don't add any more popovers
                             }
                         }
@@ -495,16 +496,16 @@
                 //Function to create mouse UI events
                 function setupMouseEvents() {
 
-                    //Removed clicked
-                    $(".timeslotCell").mouseleave(function() {
-                        $(this).removeClass("clickedCell");
-                    });
-
                     //Hide all popovers on page click
                     $("body").on('click', function() {
                         if ($('.popover').hasClass("in")) {
                             $('.popover').parent().popover('hide');
                         }
+                    });
+        
+                    //Removed clicked
+                    $(".timeslotCell").mouseleave(function() {
+                        $(this).removeClass("clickedCell");
                     });
 
                     //Add clickedCell and initialize common variables
@@ -538,14 +539,11 @@
                     $(".unbookedTimeslot").on('click', function(e) {
                         if (e.target === this) {
                             console.log(".unbookedTimeslot clicked");
-                            //Only display if user is student or admin
-                            if (<%= activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
-                                self = $(this);
-                                self.popover('show');
-                                date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
-                                startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
-                                termId = activeAcademicYearStr + "," + activeSemesterStr;
-                            }
+                            self = $(this);
+                            self.popover('show');
+                            date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
+                            startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
+                            termId = activeAcademicYearStr + "," + activeSemesterStr;
                         }
                         return false;
                     });
@@ -816,7 +814,7 @@
 
                             //Append timeslot td's row by row
                             rowloop:
-                                    for (var j = 0; j < datesArray.length; j++) {
+                            for (var j = 0; j < datesArray.length; j++) {
                                 var date = datesArray[j];
                                 date = new Date(date).toString("yyyy-MM-dd");
                                 var datetimeString = date + " " + time + ":00";
@@ -830,7 +828,6 @@
 
                                 //Table cell not part of timeslot yet. Proceed.
                                 var id = getTimeslotId(timeslots, date, time); //Get the timeslot id from datetime
-                                var classes = new Array();  //Declare CSS classes of td
                                 var team = null;
                                 bodyTd = $(document.createElement('td'));
                                 bodyTd.addClass('timeslotCell');
