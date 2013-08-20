@@ -43,6 +43,10 @@ public class User implements Serializable {
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
 	@ManyToMany(fetch = FetchType.LAZY)
+	@Filter(
+		name = "activeTermFilter",
+		condition = "term_id = :termId OR term_id IS NULL"
+	)
 	private List<Role> roles = new ArrayList<Role>();
 	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
@@ -75,11 +79,7 @@ public class User implements Serializable {
 	public void setTeam(Team team) {
 		this.team = team;
 	}
-
-	@Filter(
-		name = "activeTermFilter",
-		condition = "term.id = :termId"
-	)
+	
 	public List<Role> getRoles() {
 		return roles;
 	}
