@@ -31,6 +31,7 @@ public class Settings implements Serializable {
 	/**
 	 * Value of the setting being stored.
 	 */
+	@Column(length=19000000)
 	private String value;
 
 	public String getName() {

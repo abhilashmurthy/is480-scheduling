@@ -58,7 +58,11 @@ public class DBInitUtil {
 			em.getTransaction().commit();
 			logger.info("DB Initialization complete");
 		} catch (Exception e) {
-			logger.error("DB Initialization Error");
+			logger.error("DB Initialization Error:");
+			logger.error(e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				logger.debug(s.toString());
+			}
 			em.getTransaction().rollback();
 		}
 		
@@ -948,16 +952,25 @@ public class DBInitUtil {
 		milestones.setName("milestones");
 		ArrayList<HashMap<String,Object>> milestoneList = new ArrayList<HashMap<String, Object>>();
 		HashMap<String,Object> accMap = new HashMap<String, Object>();
+		accMap.put("order", 1);
 		accMap.put("name", "Acceptance");
 		accMap.put("duration", 60);
+		String[] accReqList = {"Supervisor"};
+		accMap.put("requiredAttendees", accReqList);
 		milestoneList.add(accMap);
 		HashMap<String,Object> midMap = new HashMap<String, Object>();
+		midMap.put("order", 2);
 		midMap.put("name", "Midterm");
 		midMap.put("duration", 90);
+		String[] midReqList = {"Reviewer1", "Reviewer2"};
+		midMap.put("requiredAttendees", midReqList);
 		milestoneList.add(midMap);
 		HashMap<String,Object> finMap = new HashMap<String, Object>();
+		finMap.put("order", 3);
 		finMap.put("name", "Final");
 		finMap.put("duration", 90);
+		String[] finReqList = {"Supervisor", "Reviewer1"};
+		finMap.put("requiredAttendees", finReqList);
 		milestoneList.add(finMap);
 		milestones.setValue(new Gson().toJson(milestoneList));
 		
