@@ -48,9 +48,6 @@ public class Booking implements Serializable {
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	private Set<User> optionalAttendees = new HashSet<User>();
-	
-	//List of email IDs of external people who are invited to the presentation
-	private Set<String> externalAttendees = new HashSet<String>();
 
 	public Timeslot getTimeslot() {
 		return timeslot;
@@ -90,14 +87,6 @@ public class Booking implements Serializable {
 
 	public void setOptionalAttendees(Set<User> optionalAttendees) {
 		this.optionalAttendees = optionalAttendees;
-	}
-
-	public Set<String> getExternalAttendees() {
-		return externalAttendees;
-	}
-
-	public void setExternalAttendees(Set<String> externalAttendees) {
-		this.externalAttendees = externalAttendees;
 	}
 
 	public BookingStatus getStatus() {

@@ -39,12 +39,12 @@ public class User implements Serializable {
 	
 	private String fullName;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	/*
+	 * COMMON VARIABLES
+	 */
+	
+	@ManyToOne(fetch = FetchType.EAGER) //Set to NULL for permanent roles
 	private Term term;
-
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private Team team;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	private List<Role> roles = new ArrayList<Role>();
@@ -55,7 +55,19 @@ public class User implements Serializable {
 	
 	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY)
 	private Set<Booking> optionalBookings;
+	
+	/*
+	 * STUDENT SPECIFIC VARIABLES
+	 */
+	
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	private Team team;
 
+	/*
+	 * GETTERS, SETTERS AND OTHER METHODS
+	 */
+	
 	public void addRole(Role role) {
 		roles.add(role);
 	}

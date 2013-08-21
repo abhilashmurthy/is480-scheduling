@@ -27,19 +27,6 @@ public class Role implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String name;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private Term term;
-	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-	private List<User> users;
-
-	public List<User> getUsers() {
-		return users;
-	}
-
-	public void setUsers(List<User> users) {
-		this.users = users;
-	}
 
 	public String getName() {
 		return name;
@@ -47,14 +34,6 @@ public class Role implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Term getTerm() {
-		return term;
-	}
-
-	public void setTerm(Term term) {
-		this.term = term;
 	}
 
 	public Long getId() {
