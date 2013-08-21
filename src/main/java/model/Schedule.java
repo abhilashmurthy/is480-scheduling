@@ -34,10 +34,15 @@ public class Schedule implements Serializable {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Milestone milestone;
+	
 	private Timestamp startDate;
 	private Timestamp endDate;
+	private int dayStartTime;
+	private int datEndTime;
+	
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Timeslot> timeslots = new HashSet<Timeslot>();
@@ -72,6 +77,22 @@ public class Schedule implements Serializable {
 
 	public void setEndDate(Timestamp endDate) {
 		this.endDate = endDate;
+	}
+	
+	public int getDayStartTime() {
+		return dayStartTime;
+	}
+
+	public void setDayStartTime(int dayStartTime) {
+		this.dayStartTime = dayStartTime;
+	}
+
+	public int getDatEndTime() {
+		return datEndTime;
+	}
+
+	public void setDatEndTime(int datEndTime) {
+		this.datEndTime = datEndTime;
 	}
 	
 	public Set<Timeslot> getTimeslots() {
