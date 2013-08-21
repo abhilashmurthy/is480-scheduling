@@ -7,6 +7,7 @@ package model;
 import constant.BookingStatus;
 import constant.Response;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +41,8 @@ public class Booking implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Team team;
 	
+	private Timestamp createdAt;
+
 	//Store the overall status of the booking. Set to PENDING by default
 	private BookingStatus status = BookingStatus.PENDING;
 	
@@ -77,6 +80,14 @@ public class Booking implements Serializable {
 		this.team = team;
 	}
 
+	public Timestamp getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Timestamp createdAt) {
+		this.createdAt = createdAt;
+	}
+	
 	public HashMap<User, Response> getResponseList() {
 		return responseList;
 	}
