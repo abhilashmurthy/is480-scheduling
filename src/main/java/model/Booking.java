@@ -4,9 +4,9 @@
  */
 package model;
 
-import constant.Status;
+import constant.BookingStatus;
+import constant.Response;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,45 +37,20 @@ public class Booking implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Team team;
 	
-	@Column(length=19000000)
-	private HashMap<User, Status> statusList = new HashMap<User, Status>();
+	//Store the overall status of the booking. Set to PENDING by default
+	private BookingStatus status = BookingStatus.PENDING;
+	
+	@Column(length=19000000) //Track the responses of the required attendees
+	private HashMap<User, Response> responseList = new HashMap<User, Response>();
 	
 	@ManyToMany(fetch = FetchType.LAZY)
-	private Set<User> attendees = new HashSet<User>();
+	private Set<User> requiredAttendees = new HashSet<User>();
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	private Set<User> optionalAttendees = new HashSet<User>();
 	
+	//List of email IDs of external people who are invited to the presentation
 	private Set<String> externalAttendees = new HashSet<String>();
-	
-	private boolean isDeleted = false;
-	
-	/**
-	 * This method returns the overall status of the booking.
-	 * @return
-	 */
-	public Status getOverallBookingStatus() {
-		Collection<Status> values = statusList.values();
-		if (values.size() > 0) {
-			int counter = 0;
-			for (Status s: statusList.values()) {
-				if (s == Status.REJECTED) {
-					// Reject the booking if any one person has rejected it
-					return Status.REJECTED;
-				} else if (s == Status.APPROVED) {
-					counter++;
-				}
-			}
-
-			// Check if everyone has approved the booking
-			if (counter == values.size()) {
-				return Status.APPROVED;
-			}
-			return Status.PENDING;
-		}
-		
-		return Status.AVAILABLE;
-	}
 
 	public Timeslot getTimeslot() {
 		return timeslot;
@@ -93,20 +68,20 @@ public class Booking implements Serializable {
 		this.team = team;
 	}
 
-	public HashMap<User, Status> getStatusList() {
-		return statusList;
+	public HashMap<User, Response> getResponseList() {
+		return responseList;
 	}
 
-	public void setStatusList(HashMap<User, Status> statusList) {
-		this.statusList = statusList;
+	public void setResponseList(HashMap<User, Response> statusList) {
+		this.responseList = statusList;
 	}
 
-	public Set<User> getAttendees() {
-		return attendees;
+	public Set<User> getRequiredAttendees() {
+		return requiredAttendees;
 	}
 
-	public void setAttendees(Set<User> attendees) {
-		this.attendees = attendees;
+	public void setRequiredAttendees(Set<User> attendees) {
+		this.requiredAttendees = attendees;
 	}
 
 	public Set<User> getOptionalAttendees() {
@@ -125,12 +100,12 @@ public class Booking implements Serializable {
 		this.externalAttendees = externalAttendees;
 	}
 
-	public boolean isIsDeleted() {
-		return isDeleted;
+	public BookingStatus getStatus() {
+		return status;
 	}
 
-	public void setIsDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+	public void setBookingStatus(BookingStatus status) {
+		this.status = status;
 	}
 
 	public Long getId() {

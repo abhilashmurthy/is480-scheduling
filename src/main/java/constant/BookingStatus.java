@@ -8,6 +8,6 @@ package constant;
  *
  * @author suresh
  */
-public enum Status {
-	AVAILABLE, PENDING, APPROVED, REJECTED
+public enum BookingStatus {
+	PENDING, APPROVED, REJECTED, DELETED
 }

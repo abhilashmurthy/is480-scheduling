@@ -26,12 +26,15 @@ public class Timeslot implements Serializable {
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	
 	private Timestamp startTime;
 	private Timestamp endTime;
 	private String venue;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Schedule schedule;
-	@OneToOne //Stores the current active booking for the timeslot. If null, then the timeslot is available
+	
+	@OneToOne(fetch = FetchType.LAZY) //Stores the current active booking for the timeslot. If null, then the timeslot is available
 	private Booking currentBooking;
 
 	public Timestamp getStartTime() {

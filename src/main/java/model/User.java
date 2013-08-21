@@ -36,22 +36,26 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	
 	@Column(unique = true)
 	private String username;
+	
 	private String fullName;
+	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
+	
 	@ManyToMany(fetch = FetchType.LAZY)
-	@Filter(
-		name = "activeTermFilter",
-		condition = "term_id = :termId OR term_id IS NULL"
-	)
+	@Filter(name = "activeTermFilter",
+		condition = "term_id = :termId OR term_id IS NULL")
 	private List<Role> roles = new ArrayList<Role>();
-	@ManyToMany(mappedBy = "attendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	
+	@ManyToMany(mappedBy = "requiredAttendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private Set<Booking> bookings = new HashSet<Booking>();
-	@ManyToMany(mappedBy = "optionalAttendees")
+	private Set<Booking> requiredBookings = new HashSet<Booking>();
+	
+	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY)
 	private Set<Booking> optionalBookings;
 
 	public void addRole(Role role) {
@@ -90,12 +94,12 @@ public class User implements Serializable {
 		this.roles = roles;
 	}
 
-	public Set<Booking> getBookings() {
-		return bookings;
+	public Set<Booking> getRequiredBookings() {
+		return requiredBookings;
 	}
 
-	public void setBookings(Set<Booking> bookings) {
-		this.bookings = bookings;
+	public void setRequiredBookings(Set<Booking> RequiredBookings) {
+		this.requiredBookings = requiredBookings;
 	}
 
 	public Set<Booking> getOptionalBookings() {
