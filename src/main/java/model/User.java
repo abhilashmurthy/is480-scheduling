@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,18 +17,17 @@ import javax.persistence.ManyToOne;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 
 /**
  *
  * @author suresh
  */
 @Entity
-@FilterDef(name = "activeTermFilter",
-		parameters = @ParamDef(name = "termId", type = "long"))
+@Table(uniqueConstraints = {
+	@UniqueConstraint(name = "uniquePerTerm", columnNames = {"username", "term_id"})})
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -37,18 +35,18 @@ public class User implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@Column(unique = true)
 	private String username;
 	
 	private String fullName;
 	
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Term term;
+
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
-	@Filter(name = "activeTermFilter",
-		condition = "term_id = :termId OR term_id IS NULL")
 	private List<Role> roles = new ArrayList<Role>();
 	
 	@ManyToMany(mappedBy = "requiredAttendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -78,6 +76,14 @@ public class User implements Serializable {
 		this.fullName = fullName;
 	}
 
+	public Term getTerm() {
+		return term;
+	}
+
+	public void setTerm(Term term) {
+		this.term = term;
+	}
+	
 	public Team getTeam() {
 		return team;
 	}
