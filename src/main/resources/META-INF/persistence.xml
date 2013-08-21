@@ -10,9 +10,10 @@
     <class>model.Term</class>
     <class>model.Timeslot</class>
     <class>model.User</class>
-    <class>model.Role</class>
     <class>model.Settings</class>
     <class>model.Booking</class>
+    <class>model.role.Student</class>
+    <class>model.role.Faculty</class>
     <properties>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/is480-scheduling"/>
