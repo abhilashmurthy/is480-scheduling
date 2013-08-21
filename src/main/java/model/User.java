@@ -4,8 +4,8 @@
  */
 package model;
 
+import constant.Role;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Entity;
@@ -14,9 +14,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Cascade;
@@ -26,6 +29,7 @@ import org.hibernate.annotations.Cascade;
  * @author suresh
  */
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(uniqueConstraints = {
 	@UniqueConstraint(name = "uniquePerTerm", columnNames = {"username", "term_id"})})
 public class User implements Serializable {
@@ -39,38 +43,13 @@ public class User implements Serializable {
 	
 	private String fullName;
 	
-	/*
-	 * COMMON VARIABLES
-	 */
-	
 	@ManyToOne(fetch = FetchType.EAGER) //Set to NULL for permanent roles
 	private Term term;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
-	private List<Role> roles = new ArrayList<Role>();
+	private Role role;
 	
-	@ManyToMany(mappedBy = "requiredAttendees", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private Set<Booking> requiredBookings = new HashSet<Booking>();
-	
-	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY)
-	private Set<Booking> optionalBookings;
-	
-	/*
-	 * STUDENT SPECIFIC VARIABLES
-	 */
-	
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private Team team;
-
-	/*
-	 * GETTERS, SETTERS AND OTHER METHODS
-	 */
-	
-	public void addRole(Role role) {
-		roles.add(role);
-	}
+	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Booking> subscribedBookings = new HashSet<Booking>();
 	
 	public String getUsername() {
 		return username;
@@ -96,36 +75,20 @@ public class User implements Serializable {
 		this.term = term;
 	}
 	
-	public Team getTeam() {
-		return team;
+	public Role getRole() {
+		return role;
 	}
 
-	public void setTeam(Team team) {
-		this.team = team;
+	public void setRole(Role role) {
+		this.role = role;
 	}
 	
-	public List<Role> getRoles() {
-		return roles;
+	public Set<Booking> getSubscribedBookings() {
+		return subscribedBookings;
 	}
 
-	public void setRoles(List<Role> roles) {
-		this.roles = roles;
-	}
-
-	public Set<Booking> getRequiredBookings() {
-		return requiredBookings;
-	}
-
-	public void setRequiredBookings(Set<Booking> RequiredBookings) {
-		this.requiredBookings = requiredBookings;
-	}
-
-	public Set<Booking> getOptionalBookings() {
-		return optionalBookings;
-	}
-
-	public void setOptionalBookings(Set<Booking> optionalBookings) {
-		this.optionalBookings = optionalBookings;
+	public void setSubscribedBookings(Set<Booking> subscribedBookings) {
+		this.subscribedBookings = subscribedBookings;
 	}
 	
 	public Long getId() {

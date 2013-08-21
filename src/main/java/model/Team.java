@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import model.role.Student;
 import org.hibernate.annotations.Cascade;
 
 /**
@@ -42,7 +43,7 @@ public class Team implements Serializable {
 	private User reviewer2;
 	@OneToMany(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private Set<User> members = new HashSet<User>();
+	private Set<Student> members = new HashSet<Student>();
 
 	public String getTeamName() {
 		return teamName;
@@ -84,11 +85,11 @@ public class Team implements Serializable {
 		this.reviewer2 = reviewer2;
 	}
 
-	public Set<User> getMembers() {
+	public Set<Student> getMembers() {
 		return members;
 	}
 
-	public void setMembers(Set<User> members) {
+	public void setMembers(Set<Student> members) {
 		this.members = members;
 	}
 

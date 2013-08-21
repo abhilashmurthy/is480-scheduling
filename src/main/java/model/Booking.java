@@ -10,12 +10,15 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -43,10 +46,16 @@ public class Booking implements Serializable {
 	@Column(length=19000000) //Track the responses of the required attendees
 	private HashMap<User, Response> responseList = new HashMap<User, Response>();
 	
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name="Required_Attendees",
+            joinColumns=@JoinColumn(name="booking_id"),
+            inverseJoinColumns=@JoinColumn(name="user_id"))
 	private Set<User> requiredAttendees = new HashSet<User>();
 	
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name="Optional_Attendees",
+            joinColumns=@JoinColumn(name="booking_id"),
+            inverseJoinColumns=@JoinColumn(name="user_id"))
 	private Set<User> optionalAttendees = new HashSet<User>();
 	
 	@Column(length=19000000)
@@ -72,8 +81,8 @@ public class Booking implements Serializable {
 		return responseList;
 	}
 
-	public void setResponseList(HashMap<User, Response> statusList) {
-		this.responseList = statusList;
+	public void setResponseList(HashMap<User, Response> responseList) {
+		this.responseList = responseList;
 	}
 
 	public Set<User> getRequiredAttendees() {
