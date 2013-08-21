@@ -7,9 +7,11 @@ package model;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -26,6 +28,17 @@ public class Milestone implements Serializable {
 	@Column(unique=true)
 	private String name;
 	private int slotDuration;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Term term;
+
+	public Term getTerm() {
+		return term;
+	}
+
+	public void setTerm(Term term) {
+		this.term = term;
+	}
 
 	public String getName() {
 		return name;

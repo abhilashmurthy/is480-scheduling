@@ -101,26 +101,6 @@ public class DBInitUtil {
         }
 	
 	private static void initDB(EntityManager em) throws Exception {
-		/*
-		 * MILESTONE TABLE POPULATION
-		 */
-		Milestone acceptance = new Milestone();
-		acceptance.setName("Acceptance");
-		acceptance.setSlotDuration(60);
-		
-		Milestone midterm = new Milestone();
-		midterm.setName("Midterm");
-		midterm.setSlotDuration(90);
-		
-		Milestone finalMilestone = new Milestone();
-		finalMilestone.setName("Final");
-		finalMilestone.setSlotDuration(90);
-		
-		// Persistence
-		em.persist(acceptance);
-		em.persist(midterm);
-		em.persist(finalMilestone);
-		logger.info("Milestones persisted");
 		
 		/*
 		 * TERM TABLE POPULATION
@@ -134,22 +114,43 @@ public class DBInitUtil {
 		logger.info("Terms persisted");
 		
 		/*
+		 * MILESTONE TABLE POPULATION
+		 */
+		Milestone acceptance = new Milestone();
+		acceptance.setName("Acceptance");
+		acceptance.setSlotDuration(60);
+		acceptance.setTerm(term12013);
+		
+		Milestone midterm = new Milestone();
+		midterm.setName("Midterm");
+		midterm.setSlotDuration(90);
+		midterm.setTerm(term12013);
+		
+		Milestone finalMilestone = new Milestone();
+		finalMilestone.setName("Final");
+		finalMilestone.setSlotDuration(90);
+		finalMilestone.setTerm(term12013);
+		
+		// Persistence
+		em.persist(acceptance);
+		em.persist(midterm);
+		em.persist(finalMilestone);
+		logger.info("Milestones persisted");
+		
+		/*
 		 * SCHEDULE TABLE POPULATION
 		 */
 		Schedule acceptance12013 = new Schedule();
-		acceptance12013.setTerm(term12013);
 		acceptance12013.setMilestone(acceptance);
 		acceptance12013.setStartDate(new Timestamp(2013 - 1900, 7, 7, 0, 0, 0, 0));
 		acceptance12013.setEndDate(new Timestamp(2013 - 1900, 7, 20, 0, 0, 0, 0));
 		
 		Schedule midterm12013 = new Schedule();
-		midterm12013.setTerm(term12013);
 		midterm12013.setMilestone(midterm);
 		midterm12013.setStartDate(new Timestamp(2013 - 1900, 9, 19, 0, 0, 0, 0));
 		midterm12013.setEndDate(new Timestamp(2013 - 1900, 9, 30, 0, 0, 0, 0));
                 
 		Schedule final12013 = new Schedule();
-		final12013.setTerm(term12013);
 		final12013.setMilestone(finalMilestone);
 		final12013.setStartDate(new Timestamp(2013 - 1900, 11, 1, 0, 0, 0, 0));
 		final12013.setEndDate(new Timestamp(2013 - 1900, 11, 15, 0, 0, 0, 0));
