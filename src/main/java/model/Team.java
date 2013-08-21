@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import model.role.Faculty;
 import model.role.Student;
 import org.hibernate.annotations.Cascade;
 
@@ -34,13 +35,13 @@ public class Team implements Serializable {
 	private Term term;
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private User supervisor;
+	private Faculty supervisor;
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private User reviewer1;
+	private Faculty reviewer1;
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
-	private User reviewer2;
+	private Faculty reviewer2;
 	@OneToMany(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Set<Student> members = new HashSet<Student>();
@@ -61,27 +62,27 @@ public class Team implements Serializable {
 		this.term = term;
 	}
 
-	public User getSupervisor() {
+	public Faculty getSupervisor() {
 		return supervisor;
 	}
 
-	public void setSupervisor(User supervisor) {
+	public void setSupervisor(Faculty supervisor) {
 		this.supervisor = supervisor;
 	}
 
-	public User getReviewer1() {
+	public Faculty getReviewer1() {
 		return reviewer1;
 	}
 
-	public void setReviewer1(User reviewer1) {
+	public void setReviewer1(Faculty reviewer1) {
 		this.reviewer1 = reviewer1;
 	}
 
-	public User getReviewer2() {
+	public Faculty getReviewer2() {
 		return reviewer2;
 	}
 
-	public void setReviewer2(User reviewer2) {
+	public void setReviewer2(Faculty reviewer2) {
 		this.reviewer2 = reviewer2;
 	}
 

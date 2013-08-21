@@ -4,18 +4,18 @@
  */
 package model.role;
 
+import constant.Role;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import model.Booking;
 import model.Team;
+import model.Term;
 import model.User;
 import org.hibernate.annotations.Cascade;
 
@@ -25,6 +25,13 @@ import org.hibernate.annotations.Cascade;
  */
 @Entity
 public class Student extends User implements Serializable {
+	
+	protected Student() {}
+	
+	public Student(String username, String fullName, Term term) {
+		super(username, fullName, Role.STUDENT, term);
+	}
+	
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

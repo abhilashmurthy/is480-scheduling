@@ -18,11 +18,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import org.hibernate.annotations.Cascade;
 
 /**
  *
@@ -33,6 +30,15 @@ import org.hibernate.annotations.Cascade;
 @Table(uniqueConstraints = {
 	@UniqueConstraint(name = "uniquePerTerm", columnNames = {"username", "term_id"})})
 public class User implements Serializable {
+	
+	protected User() {}
+	
+	public User(String username, String fullName, Role role, Term term) {
+		this.username = username;
+		this.fullName = fullName;
+		this.role = role;
+		if (term != null) this.term = term;
+	}
 
 	private static final long serialVersionUID = 1L;
 	@Id

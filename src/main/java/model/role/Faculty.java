@@ -4,17 +4,16 @@
  */
 package model.role;
 
+import constant.Role;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import model.Booking;
+import model.Term;
 import model.User;
 
 /**
@@ -23,6 +22,13 @@ import model.User;
  */
 @Entity
 public class Faculty extends User implements Serializable {
+	
+	protected Faculty() {}
+	
+	public Faculty(String username, String fullName, Term term) {
+		super(username, fullName, Role.FACULTY, term);
+	}
+	
 	private static final long serialVersionUID = 1L;
 	
 	@ManyToMany(mappedBy = "requiredAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
