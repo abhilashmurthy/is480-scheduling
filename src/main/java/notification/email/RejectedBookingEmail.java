@@ -7,7 +7,6 @@ package notification.email;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import model.Booking;
 import model.User;
@@ -75,14 +74,10 @@ public class RejectedBookingEmail extends EmailTemplate{
 		
 		//Insert required attendees
 		Set<User> userList = b.getResponseList().keySet();
-		Iterator<User> iter = userList.iterator();
 		StringBuilder result = new StringBuilder();
 		
-		while (iter.hasNext()) {
-			result.append("&nbsp;").append(iter.next().getFullName());
-			if (iter.hasNext()) {
-				result.append("<br />");
-			}
+		for(User u : userList) {
+			result.append("&nbsp;").append(u.getFullName());
 		}
 		map.put("[REQUIRED_ATTENDEES]", result.toString());
 		
