@@ -4,13 +4,12 @@
  */
 package notification.email;
 
-import constant.Status;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import model.Timeslot;
+import model.Booking;
 import model.User;
 
 /**
@@ -19,23 +18,22 @@ import model.User;
  */
 public class RespondToBookingEmail extends EmailTemplate{
 	
-	private Timeslot t;
+	private Booking b;
 	
-	public RespondToBookingEmail(Timeslot t) {
+	public RespondToBookingEmail(Booking b) {
 		super("respond_to_booking.html");
-		this.t = t;
+		this.b = b;
 	}
 
 	@Override
 	public String generateEmailSubject() {
-		return t.getSchedule().getMilestone().getName() + " - Approve Booking";
+		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Approve Booking";
 	}
 
 	@Override
 	public Set<String> generateToAddressList() {
 		HashSet<String> emails = new HashSet<String>();
-		HashMap<User, Status> map = t.getStatusList();
-		for (User u : map.keySet()) {
+		for (User u : b.getResponseList().keySet()) {
 			emails.add(u.getUsername() + "@smu.edu.sg");
 		}
 		
@@ -47,25 +45,25 @@ public class RespondToBookingEmail extends EmailTemplate{
 		HashMap<String, String> map = new HashMap<String, String>();
 		
 		//Insert milestone
-		map.put("[MILESTONE]", t.getSchedule().getMilestone().getName());
+		map.put("[MILESTONE]", b.getTimeslot().getSchedule().getMilestone().getName());
 		
 		//Insert team name
-		map.put("[TEAM_NAME]", t.getTeam().getTeamName());
+		map.put("[TEAM_NAME]", b.getTeam().getTeamName());
 		
 		//Insert start date
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
-		map.put("[DATE]", dateFormat.format(t.getStartTime()));
+		map.put("[DATE]", dateFormat.format(b.getTimeslot().getStartTime()));
 		
 		//Insert start and end time
 		SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-		map.put("[START_TIME]", timeFormat.format(t.getStartTime()));
-		map.put("[END_TIME]", timeFormat.format(t.getEndTime()));
+		map.put("[START_TIME]", timeFormat.format(b.getTimeslot().getStartTime()));
+		map.put("[END_TIME]", timeFormat.format(b.getTimeslot().getEndTime()));
 		
 		//Insert venue
-		map.put("[VENUE]", t.getVenue());
+		map.put("[VENUE]", b.getTimeslot().getVenue());
 		
 		//Insert required attendees
-		Set<User> userList = t.getStatusList().keySet();
+		Set<User> userList = b.getResponseList().keySet();
 		Iterator<User> iter = userList.iterator();
 		StringBuilder result = new StringBuilder();
 		

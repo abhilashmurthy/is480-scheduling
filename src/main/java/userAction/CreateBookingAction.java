@@ -25,6 +25,7 @@ import model.Timeslot;
 import model.User;
 import model.role.Student;
 import notification.email.NewBookingEmail;
+import notification.email.RespondToBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,9 +125,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 booking.setResponseList(responseList);
                 booking.setRequiredAttendees(reqAttendees);
                 NewBookingEmail newEmail = new NewBookingEmail(booking);
-//				RespondToBookingEmail responseEmail = new RespondToBookingEmail(bookingSlot);
+				RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
                 newEmail.sendEmail();
-//				responseEmail.sendEmail();
+				responseEmail.sendEmail();
                 em.persist(booking);
 				
 				//Setting the current active booking in the timeslot object
