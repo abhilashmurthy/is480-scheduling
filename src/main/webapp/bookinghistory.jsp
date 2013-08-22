@@ -24,7 +24,7 @@
 		
 		<!-- SECTION: Booking History -->
 		<s:if test="%{data.size() > 0 && data != null}"> 
-			<table class="table table-hover zebra-striped">
+			<table id="bookingHistoryTable" class="table table-hover zebra-striped">
 				<thead>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>

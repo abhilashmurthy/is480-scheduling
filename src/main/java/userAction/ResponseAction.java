@@ -55,7 +55,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						SimpleDateFormat sdfForDate = new SimpleDateFormat("EEE, dd MMM yyyy");
 						SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
 						String venue = timeslot.getVenue();
-						Long timeslotId = timeslot.getId();
+						Long bookingId = b.getId();
 						Team team = b.getTeam();
 						Long teamId = team.getId();
 						String teamName = team.getTeamName();
@@ -73,7 +73,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 							userRole = "Reviewer";
 						}
 
-						map.put("timeslotId", String.valueOf(timeslotId));
+						map.put("bookingId", String.valueOf(bookingId));
 						map.put("teamName", teamName);
 						map.put("milestone", milestoneName);
 						map.put("userRole", userRole);

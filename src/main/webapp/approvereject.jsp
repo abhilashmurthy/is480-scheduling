@@ -16,7 +16,15 @@
     <head>
         <title>Approve Booking</title>
 		<%@include file="footer.jsp"%>
+		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
 		<script type="text/javascript">
+			
+		//For data tables
+		$(document).ready(function(){
+			$('#approveRejectTable').dataTable();
+		});
+
 		//To check/uncheck all boxes
 		function toggle(oInput) {
 			var aInputs = document.getElementsByTagName('input');
@@ -104,7 +112,7 @@
 			<s:if test="%{data.size() > 0 && data != null}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
 				<form id="myform" action="updateBookingStatus" method="post">
-					<table class="table table-hover">
+					<table id="approveRejectTable" class="table table-hover">
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
@@ -129,7 +137,7 @@
 								</s:elseif>
 									<%--<td><s:property value="teamId"/></td> --%>
 									<s:if test='myStatus.equals("PENDING")'>
-										<td><input type="checkbox" id="approveRejectArray" name="approveRejectArray" value="<s:property value="timeslotId"/>"/></td>
+										<td><input type="checkbox" id="approveRejectArray" name="approveRejectArray" value="<s:property value="bookingId"/>"/></td>
 									</s:if><s:else>
 										<td><i class="icon-ok"></i></td>
 									</s:else>
