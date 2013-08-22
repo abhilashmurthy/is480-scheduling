@@ -7,7 +7,9 @@ package manager;
 import constant.BookingStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
@@ -15,7 +17,7 @@ import javax.persistence.Query;
 import model.Booking;
 import model.Schedule;
 import model.Team;
-import model.Timeslot;
+import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,5 +76,21 @@ public class BookingManager {
         }
         return false;
     }
+	
+	/* To get all bookings for active term */
+	public static Set<Booking> getBookingsByTerm (EntityManager em, Term term) {
+		logger.trace("Getting all bookings by active term");
+		Set<Booking> list;
+		try {
+			Query q = em.createQuery("select b from Booking b where b.timeslot.schedule.milestone.term = :term");
+			q.setParameter("term", term);
+			list = (HashSet<Booking>) q.getResultList();
+		} catch (Exception e) {
+			logger.error("Error in getBookingsByTerm()");
+			logger.error(e.getMessage());
+			return null;
+		}
+		return list;
+	}
 	
 }
