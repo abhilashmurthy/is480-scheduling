@@ -69,16 +69,13 @@ public class UserManager {
 		logger.info("Getting specific user object");
         User user = null;
         try {
-            em.getTransaction().begin();
             Query q = em.createQuery("select o from User o where role = :role and term = :term and username = :username");
 			q.setParameter("role", role);
 			q.setParameter("term", term);
 			q.setParameter("username", username);
             user = (User) q.getSingleResult();
-            em.getTransaction().commit();
         } catch (Exception e) {
             logger.error(e.getMessage());
-            em.getTransaction().rollback();
         }
         return user;
 	}
