@@ -26,12 +26,12 @@
 		<s:if test="%{data.size() > 0 && data != null}"> 
 			<table class="table table-hover zebra-striped">
 				<thead>
-					<% if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") 
-							|| activeRole.equalsIgnoreCase("Course Coordinator")) { %>
+					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
+							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<tr>
 							<th>#</th>
 							<th>
-							<% if (activeRole.equalsIgnoreCase("Student")) { %>
+							<% if (activeRole.equals(Role.STUDENT)) { %>
 								My Team
 							<% } else { %>
 								Team
@@ -44,7 +44,7 @@
 							<th>Booking Status</th>
 							<th>Overall Booking Status</th>
 						</tr>
-					<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
+					<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<tr>
 							<th>#</th>
 							<th>Team</th>
@@ -60,8 +60,8 @@
 				<tbody> 
 					<% int count = 1; %>
 					<s:iterator value="data">
-						<% if (activeRole.equalsIgnoreCase("Student") || activeRole.equalsIgnoreCase("Administrator") 
-							|| activeRole.equalsIgnoreCase("Course Coordinator")) { %>
+						<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
+							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
@@ -83,7 +83,7 @@
 								<td><s:property value="overallBookingStatus"/></td>
 								<% count = count + 1; %>
 							</tr>
-						<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
+						<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">

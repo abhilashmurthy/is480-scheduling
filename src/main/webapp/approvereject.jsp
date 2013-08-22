@@ -78,7 +78,7 @@
 		
 		 <!-- Kick unauthorized user -->
         <%
-            if (!activeRole.equals("Supervisor/Reviewer")) {
+            if (!activeRole.equals(Role.FACULTY)) {
                 request.setAttribute("error", "Oops. You are not authorized to access this page!");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
