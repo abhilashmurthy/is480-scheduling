@@ -28,14 +28,12 @@ public class ScheduleManager {
 
     private static Logger logger = LoggerFactory.getLogger(ScheduleManager.class);
 
-    public static Schedule findByTermAndMilestone(EntityManager em, Term term, Milestone milestone) {
-        logger.info("Getting schedule by term and milestone");
+    public static Schedule findByMilestone(EntityManager em, Milestone milestone) {
+        logger.info("Getting schedule by milestone");
         Schedule result = null;
         try {
             em.getTransaction().begin();
-            Query q = em.createQuery("SELECT o FROM Schedule o WHERE o.term = :term"
-                    + " AND o.milestone = :milestone", Schedule.class);
-            q.setParameter("term", term);
+            Query q = em.createQuery("SELECT o FROM Schedule o WHERE o.milestone = :milestone", Schedule.class);
             q.setParameter("milestone", milestone);
             result = (Schedule) q.getSingleResult();
             em.getTransaction().commit();
