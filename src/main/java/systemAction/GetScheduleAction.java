@@ -118,7 +118,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     map.put("startDate", viewDateFormat.format(startDate));
                     
                     //Overall status
-                    map.put("status", b.getStatus().toString());
+                    map.put("status", b.getBookingStatus().toString());
                     
                     //Start Time - End Time
                     map.put("time", viewTimeFormat.format(startDate) + " - " + viewTimeFormat.format(endDate));

@@ -7,11 +7,15 @@ package manager;
 import constant.BookingStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import model.Booking;
 import model.Schedule;
 import model.Team;
+import model.Timeslot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,5 +51,28 @@ public class BookingManager {
 		
 		return list;
 	}
+	
+	public static boolean updateBookings(EntityManager em, List<Booking> bookingsToUpdate, EntityTransaction transaction) {
+        logger.info("Updating bookings");
+        try {
+            transaction.begin();
+            for (Booking booking : bookingsToUpdate) {
+                em.persist(booking);
+            }
+            transaction.commit();
+            return true;
+        } catch (PersistenceException ex) {
+            //Rolling back data transactions
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            logger.error("Error making database call for update bookings");
+            ex.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return false;
+    }
 	
 }

@@ -7,21 +7,23 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Status;
+import constant.BookingStatus;
+import constant.Response;
+import constant.Role;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import manager.TimeslotManager;
+import manager.BookingManager;
 import manager.UserManager;
-import model.Timeslot;
+import model.Booking;
 import model.User;
+import model.role.Faculty;
 import notification.email.ApprovedBookingEmail;
 import notification.email.ConfirmedBookingEmail;
 import notification.email.RejectedBookingEmail;
@@ -48,11 +50,11 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
         try {
         EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
-        String status = null;
+        Response response = null;
         if (approve != null) {
-            status = "APPROVED";
+            response = Response.APPROVED;
         } else if (reject != null) {
-            status = "REJECTED";
+            response = Response.REJECTED;
         } else {
             logger.error("No valid response recorded from user");
             return ERROR;
@@ -60,53 +62,77 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+		
+		//Getting the faculty object for the user. Cannot proceed if the user is not a faculty member.
+		Faculty f;
+		if (user.getRole() == Role.FACULTY) {
+			f = em.find(Faculty.class, user.getId());
+		} else {
+			logger.error("User is not a faculty member");
+            return ERROR;
+		}
 
         //The list of slots to update in db
-        List<Timeslot> timeslotsToUpdate = new ArrayList<Timeslot>();
+        List<Booking> bookingsToUpdate = new ArrayList<Booking>();
 
         approveRejectArray = request.getParameterValues("approveRejectArray");
         if (approveRejectArray != null && approveRejectArray.length > 0) {
             for (int i = 0; i < approveRejectArray.length; i++) {
-                String timeslotId = approveRejectArray[i];
+                String bookingId = approveRejectArray[i];
                 //Retrieving the timeslot to update
-                Timeslot timeslot = TimeslotManager.findById(em, Long.parseLong(timeslotId));
+                Booking booking = em.find(Booking.class, Long.parseLong(bookingId));
                 //Retrieving the status list of the timeslot
-                HashMap<User, Status> statusList = timeslot.getStatusList();
-                Iterator iter = statusList.keySet().iterator();
-                while (iter.hasNext()) {
-                    if (iter.next().equals(user)) {
-                        if (status.equalsIgnoreCase("APPROVED")) {
-                            statusList.put(user, Status.APPROVED);
-							ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(timeslot, user);
-							approvedEmail.sendEmail();
-                        } else if (status.equalsIgnoreCase("REJECTED")) {
-                            statusList.put(user, Status.REJECTED);
-							RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(timeslot, user);
-							rejectedEmail.sendEmail();
-                        }
-                    }
-                }
-
-                if (statusList.size() > 0) {
-                    //Setting the new status
-                    timeslot.setStatusList(statusList);
-                    timeslotsToUpdate.add(timeslot);
-                }
+                HashMap<User, Response> responseList = booking.getResponseList();
+				if (responseList.containsKey(user)) { //Checking if the faculty is part of the response list for required attendees
+					responseList.put(user, response);
+					if (response == Response.APPROVED) {
+						ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(booking, user);
+						approvedEmail.sendEmail();
+					} else if (response == Response.REJECTED) {
+						RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(booking, user);
+						rejectedEmail.sendEmail();
+					}
+				} else {
+					logger.error("Faculty not found in responseList for required attendees");
+					return ERROR;
+				}
 				
-				if (timeslot.getOverallBookingStatus() == Status.APPROVED) {
-					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(timeslot);
+				//Computing the overall status of the booking based on the new response
+				int total = 0;
+				Collection<Response> values = booking.getResponseList().values();
+				for (Response r : values) {
+					if (r == Response.REJECTED) {
+						// Reject the booking if any one person has rejected it
+						booking.setBookingStatus(BookingStatus.REJECTED);
+						break;
+					} else if (r == Response.APPROVED) {
+						total++;
+						// Check if everyone has approved the booking
+						if (total == values.size()) {
+							booking.setBookingStatus(BookingStatus.APPROVED);
+							break;
+						}
+					}
+				}
+
+				//Setting the new status
+				booking.setResponseList(responseList);
+				bookingsToUpdate.add(booking);
+				
+				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
+					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
 				}
             }
             //Updating the time slot 
             EntityTransaction transaction = em.getTransaction();
-            boolean result = TimeslotManager.updateTimeslotStatus(em, timeslotsToUpdate, transaction);
+            boolean result = BookingManager.updateBookings(em, bookingsToUpdate, transaction);
             if (result == true) {
                 //em.close();
 				//Setting the updated user object in session
-                String username = user.getUsername();
-				User updatedUser = UserManager.findByUsername(em, username);
-				session.setAttribute("user", updatedUser);
+				em.clear();
+                Faculty newF = em.find(Faculty.class, f.getId());
+				session.setAttribute("user", newF);
                 return SUCCESS;
             }
         }
