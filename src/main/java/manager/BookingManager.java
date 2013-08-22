@@ -7,7 +7,6 @@ package manager;
 import constant.BookingStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import model.Booking;
@@ -34,10 +33,11 @@ public class BookingManager {
 		logger.trace("Getting bookings by team and schedule");
 		ArrayList<Booking> list;
 		try {
-			Query q = em.createQuery("select b from Booking b where b.team = :team and b.timeslot.schedule = :schedule and b.status in (:status)");
+			Query q = em.createQuery("select b from Booking b where b.team = :team"
+					+ " and b.timeslot.schedule = :schedule and b.status in (:status)");
 			q.setParameter("team", team);
 			q.setParameter("schedule", schedule);
-			q.setParameter("status", Arrays.asList(BookingStatus.PENDING, BookingStatus.PENDING));
+			q.setParameter("status", Arrays.asList(BookingStatus.PENDING, BookingStatus.APPROVED));
 			list = (ArrayList<Booking>) q.getResultList();
 		} catch (Exception e) {
 			logger.error("Error in getActiveByTeamAndSchedule()");

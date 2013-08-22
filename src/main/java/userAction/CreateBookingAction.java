@@ -63,10 +63,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             Team team = null;
 
 			//Retrieving the team information
-            if (activeRole.equals(Role.STUDENT)) {
+            if (activeRole == Role.STUDENT) {
 				Student s = em.find(Student.class, user.getId());
                 team = s.getTeam();
-            } else if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
+            } else if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) {
                 try {
                     team = em.find(Team.class, teamId);
                 } catch (Exception e) {

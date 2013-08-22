@@ -4,24 +4,19 @@
  */
 package manager;
 
-import constant.Status;
-import java.util.ArrayList;
+import constant.Response;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import model.Schedule;
-import model.Team;
 import model.Timeslot;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.MiscUtil;
 
 /**
  *
@@ -163,7 +158,7 @@ public class TimeslotManager {
     public static boolean deleteTimeslotBooking(EntityManager em, Timeslot ts) {
         EntityTransaction transaction = em.getTransaction();
         try {
-            HashMap<User, Status> statusList = new HashMap<User, Status>();
+            HashMap<User, Response> statusList = new HashMap<User, Response>();
             
             transaction.begin();
             String sQuery = "UPDATE Timeslot t SET t.statusList = :statusList, t.team = :team"
