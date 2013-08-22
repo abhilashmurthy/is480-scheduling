@@ -174,7 +174,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         logger.debug("Persisted final timeslots: count " + finalTimeslots.size());
 
 		//Setting newly created term as active
-		setTermAsActive(em, acceptanceSchedule.getTerm());
+		setTermAsActive(em, acceptanceSchedule.getMilestone().getTerm());
 		
         json.put("success", true);
 		json.put("message", "Timeslots stored successfully. Schedule creation complete!");

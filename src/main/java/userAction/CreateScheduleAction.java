@@ -14,9 +14,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
-import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.TermManager;
 import model.Milestone;
@@ -75,12 +73,26 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
         logger.debug("Arrayed dates");
 
-        //Getting and setting milestones
-        Milestone acceptanceMil = MilestoneManager.findByName(em, "Acceptance");
-        Milestone midtermMil = MilestoneManager.findByName(em, "Midterm");
-        Milestone finalMil = MilestoneManager.findByName(em, "Final");
+		Term storedTerm = TermManager.findByYearAndSemester(em, year, semester);
 
-        logger.debug("Got milestones");
+        logger.debug("Retreived storedTerm");
+		
+        //Getting and setting milestones
+        Milestone acceptanceMil = new Milestone();
+		acceptanceMil.setName("Acceptance");
+		acceptanceMil.setSlotDuration(60);
+		acceptanceMil.setTerm(storedTerm);
+		
+        Milestone midtermMil = new Milestone();
+		midtermMil.setName("Midterm");
+		midtermMil.setSlotDuration(90);
+		midtermMil.setTerm(storedTerm);
+        
+		Milestone finalMil = new Milestone();
+		finalMil.setName("Final");
+		finalMil.setSlotDuration(90);
+		finalMil.setTerm(storedTerm);
+
         logger.debug("Acceptance date is: " + acceptanceDates[0]);
 
         //TODO: Check that the windows don't overlap with other schedules
@@ -95,26 +107,19 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
         logger.debug("Created timestamps");
 
-        Term storedTerm = TermManager.findByYearAndSemester(em, year, semester);
-
-        logger.debug("Retreived storedTerm");
-
         //Create schedule objects
         Schedule acceptanceSched = new Schedule();
         acceptanceSched.setMilestone(acceptanceMil);
-        acceptanceSched.setTerm(storedTerm);
         acceptanceSched.setStartDate(acceptanceStartTimeStamp);
         acceptanceSched.setEndDate(acceptanceEndTimeStamp);
 
         Schedule midtermSched = new Schedule();
         midtermSched.setMilestone(midtermMil);
-        midtermSched.setTerm(storedTerm);
         midtermSched.setStartDate(midtermStartTimeStamp);
         midtermSched.setEndDate(midtermEndTimeStamp);
 
         Schedule finalSched = new Schedule();
         finalSched.setMilestone(finalMil);
-        finalSched.setTerm(storedTerm);
         finalSched.setStartDate(finalStartTimeStamp);
         finalSched.setEndDate(finalEndTimeStamp);
 
