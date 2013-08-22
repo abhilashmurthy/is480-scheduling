@@ -6,7 +6,7 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Status;
+import constant.Response;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
-import manager.TimeslotManager;
+import model.Booking;
 import model.Team;
-import model.Timeslot;
 import model.User;
+import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(ViewBookingAction.class);
-    private String timeslotId;
+    private String bookingId;
 //	private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
@@ -45,15 +45,15 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
         try {
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             //convert the chosen ID into long
-            long chosenID = Long.parseLong(timeslotId);
-            Timeslot ts = TimeslotManager.findById(em, chosenID);
+            long chosenID = Long.parseLong(bookingId);
+            Booking b = em.find(Booking.class, chosenID);
 
             //Check whether timeslot exists
-            if (ts != null) {
+            if (b != null) {
                 //Check whether timeslot has a team assigned to it
-                if (ts.getTeam() != null) {
-                    Timestamp st = ts.getStartTime();
-                    Timestamp et = ts.getEndTime();
+                if (b.getTeam() != null) {
+                    Timestamp st = b.getTimeslot().getStartTime();
+                    Timestamp et = b.getTimeslot().getEndTime();
                     Date startDate = new Date(st.getTime());
                     Date endDate = new Date(et.getTime());
 
@@ -70,7 +70,7 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     json.put("endTime", endTimeString);
 
                     //Get team's name from the timeslot
-                    String teamName = ts.getTeam().getTeamName();
+                    String teamName = b.getTeam().getTeamName();
                     json.put("teamName", teamName);
 
                     //This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
@@ -78,9 +78,9 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
 
                     //Getting all the team members associated with the timeslot
                     //First getting the team members
-                    Team team = ts.getTeam();
+                    Team team = b.getTeam();
                     if (team != null) {
-                        Set<User> teamMembers = team.getMembers();
+                        Set<Student> teamMembers = team.getMembers();
                         Iterator it = teamMembers.iterator();
                         while (it.hasNext()) {
                             HashMap<String, String> userMap = new HashMap<String, String>();
@@ -92,8 +92,8 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     }
 
                     //Second getting the supervisor/reviewer for the timeslot
-                    if (ts.getStatusList() != null) {
-                        for (Entry<User, Status> e : ts.getStatusList().entrySet()) {
+                    if (b.getResponseList() != null) {
+                        for (Entry<User, Response> e : b.getResponseList().entrySet()) {
                             HashMap<String, String> userMap = new HashMap<String, String>();
                             userMap.put("name", e.getKey().getFullName());
                             userMap.put("status", e.getValue().toString());
@@ -104,13 +104,13 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     json.put("attendees", attendees);
                     
                     //Setting the final status of the booking
-                    json.put("status", ts.getOverallBookingStatus().toString());
+                    json.put("status", b.getStatus());
 
                     //Getting venue for timeslot
-                    String venue = ts.getVenue();
+                    String venue = b.getTimeslot().getVenue();
                     json.put("venue", venue);
 
-                    //Things this code cannot get as of now (can only do this when database has values)
+                    //TODO Things this code cannot get as of now (can only do this when database has values)
                     String TA = "-";
                     json.put("TA", TA);
                     String teamWiki = "-";
@@ -146,11 +146,11 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
     }
 
     public String getTimeslotId() {
-        return timeslotId;
+        return bookingId;
     }
 
     public void setTimeslotId(String timeslotId) {
-        this.timeslotId = timeslotId;
+        this.bookingId = timeslotId;
     }
 
     public HashMap<String, Object> getJson() {
