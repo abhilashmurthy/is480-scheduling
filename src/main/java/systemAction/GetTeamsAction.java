@@ -94,6 +94,7 @@ public class GetTeamsAction extends ActionSupport implements ServletRequestAware
             for (Team t : teamList) {
                 HashMap<String, Object> team = new HashMap<String, Object>();
                 team.put("teamName", t.getTeamName());
+				team.put("teamId", t.getId());
                 teamJsonList.add(team);
             }
             
@@ -107,7 +108,7 @@ public class GetTeamsAction extends ActionSupport implements ServletRequestAware
                 }
             }
             json.put("success", false);
-            json.put("message", "Error with GetSchedule: Escalate to developers!");
+            json.put("message", "Error with GetTeams: Escalate to developers!");
         }
         return SUCCESS;
     }

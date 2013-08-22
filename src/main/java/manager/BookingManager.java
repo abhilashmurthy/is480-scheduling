@@ -38,10 +38,10 @@ public class BookingManager {
 		ArrayList<Booking> list;
 		try {
 			Query q = em.createQuery("select b from Booking b where b.team = :team"
-					+ " and b.timeslot.schedule = :schedule and b.status in (:status)");
+					+ " and b.timeslot.schedule = :schedule and b.bookingStatus in (:bookingStatus)");
 			q.setParameter("team", team);
 			q.setParameter("schedule", schedule);
-			q.setParameter("status", Arrays.asList(BookingStatus.PENDING, BookingStatus.APPROVED));
+			q.setParameter("bookingStatus", Arrays.asList(BookingStatus.PENDING, BookingStatus.APPROVED));
 			list = (ArrayList<Booking>) q.getResultList();
 		} catch (Exception e) {
 			logger.error("Error in getActiveByTeamAndSchedule()");

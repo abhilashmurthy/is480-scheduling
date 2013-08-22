@@ -142,6 +142,7 @@
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
                 var self = null;
                 var teamName = null;
+				var teamId = null;
                 var date = null;
                 var startTime = null;
                 var termId = null;
@@ -413,7 +414,7 @@
                                     //Append only teams without bookings
                                     if (!$("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teams[t].teamName + ")").length) {
                                         var teamDropDownOption = $(document.createElement('option'));
-                                        teamDropDownOption.attr('value', teams[t].teamName);
+                                        teamDropDownOption.attr('value', teams[t].teamId);
                                         teamDropDownOption.html(teams[t].teamName);
                                         teamDropDownSelect.append(teamDropDownOption);
                                         teamsPendingBooking.push(teams[t].teamName);
@@ -569,7 +570,7 @@
                     $("td").on('click', '#createBookingBtn', function(e) {
                         e.stopPropagation();
                         if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                            teamName = $("#createTeamSelect").val();
+                            teamId = $("#createTeamSelect").val();
                         }
                         createBooking(self);
                         showResult(self, "Booked <br/> Confirmation email sent");
@@ -622,11 +623,8 @@
                 //AJAX CALL functions
                 function createBooking(self) {
                     var data = {
-                        date: date,
-                        startTime: startTime,
-                        termId: termId,
-                        milestoneStr: milestoneStr.toLowerCase(),
-                        teamName: teamName
+                        timeslotId: self.attr('id').split("_")[1],
+                        teamId: teamId
                     };
                     console.log("Submitting create booking data: " + JSON.stringify(data));
                     //Create Booking AJAX
