@@ -86,11 +86,9 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat viewDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
             SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
-            
-            Term term = TermManager.findByYearAndSemester(em, Integer.parseInt(academicYearString), semesterString);
             Milestone milestone = MilestoneManager.findByName(em, milestoneString);
             
-            Schedule activeSchedule = ScheduleManager.findByTermAndMilestone(em, term, milestone);
+            Schedule activeSchedule = ScheduleManager.findByMilestone(em, milestone);
             json.put("id", activeSchedule.getId());
             json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
             json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
