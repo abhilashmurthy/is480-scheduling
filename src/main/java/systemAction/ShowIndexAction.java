@@ -6,27 +6,22 @@ package systemAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Status;
+import constant.Response;
+import constant.Role;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import manager.ScheduleManager;
 import manager.SettingsManager;
-import manager.TermManager;
-import model.Schedule;
+import model.Booking;
 import model.Term;
-import model.Timeslot;
 import model.User;
+import model.role.Faculty;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import userAction.DeleteBookingAction;
 import util.MiscUtil;
 
 /**
@@ -51,29 +46,14 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 			
 			//<----- 1st Part: To get number of pending bookings ------>
 			//Checking whether user is supervisor/reviewer
-			String activeRole = (String) session.getAttribute("activeRole");
-			if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { 
-				//Objective: Getting bookings with pending status (if any) for active term
-				Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
-
-				//Getting all schedules for the active term
-				List<Schedule> listSchedules = ScheduleManager.findByTerm(em, activeTerm);
-				//Getting all timeslots for the user
-				Set<Timeslot> userTimeslots = user.getTimeslots();
-
-				if (userTimeslots.size() > 0) {
-					for (Timeslot timeslot: userTimeslots) {
-						for (Schedule schedule: listSchedules) {
-							//Checking if the timeslot is part of active term
-							if (timeslot.getSchedule().equals(schedule)) {
-								HashMap<User, Status> statusList = timeslot.getStatusList();
-								String status = statusList.get(user).toString();
-								if (status.equalsIgnoreCase("Pending")) {
-									pendingBookingCount++;
-								}
-							}
-						}
-					}
+			Role activeRole = (Role) session.getAttribute("activeRole");
+			if (activeRole == Role.FACULTY) {
+				Faculty faculty = (Faculty) user;
+				//Getting all bookings for the user
+				for (Booking b : faculty.getRequiredBookings()) {
+					if (b.getResponseList().get(faculty) == Response.PENDING) {
+						pendingBookingCount++;
+					}	
 				}
 			}  //end of outer if
 			
