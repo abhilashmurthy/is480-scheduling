@@ -28,7 +28,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(uniqueConstraints = {
-	@UniqueConstraint(name = "uniquePerTerm", columnNames = {"username", "term_id"})})
+	@UniqueConstraint(name = "User_unique_constraint", columnNames = {"username", "role", "term_id"})})
 public class User implements Serializable {
 	
 	protected User() {}

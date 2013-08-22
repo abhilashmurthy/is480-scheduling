@@ -50,13 +50,13 @@ public class Booking implements Serializable {
 	private HashMap<User, Response> responseList = new HashMap<User, Response>();
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name="Required_Attendees",
+	@JoinTable(name="Booking_Required_Attendees",
             joinColumns=@JoinColumn(name="booking_id"),
             inverseJoinColumns=@JoinColumn(name="user_id"))
 	private Set<User> requiredAttendees = new HashSet<User>();
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name="Optional_Attendees",
+	@JoinTable(name="Booking_Optional_Attendees",
             joinColumns=@JoinColumn(name="booking_id"),
             inverseJoinColumns=@JoinColumn(name="user_id"))
 	private Set<User> optionalAttendees = new HashSet<User>();
