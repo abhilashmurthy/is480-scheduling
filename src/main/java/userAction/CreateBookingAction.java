@@ -24,6 +24,7 @@ import model.Team;
 import model.Timeslot;
 import model.User;
 import model.role.Student;
+import notification.email.NewBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,9 +123,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
                 booking.setResponseList(responseList);
                 booking.setRequiredAttendees(reqAttendees);
-//                NewBookingEmail newEmail = new NewBookingEmail(bookingSlot);
+                NewBookingEmail newEmail = new NewBookingEmail(booking);
 //				RespondToBookingEmail responseEmail = new RespondToBookingEmail(bookingSlot);
-//                newEmail.sendEmail();
+                newEmail.sendEmail();
 //				responseEmail.sendEmail();
                 em.persist(booking);
 				
@@ -188,7 +189,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		ArrayList<Booking> activeBookings = BookingManager.getActiveByTeamAndSchedule(em, team, timeslot.getSchedule());
 		if (!activeBookings.isEmpty()) {
 			json.put("success", false);
-			json.put("message", "Team already has a booking in the current schedule");
+			json.put("message", "Team already has an active booking in the current schedule");
 			return false;	
 		}
 		
