@@ -25,7 +25,6 @@ import org.hibernate.annotations.Cascade;
  * @author suresh
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"term_id","milestone_id"}))
 public class Schedule implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
