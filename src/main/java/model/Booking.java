@@ -44,7 +44,7 @@ public class Booking implements Serializable {
 	private Timestamp createdAt;
 
 	//Store the overall status of the booking. Set to PENDING by default
-	private BookingStatus status = BookingStatus.PENDING;
+	private BookingStatus bookingStatus = BookingStatus.PENDING;
 	
 	@Column(length=19000000) //Track the responses of the required attendees
 	private HashMap<User, Response> responseList = new HashMap<User, Response>();
@@ -112,12 +112,12 @@ public class Booking implements Serializable {
 		this.optionalAttendees = optionalAttendees;
 	}
 
-	public BookingStatus getStatus() {
-		return status;
+	public BookingStatus getBookingStatus() {
+		return bookingStatus;
 	}
 
-	public void setBookingStatus(BookingStatus status) {
-		this.status = status;
+	public void setBookingStatus(BookingStatus bookingStatus) {
+		this.bookingStatus = bookingStatus;
 	}
 
 	public HashSet<String> getExternalAttendees() {

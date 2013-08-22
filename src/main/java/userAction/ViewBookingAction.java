@@ -104,7 +104,7 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     json.put("attendees", attendees);
                     
                     //Setting the final status of the booking
-                    json.put("status", b.getStatus());
+                    json.put("status", b.getBookingStatus());
 
                     //Getting venue for timeslot
                     String venue = b.getTimeslot().getVenue();
