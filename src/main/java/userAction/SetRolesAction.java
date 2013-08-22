@@ -4,6 +4,7 @@
  */
 package userAction;
 
+import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
@@ -47,79 +48,83 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
             List<User> userRoles = (List<User>) session.getAttribute("userRoles");
 			
 			if (userRoles.size() > 1) {
+				boolean isFaculty = false;
+				boolean isAdministrator = false;
+				boolean isCourseCoordinator = false;
+				long facultyId = 0;
+				long administratorId = 0;
+				long courseCoordinatorId = 0;
 				
-//				boolean isSupervisorReviewer = false;
-//				boolean isAdministrator = false;
-//				boolean isCourseCoordinator = false;
-//				for (Role role: userRoles) {
-//					if (role.getName().equalsIgnoreCase("Supervisor") || 
-//							role.getName().equalsIgnoreCase("Reviewer")) {
-//						isSupervisorReviewer = true;
-//					} else if (role.getName().equalsIgnoreCase("Administrator")) {
-//						isAdministrator = true;
-//					} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
-//						isCourseCoordinator = true;
-//					}
-//				}
-//				
-//				//Setting default role during first login for users with multiple roles
-//				if (firstLogin != null) {
-//					if (firstLogin.equalsIgnoreCase("Yes")) {
-//						if (isSupervisorReviewer) {
-//							if (isAdministrator || isCourseCoordinator) {
-//								session.setAttribute("activeRole", "Supervisor/Reviewer");
-//								return SUCCESS;
-//							}
-//						} else if(isAdministrator && isCourseCoordinator) {
-//							session.setAttribute("activeRole", "Course Coordinator");
-//							return SUCCESS;
-//						}
-//					}
-//				}
-//				
-//				//Checking whether the user is not just supervisor & reviewer 
-//				if (isAdministrator == true || isCourseCoordinator == true) {
-//					//Validation checking for user's roles and setting the active role (in case of multiple roles)
-//					if (administrator != null) {
-//						if (administrator.equalsIgnoreCase("Administrator")) {
-//							if (isAdministrator) {
-//								session.setAttribute("activeRole", "Administrator");
-//							} else {
-//								request.setAttribute("rolesError", "You are not authorized to access this page!");
-//								request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-//							}
-//						}
-//					} else if (supervisorReviewer != null) {
-//						if (supervisorReviewer.equalsIgnoreCase("Supervisor/Reviewer")) {
-//							if (isSupervisorReviewer) {
-//								session.setAttribute("activeRole", "Supervisor/Reviewer");
-//							} else {
-//								request.setAttribute("rolesError", "You are not authorized to access this page!");
-//								request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-//							}
-//						}
-//					} else if (courseCoordinator != null) {
-//						if (courseCoordinator.equalsIgnoreCase("Course Coordinator")) {
-//							if (isCourseCoordinator) {
-//								session.setAttribute("activeRole", "Course Coordinator");
-//							} else {
-//								request.setAttribute("rolesError", "You are not authorized to access this page!");
-//								request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-//							}
-//						}
-//					} else {
-//						//send error message
-//						request.setAttribute("rolesError", "Error. Please select a role!");
-//						request.getRequestDispatcher("multipleroles.jsp").forward(request, response);
-//					}
-//				} else {
-//					// This mean that user is both supervisor & reviewer only
-//					if (isSupervisorReviewer) {
-//						session.setAttribute("activeRole", "Supervisor/Reviewer");
-//					}
-//				}
-//				return SUCCESS;
-			} 
+				for (User user: userRoles) {
+					if (user.getRole().equals(Role.FACULTY)) {
+						isFaculty = true;
+						facultyId = user.getId();
+					} else if (user.getRole().equals(Role.ADMINISTRATOR)) {
+						isAdministrator = true;
+						administratorId = user.getId();
+					} else if (user.getRole().equals(Role.COURSE_COORDINATOR)) {
+						isCourseCoordinator = true;
+						courseCoordinatorId = user.getId();
+					}
+				}
+				
+				//Setting default role during first login for users with multiple roles
+				if (firstLogin.equalsIgnoreCase("Yes")) {
+					if (isFaculty) {
+						if (isAdministrator || isCourseCoordinator) {
+							session.setAttribute("activeRole", Role.FACULTY);
+							Faculty faculty = em.find(Faculty.class, facultyId);
+							session.setAttribute("user", faculty);
+						}
+					} else if (isAdministrator && isCourseCoordinator) {
+						session.setAttribute("activeRole", Role.COURSE_COORDINATOR);
+						User userCC = em.find(User.class, courseCoordinatorId);
+						session.setAttribute("user", userCC);
+					}
+					return SUCCESS;
+				}
+				
+				//Validation checking for user's roles and setting the active role (in case of multiple roles)
+				if (administrator != null) {
+					if (administrator.equalsIgnoreCase("Administrator")) {
+						if (isAdministrator) {
+							session.setAttribute("activeRole", Role.ADMINISTRATOR);
+							User userAdmin = em.find(User.class, administratorId);
+							session.setAttribute("user", userAdmin);
+						} else {
+							request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
+							return ERROR;
+						}
+					}
+				} else if (faculty != null) {
+					if (faculty.equalsIgnoreCase("Faculty")) {
+						if (isFaculty) {
+							session.setAttribute("activeRole", Role.FACULTY);
+							Faculty faculty = em.find(Faculty.class, facultyId);
+							session.setAttribute("user", faculty);
+						} else {
+							request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
+							return ERROR;
+						}
+					}
+				} else if (courseCoordinator != null) {
+					if (courseCoordinator.equalsIgnoreCase("Course Coordinator")) {
+						if (isCourseCoordinator) {
+							session.setAttribute("activeRole", Role.COURSE_COORDINATOR);
+							User userCC = em.find(User.class, courseCoordinatorId);
+							session.setAttribute("user", userCC);
+						} else {
+							request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
+							return ERROR;
+						}
+					}
+				} else {
+					//send error message
+					request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
+					return ERROR;
+				}
+				return SUCCESS;
+			}
 			
 			// --------When user has only 1 role---------
 			//Setting active role 
