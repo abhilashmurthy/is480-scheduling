@@ -1,3 +1,4 @@
+<%@page import="model.role.Student"%>
 <%@page import="model.Team"%>
 <%@page import="model.Term"%>
 <%@page import="model.User"%>
@@ -17,8 +18,13 @@
         <%@include file="navbar.jsp" %>
 
         <%
-            Team team = user.getTeam();
-            String fullName = user.getFullName();
+			Team team = null;
+			String fullName = null;
+			if (activeRole.equals(Role.STUDENT)) {
+				Student studentUser = (Student) session.getAttribute("user");
+				team = studentUser.getTeam();
+				fullName = studentUser.getFullName();
+			}
         %>
 
         <!-- Welcome Text -->
@@ -54,7 +60,7 @@
         </div>
 
         <!-- To display number of pending bookings for supervisor/reviewer -->
-        <% if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) {%>
+        <% if (activeRole.equals(Role.FACULTY)) {%>
         <s:if test="%{pendingBookingCount > 0}">
             <div class="pendingBookings alert" style="width: 230px; text-align: center">
                 <button type="button" class="close" data-dismiss="alert">×</button>
@@ -199,7 +205,7 @@
                         if (response.success) {
 
                             //Get Teams data if user is administrator
-                            if (<%= activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
+                            if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                                 teams = null;
                                 $.ajax({
                                     type: 'GET',
@@ -309,7 +315,7 @@
                                 }
 
                                 //Make fields editable and add Update and Delete buttons if user is admin
-                                if (<%=activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
+                                if (<%=activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                                     //Replace startDate and startTime with editable fields
                                     for (var i = 0; i < outputData.length; i++) {
                                         if (outputData[i][0] === "Date") {
@@ -396,7 +402,7 @@
                         });
                     } else {
                         //Make a dropdown of all teams that have not booked yet if user is admin
-                        if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
+                        if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                             if (teams.length === 0) {
                                 createBookingOutput = "There are no teams for this term";
                             } else {
@@ -442,7 +448,7 @@
                         }
                         
                         //Add Create Booking popover for all timeslots if is student, admin, or course coordinator
-                        if (<%= activeRole.equals("Student") || activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
+                        if (<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                             $(".unbookedTimeslot").each(function() {
                                 appendCreateBookingPopover($(this));
                             });
@@ -562,7 +568,7 @@
                     //Create Booking Button
                     $("td").on('click', '#createBookingBtn', function(e) {
                         e.stopPropagation();
-                        if (<%= activeRole.equals("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")%>) {
+                        if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                             teamName = $("#createTeamSelect").val();
                         }
                         createBooking(self);

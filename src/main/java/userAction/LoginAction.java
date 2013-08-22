@@ -11,7 +11,6 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -22,10 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
-import manager.RoleManager;
 import manager.SettingsManager;
 import manager.UserManager;
-import model.Role;
 import model.Term;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -44,7 +41,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(LoginAction.class);
     private HttpServletResponse response;
-    private List<Role> userRoles;
     private boolean isSupervisorReviewer;
     private boolean isAdministrator;
     private boolean isCourseCoordinator;
@@ -80,7 +76,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     public String execute() throws Exception {
         try {
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-
             logger.info("Reached LoginAction");
 			
 			if (true) { //CODE FOR LOCALHOST TESTING
@@ -97,12 +92,12 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 				}
 
 				//Get callback URL
-                                String callbackUrl = null;
-                                if (request.getServerName().equals("localhost")) {
-                                    callbackUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI();
-                                } else {
-                                    callbackUrl = "http://" + request.getServerName() + request.getRequestURI();
-                                }
+				String callbackUrl = null;
+				if (request.getServerName().equals("localhost")) {
+					callbackUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI();
+				} else {
+					callbackUrl = "http://" + request.getServerName() + request.getRequestURI();
+				}
 
 				String uri = "POST&" + encode(callbackUrl) + "&";
 				String pairs = "";
@@ -187,36 +182,16 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 		
 		//Check if user exists in our DB
 		String smuUsername = request.getParameter("smu_username");
-		User user = UserManager.findByUsername(em, smuUsername);
-		if (user != null) {
-			//Welcome to the system
-			session.setAttribute("user", user);
-			if (false) {
-				session.setAttribute("fullname", request.getParameter("smu_fullname"));
-				session.setAttribute("groups", request.getParameter("smu_groups").split(","));	
-			}
-			ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+		//Getting the active term
+		ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+		//Getting the user based on username and active term
+		ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerms.get(0));
+		
+		if (users.size() > 0) {
+			//Welcome to the system. 
+			session.setAttribute("userRoles", users);
 			session.setAttribute("currentActiveTerm", activeTerms.get(0));
 
-			//Getting the users roles for active term
-			userRoles = new ArrayList<Role>();
-			Term activeTerm = activeTerms.get(0);
-			List<Role> activeRoles = RoleManager.getAllRolesByTerm(em, activeTerm);
-			activeRoles.addAll(RoleManager.getNonTermRoles(em));
-			for (Role role : activeRoles) {
-				List<User> listUsers = role.getUsers();
-				for (User userObj : listUsers) {
-					if (user.equals(userObj)) {
-						userRoles.add(role);
-					}
-				}
-			}
-
-			//This is not for the active term
-			//userRoles = user.getRoles();
-			
-			session.setAttribute("userRoles", userRoles);  //Setting the list of roles for user
-			
 		} else {
 			//Kick user out
 			request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo!");
@@ -240,11 +215,4 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         this.response = response;
     }
 
-    public List<Role> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<Role> userRoles) {
-        this.userRoles = userRoles;
-    }
 } //end of class

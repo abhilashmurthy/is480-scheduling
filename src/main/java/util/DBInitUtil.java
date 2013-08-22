@@ -54,7 +54,7 @@ public class DBInitUtil {
 	public static void main(String[] args) {
 		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 		try {
-                        logger.info("DB Initialization started");   
+			logger.info("DB Initialization started");   
 			em.getTransaction().begin();
 			initDB(em);
 			em.getTransaction().commit();

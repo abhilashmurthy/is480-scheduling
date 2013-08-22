@@ -4,8 +4,9 @@
     Author     : ABHILASHM.2010
 --%>
 
+<%@page import="model.role.Student"%>
+<%@page import="constant.Role"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="model.Role"%>
 <%@page import="java.util.List"%>
 <%@page import="org.slf4j.LoggerFactory"%>
 <%@page import="org.slf4j.Logger"%>
@@ -19,18 +20,17 @@
 <%@include file="imports.jsp"%>
 
 <% //Getting session objects
-   List<Role> userRoles = (List<Role>) session.getAttribute("userRoles");
-   String activeRole = (String) session.getAttribute("activeRole");  //Active Role can never be empty
-   boolean isSupervisorReviewer = false;
+   List<User> userRoles = (List<User>) session.getAttribute("userRoles");
+   Role activeRole = (Role) session.getAttribute("activeRole");  //Active Role can never be empty
+   boolean isFaculty = false;
    boolean isAdministrator = false;
    boolean isCourseCoordinator = false;
-   for (Role role: userRoles) {
-		if (role.getName().equalsIgnoreCase("Supervisor") || 
-				role.getName().equalsIgnoreCase("Reviewer")) {
-			isSupervisorReviewer = true;
-		} else if (role.getName().equalsIgnoreCase("Administrator")) {
+   for (User userObj: userRoles) {
+		if (userObj.getRole().equals(Role.FACULTY)) {
+			isFaculty = true;
+		} else if (userObj.getRole().equals(Role.ADMINISTRATOR)) {
 			isAdministrator = true;
-		} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
+		} else if (userObj.getRole().equals(Role.COURSE_COORDINATOR)) {
 			isCourseCoordinator = true;
 		}
    }
@@ -47,7 +47,7 @@
             <a class="brand navbar-title" href="index">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
                 <ul class="nav">
-				<%  if (activeRole.equalsIgnoreCase("Administrator") || activeRole.equalsIgnoreCase("Course Coordinator")) { %>
+				<%  if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<!--<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Booking</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
@@ -62,16 +62,16 @@
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="editschedule.jsp">Edit Schedule</a></li>
 							</ul>
 						</li>
-<!--						<li class="dropdown">
+						<li class="dropdown">
 							<a id="adminConfigDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Admin Config</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-								<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="">Manage Milestones</a></li>
+								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
-						</li>-->
+						</li>
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
-				<% } else if (activeRole.equalsIgnoreCase("Supervisor/Reviewer")) { %>
+				<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<!--<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
 							<!--<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
@@ -79,14 +79,14 @@
 						<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
-				<% } else if (activeRole.equalsIgnoreCase("Student")) { %>
+				<% } else if (activeRole.equals(Role.STUDENT)) { %>
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
 							<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
-				<% } else if (activeRole.equalsIgnoreCase("TA")) { %>	
+				<% } else if (activeRole.equals(Role.TA)) { %>	
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
 						<!--Nothing for now!-->
 				<% } %>
@@ -111,8 +111,10 @@
 <div style="visibility: collapse" id="userDashboardContent" hidden="">
     <!--<p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>-->
 	
-	 <% if (activeRole.equalsIgnoreCase("Student")) { %>
-		<p><strong>Team</strong><br/><% out.print(user.getTeam().getTeamName());%></p>
+	 <% if (activeRole.equals(Role.STUDENT)) { 
+			Student student = (Student) session.getAttribute("user");
+	 %>
+		<p><strong>Team</strong><br/><% out.print(student.getTeam().getTeamName());%></p>
 	 <% } %>
     
 	<strong>Current Role</strong>
@@ -126,13 +128,13 @@
 			<strong>Other Role(s)</strong><br/>
 			<form id="myform" action="setRole" method="post">
 			<div class="btn-group">
-				<% if (isAdministrator && (!activeRole.equalsIgnoreCase("Administrator"))) { %>
+				<% if (isAdministrator && (!activeRole.equals(Role.ADMINISTRATOR))) { %>
 					<button type="submit" class="btn btn-small" value="Administrator" name="administrator">Administrator</button><br/>
 				<% } %>
-				<% if (isSupervisorReviewer && (!activeRole.equalsIgnoreCase("Supervisor/Reviewer"))) { %>
-					<button type="submit" class="btn btn-small" value="Supervisor/Reviewer" name="supervisorReviewer">Supervisor/Reviewer</button><br/>
+				<% if (isFaculty && (!activeRole.equals(Role.FACULTY))) { %>
+					<button type="submit" class="btn btn-small" value="Faculty" name="faculty">Faculty</button><br/>
 				<% } %>
-				<% if (isCourseCoordinator && (!activeRole.equalsIgnoreCase("Course Coordinator"))) {  %>
+				<% if (isCourseCoordinator && (!activeRole.equals(Role.COURSE_COORDINATOR))) {  %>
 					<button type="submit" class="btn btn-small" value="Course Coordinator" name="courseCoordinator">Course Coordinator</button>
 				<% } %>
 			</div>
