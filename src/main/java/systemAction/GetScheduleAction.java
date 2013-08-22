@@ -6,29 +6,28 @@ package systemAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Status;
+import constant.Response;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.TermManager;
+import model.Booking;
 import model.Milestone;
 import model.Schedule;
-import model.Team;
 import model.Term;
 import model.Timeslot;
 import model.User;
+import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,16 +108,17 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 String venue = t.getVenue();
                 map.put("venue", venue);
                 
-                if (t.getTeam() != null) {
+                if (t.getCurrentBooking()!= null) {
+					Booking b = t.getCurrentBooking();
                     Date startDate = new Date(t.getStartTime().getTime());
                     Date endDate = new Date(t.getEndTime().getTime());
-                    map.put("team", t.getTeam().getTeamName());
+                    map.put("team", b.getTeam().getTeamName());
                     
                     //View start date (DDD, dd MMM YYYY)
                     map.put("startDate", viewDateFormat.format(startDate));
                     
                     //Overall status
-                    map.put("status", t.getOverallBookingStatus().toString());
+                    map.put("status", b.getStatus().toString());
                     
                     //Start Time - End Time
                     map.put("time", viewTimeFormat.format(startDate) + " - " + viewTimeFormat.format(endDate));
@@ -128,7 +128,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     List<HashMap<String, String>> faculties = new ArrayList<HashMap<String, String>>();
 
                     //Adding all students
-                    Set<User> teamMembers = t.getTeam().getMembers();
+                    Set<Student> teamMembers = b.getTeam().getMembers();
                     for (User student : teamMembers) {
                         HashMap<String, String> studentMap = new HashMap<String, String>();
                         studentMap.put("name", student.getFullName());
@@ -136,7 +136,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     }
                     
                     //Adding all faculty and their status
-                    HashMap<User, Status> statusList = t.getStatusList();
+                    HashMap<User, Response> statusList = b.getResponseList();
                     if (statusList != null) {
                         for (User faculty : statusList.keySet()) {
                             HashMap<String, String> facultyMap = new HashMap<String, String>();
