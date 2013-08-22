@@ -4,14 +4,13 @@
  */
 package notification.email;
 
-import constant.Status;
+import constant.Response;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+import model.Booking;
 import model.Team;
-import model.Timeslot;
 import model.User;
 
 /**
@@ -19,15 +18,15 @@ import model.User;
  * @author suresh
  */
 public class DeletedBookingEmail extends EmailTemplate{
-	Timeslot t;
+	Booking b;
 	Team team;
-	HashMap<User, Status> statusList;
+	HashMap<User, Response> statusList;
 	User deletor;
 	
-	public DeletedBookingEmail(Timeslot t, User deletor, Team team,
-			HashMap<User, Status> statusList) {
+	public DeletedBookingEmail(Booking b, User deletor, Team team,
+			HashMap<User, Response> statusList) {
 		super("deleted_booking.html");
-		this.t = t;
+		this.b = b;
 		this.deletor = deletor;
 		this.team = team;
 		this.statusList = statusList;
@@ -35,7 +34,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return t.getSchedule().getMilestone().getName() + " - Booking Deletion";
+		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Booking Deletion";
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 		HashMap<String, String> map = new HashMap<String, String>();
 		
 		//Inserting milestone
-		map.put("[MILESTONE]", t.getSchedule().getMilestone().getName());
+		map.put("[MILESTONE]", b.getTimeslot().getSchedule().getMilestone().getName());
 		
 		//Inserting approver name
 		map.put("[DELETOR_NAME]", deletor.getFullName());
@@ -74,26 +73,22 @@ public class DeletedBookingEmail extends EmailTemplate{
 		
 		//Insert start date
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
-		map.put("[DATE]", dateFormat.format(t.getStartTime()));
+		map.put("[DATE]", dateFormat.format(b.getTimeslot().getStartTime()));
 		
 		//Insert start and end time
 		SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-		map.put("[START_TIME]", timeFormat.format(t.getStartTime()));
-		map.put("[END_TIME]", timeFormat.format(t.getEndTime()));
+		map.put("[START_TIME]", timeFormat.format(b.getTimeslot().getStartTime()));
+		map.put("[END_TIME]", timeFormat.format(b.getTimeslot().getEndTime()));
 		
 		//Insert venue
-		map.put("[VENUE]", t.getVenue());
+		map.put("[VENUE]", b.getTimeslot().getVenue());
 		
 		//Insert required attendees
-		Set<User> userList = statusList.keySet();
-		Iterator<User> iter = userList.iterator();
+		Set<User> userList = b.getResponseList().keySet();
 		StringBuilder result = new StringBuilder();
 		
-		while (iter.hasNext()) {
-			result.append("&nbsp;").append(iter.next().getFullName());
-			if (iter.hasNext()) {
-				result.append("<br />");
-			}
+		for(User u : userList) {
+			result.append("&nbsp;").append(u.getFullName());
 		}
 		map.put("[REQUIRED_ATTENDEES]", result.toString());
 		
