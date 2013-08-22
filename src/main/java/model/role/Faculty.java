@@ -11,9 +11,12 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import model.Booking;
 import model.Term;
+import model.Timeslot;
 import model.User;
 
 /**
@@ -33,6 +36,19 @@ public class Faculty extends User implements Serializable {
 	
 	@ManyToMany(mappedBy = "requiredAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Booking> requiredBookings = new HashSet<Booking>();
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name="Unavailable_Timeslots",
+            joinColumns=@JoinColumn(name="faculty_id"),
+            inverseJoinColumns=@JoinColumn(name="timeslot_id"))
+	private Set<Timeslot> unavailableTimeslots = new HashSet<Timeslot>();
+
+        public Set<Timeslot> getUnavailableTimeslots() {
+            return unavailableTimeslots;
+        }
+
+        public void setUnavailableTimeslots(Set<Timeslot> unavailableTimeslots) {
+            this.unavailableTimeslots = unavailableTimeslots;
+        }
 
 	public Set<Booking> getRequiredBookings() {
 		return requiredBookings;
