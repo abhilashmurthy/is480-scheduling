@@ -570,6 +570,7 @@
                     $("td").on('click', '#createBookingBtn', function(e) {
                         e.stopPropagation();
                         if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+							teamName = $("#createTeamSelect option:selected").text();
                             teamId = $("#createTeamSelect").val();
                         }
                         createBooking(self);
