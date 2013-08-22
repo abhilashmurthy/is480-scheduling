@@ -46,8 +46,9 @@ public class UserManager {
         ArrayList<User> users = new ArrayList<User>();
         try {
             em.getTransaction().begin();
-            Query q = em.createQuery("select o from User o where o.username = :username and (term.id = :termId or term is null)")
-                    .setParameter("termId", activeTerm.getId());
+            Query q = em.createQuery("select o from User o where o.username = :username and (term.id = :termId or term is null)");
+			q.setParameter("username", username);
+			q.setParameter("termId", activeTerm.getId());
             users = (ArrayList<User>) q.getResultList();
             em.getTransaction().commit();
         } catch (Exception e) {
