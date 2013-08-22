@@ -69,7 +69,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 				}
 				
 				//Setting default role during first login for users with multiple roles
-				if (firstLogin.equalsIgnoreCase("Yes")) {
+				if (firstLogin != null && firstLogin.equalsIgnoreCase("Yes")) {
 					if (isFaculty) {
 						if (isAdministrator || isCourseCoordinator) {
 							session.setAttribute("activeRole", Role.FACULTY);

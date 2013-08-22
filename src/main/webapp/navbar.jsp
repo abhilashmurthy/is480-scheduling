@@ -120,7 +120,7 @@
 	<strong>Current Role</strong>
 	<!-- For all roles -->
 	<ul class="unstyled">
-		<li><%= activeRole %></li>
+		<li><%= activeRole.getDisplayName() %></li>
 	</ul>
 	<!-- For multiple roles -->
 	<%  if (userRoles.size() > 1) { %>
