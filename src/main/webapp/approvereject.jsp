@@ -22,7 +22,15 @@
 			
 		//For data tables
 		$(document).ready(function(){
-			$('#approveRejectTable').dataTable();
+			$('#approveRejectTable').dataTable({
+				"bPaginate": false,
+				"bLengthChange": false,
+//				"bFilter": false,
+//				"bSort": false,
+				"bInfo": false,
+				"bAutoWidth": false,
+				"asStripClasses": null
+			})
 		});
 
 		//To check/uncheck all boxes
@@ -152,6 +160,7 @@
 							</s:iterator>
 							</tbody>
 						</table>
+						<br/><br/>
 						<table>
 							<tr>
 								<td><input type="submit" class="btn btn-success" id="approveButton" value="Approve" name="Approve" onclick="return valthisform();"/></td>
