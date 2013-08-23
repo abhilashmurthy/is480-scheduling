@@ -19,7 +19,7 @@
 %>
 <html>
     <head>
-        <title>Edit Term</title>
+        <title>Faculty Availability</title>
         <style type="text/css">
             table {
                 margin-left: 20px;
@@ -86,6 +86,10 @@
                 rd.forward(request, response);
             }
          %>
+
+        <%
+                        Faculty facultyUser = (Faculty) session.getAttribute("user");
+        %>
 
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
