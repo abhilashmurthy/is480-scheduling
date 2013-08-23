@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.TermManager;
@@ -81,6 +82,10 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
     public String execute() throws ServletException, IOException {
         try {
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            
+            //Write lastSelectedMilstone session object
+            HttpSession session = request.getSession();
+            session.setAttribute("lastSelectedMilestone", milestoneString.toUpperCase());
             
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
