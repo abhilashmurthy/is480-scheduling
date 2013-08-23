@@ -19,7 +19,7 @@
 %>
 <html>
     <head>
-        <title>Edit Term</title>
+        <title>Faculty Availability</title>
         <style type="text/css">
             table {
                 margin-left: 20px;
@@ -81,7 +81,7 @@
         <!-- Kick unauthorized user -->
         <%
             if (activeRole != Role.FACULTY) {
-                request.setAttribute("error", "You need administrator privileges for this page");
+                request.setAttribute("error", "You need to be a faculty member to view this page");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
             }
@@ -89,13 +89,12 @@
 
         <%
                         Faculty facultyUser = (Faculty) session.getAttribute("user");
-                        String fullName = facultyUser.getFullName();
         %>
 
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
-                <h3><%= fullName %>'s Availability </h3>
+                <h3>Your Availability</h3>
                 <div id="timeslotsTableSection">
                     <table id="acceptanceTimeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped">
                     </table> 
@@ -170,7 +169,7 @@
                 var tableId = milestoneStr.toLowerCase() + "TimeslotsTable";
                 var table = $("#" + tableId);
                 table.before("<h4>" + milestoneStr.toUpperCase() + "</h4>"); //Add milestone title
-                makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeDate"));
+                makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeString"));
                 populateTimeslotsTable(tableId, scheduleData);
                 populateUnavailableTimeslots(tableId, scheduleData);
             }
@@ -284,7 +283,7 @@
             }
             
             /*
-              * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
+              * METHOD TO MARK TIMESLOTS ON TABLE
               */
              function triggerTimeslot(e, duration) {
                  var col = $(e).parent().children().index(e);
@@ -367,13 +366,13 @@
                  }
              }
 
-             $("td.timeslotcell", "#acceptanceTimeslotsTable").on("click", function() {
+             $("td.chosen , td.unavailable", "#acceptanceTimeslotsTable").on("click", function() {
                  triggerTimeslot(this, 60);
              });
-             $("td.timeslotcell", "#midtermTimeslotsTable").on("click", function() {
+             $("td.chosen , td.unavailable", "#midtermTimeslotsTable").on("click", function() {
                  triggerTimeslot(this, 90);
              });
-             $("td.timeslotcell", "#finalTimeslotsTable").on("click", function() {
+             $("td.chosen , td.unavailable", "#finalTimeslotsTable").on("click", function() {
                  triggerTimeslot(this, 90);
              });
              
@@ -429,31 +428,31 @@
                 timeslotsData["timeslot_data[]"] = timeslot_data;
                 
                 console.log('Availability data is: ' + JSON.stringify(timeslotsData));
-//                $.ajax({
-//                    type: 'POST',
-//                    url: 'setAvailabilityJson',
-//                    data: timeslotsData,
-//                    dataType: 'json'
-//                }).done(function(response) {
-//                    if (!response.exception) {
-//                        if (response.success) {
-//                            console.log("editTimeslotsJson was successful");
-//                            displayMessage("timeslotsResultMessage", response.message, false);
-//                        } else {
-//                            var eid = btoa(response.message);
-//                            console.log(response.message);
-//                            window.location = "error.jsp?eid=" + eid;
-//                        }
-//                        setTimeout(function(){window.location.reload();}, 1000);
-//                    } else {
-//                        var eid = btoa(response.message);
-//                        window.location="error.jsp?eid=" + eid;
-//                    }
-//                }).fail(function(error) {
-//                    $("#editTimeslotsSubmitBtn").button('reset');
-//                    console.log("createTimeslotsJson AJAX FAIL");
-//                    displayMessage("timeslotsResultMessage", "Oops.. something went wrong", true);
-//                });
+                $.ajax({
+                    type: 'POST',
+                    url: 'setAvailabilityJson',
+                    data: timeslotsData,
+                    dataType: 'json'
+                }).done(function(response) {
+                    if (!response.exception) {
+                        if (response.success) {
+                            console.log("editTimeslotsJson was successful");
+                            displayMessage("timeslotsResultMessage", response.message, false);
+                        } else {
+                            var eid = btoa(response.message);
+                            console.log(response.message);
+                            window.location = "error.jsp?eid=" + eid;
+                        }
+                        setTimeout(function(){window.location.reload();}, 1000);
+                    } else {
+                        var eid = btoa(response.message);
+                        window.location="error.jsp?eid=" + eid;
+                    }
+                }).fail(function(error) {
+                    $("#editTimeslotsSubmitBtn").button('reset');
+                    console.log("createTimeslotsJson AJAX FAIL");
+                    displayMessage("timeslotsResultMessage", "Oops.. something went wrong", true);
+                });
 
                 return false;
             });
