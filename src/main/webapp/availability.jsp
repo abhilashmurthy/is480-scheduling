@@ -4,6 +4,8 @@
     Author     : Prakhar
 --%>
 
+<%@page import="java.util.Set"%>
+<%@page import="model.role.Faculty"%>
 <%@page import="com.opensymphony.xwork2.ActionContext"%>
 <%@page import="com.opensymphony.xwork2.util.ValueStack"%>
 <%@page import="model.*"%>
@@ -66,6 +68,9 @@
             .chosen {
                 background-color: #B8F79E !important ;
             }
+            .unavailable {
+                background-color: #F7A8A8 !important ;
+            }
 
         </style>
     </head>
@@ -75,77 +80,39 @@
         
         <!-- Kick unauthorized user -->
         <%
-            if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) {
+            if (activeRole != Role.FACULTY) {
                 request.setAttribute("error", "You need administrator privileges for this page");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
             }
          %>
 
+        <%
+                        Faculty facultyUser = (Faculty) session.getAttribute("user");
+                        String fullName = facultyUser.getFullName();
+        %>
 
-        <!-- Edit Term -->
-        <div id="editTermPanel" class="container">
-            <h3>Edit Term</h3>
-            <form id="editTermForm">
-                <table>
-                    <tr><td class="formLabelTd">Year</td><td><input id="yearInput" type="text" name="year" disabled/></td></tr>
-                    <tr><td class="formLabelTd">Edit Semester</td><td><input id="semesterInput" type="text" name="semester" /></td></tr>
-                    <tr id="editTermRow"><td></td><td><button id="editTermSubmitBtn" type="submit" class="btn btn-primary" data-loading-text="Waiting...">Save</button></td></tr>
-                </table>
-            </form>
-            <h4 id="termResultMessage" class="resultMessage"/></h4>
-
-        <div class="line-separator"></div>
-
-        <!-- Edit Schedule -->
-        <div id="editSchedulePanel">
-            <h3>Edit Schedule</h3>
-            <form id="editScheduleForm">
-                <table>
-                    <th>Milestone</th><th>Dates</th>
-                    <tr>
-                        <td class="formLabelTd">Acceptance</td>
-                        <td><input type="text" id="acceptanceDatePicker" class="input-medium datepicker" name="acceptanceDates"/></td>
-                    </tr>
-                    <tr>
-                        <td class="formLabelTd">Midterm</td>
-                        <td><input type="text" id="midtermDatePicker" class="input-medium datepicker" name="midtermDates"/></td>
-                    </tr>
-                    <tr>
-                        <td class="formLabelTd">Final</td>
-                        <td><input type="text" id="finalDatePicker" class="input-medium datepicker" name="finalDates"/></td>
-                    </tr>
-                    <tr class="editScheduleSubmitRow">
-                        <td></td>
-                        <td><button id="editScheduleSubmitBtn" type="submit" class="btn btn-primary" data-loading-text="Waiting...">Save</button></td>
-                    </tr>
-                </table>
-            </form>
-            <h4 id="scheduleResultMessage" class="resultMessage"/></h4>
-        </div>
-
-        <div class="line-separator"></div>
-
-        <!-- Edit Timeslots -->
-        <div id="editTimeslotsPanel">
-            <h3>Edit Timeslots</h3>
-            <div id="timeslotsTableSection">
-                <table id="acceptanceTimeslotsTable" class="table-condensed table-hover table-bordered table-striped">
-                </table> 
-                <br/>
-                <table id="midtermTimeslotsTable" class="table-condensed table-hover table-bordered table-striped">
-                </table>
-                <br/>
-                <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped">
-                </table>
-                <br/>
-                <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Waiting...">Save</button>
-                <br />
+        <!-- Edit Availability -->
+        <div id="availabilityPanel" class="container">
+            <div id="editTimeslotsPanel">
+                <h3><%= fullName %>'s Availability </h3>
+                <div id="timeslotsTableSection">
+                    <table id="acceptanceTimeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped">
+                    </table> 
+                    <br/>
+                    <table id="midtermTimeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped">
+                    </table>
+                    <br/>
+                    <table id="finalTimeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped">
+                    </table>
+                    <br/>
+                    <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Waiting...">Save</button>
+                    <br />
+                </div>
+                <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
             </div>
-            <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
         </div>
 
-    </div>
     <%@include file="footer.jsp" %>
     <!-- jshashset imports -->
     <script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
@@ -153,7 +120,7 @@
     <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
     <script type="text/javascript">
         //Makes use of footer.jsp's jQuery and bootstrap imports
-        editScheduleLoad = function() {
+        supervisorAvailabilityLoad = function() {
             
             //------------------------------------------//
             // View Schedule Data
@@ -166,19 +133,17 @@
             var acceptanceId = null;
             var midtermId = null;
             var finalId = null;
+            var unavailableTimeslots = new Array();
             
-            loadInitialValues();
+            loadUnavailableTimeslots();
+            loadScheduleDates();
             
-            /* Datepicker validation */
-            $(".datepicker").multiDatesPicker({
-                dateFormat: "yy-mm-dd",
-                beforeShowDay: $.datepicker.noWeekends
-            });
-            
-            function loadInitialValues() {
-                $("#yearInput").val(activeAcademicYearStr);
-                $("#semesterInput").val(activeSemesterStr);
-                loadScheduleDates();
+            function loadUnavailableTimeslots() {
+                <%
+                    Set<Timeslot> unavailableTimeslots = facultyUser.getUnavailableTimeslots();
+                    for (Timeslot t : unavailableTimeslots) { %>
+                        unavailableTimeslots.push("timeslot_" + <%= t.getId() %>);
+                <%  } %>
             }
             
             function loadScheduleDates() {
@@ -186,53 +151,28 @@
                 var milestoneStr = "ACCEPTANCE";
                 var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
                 acceptanceId = scheduleData.id;
-                var distinctDates = getDistinctDates(scheduleData, "typeDate");
-                $("#acceptanceDatePicker").datepicker('destroy');
-                $("#acceptanceDatePicker").multiDatesPicker({
-                    dateFormat: "yy-mm-dd",
-                    defaultDate: new Date(scheduleData.startDate),
-                    beforeShowDay: $.datepicker.noWeekends
-                });
-                $("#acceptanceDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get midterm schedule data
                 var milestoneStr = "MIDTERM";
                 var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
                 midtermId = scheduleData.id;
-                var distinctDates = getDistinctDates(scheduleData, "typeDate");
-                $("#midtermDatePicker").datepicker('destroy');
-                $("#midtermDatePicker").multiDatesPicker({
-                    dateFormat: "yy-mm-dd",
-                    defaultDate: new Date(scheduleData.startDate),
-                    beforeShowDay: $.datepicker.noWeekends
-                });
-                $("#midtermDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
                 
                 //Get final schedule data
                 var milestoneStr = "FINAL";
                 var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
                 finalId = scheduleData.id;
-                var distinctDates = getDistinctDates(scheduleData, "typeDate");
-                $("#finalDatePicker").datepicker('destroy');
-                $("#finalDatePicker").multiDatesPicker({
-                    dateFormat: "yy-mm-dd",
-                    defaultDate: new Date(scheduleData.startDate),
-                    beforeShowDay: $.datepicker.noWeekends
-                });
-                $("#finalDatePicker").multiDatesPicker('addDates', distinctDates);
                 loadScheduleTimeslots(milestoneStr, scheduleData);
             }
             
             function loadScheduleTimeslots(milestoneStr, scheduleData) {
                 var tableId = milestoneStr.toLowerCase() + "TimeslotsTable";
                 var table = $("#" + tableId);
-                var dates = $("#" + milestoneStr.toLowerCase() + "DatePicker").multiDatesPicker('getDates');
-//                var dateArray = getDatesBetween(dates[0], dates[dates.length - 1]);
                 table.before("<h4>" + milestoneStr.toUpperCase() + "</h4>"); //Add milestone title
-                makeTimeslotTable(tableId, scheduleData, dates);
+                makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeDate"));
                 populateTimeslotsTable(tableId, scheduleData);
+                populateUnavailableTimeslots(tableId, scheduleData);
             }
             
             function getDatesBetween(startDate, endDate) {
@@ -330,7 +270,10 @@
                         var date = dateArray[j];
                         date = new Date(date).toString("yyyy-MM-dd");
                         var datetimeString = date + " " + timesArray[i] + ":00";
-                        td.attr("value", datetimeString);
+                        var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
+                        if (timeslot) {
+                            td.attr("value", "timeslot_" + timeslot.id);
+                        }
                         tr.append(td);
                     }
                     tbody.append(tr);
@@ -350,7 +293,8 @@
                  var tbody = $(e).parents("tbody");
                  var slotSize = duration / 30;
 
-                 if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
+                 if ($(e).hasClass("chosen")) {
+                     //Section for a cell thats available
                      //Checking if the cell clicked is the start of the chosen timeslot (Important!)
                      if ($(e).children().index(".start-marker") !== -1) {
                          $(e).removeClass("chosen");
@@ -361,13 +305,48 @@
                              $(nextCell).removeClass("chosen");
                          }
                      }
-                 } else { //Section for a non-highlighted cell
+                     
+                     //Add unavailable class
+                     for (i = 1; i < slotSize; i++) {
+                         var nextRow = $(tbody).children().get(row + i);
+                         var nextCell = $(nextRow).children().get(col);
+                         if ($(nextCell).hasClass("chosen")) {
+                             return;
+                         }
+                     }
+
+                     var numRows = $(tbody).children().length;
+                     //Checking if there are enough cells for the slot duration
+                     if ((row + slotSize) <= numRows) {
+                         $(e).addClass("unavailable");
+                         var marker = document.createElement("div");
+                         $(marker).addClass("start-marker");
+                         $(e).append(marker);
+                         for (i = 1; i < slotSize; i++) {
+                             var nextRow = $(tbody).children().get(row + i);
+                             var nextCell = $(nextRow).children().get(col);
+                             $(nextCell).addClass("unavailable");
+                         }
+                     }
+                     
+                 } else {
+                     //Section for a cell thats available
+                     if ($(e).children().index(".start-marker") !== -1) {
+                         $(e).removeClass("unavailable");
+                         $(e).children().remove();
+                         for (i = 1; i < slotSize; i++) {
+                             var nextRow = $(tbody).children().get(row + i);
+                             var nextCell = $(nextRow).children().get(col);
+                             $(nextCell).removeClass("unavailable");
+                         }
+                     }
+                     
                      //Checking if there will be an overlap of timeslots
                      //Abort if there is going to be an overlap
                      for (i = 1; i < slotSize; i++) {
                          var nextRow = $(tbody).children().get(row + i);
                          var nextCell = $(nextRow).children().get(col);
-                         if ($(nextCell).hasClass("chosen")) {
+                         if ($(nextCell).hasClass("unavailable")) {
                              return;
                          }
                      }
@@ -401,9 +380,19 @@
             function populateTimeslotsTable(tableId, scheduleData) {
                 $("#" + tableId).find("td").each(function(){
                     var self = $(this);
-                    var timeslot = getScheduleDataTimeslot(self.attr('value'), scheduleData);
-                    if (timeslot) {
+                    if (self.attr('value')) {
                         triggerTimeslot(this, scheduleData.duration);
+                    }
+                });
+            }
+            
+            function populateUnavailableTimeslots(tableId, scheduleData) {
+                $("#" + tableId).find("td").each(function(){
+                    var self = $(this);
+                    for (var i = 0; i < unavailableTimeslots.length; i++) {
+                        if (self.attr('value') === unavailableTimeslots[i]) {
+                            triggerTimeslot(this, scheduleData.duration);
+                        }
                     }
                 });
             }
@@ -421,140 +410,50 @@
             }
             
             //------------------------------------------//
-            // Change Schedule Data
+            // Change Supervisor Availability
             //------------------------------------------//
-            
-            //Update Term AJAX Call
-            $("#editTermForm").on('submit', function() {
-                $("#editTermSubmitBtn").button('loading');
-                console.log('clicked');
-                var editTermData = {
-                    year: $("#yearInput").val(), 
-                    semester: $("#semesterInput").val(), 
-                    activeYear:activeAcademicYearStr, 
-                    activeSemester:activeSemesterStr
-                };
-                $.ajax({
-                    type: 'GET',
-                    url: 'updateTermJson',
-                    data: editTermData,
-                    dataType: 'json'
-                }).done(function(response) {
-                    if (!response.exception) {
-                        if (response.success) {
-                            displayMessage("termResultMessage", response.message, false);
-                        } else {
-                            displayMessage("termResultMessage", response.message, true);
-                        }
-                        setTimeout(function(){window.location.reload();}, 1000);
-                    } else {
-                        var eid = btoa(response.message);
-                        window.location="error.jsp?eid=" + eid;
-                    }
-                }).fail(function(error) {
-                    console.log("Edit Term Form AJAX Fail");
-                });
-                return false;
-            });
-            
-            //Update Schedule AJAX Call
-            $("#editScheduleForm").on('submit', function() {
-                $("#editScheduleSubmitBtn").button('loading');
-                console.log('clicked');
-                editScheduleData = {
-                    year:activeAcademicYearStr, 
-                    semester:activeSemesterStr,
-                    acceptanceId:acceptanceId,
-                    midtermId:midtermId,
-                    finalId:finalId,
-                    acceptanceDates:$("#acceptanceDatePicker").multiDatesPicker('getDates').sort(),
-                    midtermDates:$("#midtermDatePicker").multiDatesPicker('getDates').sort(),
-                    finalDates:$("#finalDatePicker").multiDatesPicker('getDates').sort()
-                };
-                $.ajax({
-                    type: 'POST',
-                    url: 'updateScheduleJson',
-                    data: editScheduleData,
-                    async: false,
-                    dataType: 'json'
-                }).done(function(response) {
-                    if (!response.exception) {
-                        if (response.success) {
-                            displayMessage("scheduleResultMessage", response.message, false);
-                        } else {
-                            displayMessage("scheduleResultMessage", response.message, true);
-                        }
-                        setTimeout(function(){window.location.reload();}, 1000);
-                    } else {
-                        var eid = btoa(response.message);
-                        window.location="error.jsp?eid=" + eid;
-                    }
-                }).fail(function(error) {
-                    console.log("Edit Term Form AJAX Fail");
-                });
-                return false;
-            });
             
             //Update Timeslots AJAX Call            
             $("#editTimeslotsSubmitBtn").on('click', function() {
                 $("#editTimeslotsSubmitBtn").button('loading');
                 //SerializeArray not functional for timeslots
                 var timeslotsData = {};
-                var timeslot_acceptance = new Array();
-                var timeslot_midterm = new Array();
-                var timeslot_final = new Array();
+                var timeslot_data = new Array();
 
-                var accData = $("div.start-marker", "#acceptanceTimeslotsTable").get();
-                for (var i = 0; i < accData.length; i++) {
-                    var obj = accData[i];
-                    timeslot_acceptance.push($(obj).parent().attr("value"));
+                var allTimeslots = $("td.unavailable > div.start-marker", ".timeslotsTable").get();
+                for (var i = 0; i < allTimeslots.length; i++) {
+                    var obj = allTimeslots[i];
+                    timeslot_data.push($(obj).parent().attr("value"));
                 }
 
-                var midData = $("div.start-marker", "#midtermTimeslotsTable").get();
-                for (var i = 0; i < midData.length; i++) {
-                    var obj = midData[i];
-                    timeslot_midterm.push($(obj).parent().attr("value"));
-                }
-
-                var finData = $("div.start-marker", "#finalTimeslotsTable").get();
-                for (var i = 0; i < finData.length; i++) {
-                    var obj = finData[i];
-                    timeslot_final.push($(obj).parent().attr("value"));
-                }
-
-                timeslotsData["timeslot_acceptance[]"] = timeslot_acceptance;
-                timeslotsData["timeslot_midterm[]"] = timeslot_midterm;
-                timeslotsData["timeslot_final[]"] = timeslot_final;
-                timeslotsData["acceptanceId"] = acceptanceId;
-                timeslotsData["midtermId"] = midtermId;
-                timeslotsData["finalId"] = finalId;
+                timeslotsData["timeslot_data[]"] = timeslot_data;
                 
-                console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
-                $.ajax({
-                    type: 'POST',
-                    url: 'updateTimeslotsJson',
-                    data: timeslotsData,
-                    dataType: 'json'
-                }).done(function(response) {
-                    if (!response.exception) {
-                        if (response.success) {
-                            console.log("editTimeslotsJson was successful");
-                            displayMessage("timeslotsResultMessage", response.message, false);
-                        } else {
-                            var eid = btoa(response.message);
-                            console.log(response.message);
-                            window.location = "error.jsp?eid=" + eid;
-                        }
-                        setTimeout(function(){window.location.reload();}, 1000);
-                    } else {
-                        var eid = btoa(response.message);
-                        window.location="error.jsp?eid=" + eid;
-                    }
-                }).fail(function(error) {
-                    $("#editTimeslotsSubmitBtn").button('reset');
-                    console.log("createTimeslotsJson AJAX FAIL");
-                    displayMessage("timeslotsResultMessage", "Oops.. something went wrong", true);
-                });
+                console.log('Availability data is: ' + JSON.stringify(timeslotsData));
+//                $.ajax({
+//                    type: 'POST',
+//                    url: 'setAvailabilityJson',
+//                    data: timeslotsData,
+//                    dataType: 'json'
+//                }).done(function(response) {
+//                    if (!response.exception) {
+//                        if (response.success) {
+//                            console.log("editTimeslotsJson was successful");
+//                            displayMessage("timeslotsResultMessage", response.message, false);
+//                        } else {
+//                            var eid = btoa(response.message);
+//                            console.log(response.message);
+//                            window.location = "error.jsp?eid=" + eid;
+//                        }
+//                        setTimeout(function(){window.location.reload();}, 1000);
+//                    } else {
+//                        var eid = btoa(response.message);
+//                        window.location="error.jsp?eid=" + eid;
+//                    }
+//                }).fail(function(error) {
+//                    $("#editTimeslotsSubmitBtn").button('reset');
+//                    console.log("createTimeslotsJson AJAX FAIL");
+//                    displayMessage("timeslotsResultMessage", "Oops.. something went wrong", true);
+//                });
 
                 return false;
             });
@@ -571,7 +470,7 @@
 
         };
 
-        addLoadEvent(editScheduleLoad);
+        addLoadEvent(supervisorAvailabilityLoad);
     </script>
 </body>
 </html>
