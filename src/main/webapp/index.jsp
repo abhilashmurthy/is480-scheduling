@@ -323,7 +323,7 @@
                                             outputData[i][1] = "<input type='text' id='updateFormDate'" + " placeholder='" + outputData[i][1] + "' title='Enter date in YYYY-MM-DD format (e.g. 2013-01-10)' /input>";
                                         }
                                         if (outputData[i][0] === "Time") {
-                                            outputData[i][1] = "<input type='text' id='updateFormStartTime'" + " placeholder='" + outputData[i][1] + "' title='Enter time in HH:mm format (e.g. 10:00)' /input>";
+                                            outputData[i][1] = "<input type='text' id='updateFormStartTime'" + " placeholder='" + outputData[i][1] + "' title='Enter only start time in HH:mm format (e.g. 10:00)' /input>";
                                         }
                                     }
                                     //Add Update AND Delete button

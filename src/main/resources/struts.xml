@@ -156,6 +156,12 @@
                 <param name="root">json</param>
             </result>
         </action>
+        
+         <action name="updateBookingJson" class="userAction.UpdateBookingAction" method="execute">
+                <result type="json">
+                        <param name="root">json</param>
+                </result>
+        </action>
 		
     </package>
 
