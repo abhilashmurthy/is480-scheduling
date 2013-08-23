@@ -93,7 +93,7 @@
 
         <!-- Main schedule navigation -->
         <div class="container page">
-            <ul id="mileStoneTab" class="nav nav-tabs">
+            <ul id="milestoneTab" class="nav nav-tabs">
                 <!-- TODO: populate dynamic milestones -->
                 <li class="active">
                     <a id="acceptance" href="#acceptance" data-toggle="tab">Acceptance</a>
@@ -134,47 +134,47 @@
         <script type="text/javascript">
             //Makes use of footer.jsp's jQuery and bootstrap imports
             viewScheduleLoad = function() {
-
+                //Index page stuff
+                console.log("index init");
+                
                 //Declare common variables
                 //Default milestoneStr is ACCEPTANCE
-                var milestoneStr = "ACCEPTANCE";
+                var milestoneStr = "<%= session.getAttribute("lastSelectedMilestone") == null? "ACCEPTANCE":(String)session.getAttribute("lastSelectedMilestone")%>";
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
                 var self = null;
                 var teamName = null;
-				var teamId = null;
+		var teamId = null;
                 var date = null;
                 var startTime = null;
                 var termId = null;
 
                 //All teams data if for admins
-                var teams = null;
+                var teams = new Array();
                 var teamsPendingBooking = new Array();
 
                 //Make schedule rows and columns
                 var datesArray = new Array();
                 var timesArray = new Array();
+                
+                loadDefault();
+                
+                function loadDefault() {
+                    //Default schedule to see upon opening index page
+                    $("#milestoneTab a#" + milestoneStr.toLowerCase()).tab('show');
+                    populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                }
 
-                //Default schedule to see upon opening index page
-                populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
-
-                //Index page stuff
-                console.log("index init");
                 //Function to change schedule based on selected milestone tab
-                $('#mileStoneTab a').on('click', function(e) {
-                    //Content TAB effect
-                    var tabId = $(this).attr('id');
-                    var contentId = tabId + "Content";
-                    $(".tab-pane").removeClass("active in");
-                    $(".tab-pane").hide();
-                    $("#" + contentId).addClass("active in");
-                    $("#" + contentId).show();
-
+                $('#milestoneTab a').on('click', function(e){
+                    $("#milestoneTab").removeClass('active in');
+                    $(this).tab('show');                    
                     clearSchedules();
-                    milestoneStr = tabId.toUpperCase();
+                    milestoneStr = $(this).attr('id').toUpperCase();
                     activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                     activeSemesterStr = "<%= activeTerm.getSemester()%>";
                     populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                    return false;
                 });
 
                 //Function to empty schedules
@@ -207,21 +207,11 @@
 
                             //Get Teams data if user is administrator
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                                teams = null;
-                                $.ajax({
-                                    type: 'GET',
-                                    url: 'getTeams',
-                                    data: data,
-                                    async: false,
-                                    dataType: 'json'
-                                }).done(function(response) {
-                                    if (response.success) {
-                                        teams = response.teamList;
-                                    } else {
-                                        var eid = btoa(response.message);
-                                        window.location = "error.jsp?eid=" + eid;
-                                    }
-                                });
+                                <% 
+                                    List<Team> teams = (List<Team>) session.getAttribute("allTeams");
+                                    for (Team t : teams) { %>
+                                            teams.push({teamName:"<%= t.getTeamName() %>", teamId:"<%= t.getId() %>"});
+                                <%  } %>
                             }
 
                             //Draw the schedule table
