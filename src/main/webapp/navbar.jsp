@@ -72,13 +72,14 @@
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
 				<% } else if (activeRole.equals(Role.FACULTY)) { %>
-						<!--<li class="dropdown">
+						<!--<li class="dropdown">   
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
 							<!--<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
 						<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject" class="navbar-title"><b>Approve Booking</b></a></li>
 						<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
+                                                <li id="bookingHistory"><a href="availability.jsp" class="navbar-title"><b>Supervisor Availability</b></a></li>
 				<% } else if (activeRole.equals(Role.STUDENT)) { %>
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>

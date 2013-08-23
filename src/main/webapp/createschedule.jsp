@@ -74,7 +74,7 @@
 
         <!-- Kick unauthorized user -->
         <%
-            if (!(activeRole.equals("Administrator") || activeRole.equals("Course Coordinator"))) {
+            if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) {
                 request.setAttribute("error", "You need administrator privileges for this page");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
