@@ -41,7 +41,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 				json.put("message", "Cannot set availability. User is not a faculty member.");
 				return SUCCESS;
 			}
-			Faculty faculty = (Faculty) user;
+			Faculty faculty = em.find(Faculty.class, user.getId());
 			
 			Map parameters = request.getParameterMap();
 
@@ -60,8 +60,11 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 			
 			em.getTransaction().begin();
 			faculty.setUnavailableTimeslots(availability);
-			em.flush();
+			em.persist(faculty);
 			em.getTransaction().commit();
+			
+			//Reloading the user object in the session
+			request.getSession().setAttribute("user", faculty);
 			
 			json.put("success", true);
             json.put("message", "Faculty availability updated successfully");

@@ -20,8 +20,8 @@ import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
-import manager.UserManager;
 import model.Booking;
+import model.Timeslot;
 import model.User;
 import model.role.Faculty;
 import notification.email.ApprovedBookingEmail;
@@ -104,6 +104,10 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					if (r == Response.REJECTED) {
 						// Reject the booking if any one person has rejected it
 						booking.setBookingStatus(BookingStatus.REJECTED);
+						//Removing the current booking from the timeslot to make it available for others
+						Timeslot t = booking.getTimeslot();
+						t.setCurrentBooking(null);
+						em.persist(t);
 						break;
 					} else if (r == Response.APPROVED) {
 						total++;
@@ -119,6 +123,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				booking.setResponseList(responseList);
 				bookingsToUpdate.add(booking);
 				
+				//TODO Send an email when booking's rejected
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();

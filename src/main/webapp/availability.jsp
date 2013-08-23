@@ -81,21 +81,16 @@
         <!-- Kick unauthorized user -->
         <%
             if (activeRole != Role.FACULTY) {
-                request.setAttribute("error", "You need administrator privileges for this page");
+                request.setAttribute("error", "You need to be a faculty member to view this page");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
             }
          %>
 
-        <%
-                        Faculty facultyUser = (Faculty) session.getAttribute("user");
-                        String fullName = facultyUser.getFullName();
-        %>
-
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
-                <h3><%= fullName %>'s Availability </h3>
+                <h3>Your Availability</h3>
                 <div id="timeslotsTableSection">
                     <table id="acceptanceTimeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped">
                     </table> 
@@ -429,31 +424,31 @@
                 timeslotsData["timeslot_data[]"] = timeslot_data;
                 
                 console.log('Availability data is: ' + JSON.stringify(timeslotsData));
-//                $.ajax({
-//                    type: 'POST',
-//                    url: 'setAvailabilityJson',
-//                    data: timeslotsData,
-//                    dataType: 'json'
-//                }).done(function(response) {
-//                    if (!response.exception) {
-//                        if (response.success) {
-//                            console.log("editTimeslotsJson was successful");
-//                            displayMessage("timeslotsResultMessage", response.message, false);
-//                        } else {
-//                            var eid = btoa(response.message);
-//                            console.log(response.message);
-//                            window.location = "error.jsp?eid=" + eid;
-//                        }
-//                        setTimeout(function(){window.location.reload();}, 1000);
-//                    } else {
-//                        var eid = btoa(response.message);
-//                        window.location="error.jsp?eid=" + eid;
-//                    }
-//                }).fail(function(error) {
-//                    $("#editTimeslotsSubmitBtn").button('reset');
-//                    console.log("createTimeslotsJson AJAX FAIL");
-//                    displayMessage("timeslotsResultMessage", "Oops.. something went wrong", true);
-//                });
+                $.ajax({
+                    type: 'POST',
+                    url: 'setAvailabilityJson',
+                    data: timeslotsData,
+                    dataType: 'json'
+                }).done(function(response) {
+                    if (!response.exception) {
+                        if (response.success) {
+                            console.log("editTimeslotsJson was successful");
+                            displayMessage("timeslotsResultMessage", response.message, false);
+                        } else {
+                            var eid = btoa(response.message);
+                            console.log(response.message);
+                            window.location = "error.jsp?eid=" + eid;
+                        }
+                        setTimeout(function(){window.location.reload();}, 1000);
+                    } else {
+                        var eid = btoa(response.message);
+                        window.location="error.jsp?eid=" + eid;
+                    }
+                }).fail(function(error) {
+                    $("#editTimeslotsSubmitBtn").button('reset');
+                    console.log("createTimeslotsJson AJAX FAIL");
+                    displayMessage("timeslotsResultMessage", "Oops.. something went wrong", true);
+                });
 
                 return false;
             });
