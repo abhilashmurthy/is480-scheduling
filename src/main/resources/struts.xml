@@ -151,15 +151,16 @@
                 <param name="root">json</param>
             </result>
         </action>
-        <action name="updateBookingJson" class="userAction.UpdateBookingAction" method="execute">
-                <result type="json">
-                        <param name="root">json</param>
-                </result>
-        </action>
-        <action name="deleteBookingJson" class="userAction.DeleteBookingAction" method="execute">
+          <action name="deleteBookingJson" class="userAction.DeleteBookingAction" method="execute">
             <result type="json">
                 <param name="root">json</param>
             </result>
+        </action>
+        
+         <action name="updateBookingJson" class="userAction.UpdateBookingAction" method="execute">
+                <result type="json">
+                        <param name="root">json</param>
+                </result>
         </action>
 		
 		<action name="setAvailabilityJson" class="userAction.SetAvailabilityAction" method="execute">

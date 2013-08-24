@@ -5,7 +5,8 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Status;
+import constant.BookingStatus;
+//import constant.Status;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.TimeslotManager;
 import manager.UserManager;
+import model.Booking;
 import model.Timeslot;
 import model.User;
 import notification.email.DeletedBookingEmail;
@@ -41,42 +43,35 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
         try {
             json.put("exception", false);
             EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-			HttpSession session = request.getSession();
-			User user = (User) session.getAttribute("user");
-			
+
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
             Timeslot ts = TimeslotManager.findById(em, chosenID);
 
             try {
                 em.getTransaction().begin();
-                //this is the line to remove a timeslot
-                //em.remove(ts);
-				
-				//Sending email
-				//TODO Bad code. Change after booking and timeslot have been separated!
+                //Sending email
+                //TODO Bad code. Change after booking and timeslot have been separated!
 //				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(ts, user, ts.getTeam(), ts.getStatusList());
 //				deletedEmail.sendEmail();
 
-                //set the statuslist, team and attendees for that timeslot
-                HashMap<User, Status> statusList = new HashMap<User, Status>();
-                Set<User> attendees = new HashSet<User>();
 
-                ts.setStatusList(statusList);
-                ts.setTeam(null);
-                ts.setAttendees(attendees);
+                //set the current booking's status to deleted
+                Booking b = ts.getCurrentBooking();
+
+                b.setBookingStatus(BookingStatus.DELETED);
+
+                //set the current booking to null
+                ts.setCurrentBooking(null);
+
+                em.persist(b);
                 em.persist(ts);
 
                 em.getTransaction().commit();
-				
-				//Setting the updated user object in session
-				String username = user.getUsername();
-				User updatedUser = UserManager.findByUsername(em, username);
-				session.setAttribute("user", updatedUser);
-				
+
                 //if the booking has been removed successfully
                 json.put("message", "Booking deleted successfully! Deletion email has been sent to all attendees. (Coming soon..)");
-                
+
             } catch (Exception e) {
                 logger.error("Exception caught: " + e.getMessage());
                 if (MiscUtil.DEV_MODE) {

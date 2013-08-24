@@ -6,7 +6,6 @@ package userAction;
 
 import systemAction.*;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Status;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -18,7 +17,10 @@ import javax.persistence.Persistence;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import manager.ScheduleManager;
 import manager.TimeslotManager;
+import model.Booking;
+import model.Schedule;
 import model.Timeslot;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -91,7 +93,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 
             Timestamp newbookingTime = null;
             boolean proceed = false;
-            
+
             //see if the edited start date and time is in the correct format
             try {
                 newbookingTime = Timestamp.valueOf(changedDate);
@@ -209,24 +211,38 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     //the new timeslot
                     boolean successUpdate = false;
 
+                    //get the present timeslot's schedule id
+                    Schedule scheduleOfBooking = ScheduleManager.findById(em, ts.getSchedule().getId());
+
                     for (Timeslot toCompare : allSlots) {
 
-                        if (toCompare.getStartTime().equals(newbookingTime) && toCompare.getTeam() == null) {
+                        if (toCompare.getStartTime().equals(newbookingTime) && toCompare.getCurrentBooking() == null && scheduleOfBooking == toCompare.getSchedule()) {
 
                             em.getTransaction().begin();
-                            toCompare.setAttendees(ts.getAttendees());
-                            toCompare.setStatusList(ts.getStatusList());
-                            toCompare.setTeam(ts.getTeam());
+                            /*toCompare.setAttendees(ts.getAttendees());
+                             toCompare.setStatusList(ts.getStatusList());
+                             toCompare.setTeam(ts.getTeam());*/
 
-                            HashMap<User, Status> statusList = new HashMap<User, Status>();
-                            Set<User> attendees = new HashSet<User>();
+                            //set the new timeslot to team
+                            toCompare.setCurrentBooking(ts.getCurrentBooking());
 
-                            ts.setAttendees(attendees);
-                            ts.setTeam(null);
-                            ts.setStatusList(statusList);
+                            //change the timeslot_id of booking to the new timeslot
+                            Booking booking = ts.getCurrentBooking();
+                            booking.setTimeslot(toCompare);
+
+                            //set the old timeslot to null
+                            ts.setCurrentBooking(null);
+
+                            //HashMap<User, Status> statusList = new HashMap<User, Status>();
+                            //Set<User> attendees = new HashSet<User>();
+
+                            /*ts.setAttendees(attendees);
+                             ts.setTeam(null);
+                             ts.setStatusList(statusList);*/
 
                             em.persist(toCompare);
                             em.persist(ts);
+                            em.persist(booking);
                             em.getTransaction().commit();
 
                             successUpdate = true;
@@ -302,5 +318,4 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
     public void setChangedDate(String changedDate) {
         this.changedDate = changedDate;
     }
-
 }
