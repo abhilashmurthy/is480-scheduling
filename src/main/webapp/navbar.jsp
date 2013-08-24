@@ -63,9 +63,9 @@
 							</ul>
 						</li>
 						<li class="dropdown">
-							<a id="adminConfigDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Admin Config</b><b class="caret"></b></a>
+							<a href="#" id="adminConfigDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Admin Config</b><b class="caret"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="">Manage Milestones</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>

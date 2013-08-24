@@ -10,10 +10,14 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.Team;
+import model.Term;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
@@ -62,6 +66,23 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 					} else if (user.getRole().equals(Role.ADMINISTRATOR)) {
 						isAdministrator = true;
 						administratorId = user.getId();
+                                                
+                                                //Get Teams from here and populate into session
+                                                Term term = (Term) session.getAttribute("currentActiveTerm");
+                                                List<Team> teamList = null;
+                                                EntityTransaction transaction = em.getTransaction();
+                                                try {
+                                                    transaction.begin();
+                                                    Query q = em.createQuery("Select t from Team t where term = :term")
+                                                            .setParameter("term", term);
+                                                    teamList = q.getResultList();
+                                                    transaction.commit();
+                                                } catch (Exception e) {
+                                                    logger.error("Database Operation Error");
+                                                }
+                                                if (teamList != null) {
+                                                    session.setAttribute("allTeams", teamList);
+                                                }
 					} else if (user.getRole().equals(Role.COURSE_COORDINATOR)) {
 						isCourseCoordinator = true;
 						courseCoordinatorId = user.getId();
@@ -90,7 +111,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 						if (isAdministrator) {
 							session.setAttribute("activeRole", Role.ADMINISTRATOR);
 							User userAdmin = em.find(User.class, administratorId);
-							session.setAttribute("user", userAdmin);
+							session.setAttribute("user", userAdmin);    
 						} else {
 							request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
 							return ERROR;
@@ -131,6 +152,23 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 			session.setAttribute("activeRole", userRoles.get(0).getRole());
 			if (userRoles.get(0).getRole().equals(Role.ADMINISTRATOR)) {
 				session.setAttribute("user", userRoles.get(0));
+
+                                //Get Teams from here and populate into session
+                                Term term = (Term) session.getAttribute("currentActiveTerm");
+                                List<Team> teamList = null;
+                                EntityTransaction transaction = em.getTransaction();
+                                try {
+                                    transaction.begin();
+                                    Query q = em.createQuery("Select t from Team t where term = :term")
+                                            .setParameter("term", term);
+                                    teamList = q.getResultList();
+                                    transaction.commit();
+                                } catch (Exception e) {
+                                    logger.error("Database Operation Error");
+                                }
+                                if (teamList != null) {
+                                    session.setAttribute("allTeams", teamList);
+                                }
 			} else if (userRoles.get(0).getRole().equals(Role.COURSE_COORDINATOR)) {
 				session.setAttribute("user", userRoles.get(0));
 			} else if (userRoles.get(0).getRole().equals(Role.FACULTY)) {

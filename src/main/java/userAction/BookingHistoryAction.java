@@ -88,7 +88,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			}
 				
 			//Iterating over the list and getting the necessary details
-			if (bookings.size() > 0) {
+			if (bookings != null && bookings.size() > 0) {
 				for (Booking b: bookings) {
 					Timeslot timeslot = b.getTimeslot();
 					HashMap<String, Object> map = new HashMap<String, Object>();

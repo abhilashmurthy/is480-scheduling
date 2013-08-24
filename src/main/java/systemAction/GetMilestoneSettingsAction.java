@@ -8,6 +8,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import util.MiscUtil;
 public class GetMilestoneSettingsAction extends ActionSupport implements ServletRequestAware {
 	
 	private HashMap<String, Object> json = new HashMap<String, Object>();
+	private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(GetMilestoneSettingsAction.class);
 	
@@ -39,9 +41,36 @@ public class GetMilestoneSettingsAction extends ActionSupport implements Servlet
 			User user = (User) session.getAttribute("user");
 			if (user.getRole().equals(Role.ADMINISTRATOR) || user.getRole().equals(Role.COURSE_COORDINATOR)) {
 				//Getting the current settings for milestones
-				//Settings milestoneSettings = SettingsManager.getByName(em, "milestones");
-				HashMap<String, ArrayList<String>> settingsMap = SettingsManager.getSettings(em);
-				
+				ArrayList<HashMap<String,Object>> settingsList = SettingsManager.getSettings(em);
+				try {
+					for (HashMap<String, Object> map : settingsList) {
+						double duration = (Double) map.get("duration");
+						int dur = (int) duration;
+						map.put("duration", String.valueOf(dur));
+						
+						double order = (Double) map.get("order");
+						int o = (int) order;
+						map.put("order", String.valueOf(o));
+						
+						String milestone = (String) map.get("name");
+						map.put("milestone", milestone);
+						
+						ArrayList<String> attendees = (ArrayList<String>) map.get("requiredAttendees");
+						List<HashMap<String, String>> attendeesList = new ArrayList<HashMap<String, String>>();
+						if (attendees.size() > 0) {
+							for (String attendee: attendees) {
+								HashMap<String, String> userMap = new HashMap<String, String>();
+								userMap.put("attendee", attendee);
+								attendeesList.add(userMap);
+							}
+						}
+						map.put("attendees", attendeesList);
+
+						data.add(map);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			} else {
 				//Incorrect user role
 				json.put("error", true);
@@ -78,5 +107,13 @@ public class GetMilestoneSettingsAction extends ActionSupport implements Servlet
 
 	public void setJson(HashMap<String, Object> json) {
 		this.json = json;
+	}
+
+	public ArrayList<HashMap<String, Object>> getData() {
+		return data;
+	}
+
+	public void setData(ArrayList<HashMap<String, Object>> data) {
+		this.data = data;
 	}
 }  // end of class

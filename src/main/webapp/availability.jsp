@@ -169,7 +169,7 @@
                 var tableId = milestoneStr.toLowerCase() + "TimeslotsTable";
                 var table = $("#" + tableId);
                 table.before("<h4>" + milestoneStr.toUpperCase() + "</h4>"); //Add milestone title
-                makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeDate"));
+                makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeString"));
                 populateTimeslotsTable(tableId, scheduleData);
                 populateUnavailableTimeslots(tableId, scheduleData);
             }
@@ -283,7 +283,7 @@
             }
             
             /*
-              * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
+              * METHOD TO MARK TIMESLOTS ON TABLE
               */
              function triggerTimeslot(e, duration) {
                  var col = $(e).parent().children().index(e);
@@ -366,13 +366,13 @@
                  }
              }
 
-             $("td.timeslotcell", "#acceptanceTimeslotsTable").on("click", function() {
+             $("td.chosen , td.unavailable", "#acceptanceTimeslotsTable").on("click", function() {
                  triggerTimeslot(this, 60);
              });
-             $("td.timeslotcell", "#midtermTimeslotsTable").on("click", function() {
+             $("td.chosen , td.unavailable", "#midtermTimeslotsTable").on("click", function() {
                  triggerTimeslot(this, 90);
              });
-             $("td.timeslotcell", "#finalTimeslotsTable").on("click", function() {
+             $("td.chosen , td.unavailable", "#finalTimeslotsTable").on("click", function() {
                  triggerTimeslot(this, 90);
              });
              
