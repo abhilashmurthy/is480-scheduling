@@ -5,6 +5,7 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Response;
 import constant.Role;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Set;
 import model.Booking;
 import model.Team;
+import model.User;
 import model.role.Faculty;
 import util.MiscUtil;
 
@@ -43,10 +45,21 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				Faculty faculty = (Faculty) session.getAttribute("user");
 				//Getting all the bookings for the faculty for the active term
 				Set<Booking> bookingsList = faculty.getRequiredBookings();
+				
+				//Getting all bookings for which the user's status is pending
+				Set<Booking> pendingBookingList = null;
+				if (bookingsList.size() > 0) {
+					for (Booking b : bookingsList) {
+						HashMap<User, Response> responseList = b.getResponseList();
+						if (responseList.get(faculty) == Response.PENDING) {
+							pendingBookingList.add(b);
+						}
+					}
+				}
 
 				//Putting all the booking details for the user in a hash map to display it 
-				if (bookingsList.size() > 0) {
-					for (Booking b: bookingsList) {
+				if (pendingBookingList != null && pendingBookingList.size() > 0) {
+					for (Booking b : pendingBookingList) {
 						Timeslot timeslot = b.getTimeslot();
 						
 						//Getting all the timeslot and booking details

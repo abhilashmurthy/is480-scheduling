@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -68,8 +69,12 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			//Retrieving all bookings for admin and course coordinator
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
 				//Getting all the bookings for the active term
-				bookings = BookingManager.getBookingsByTerm(em, activeTerm);
-			
+				ArrayList<Booking> bookingsList = BookingManager.getBookingsByTerm(em, activeTerm);
+				//Converting list to set (Duplicated values will be ignored)
+				if (bookingsList != null) {
+					bookings = new HashSet(bookingsList);
+				}
+				
 			} else if (activeRole.equals(Role.TA)) {
 				/* TO DO after TA Model class is ready */
 				// TA ta = (TA) session.getAttribute("user");
@@ -84,6 +89,9 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				} else if (activeRole.equals(Role.STUDENT)) {
 					student = (Student) session.getAttribute("user");
 					bookings = student.getRequiredBookings();
+					for (Booking b: bookings) {
+						Term term = b.getTimeslot().getSchedule().getMilestone().getTerm();
+					}
 				}
 			}
 				

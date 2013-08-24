@@ -78,13 +78,13 @@ public class BookingManager {
     }
 	
 	/* To get all bookings for active term */
-	public static Set<Booking> getBookingsByTerm (EntityManager em, Term term) {
+	public static ArrayList<Booking> getBookingsByTerm (EntityManager em, Term term) {
 		logger.trace("Getting all bookings by active term");
-		Set<Booking> list;
+		ArrayList<Booking> list = null;
 		try {
 			Query q = em.createQuery("select b from Booking b where b.timeslot.schedule.milestone.term = :term");
 			q.setParameter("term", term);
-			list = (HashSet<Booking>) q.getResultList();
+			list = (ArrayList<Booking>) q.getResultList();
 		} catch (Exception e) {
 			logger.error("Error in getBookingsByTerm()");
 			logger.error(e.getMessage());

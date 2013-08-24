@@ -52,9 +52,22 @@
 								<s:property value="attendee"/> <br/> 
 							</s:iterator>
 							</td>
+							<td style="width: 10px"><button id='editMilestoneBtn' title="Edit" class='btn btn-info'><i class='icon-edit icon-white'></i></button></td>
+							<td><button id='delMilestoneBtn' title="Delete" class='btn btn-danger'><i class='icon-trash icon-white'></i></button></td>
 						</tr>
 					</s:iterator>
 					</tbody>
+				</table>
+				<table>
+					<tr>
+						<td style="width:90px"><input type="submit" class="btn btn-primary" value="Submit" name="Submit" onclick="return valthisform();"/></td>
+						<td>
+							<button type="submit" class="btn btn-success" value="Add" name="Add">
+								Add
+							</button>
+						</td>
+						<!--<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td> -->
+					</tr>
 				</table>
 		</s:if><s:else>
 			<h4>No milestones to configure!</h4>
