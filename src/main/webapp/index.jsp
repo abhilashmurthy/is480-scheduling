@@ -206,13 +206,11 @@
                         if (response.success) {
 
                             //Get Teams data if user is administrator
-                            if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                                <% 
+                            <% if(activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
                                     List<Team> teams = (List<Team>) session.getAttribute("allTeams");
                                     for (Team t : teams) { %>
                                             teams.push({teamName:"<%= t.getTeamName() %>", teamId:"<%= t.getId() %>"});
-                                <%  } %>
-                            }
+                                <%  } } %>
 
                             //Draw the schedule table
                             makeSchedule(response);

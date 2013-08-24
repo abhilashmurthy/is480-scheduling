@@ -31,6 +31,7 @@ import model.Timeslot;
 import model.User;
 import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -102,15 +103,16 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             json.put("duration", milestone.getSlotDuration());
 			
 			//Get unavailable timeslots if user is a student
-			HashSet<Timeslot> supervisorAvailability = null;
-			HashSet<Timeslot> reviewer1Availability = null;
-			HashSet<Timeslot> reviewer2Availability = null;
+			Set<Timeslot> supervisorAvailability = null;
+			Set<Timeslot> reviewer1Availability = null;
+			Set<Timeslot> reviewer2Availability = null;
 			User user = (User) request.getSession().getAttribute("user");
 			if (user.getRole() == Role.STUDENT) {
-				Team team = ((Student) user).getTeam();
-				supervisorAvailability = (HashSet<Timeslot>) team.getSupervisor().getUnavailableTimeslots();
-				reviewer1Availability = (HashSet<Timeslot>) team.getReviewer1().getUnavailableTimeslots();
-				reviewer2Availability = (HashSet<Timeslot>) team.getReviewer2().getUnavailableTimeslots();
+				Student student = em.find(Student.class, user.getId());
+				Team team = student.getTeam();
+				supervisorAvailability = team.getSupervisor().getUnavailableTimeslots();
+				reviewer1Availability = team.getReviewer1().getUnavailableTimeslots();
+				reviewer2Availability = team.getReviewer2().getUnavailableTimeslots();
 			}
             
             ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
