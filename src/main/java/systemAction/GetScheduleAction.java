@@ -7,11 +7,13 @@ package systemAction;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Response;
+import constant.Role;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -20,11 +22,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
-import manager.TermManager;
 import model.Booking;
 import model.Milestone;
 import model.Schedule;
-import model.Term;
+import model.Team;
 import model.Timeslot;
 import model.User;
 import model.role.Student;
@@ -79,8 +80,9 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
     
     @Override
     public String execute() throws ServletException, IOException {
+		EntityManager em = null;
         try {
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -93,6 +95,18 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
             json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
             json.put("duration", milestone.getSlotDuration());
+			
+			//Get unavailable timeslots if user is a student
+			HashSet<Timeslot> supervisorAvailability = null;
+			HashSet<Timeslot> reviewer1Availability = null;
+			HashSet<Timeslot> reviewer2Availability = null;
+			User user = (User) request.getSession().getAttribute("user");
+			if (user.getRole() == Role.STUDENT) {
+				Team team = ((Student) user).getTeam();
+				supervisorAvailability = (HashSet<Timeslot>) team.getSupervisor().getUnavailableTimeslots();
+				reviewer1Availability = (HashSet<Timeslot>) team.getReviewer1().getUnavailableTimeslots();
+				reviewer2Availability = (HashSet<Timeslot>) team.getReviewer2().getUnavailableTimeslots();
+			}
             
             ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
             logger.info("Timeslots size: " + activeSchedule.getTimeslots().size());
@@ -106,7 +120,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 String venue = t.getVenue();
                 map.put("venue", venue);
                 
-                if (t.getCurrentBooking()!= null) {
+                if (t.getCurrentBooking() != null) {
 					Booking b = t.getCurrentBooking();
                     Date startDate = new Date(t.getStartTime().getTime());
                     Date endDate = new Date(t.getEndTime().getTime());
@@ -153,7 +167,41 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     map.put("TA", TA);
                     String teamWiki = "-";
                     map.put("teamWiki", teamWiki);
-                }
+                } else if (user.getRole() == Role.STUDENT) {
+					Team team = ((Student) user).getTeam();
+					boolean available = true;
+					ArrayList<String> unavailable = new ArrayList<String>();
+					
+					//TODO Update code after manage milestones is completed!
+					Milestone m = activeSchedule.getMilestone();
+					if (m.getName().equalsIgnoreCase("acceptance")) { 
+						if (supervisorAvailability.contains(t)) { //Supervisor
+							available = false;
+							unavailable.add(team.getSupervisor().getFullName());
+						}
+					} else if (m.getName().equalsIgnoreCase("midterm")) {
+						if (reviewer1Availability.contains(t)) { //Reviewer 1
+							available = false;
+							unavailable.add(team.getReviewer1().getFullName());
+						}
+						if (reviewer2Availability.contains(t)) { //Reviewer 2
+							available = false;
+							unavailable.add(team.getReviewer2().getFullName());
+						}
+					} else if (m.getName().equalsIgnoreCase("final")) {
+						if (supervisorAvailability.contains(t)) { //Supervisor
+							available = false;
+							unavailable.add(team.getSupervisor().getFullName());
+						}
+						if (reviewer1Availability.contains(t)) { //Reviewer 1
+							available = false;
+							unavailable.add(team.getReviewer1().getFullName());
+						}
+					}
+					
+					map.put("available", available);
+					map.put("unavailable", unavailable);
+				}
                 mapList.add(map);
             }
             logger.info("mapList size: " + mapList.size());
@@ -168,7 +216,11 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             }
             json.put("success", false);
             json.put("message", "Error with GetSchedule: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.isOpen()) {
+				em.close();
+			}
+		}
         return SUCCESS;
     }
     private HashMap<String, Object> json = new HashMap<String, Object>();
