@@ -150,6 +150,40 @@
                 newAttendees += toAdd;
             }
             
+            data = {pastOrderNumber: pastOrder, newOrderNumber: newOrderNumber,newMilestoneName:newMilestoneName,  
+                        newDuration:newDuration,newAttendees: newAttendees};
+ 
+            
+            //code to send the update to backend. url corresponds to action class name defined in struts
+            //uncomment this part
+            /*$.ajax({
+                type: 'POST',
+                async: false,
+                url: 'milestoneUpdateJson',
+                data: data,
+                cache: false,
+                dataType: 'json'
+
+            }).done(function(response) {
+                if (!response.exception) {
+                    console.log('Destroying C');
+                    self.popover('destroy');
+                    var msg = response.message + "";
+                    console.log(msg);
+
+                    if (msg === ('Booking updated successfully! Update email has been sent to all attendees. (Coming soon..)')) {
+                        response.message;
+                    } else {
+                        
+
+                    }
+                } else {
+                    var eid = btoa(response.message);
+                    window.location = "error.jsp?eid=" + eid;
+                }
+            }).fail(function(error) {
+                alert("Oops. There was an error: " + error);
+            });*/
         }
 
         function createInput(id) {
