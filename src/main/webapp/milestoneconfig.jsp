@@ -71,19 +71,19 @@
                                 </td>
                                 <td>
                                     <% int counter2 = counter; %>
-                                    
+                                    <div id="textarea<%=counter%>">
                                     <s:iterator value="attendees">
-                                        <div id="textarea<%=counter2%>">
+                                        
                                             <div>
                                                 <input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' placeholder='<s:property value="attendee"/>'> </input> 
 
                                                 <button id="delete" style="" class="btn" onclick="deleteInput(document.getElementById('name<%=counter2%>'));
                                                     $(this).hide();"><i class="icon-black icon-minus-sign"></i></button>
                                             </div>
-                                        </div> 
+                                        
                                         <% counter2++;%>
                                     </s:iterator>
-                                    
+                                    </div> 
                                     <button class="btn-info" onclick="createInput(document.getElementById('textarea<%=counter%>'));"><i class="icon-black icon-plus-sign"></i>  Add </button>
                                 </td>
 
