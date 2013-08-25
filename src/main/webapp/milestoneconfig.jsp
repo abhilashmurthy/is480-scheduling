@@ -31,7 +31,7 @@
                 }
 
                 int counter = 1;
-
+                int counter2 = counter;
             %>
 
             <!-- SECTION: Booking History -->
@@ -59,10 +59,10 @@
                                         </div>     
                                     </div>  
                                 </td>
-                                <td><input type='text' style="width: 100px;height: 20px" cellspacing='0' id='name' placeholder='<s:property value="name"/>'></input></td>
+                                <td><input type='text' id="milestone<%=counter%>" style="width: 100px;height: 20px" placeholder='<s:property value="name"/>'></input></td>
                                 <td>
                                     <div class="input-append">
-                                        <input type='text' style="width: 18px; height: 20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' disabled/>
+                                        <input type='text' style="width: 28px; height: 20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' disabled/>
                                         <div class="btn-group">
                                             <button class="btn" type="button" onclick="upOne(document.getElementById('duration<%=counter%>'));" >&#9650;</button>
                                             <button class="btn" type="button" onclick="downOne(document.getElementById('duration<%=counter%>'));" >&#9660;</button>
@@ -70,12 +70,12 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <% int counter2 = counter; %>
+                                    
                                     <div id="textarea<%=counter%>">
                                     <s:iterator value="attendees">
                                         
-                                            <div>
-                                                <input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' placeholder='<s:property value="attendee"/>'> </input> 
+                                            <div id="eachOne<%=counter%>">
+                                                <input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' placeholder='<s:property value="attendee"/>'></input>
 
                                                 <button id="delete" style="" class="btn" onclick="deleteInput(document.getElementById('name<%=counter2%>'));
                                                     $(this).hide();"><i class="icon-black icon-minus-sign"></i></button>
@@ -89,7 +89,7 @@
 
                                 <td>
 
-                                    <button type="button" style="width: 70px;"  class="btn-info"><i class='icon-edit icon-white'></i> Save </button>                                                                             
+                                    <button type="button" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited(<%=counter%>);"><i class='icon-edit icon-white'></i> Save </button>                                                                             
                                     <button type="button" class="btn-danger"><i class='icon-trash icon-white'></i> Delete </button>                                                                             
                                     <!-- <button class="btn" onClick="window.location.reload()"><i class="icon-black icon-refresh"></i> Reset </button>
                                         -->
@@ -112,6 +112,45 @@
     <script type="text/javascript">
 
         var count = <%=counter%>
+        count++;
+        
+        function edited(number){
+            
+            //get the past order of this milestone
+            var pastOrder = number;
+            
+            //get the new order number
+            var newOrderNumber = document.getElementById('orderNumber'+number).value;
+            
+            //get the new milestone name
+            var newMilestoneName = document.getElementById('milestone'+number).value;
+            
+            if(newMilestoneName.length < 1){
+                
+                newMilestoneName = document.getElementById('milestone'+number).placeholder;
+                
+            }
+            
+            //get the new duration number
+            var newDuration = document.getElementById('duration'+number).value;
+            
+            //get the new attendees for this milestone
+            var attendees = document.getElementById('textarea' + number).getElementsByTagName('input');
+            
+            //new attendees is a string representative of who the new attendees are
+            var newAttendees = "";
+            for(var i=0;i<attendees.length;i++){
+                var eachAttendee = attendees[i].id;
+                var toAdd = document.getElementById(eachAttendee).value + ",";
+                
+                if(toAdd.length === 1){
+                    toAdd = document.getElementById(eachAttendee).placeholder + ",";
+                }
+                
+                newAttendees += toAdd;
+            }
+            
+        }
 
         function createInput(id) {
             //alert(id.id);
@@ -140,7 +179,7 @@
         }
 
         function deleteInput(id) {
-            alert(id);
+            alert(id.id);
             //var text = "#" + id;
             jQuery(id).remove();
             
