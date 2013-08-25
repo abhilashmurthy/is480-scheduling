@@ -322,13 +322,11 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
+                            console.log("Received: " + JSON.stringify(response));
                             console.log("Schedules have been created successfully");
-                            acceptanceId = response.acceptanceScheduleId;
-                            midtermId = response.midtermScheduleId;
-                            finalId = response.finalScheduleId;
-							$("#createScheduleSubmitBtn").button('loading');
+			    $("#createScheduleSubmitBtn").button('loading');
                             //Display create timeslots forms
-                            displayCreateTimeslots();
+                            displayCreateTimeslots(response);
                         } else {
                             var eid = btoa(response.message);
                             window.location = "error.jsp?eid=" + eid;
@@ -345,44 +343,41 @@
                  ------------------------------------------*/
 
                 //Display create timeslots
-                function displayCreateTimeslots() {
+                //TODO: Change to MilestoneConfig
+                function displayCreateTimeslots(data) {
                     //Display create timeslots
                     $("#createTimeslotsPanel").show();
                     $("#createTimeslotsPanel").css('padding-top', '20px');
 
                     //Scroll to the bottom
                     $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                    
+                    acceptanceId = data.acceptance.scheduleId;
+                    midtermId = data.midterm.scheduleId;
+                    finalId = data.final.scheduleId;
 
                     var acceptanceDates = $("#acceptanceDatePicker").multiDatesPicker('getDates');
                     var midtermDates = $("#midtermDatePicker").multiDatesPicker('getDates');
                     var finalDates = $("#finalDatePicker").multiDatesPicker('getDates');
 
-                    //                console.log(acceptanceDates);
-                    //                console.log(midtermDates);
-                    //                console.log(finalDates);
-
-                    var dayStart = 9;
-                    var dayEnd = 16;
-                    var duration = 60;
-
                     //Append timeslot form details
                     if (acceptanceDates.length > 0) {
                         $("#acceptanceTimeslotsTable").show();
                         $("#acceptanceTimeslotsTable").before("<h4>Acceptance</h4>");
-                        makeTimeslotTable("acceptanceTimeslotsTable", acceptanceDates);
-                        populateTimeslotsTable("acceptanceTimeslotsTable");
+                        makeTimeslotTable("acceptanceTimeslotsTable", acceptanceDates, data.acceptance.dayStartTime, data.acceptance.dayEndTime);
+                        populateTimeslotsTable("acceptanceTimeslotsTable", data);
                     }
                     if (midtermDates.length > 0) {
                         $("#midtermTimeslotsTable").show();
                         $("#midtermTimeslotsTable").before("<h4>Midterm</h4>");
-                        makeTimeslotTable("midtermTimeslotsTable", midtermDates);
-                        populateTimeslotsTable("midtermTimeslotsTable");
+                        makeTimeslotTable("midtermTimeslotsTable", midtermDates, data.midterm.dayStartTime, data.midterm.dayEndTime);
+                        populateTimeslotsTable("midtermTimeslotsTable", data);
                     }
                     if (finalDates.length > 0) {
                         $("#finalTimeslotsTable").show();
                         $("#finalTimeslotsTable").before("<h4>Final</h4>");
-                        makeTimeslotTable("finalTimeslotsTable", finalDates);
-                        populateTimeslotsTable("finalTimeslotsTable");
+                        makeTimeslotTable("finalTimeslotsTable", finalDates, data.final.dayStartTime, data.final.dayEndTime);
+                        populateTimeslotsTable("finalTimeslotsTable", data);
                     }
 
                     //OVERALL SUBMIT TO SERVER
@@ -445,10 +440,10 @@
                         return false;
                     });
 
-                    function makeTimeslotTable(tableId, dateArray) {
+                    function makeTimeslotTable(tableId, dateArray, dayStart, dayEnd) {
                         var thead = $(document.createElement("thead"));
-                        var minTime = 9;
-                        var maxTime = 19;
+                        var minTime = dayStart;
+                        var maxTime = dayEnd;
 
                         //Creating table header with dates
                         thead.append("<th></th>"); //Empty cell for time column
@@ -559,14 +554,10 @@
                 }
             }
 
-            function populateTimeslotsTable(tableId) {
+            function populateTimeslotsTable(tableId, data) {
                 $("#" + tableId).find("td.timeslotcell").each(function() {
                     var milestone = tableId.split("TimeslotsTable")[0];
-                    if (milestone === "acceptance") {
-                        triggerTimeslot(this, 60);
-                    } else {
-                        triggerTimeslot(this, 90);
-                    }
+                    triggerTimeslot(this, data[milestone].duration);
                 });
             }
 
