@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import model.Booking;
 import model.Team;
@@ -47,7 +48,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				Set<Booking> bookingsList = faculty.getRequiredBookings();
 				
 				//Getting all bookings for which the user's status is pending
-				Set<Booking> pendingBookingList = null;
+				Set<Booking> pendingBookingList = new HashSet<Booking>();
 				if (bookingsList.size() > 0) {
 					for (Booking b : bookingsList) {
 						HashMap<User, Response> responseList = b.getResponseList();
@@ -58,7 +59,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				}
 
 				//Putting all the booking details for the user in a hash map to display it 
-				if (pendingBookingList != null && pendingBookingList.size() > 0) {
+				if (pendingBookingList.size() > 0) {
 					for (Booking b : pendingBookingList) {
 						Timeslot timeslot = b.getTimeslot();
 						
@@ -70,7 +71,6 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						String venue = timeslot.getVenue();
 						Long bookingId = b.getId();
 						Team team = b.getTeam();
-						Long teamId = team.getId();
 						String teamName = team.getTeamName();
 						String milestoneName = timeslot.getSchedule().getMilestone().getName();
 						String time = sdfForTime.format(timeslot.getStartTime()) + " - " + 
@@ -111,7 +111,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
                     logger.debug(s.toString());
                 }
             }
-            request.setAttribute("error", "Error with Response: Escalate to developers!");
+            request.setAttribute("error", "Error with ResponseAction: Escalate to developers!");
             return ERROR;
         }
     }
