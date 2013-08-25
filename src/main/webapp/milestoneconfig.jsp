@@ -213,7 +213,7 @@
         }
 
         function deleteInput(id) {
-            alert(id.id);
+            //alert(id.id);
             //var text = "#" + id;
             jQuery(id).remove();
             
