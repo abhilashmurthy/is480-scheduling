@@ -27,6 +27,7 @@ import model.Booking;
 import model.Milestone;
 import model.Schedule;
 import model.Team;
+import model.Term;
 import model.Timeslot;
 import model.User;
 import model.role.Student;
@@ -94,7 +95,8 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat viewDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
             SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
-            Milestone milestone = MilestoneManager.findByName(em, milestoneString);
+            Term term = (Term) session.getAttribute("currentActiveTerm");
+            Milestone milestone = MilestoneManager.findByNameAndTerm(em, milestoneString, term);
             
             Schedule activeSchedule = ScheduleManager.findByMilestone(em, milestone);
             json.put("id", activeSchedule.getId());

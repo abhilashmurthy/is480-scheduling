@@ -12,12 +12,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  *
  * @author suresh
  */
 @Entity
+@Table(uniqueConstraints = {
+	@UniqueConstraint(name = "Milestone_unique_constraint", columnNames = {"name", "term_id"})})
 public class Milestone implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -25,12 +29,19 @@ public class Milestone implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@Column(unique=true)
 	private String name;
 	private int slotDuration;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
+        
+        public Milestone() {}
+        
+        public Milestone(String name, int slotDuration, Term term) {
+            this.name = name;
+            this.slotDuration = slotDuration;
+            this.term = term;
+        }
 
 	public Term getTerm() {
 		return term;

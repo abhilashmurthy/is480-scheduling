@@ -37,7 +37,7 @@ public class Schedule implements Serializable {
 	private Timestamp startDate;
 	private Timestamp endDate;
 	private int dayStartTime;
-	private int datEndTime;
+	private int dayEndTime;
 	
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -75,12 +75,12 @@ public class Schedule implements Serializable {
 		this.dayStartTime = dayStartTime;
 	}
 
-	public int getDatEndTime() {
-		return datEndTime;
+	public int getDayEndTime() {
+		return dayEndTime;
 	}
 
-	public void setDatEndTime(int datEndTime) {
-		this.datEndTime = datEndTime;
+	public void setDayEndTime(int datEndTime) {
+		this.dayEndTime = datEndTime;
 	}
 	
 	public Set<Timeslot> getTimeslots() {

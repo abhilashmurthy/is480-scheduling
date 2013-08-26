@@ -105,6 +105,28 @@ public class ScheduleManager {
         return false;
     }
     
+    public static boolean save(EntityManager em, Schedule schedule, EntityTransaction transaction) {
+        logger.info("Creating new schedule: " + schedule);
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+            em.persist(schedule);
+            transaction.commit();
+            return true;
+        } catch (PersistenceException ex) {
+            //Rolling back data transactions
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            logger.error("Error making database call for Create Schedule");
+            ex.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
     public static boolean update(EntityManager em, Schedule schedule, EntityTransaction transaction) {
         logger.info("Updated schedule: " + schedule);
         try {
