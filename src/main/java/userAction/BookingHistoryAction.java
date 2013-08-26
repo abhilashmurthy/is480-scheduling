@@ -100,7 +100,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				for (Booking b: bookings) {
 					Timeslot timeslot = b.getTimeslot();
 					HashMap<String, Object> map = new HashMap<String, Object>();
-					SimpleDateFormat sdfForDate = new SimpleDateFormat("EEE, dd MMM yyyy");
+					SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd yyyy, EEE");
 					SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
 
 					String venue = timeslot.getVenue();

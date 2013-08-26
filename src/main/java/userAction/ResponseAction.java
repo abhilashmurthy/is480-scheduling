@@ -66,7 +66,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						//Getting all the timeslot and booking details
 						HashMap<String, String> map = new HashMap<String, String>();
 						//SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
-						SimpleDateFormat sdfForDate = new SimpleDateFormat("EEE, dd MMM yyyy");
+						SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd yyyy, EEE");
 						SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
 						String venue = timeslot.getVenue();
 						Long bookingId = b.getId();
