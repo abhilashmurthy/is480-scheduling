@@ -49,7 +49,7 @@
                     </thead>
                     <tbody> 
                         <s:iterator value="data">
-                            <tr>
+                            <tr id="id<%=counter%>">
                                 <td>
                                     <div class="input-append">
                                         <input id="orderNumber<%=counter%>" style="width: 18px;height: 20px" type="text" name="orderNumber" value="<s:property value="order"/>" disabled/>
@@ -89,10 +89,12 @@
 
                                 <td>
 
-                                    <button type="button" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited();"><i class='icon-edit icon-white'></i> Save </button>                                                                             
-                                    <button type="button" class="btn-danger"><i class='icon-trash icon-white'></i> Delete </button>                                                                             
+                                                                                                                 
+                                    
+                                    <button type="button" class="btn-danger" id="<%=counter%>" onclick='deleteRow(<%=counter%>);'><i class='icon-trash icon-white'></i> Delete </button>                                                                             
                                     <!-- <button class="btn" onClick="window.location.reload()"><i class="icon-black icon-refresh"></i> Reset </button>
                                         -->
+                                      
                                 </td>
                             </tr>
 
@@ -107,7 +109,7 @@
                 </table>
                 <br/>
                     <button class="btn-info" style="position:absolute;right: 100px;width:140px; height:70px" onclick="addRow(<%=counter%>)"><i class="icon-black icon-plus-sign"></i>  <b>Add new milestone</b> </button>
-                    
+                    <button type="button" style="position:absolute;right: 240px;width:140px; height:70px" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited();"><i class='icon-edit icon-black'></i><b>Save </b> </button>
                 
             </s:if><s:else>
                 <h4>No default milestones!</h4>
@@ -127,7 +129,7 @@
             //alert(number);
             var onumber = "orderNumber" + number;
             var myTextArea = document.getElementById(milestoneConfigTable.id);
-            var newOrderNumber = "<tr><td><div class='input-append'>"
+            var newOrderNumber = "<tr id='id" + number + "'><td><div class='input-append'>"
                                        + "<input id='orderNumber" + number + "'style='width: 18px;height: 20px' type='text' name='orderNumber' value='0' disabled/>'"
                                             + "<div class='btn-group'>"
                                                 + "<button class='btn' type='button' onclick='upOne(" + onumber + ");' >&#9650;</button>"
@@ -151,10 +153,9 @@
                                     + "</div>" 
                                         + "<button class='btn-info' style='width: 40px;height: 25px;' onclick='createInput(" + textNumber + ");'><i class='icon-black icon-plus-sign'></i>  Add </button>"           
                                            + "</div></td>";
-             var saveNumber = "save" + number;                      
-             var buttons = "<td>"
-                               + "<button type='button' id='" + saveNumber + "'style='width: 70px;' class='btn-info' onclick='edited("+ number + ");'><i class='icon-edit icon-white'></i> Save </button>"                                                                             
-                                + "<button type='button' class='btn-danger'><i class='icon-trash icon-white'></i> Delete </button>"                                                                                                            
+             //var saveNumber = "save" + number;                      
+             var buttons = "<td>"                                                                             
+                                + "<button type='button' class='btn-danger' id='" + number + "' onclick='deleteRow(" + number + ");'><i class='icon-trash icon-white'></i> Delete </button>"                                                                                                            
                                   +"</td></tr>";
                                     
              myTextArea.innerHTML += newOrderNumber + newMilestoneId + newDuration + attendees + buttons;
@@ -163,45 +164,66 @@
             newCount++;                           
         }
         
-        function edited(number){
+        function deleteRow(number){
+             //var id = this.id;
+             //alert(id);
+             var idToPass = "#id" + number;
+             $(idToPass).remove();
+        }
+        
+        function edited(){
             
-            //get the past order of this milestone
-            var pastOrder = number;
+            //get total length (here length is +1)
+            //var count = $('#milestoneConfigTable tr:last');
+            var count = 99;
             
-            //get the new order number
-            var newOrderNumber = document.getElementById('orderNumber'+number).value;
+            var data = "";
             
-            //get the new milestone name
-            var newMilestoneName = document.getElementById('milestone'+number).value;
-            
-            if(newMilestoneName.length < 1){
+            //for each row, get the details
+            for(var number=1;number<count;number++){
                 
-                newMilestoneName = document.getElementById('milestone'+number).placeholder;
-                
-            }
-            
-            //get the new duration number
-            var newDuration = document.getElementById('duration'+number).value;
-            
-            //get the new attendees for this milestone
-            var attendees = document.getElementById('textarea' + number).getElementsByTagName('input');
-            
-            //new attendees is a string representative of who the new attendees are
-            var newAttendees = "";
-            for(var i=0;i<attendees.length;i++){
-                var eachAttendee = attendees[i].id;
-                var toAdd = document.getElementById(eachAttendee).value + ",";
-                
-                if(toAdd.length === 1){
-                    toAdd = document.getElementById(eachAttendee).placeholder + ",";
+                var checker = "#" + number;
+                //check if the row exists
+                if($(checker).length){
+                    //get the past order of this milestone
+                    var pastOrder = number;
+
+                    //get the new order number
+                    var newOrderNumber = document.getElementById('orderNumber'+number).value;
+
+                    //get the new milestone name
+                    var newMilestoneName = document.getElementById('milestone'+number).value;
+
+                    if(newMilestoneName.length < 1){
+
+                        newMilestoneName = document.getElementById('milestone'+number).placeholder;
+
+                    }
+
+                    //get the new duration number
+                    var newDuration = document.getElementById('duration'+number).value;
+
+                    //get the new attendees for this milestone
+                    var attendees = document.getElementById('textarea' + number).getElementsByTagName('input');
+
+                    //new attendees is a string representative of who the new attendees are
+                    var newAttendees = "";
+                    for(var i=0;i<attendees.length;i++){
+                        var eachAttendee = attendees[i].id;
+                        var toAdd = document.getElementById(eachAttendee).value + ",";
+
+                        if(toAdd.length === 1){
+                            toAdd = document.getElementById(eachAttendee).placeholder + ",";
+                        }
+
+                        newAttendees += toAdd;
+                    }
+
+                    data += "pastOrderNumber:" + pastOrder + ",newOrderNumber:" + newOrderNumber + ",newMilestoneName:" + newMilestoneName  
+                                + ",newDuration:" + newDuration + ",newAttendees:" + newAttendees;
                 }
-                
-                newAttendees += toAdd;
             }
-            
-            data = {pastOrderNumber: pastOrder, newOrderNumber: newOrderNumber,newMilestoneName:newMilestoneName,  
-                        newDuration:newDuration,newAttendees: newAttendees};
- 
+            alert(data);
             
             //code to send the update to backend. url corresponds to action class name defined in struts
             //uncomment this part
