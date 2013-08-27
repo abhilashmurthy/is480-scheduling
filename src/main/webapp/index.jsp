@@ -204,14 +204,10 @@
                     }).done(function(response) {
 
                         if (response.success) {
-
+                            
                             //Get Teams data if user is administrator
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                                <% 
-                                    List<Team> teams = (List<Team>) session.getAttribute("allTeams");
-                                    for (Team t : teams) { %>
-                                            teams.push({teamName:"<%= t.getTeamName() %>", teamId:"<%= t.getId() %>"});
-                                <%  } %>
+                                teams = JSON.parse('<%= session.getAttribute("allTeams")%>');
                             }
 
                             //Draw the schedule table
@@ -560,7 +556,7 @@
                     $("td").on('click', '#createBookingBtn', function(e) {
                         e.stopPropagation();
                         if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-							teamName = $("#createTeamSelect option:selected").text();
+		            teamName = $("#createTeamSelect option:selected").text();
                             teamId = $("#createTeamSelect").val();
                         }
                         createBooking(self);

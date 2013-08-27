@@ -65,7 +65,38 @@
             .chosen {
                 background-color: #B8F79E !important ;
             }
-
+            
+            .createScheduleTabList {
+                position: relative;
+                /*padding-top: 50px;*/
+                height: 100%;
+            }
+            
+            .createScheduleTab {
+                width: 180px;
+            }
+            
+            .createScheduleTab a, .createScheduleTab p {
+                font-size: 20px;
+                font-weight: bold;
+                padding: 20px 10px 20px 10px !important;
+            }
+            
+            .schedulePanel {
+                padding-left: 5%;
+            }
+            
+            html, body, .container {
+                height: 100%;
+            }
+            
+            .scheduleLeftNav {
+                height: 100%;
+            }
+            
+            .tab-content {
+                padding-top: 50px;
+            }
         </style>
     </head>
     <body>
@@ -80,126 +111,150 @@
                 rd.forward(request, response);
             }
         %>
+        
+        <!-- Create Term Suggestion Code -->
+        <% 
+            Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
+            String activeSem = activeTerm.getSemester();
+            String nextSem = activeSem;
+            String nextYear = "" + (activeTerm.getAcademicYear());
+            int semNum = -1;
+            String letter = null;
+            Pattern p = Pattern.compile("(\\d+)");
+            Matcher m = p.matcher(activeSem);
+            if (m.find()) {
+                semNum = Integer.parseInt(m.group());
+            }
+            p = Pattern.compile("[A-B]");
+            m = p.matcher(activeSem);
+            if (m.find()) {
+                letter = m.group();
+            }
 
-        <!-- Create Term -->
-        <div id="createTermPanel" class="container">
-            <h3>Create Term</h3>
-            <% 
-                Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
-                String activeSem = activeTerm.getSemester();
-                String nextSem = activeSem;
-                String nextYear = "" + (activeTerm.getAcademicYear());
-                int semNum = -1;
-                String letter = null;
-                Pattern p = Pattern.compile("(\\d+)");
-                Matcher m = p.matcher(activeSem);
-                if (m.find()) {
-                    semNum = Integer.parseInt(m.group());
+            if (letter != null) {
+                if (semNum == 3){
+                    nextYear = "" + ((activeTerm.getAcademicYear()) + 1);
+                    nextSem = "Term 1";
+                } else if (letter.equals("B")) {
+                    nextSem = "Term " + (++semNum);
+                } else if (letter.equals("A")) {
+                    nextSem = "Modified Term " + semNum + "B";
                 }
-                p = Pattern.compile("[A-B]");
-                m = p.matcher(activeSem);
-                if (m.find()) {
-                    letter = m.group();
-                }
-                
-                if (letter != null) {
-                    if (semNum == 3){
-                        nextYear = "" + ((activeTerm.getAcademicYear()) + 1);
-                        nextSem = "Term 1";
-                    } else if (letter.equals("B")) {
-                        nextSem = "Term " + (++semNum);
-                    } else if (letter.equals("A")) {
-                        nextSem = "Modified Term " + semNum + "B";
-                    }
-                } else {
-                    nextSem = "Modified Term " + semNum + "A";
-                }
-            %>
-            <form id="createTermForm">
-                <table>
-                    <tr>
-                        <td class="formLabelTd">
-                            Choose Year
-                        </td>
-                        <td> <!-- Putting default values for testing purposes -->
-                            <div class="input-append">
-                                <input id="yearInput" type="text" name="year" value="<%= nextYear %>" disabled/>
-                                <div class="btn-group">
-                                    <button class="btn" type="button" id="plusYearBtn">&#9650;</button>
-                                    <button class="btn" type="button" id="minusYearBtn">&#9660;</button>
-                                </div>
+            } else {
+                nextSem = "Modified Term " + semNum + "A";
+            }
+        %>
+
+        <!-- Create Schedule Container -->
+        <div id="createSchedulePage" class="container">
+            
+            <div class="createScheduleTabList tabbable tabs-left">
+                <ul class="scheduleLeftNav nav nav-tabs">
+                    <li class="createScheduleTab">
+                        <p></p>
+                    </li>
+                    <li class="createScheduleTab active">
+                        <a href="#createTermTab" data-toggle="tab">Create Term</a>
+                    </li>
+                    <li class="createScheduleTab">
+                        <a href="#createScheduleTab" data-toggle="tab">Create Schedule</a>
+                    </li>
+                    <li class="createScheduleTab">
+                        <a href="#createTimeslotsTab" data-toggle="tab">Create Timeslots</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="createTermTab">
+                        <!-- Create Term -->
+                        <div id="createTermPanel" class="schedulePanel">
+                            <h3>Create Term</h3>
+                            <form id="createTermForm">
+                                <table>
+                                    <tr>
+                                        <td class="formLabelTd">
+                                            Choose Year
+                                        </td>
+                                        <td> <!-- Putting default values for testing purposes -->
+                                            <div class="input-append">
+                                                <input id="yearInput" type="text" name="year" value="<%= nextYear %>" disabled/>
+                                                <div class="btn-group">
+                                                    <button class="btn" type="button" id="plusYearBtn">&#9650;</button>
+                                                    <button class="btn" type="button" id="minusYearBtn">&#9660;</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="formLabelTd">
+                                            Semester Name
+                                        </td>
+                                        <td>
+                                            <input type="text" name="semester" placeholder="<%= nextSem %>"/>
+                                        </td>
+                                    </tr>
+                                    <tr id="createTermSubmitRow"><td></td><td><input id="createTermSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td></tr>
+                                </table>
+                            </form>
+                            <h4 id="termResultMessage"></h4>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="createScheduleTab">
+                        <!-- Create Schedule -->
+                        <div id="createSchedulePanel" class="schedulePanel">
+                            <h3>Create Schedule</h3>
+                            <form id="createScheduleForm">
+                                <table>
+                                    <th>Milestone</th><th>Dates</th>
+                                    <tr>
+                                        <td class="formLabelTd">Acceptance</td>
+                                        <td><input type="text" id="acceptanceDatePicker" class="input-medium datepicker" name="acceptanceDates"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="formLabelTd">Midterm</td>
+                                        <td><input type="text" id="midtermDatePicker" class="input-medium datepicker" name="midtermDates"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="formLabelTd">Final</td>
+                                        <td><input type="text" id="finalDatePicker" class="input-medium datepicker" name="finalDates"/></td>
+                                    </tr>
+                                    <tr class="createScheduleSubmitRow">
+                                        <td></td>
+                                        <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td>
+                                    </tr>
+                                </table>
+                            </form>
+                            <h4 id="scheduleResultMessage"></h4>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="createTimeslotsTab">
+                        <!-- Create Timeslots -->
+                        <div id="createTimeslotsPanel" class="schedulePanel">
+                            <h3>Create Timeslots</h3>
+                            <div id="timeslotsTableSection">
+                                <table id="acceptanceTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
+                                </table> 
+                                <br/>
+                                <table id="midtermTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
+                                </table>
+                                <br/>
+                                <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
+                                </table>
+                                <br/>
+                                <button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button>
+                                <h4 id="timeslotResultMessage"></h4>
+                                <br />
                             </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="formLabelTd">
-                            Semester Name
-                        </td>
-                        <td>
-                            <input type="text" name="semester" placeholder="<%= nextSem %>"/>
-                        </td>
-                    </tr>
-                    <tr id="createTermSubmitRow"><td></td><td><input id="createTermSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td></tr>
-                </table>
-            </form>
-            <h4 id="termResultMessage"></h4>
 
-            <div class="line-separator"></div>
-
-            <!-- Create Schedule -->
-            <div id="createSchedulePanel" hidden>
-                <h3>Create Schedule</h3>
-                <form id="createScheduleForm">
-                    <table>
-                        <th>Milestone</th><th>Dates</th>
-                        <tr>
-                            <td class="formLabelTd">Acceptance</td>
-                            <td><input type="text" id="acceptanceDatePicker" class="input-medium datepicker" name="acceptanceDates"/></td>
-                        </tr>
-                        <tr>
-                            <td class="formLabelTd">Midterm</td>
-                            <td><input type="text" id="midtermDatePicker" class="input-medium datepicker" name="midtermDates"/></td>
-                        </tr>
-                        <tr>
-                            <td class="formLabelTd">Final</td>
-                            <td><input type="text" id="finalDatePicker" class="input-medium datepicker" name="finalDates"/></td>
-                        </tr>
-                        <tr class="createScheduleSubmitRow">
-                            <td></td>
-                            <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td>
-                        </tr>
-                    </table>
-                </form>
-                <h4 id="scheduleResultMessage"></h4>
-            </div>
-
-            <div class="line-separator"></div>
-
-            <!-- Create Timeslots -->
-            <div id="createTimeslotsPanel" hidden>
-                <h3>Create Timeslots</h3>
-                <div id="timeslotsTableSection">
-                    <table id="acceptanceTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
-                    </table> 
-                    <br/>
-                    <table id="midtermTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
-                    </table>
-                    <br/>
-                    <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
-                    </table>
-                    <br/>
-                    <button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button>
-                    <h4 id="timeslotResultMessage"></h4>
-                    <br />
+                        </div>
+                    </div>
                 </div>
-
             </div>
 
         </div>
         <%@include file="footer.jsp" %>
         <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
-            $(document).ready(function() {
+            createScheduleLoad = function() {
 
                 var termData = null;
                 var scheduleData = null;
@@ -241,7 +296,7 @@
                             if (response.canAdd) {
                                 //Remove Create Button - Brought it back
                                 displayMessage("termResultMessage", "Term added", false);
-								$("#createTermSubmitBtn").button('loading');
+				$("#createTermSubmitBtn").button('loading');
                                 displayCreateSchedule();
                             } else {
                                 //Display error message
@@ -503,74 +558,76 @@
                         triggerTimeslot(this, 90);
                     });
                 }
+                
+                /*
+                 * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
+                 */
+                function triggerTimeslot(e, duration) {
+                    var col = $(e).parent().children().index(e);
+                    var tr = $(e).parent();
+                    var row = $(tr).parent().children().index(tr);
+                    var tbody = $(e).parents("tbody");
+                    var slotSize = duration / 30;
 
-            });
-
-            /*
-             * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
-             */
-            function triggerTimeslot(e, duration) {
-                var col = $(e).parent().children().index(e);
-                var tr = $(e).parent();
-                var row = $(tr).parent().children().index(tr);
-                var tbody = $(e).parents("tbody");
-                var slotSize = duration / 30;
-
-                if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
-                    //Checking if the cell clicked is the start of the chosen timeslot (Important!)
-                    if ($(e).children().index(".start-marker") !== -1) {
-                        $(e).removeClass("chosen");
-                        $(e).children().remove();
+                    if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
+                        //Checking if the cell clicked is the start of the chosen timeslot (Important!)
+                        if ($(e).children().index(".start-marker") !== -1) {
+                            $(e).removeClass("chosen");
+                            $(e).children().remove();
+                            for (i = 1; i < slotSize; i++) {
+                                var nextRow = $(tbody).children().get(row + i);
+                                var nextCell = $(nextRow).children().get(col);
+                                $(nextCell).removeClass("chosen");
+                            }
+                        }
+                    } else { //Section for a non-highlighted cell
+                        //Checking if there will be an overlap of timeslots
+                        //Abort if there is going to be an overlap
                         for (i = 1; i < slotSize; i++) {
                             var nextRow = $(tbody).children().get(row + i);
                             var nextCell = $(nextRow).children().get(col);
-                            $(nextCell).removeClass("chosen");
+                            if ($(nextCell).hasClass("chosen")) {
+                                return;
+                            }
                         }
-                    }
-                } else { //Section for a non-highlighted cell
-                    //Checking if there will be an overlap of timeslots
-                    //Abort if there is going to be an overlap
-                    for (i = 1; i < slotSize; i++) {
-                        var nextRow = $(tbody).children().get(row + i);
-                        var nextCell = $(nextRow).children().get(col);
-                        if ($(nextCell).hasClass("chosen")) {
-                            return;
-                        }
-                    }
 
-                    var numRows = $(tbody).children().length;
-                    //Checking if there are enough cells for the slot duration
-                    if ((row + slotSize) <= numRows) {
-                        $(e).addClass("chosen");
-                        var marker = document.createElement("div");
-                        $(marker).addClass("start-marker");
-                        $(e).append(marker);
-                        for (i = 1; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            $(nextCell).addClass("chosen");
+                        var numRows = $(tbody).children().length;
+                        //Checking if there are enough cells for the slot duration
+                        if ((row + slotSize) <= numRows) {
+                            $(e).addClass("chosen");
+                            var marker = document.createElement("div");
+                            $(marker).addClass("start-marker");
+                            $(e).append(marker);
+                            for (i = 1; i < slotSize; i++) {
+                                var nextRow = $(tbody).children().get(row + i);
+                                var nextCell = $(nextRow).children().get(col);
+                                $(nextCell).addClass("chosen");
+                            }
                         }
                     }
                 }
-            }
 
-            function populateTimeslotsTable(tableId, data) {
-                $("#" + tableId).find("td.timeslotcell").each(function() {
-                    var milestone = tableId.split("TimeslotsTable")[0];
-                    triggerTimeslot(this, data[milestone].duration);
-                });
-            }
-
-            //Display termMessage
-            function displayMessage(id, msg, fade) {
-                //Dislay result
-                var e = $("#" + id);
-                $(e).fadeTo('slow', 2000);
-                $(e).css('color', 'darkgreen').html(msg);
-                if (fade) {
-                    $(e).css('color', 'darkred').html(msg).fadeTo('slow', 0);
+                function populateTimeslotsTable(tableId, data) {
+                    $("#" + tableId).find("td.timeslotcell").each(function() {
+                        var milestone = tableId.split("TimeslotsTable")[0];
+                        triggerTimeslot(this, data[milestone].duration);
+                    });
                 }
-            }
+
+                //Display termMessage
+                function displayMessage(id, msg, fade) {
+                    //Dislay result
+                    var e = $("#" + id);
+                    $(e).fadeTo('slow', 2000);
+                    $(e).css('color', 'darkgreen').html(msg);
+                    if (fade) {
+                        $(e).css('color', 'darkred').html(msg).fadeTo('slow', 0);
+                    }
+                }
+
+            };
+            
+            addLoadEvent(createScheduleLoad);
         </script>
     </body>
 </html>

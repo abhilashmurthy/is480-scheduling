@@ -92,7 +92,7 @@
 </div>
 <script type="text/javascript">
     //Makes use of footer.jsp's jQuery and bootstrap imports
-    navbarLoad = function(){
+    navbarMultipleLoad = function(){
         
         //Nav specific
         console.log("nav init");
@@ -117,6 +117,6 @@
         
     };
 	
-	addLoadEvent(navbarLoad);
+	addLoadEvent(navbarMultipleLoad);
 
 </script>

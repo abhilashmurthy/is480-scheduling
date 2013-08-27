@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -104,15 +103,15 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             json.put("duration", milestone.getSlotDuration());
 			
 			//Get unavailable timeslots if user is a student
-			HashSet<Timeslot> supervisorAvailability = null;
-			HashSet<Timeslot> reviewer1Availability = null;
-			HashSet<Timeslot> reviewer2Availability = null;
+			Set<Timeslot> supervisorAvailability = null;
+			Set<Timeslot> reviewer1Availability = null;
+			Set<Timeslot> reviewer2Availability = null;
 			User user = (User) request.getSession().getAttribute("user");
 			if (user.getRole() == Role.STUDENT) {
 				Team team = ((Student) user).getTeam();
-				supervisorAvailability = (HashSet<Timeslot>) team.getSupervisor().getUnavailableTimeslots();
-				reviewer1Availability = (HashSet<Timeslot>) team.getReviewer1().getUnavailableTimeslots();
-				reviewer2Availability = (HashSet<Timeslot>) team.getReviewer2().getUnavailableTimeslots();
+				supervisorAvailability = team.getSupervisor().getUnavailableTimeslots();
+				reviewer1Availability = team.getReviewer1().getUnavailableTimeslots();
+				reviewer2Availability = team.getReviewer2().getUnavailableTimeslots();
 			}
             
             ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
