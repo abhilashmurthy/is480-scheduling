@@ -69,7 +69,7 @@
                                     <div id="textarea<%=counter%>">
                                     <s:iterator value="attendees">
 										<div id="eachOne<%=counter%>">
-											<input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' value='<s:property value="attendee"/>'></input>
+											<input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' value='<s:property value="attendee"/>'/> &nbsp;
 											<button id="delete" title="Delete Attendee" style="width: 40px;height: 25px;" class="btn" onclick="deleteInput(document.getElementById('name<%=counter2%>'));
 												$(this).hide();"><i class="icon-black icon-minus-sign"></i></button>
 										</div>
@@ -90,7 +90,7 @@
                         </s:iterator>
                     </tbody>
                 </table>
-                <br/>
+            
 				<table>
 				<tr>
 					<td>
@@ -265,7 +265,7 @@
             var text = "#" + id.id;
             var nameUpdated = "'name" + count + "'";
             //alert(nameUpdated);
-            var newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' />";
+            var newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' /> &nbsp&nbsp;";
             var newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 25px;' class='btn' onclick='deleteInput(" + name + ");$(this).hide();  '><i class='icon-black icon-minus-sign'></i></button></div>";
 
             myTextArea = document.getElementById(id.id);
