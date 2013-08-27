@@ -54,65 +54,55 @@
 									<div class="input-append">
 									<input id="orderNumber<%=counter%>" style="width: 18px;height: 20px" type="text" name="orderNumber" value="<s:property value="order"/>" />
 									<div class="btn-group">
-										<button class="btn" type="button" onclick="upOne(document.getElementById('duration<%=counter%>'));" >&#9650;</button>
-										<button class="btn" type="button" onclick="downOne(document.getElementById('duration<%=counter%>'));" >&#9660;</button>
+										<button class="btn" type="button" onclick="upOne(document.getElementById('orderNumber<%=counter%>'));" >&#9650;</button>
+										<button class="btn" type="button" onclick="downOne(document.getElementById('orderNumber<%=counter%>'));" >&#9660;</button>
 									</div>
 									</div>
                                 </td>
-                                <td><input type='text' id="milestone<%=counter%>" style="width: 100px;height: 20px" placeholder='<s:property value="name"/>'></input></td>
                                 <td>
-                                   
-                                        <input type='text' style="width: 28px; height: 20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' />
-                                    </div>
+									<input type='text' id="milestone<%=counter%>" style="width:80px; height:20px" placeholder='<s:property value="name"/>'></input>
+								</td>
+                                <td style="width:90px">
+									<input type='text' style="width:30px; height:20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' />
                                 </td>
                                 <td>
-                                    
                                     <div id="textarea<%=counter%>">
                                     <s:iterator value="attendees">
-                                        
-                                            <div id="eachOne<%=counter%>">
-                                                <input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' placeholder='<s:property value="attendee"/>'></input>
-
-                                                <button id="delete" style="width: 40px;height: 25px;" class="btn" onclick="deleteInput(document.getElementById('name<%=counter2%>'));
-                                                    $(this).hide();"><i class="icon-black icon-minus-sign"></i></button>
-                                            </div>
-                                        
+										<div id="eachOne<%=counter%>">
+											<input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' placeholder='<s:property value="attendee"/>'></input>
+											<button id="delete" title="Delete Attendee" style="width: 40px;height: 25px;" class="btn" onclick="deleteInput(document.getElementById('name<%=counter2%>'));
+												$(this).hide();"><i class="icon-black icon-minus-sign"></i></button>
+										</div>
                                         <% counter2++;%>
                                     </s:iterator>
                                     </div> 
-                                    <button class="btn-info" style="width: 40px;height: 25px;" onclick="createInput(document.getElementById('textarea<%=counter%>'));"><i class="icon-black icon-plus-sign"></i> </button>
+                                    <button class="btn" title="Add New Attendee" style="width:40px; height:25px;" onclick="createInput(document.getElementById('textarea<%=counter%>'));">
+										<i class="icon-black icon-plus-sign"></i> 
+									</button>
                                 </td>
-
                                 <td>
-
-                                                                                                                 
-                                    
-                                    <button type="button" title="Delete" class="btn" id="<%=counter%>" onclick='deleteRow(<%=counter%>);'><i class='icon-trash icon-black'></i></button>                                                                             
-                                    <!-- <button class="btn" onClick="window.location.reload()"><i class="icon-black icon-refresh"></i> Reset </button>
-                                        -->
-                                      
+                                    <button type="button" title="Delete Milestone" class="btn btn-danger" id="<%=counter%>" onclick='deleteRow(<%=counter%>);'>
+										<i class='icon-trash icon-white'></i>
+									</button>                                                                             
                                 </td>
                             </tr>
-
                             <% counter++;%>
-
-
                         </s:iterator>
-
                     </tbody>
-                    
-                      
                 </table>
                 <br/>
-                    <button class="btn-info" style="position:absolute;right: 100px;width:140px; height:70px" onclick="addRow(<%=counter%>)"><i class="icon-black icon-plus-sign"></i>  <b>Add new milestone</b> </button>
-                    <button type="button" style="position:absolute;right: 240px;width:140px; height:70px" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited();"><i class='icon-edit icon-black'></i><b>Save </b> </button>
-                
+				<table>
+				<button class="btn btn-warning" style="position:absolute; right:115px; width:160px; height:30px" onclick="addRow(<%=counter%>)"><i class="icon-black icon-plus-sign"></i><b>&nbsp;Add Milestone</b> </button>
+				<button type="button" class="btn btn-primary" style="position:absolute; left:80px; width:80px; height:30px" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited();">
+					<b>Submit</b>
+				</button>
+                </table>
+				<br/><br/><br/>
             </s:if><s:else>
                 <h4>No default milestones to set!</h4>
             </s:else>
         </div>
           
-    </body>      
     <script type="text/javascript">
 
         var count = <%=counter%>;
@@ -316,5 +306,5 @@
         }
 
     </script>
-
+	</body> 
 </html>
