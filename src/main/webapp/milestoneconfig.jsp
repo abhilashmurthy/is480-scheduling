@@ -133,7 +133,7 @@
                                        + "<input id='orderNumber" + number + "'style='width: 18px;height: 20px' type='text' name='orderNumber' value='0' disabled/>'"
                                             + "<div class='btn-group'>"
                                                 + "<button class='btn' type='button' onclick='upOne(" + onumber + ");' >&#9650;</button>"
-                                                    + "<button class='btn' type='button' onclick='downOne(" + onumber + ");' >&#9650;</button>"                                       
+                                                    + "<button class='btn' type='button' onclick='downOne(" + onumber + ");' >&#9660;</button>"                                       
                                                         + "</div></div></td>";
             var milestoneNumber = "milestone" + number;                                 
             var newMilestoneId = "<td><input type='text' id='" + milestoneNumber +"' style='width: 100px;height: 20px'></input></td>";
@@ -144,7 +144,7 @@
                                     +  "<input type='text' style='width: 28px; height: 20px' cellspacing='0' id='" + durationNumber + "' value='60' disabled/>'"
                                        + "<div class='btn-group'>"
                                          +   "<button class='btn' type='button' onclick='upOne(" + durationNumber + ");' >&#9650;</button>"
-                                            +  "<button class='btn' type='button' onclick='downOne(" + durationNumber + ");' >&#9650;</button>"
+                                            +  "<button class='btn' type='button' onclick='downOne(" + durationNumber + ");' >&#9660;</button>"
                                                 + "</div></div></td>";
              var textNumber = "textarea" + number;
              var attendees = "<td>"    
@@ -174,13 +174,27 @@
         function edited(){
             
             //get total length (here length is +1)
-            //var count = $('#milestoneConfigTable tr:last');
-            var count = 99;
+            var count2 = $('#milestoneConfigTable :last td');
+            var rows = document.getElementsByTagName("table")[0].rows;
+            //var last = rows[rows.length - 1];
+            //var cell = last.cells[0];
+            //var value = cell.innerHTML;
+            
+            var numberChecker = "";
+            
+            for(var i=0;i<rows.length;i++){
+                //console.log(rows[i].id.substring(2));
+                if(i===rows.length-1){
+                    numberChecker = rows[i].id.substring(2);
+                }
+            }
+            //console.log(rows);
+            //var count = 99;
             
             var data = "";
             
             //for each row, get the details
-            for(var number=1;number<count;number++){
+            for(var number=1;number<=numberChecker;number++){
                 
                 var checker = "#" + number;
                 //check if the row exists
