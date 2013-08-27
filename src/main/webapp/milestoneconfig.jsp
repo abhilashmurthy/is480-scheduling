@@ -51,22 +51,18 @@
                         <s:iterator value="data">
                             <tr id="id<%=counter%>">
                                 <td>
-                                    <div class="input-append">
-                                        <input id="orderNumber<%=counter%>" style="width: 18px;height: 20px" type="text" name="orderNumber" value="<s:property value="order"/>" disabled/>
-                                        <div class="btn-group"> 
-                                            <button class="btn" type="button" onclick="upOne(document.getElementById('orderNumber<%=counter%>'));" >&#9650;</button>
-                                            <button class="btn" type="button" onclick="downOne(document.getElementById('orderNumber<%=counter%>'));" >&#9660;</button>
-                                        </div>     
-                                    </div>  
+									<div class="input-append">
+									<input id="orderNumber<%=counter%>" style="width: 18px;height: 20px" type="text" name="orderNumber" value="<s:property value="order"/>" />
+									<div class="btn-group">
+										<button class="btn" type="button" onclick="upOne(document.getElementById('duration<%=counter%>'));" >&#9650;</button>
+										<button class="btn" type="button" onclick="downOne(document.getElementById('duration<%=counter%>'));" >&#9660;</button>
+									</div>
+									</div>
                                 </td>
                                 <td><input type='text' id="milestone<%=counter%>" style="width: 100px;height: 20px" placeholder='<s:property value="name"/>'></input></td>
                                 <td>
-                                    <div class="input-append">
-                                        <input type='text' style="width: 28px; height: 20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' disabled/>
-                                        <div class="btn-group">
-                                            <button class="btn" type="button" onclick="upOne(document.getElementById('duration<%=counter%>'));" >&#9650;</button>
-                                            <button class="btn" type="button" onclick="downOne(document.getElementById('duration<%=counter%>'));" >&#9660;</button>
-                                        </div>
+                                   
+                                        <input type='text' style="width: 28px; height: 20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' />
                                     </div>
                                 </td>
                                 <td>
@@ -91,7 +87,7 @@
 
                                                                                                                  
                                     
-                                    <button type="button" class="btn-danger" id="<%=counter%>" onclick='deleteRow(<%=counter%>);'><i class='icon-trash icon-white'></i> Delete </button>                                                                             
+                                    <button type="button" title="Delete" class="btn" id="<%=counter%>" onclick='deleteRow(<%=counter%>);'><i class='icon-trash icon-black'></i></button>                                                                             
                                     <!-- <button class="btn" onClick="window.location.reload()"><i class="icon-black icon-refresh"></i> Reset </button>
                                         -->
                                       
@@ -112,7 +108,7 @@
                     <button type="button" style="position:absolute;right: 240px;width:140px; height:70px" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited();"><i class='icon-edit icon-black'></i><b>Save </b> </button>
                 
             </s:if><s:else>
-                <h4>No default milestones!</h4>
+                <h4>No default milestones to set!</h4>
             </s:else>
         </div>
           

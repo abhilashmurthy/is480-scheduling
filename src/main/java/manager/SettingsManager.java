@@ -36,8 +36,7 @@ public class SettingsManager {
 		return activeTerms;
 	}
 	
-	public static ArrayList<HashMap<String,Object>> getSettings (EntityManager em) {
-		Settings result = getByName(em, "milestones");
+	public static ArrayList<HashMap<String,Object>> getMilestoneSettings (EntityManager em, Settings result) {
 		Type type = new TypeToken<ArrayList<HashMap<String,Object>>>(){}.getType();
 		ArrayList<HashMap<String,Object>> settingsList = new Gson().fromJson(result.getValue(), type);
 		return settingsList;
