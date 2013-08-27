@@ -22,7 +22,7 @@
         <%@include file="navbar.jsp" %>
         <div class="container">
             <h3>Milestone Configuration</h3>
-
+			
             <!-- Kick unauthorized user -->
             <%	if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
                     request.setAttribute("error", "Oops. You are not authorized to access this page!");
@@ -92,10 +92,21 @@
                 </table>
                 <br/>
 				<table>
-				<button class="btn btn-warning" style="position:absolute; right:115px; width:160px; height:30px" onclick="addRow(<%=counter%>)"><i class="icon-black icon-plus-sign"></i><b>&nbsp;Add Milestone</b> </button>
-				<button type="button" class="btn btn-primary" style="position:absolute; left:80px; width:80px; height:30px" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited();">
-					<b>Submit</b>
-				</button>
+				<tr>
+					<td>
+						<button type="button" class="btn btn-primary" style="width:80px; height:30px" id="save<%=counter%>"style="width: 70px;"  class="btn-info" onclick="edited();">
+						<b>Submit</b>
+						</button>
+					</td>
+					<td style="width:20px"></td>
+					<td>
+						<button class="btn btn-warning" style="width:160px; height:30px" onclick="addRow(<%=counter%>)"><i class="icon-black icon-plus-sign"></i><b>&nbsp;Add Milestone</b> </button>
+					</td>
+					<td style="width:600px"></td>
+					<td>
+						<h4 id="milestoneSettingsUpdateMessage"></h4>
+					</td>
+				</tr>
                 </table>
 				<br/><br/><br/>
             </s:if><s:else>
@@ -223,34 +234,27 @@
             
             //code to send the update to backend. url corresponds to action class name defined in struts
             //uncomment this part
-            /*$.ajax({
+            $.ajax({
                 type: 'POST',
                 async: false,
-                url: 'milestoneUpdateJson',
+                url: 'updateMilestoneSettings',
                 data: data,
                 cache: false,
                 dataType: 'json'
 
             }).done(function(response) {
-                if (!response.exception) {
-                    console.log('Destroying C');
-                    self.popover('destroy');
-                    var msg = response.message + "";
-                    console.log(msg);
-
-                    if (msg === ('Booking updated successfully! Update email has been sent to all attendees. (Coming soon..)')) {
-                        response.message;
-                    } else {
-                        
-
-                    }
-                } else {
-                    var eid = btoa(response.message);
-                    window.location = "error.jsp?eid=" + eid;
-                }
+               if (response.success) {
+					console.log("Milestones updated successfully!");
+					displayMessage("milestoneSettingsUpdateMessage", response.message, false);
+				} else {
+					var eid = btoa(response.message);
+					console.log(response.message);
+					window.location = "error.jsp?eid=" + eid;
+				}
             }).fail(function(error) {
-                alert("Oops. There was an error: " + error);
-            });*/
+                console.log("Updating Milestone settings AJAX FAIL");
+				displayMessage("milestoneSettingsUpdateMessage", "Oops.. something went wrong", true);
+            });
         }
 
         function createInput(id) {
@@ -300,6 +304,17 @@
             formId = id.id;
             id.value--;
         }
+		
+		//Display Message
+		function displayMessage(id, msg, fade) {
+			//Dislay result
+			var e = $("#" + id);
+			$(e).fadeTo(3000, 0);
+			$(e).css('color', 'darkgreen').html(msg);
+			if (fade) {
+				$(e).css('color', 'darkred').html(msg).fadeTo(3000, 0);
+			}
+		}
 
     </script>
 	</body> 
