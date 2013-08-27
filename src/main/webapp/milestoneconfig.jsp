@@ -60,7 +60,7 @@
 									</div>
                                 </td>
                                 <td>
-									<input type='text' id="milestone<%=counter%>" style="width:80px; height:20px" placeholder='<s:property value="name"/>'></input>
+									<input type='text' id="milestone<%=counter%>" style="width:90px; height:20px" value='<s:property value="name"/>'></input>
 								</td>
                                 <td style="width:90px">
 									<input type='text' style="width:30px; height:20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' />
@@ -69,7 +69,7 @@
                                     <div id="textarea<%=counter%>">
                                     <s:iterator value="attendees">
 										<div id="eachOne<%=counter%>">
-											<input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' placeholder='<s:property value="attendee"/>'></input>
+											<input type='text' style="width: 80px;height: 20px;" cellspacing='0' id='name<%=counter2%>' value='<s:property value="attendee"/>'></input>
 											<button id="delete" title="Delete Attendee" style="width: 40px;height: 25px;" class="btn" onclick="deleteInput(document.getElementById('name<%=counter2%>'));
 												$(this).hide();"><i class="icon-black icon-minus-sign"></i></button>
 										</div>
@@ -122,26 +122,22 @@
                                                     + "<button class='btn' type='button' onclick='downOne(" + onumber + ");' >&#9660;</button>"                                       
                                                         + "</div></div></td>";
             var milestoneNumber = "milestone" + number;                                 
-            var newMilestoneId = "<td><input type='text' id='" + milestoneNumber +"' style='width: 100px;height: 20px'></input></td>";
+            var newMilestoneId = "<td><input type='text' id='" + milestoneNumber +"' style='width:90px; height:20px'></input></td>";
             
             var durationNumber = "duration" + number;
             var newDuration =  " <td>"
-                                  +  "<div class='input-append'>" 
-                                    +  "<input type='text' style='width: 28px; height: 20px' cellspacing='0' id='" + durationNumber + "' value='60' disabled/>'"
-                                       + "<div class='btn-group'>"
-                                         +   "<button class='btn' type='button' onclick='upOne(" + durationNumber + ");' >&#9650;</button>"
-                                            +  "<button class='btn' type='button' onclick='downOne(" + durationNumber + ");' >&#9660;</button>"
-                                                + "</div></div></td>";
+								+  "<input type='text' style='width: 30px; height: 20px' cellspacing='0' id='" + durationNumber + "' value='60' />"
+									+ "</td>";
              var textNumber = "textarea" + number;
              var attendees = "<td>"    
                                + "<div id='" + textNumber + "'>"
                                  + "<div>" 
                                     + "</div>" 
-                                        + "<button class='btn-info' style='width: 40px;height: 25px;' onclick='createInput(" + textNumber + ");'><i class='icon-black icon-plus-sign'></i>  Add </button>"           
+                                        + "<button class='btn' title='Add New Attendee' style='width: 40px;height: 25px;' onclick='createInput(" + textNumber + ");'><i class='icon-black icon-plus-sign'></i></button>"           
                                            + "</div></td>";
              //var saveNumber = "save" + number;                      
              var buttons = "<td>"                                                                             
-                                + "<button type='button' class='btn-danger' id='" + number + "' onclick='deleteRow(" + number + ");'><i class='icon-trash icon-white'></i> Delete </button>"                                                                                                            
+                                + "<button type='button' title='Delete Milestone' class='btn btn-danger' id='" + number + "' onclick='deleteRow(" + number + ");'><i class='icon-trash icon-white'></i></button>"                                                                                                            
                                   +"</td></tr>";
                                     
              myTextArea.innerHTML += newOrderNumber + newMilestoneId + newDuration + attendees + buttons;
@@ -266,7 +262,7 @@
             var nameUpdated = "'name" + count + "'";
             //alert(nameUpdated);
             var newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' />";
-            var newButton = "<button id='delete' style='width: 40px;height: 25px;' class='btn' onclick='deleteInput(" + name + ");$(this).hide();  '><i class='icon-black icon-minus-sign'></i></button></div>";
+            var newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 25px;' class='btn' onclick='deleteInput(" + name + ");$(this).hide();  '><i class='icon-black icon-minus-sign'></i></button></div>";
 
             myTextArea = document.getElementById(id.id);
             myTextArea.innerHTML += newInput + newButton;
