@@ -253,6 +253,12 @@
 
                             newAttendees += toAdd;
                         }
+                        
+                        if(newAttendees.length < 1){
+                            alert("Ensure that there is at least one required attendee for each milestone");
+                            return true;
+                            
+                        }
 
                         data += "newOrderNumber:" + newOrderNumber + ",newMilestoneName:" + newMilestoneName
                                 + ",newDuration:" + newDuration + ",newAttendees:" + newAttendees;
