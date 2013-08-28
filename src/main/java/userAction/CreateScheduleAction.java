@@ -85,9 +85,9 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
             
             //Hardcoded list of Milestone names before MilestoneConfig
             List<Milestone> milestones = new ArrayList<Milestone>();
-            milestones.add(new Milestone("Acceptance", 60, storedTerm));
-            milestones.add(new Milestone("Midterm", 90, storedTerm));
-            milestones.add(new Milestone("Final", 90, storedTerm));
+            //milestones.add(new Milestone("Acceptance", 60, storedTerm));
+            //milestones.add(new Milestone("Midterm", 90, storedTerm));
+            //milestones.add(new Milestone("Final", 90, storedTerm));
             
             logger.debug("Simulated Milestone list from MilestoneConfig. Example: " + milestones.get(0).getName());
 
