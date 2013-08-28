@@ -72,6 +72,7 @@ body {
 .scheduleTable {
     /*margin: auto;*/
     display: table;
+    table-layout: fixed;
 }
 
 .timeDisplayCell {
@@ -81,6 +82,9 @@ body {
 }
 
 .timeslotCell {
+    box-sizing: border-box;
+    border: 1px solid #dddddd;
+    background-color: #AEC7C9 !important; 
     padding: 5px;
     width: 100px;
 }
@@ -95,7 +99,7 @@ body {
 
 .bookedTimeslot:hover, .unbookedTimeslot:hover {
     box-sizing: border-box;
-    border: 2px solid #1E647C !important;
+    border: 2px solid darkblue;
     cursor: pointer !important;
 }
 
@@ -105,53 +109,75 @@ body {
 }
 
 .unbookedTimeslot {
-    box-sizing: border-box;
-    background-color: #AEC7C9 !important; 
-    border: 1px solid #dddddd;
+    /*box-sizing: border-box;*/
+/*    background-color: #AEC7C9 !important; 
+    border: 1px solid #dddddd;*/
+}
+
+.unavailableTimeslot {
+    background-size: 50px 50px;
+    background-color: #ac0;
+    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+                      transparent 50%, rgba(255, 255, 255, .6) 2%, rgba(255, 255, 255, .6) 75%,
+                      transparent 0%);
+    background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+                      transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+                      transparent 75%, transparent);
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+                      transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+                      transparent 75%, transparent);
+    -pie-background: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+                     transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+                     transparent 75%, transparent) 0 0 / 50px 50px #ac0;
 }
 
 .bookedTimeslot {
-    box-sizing: border-box;
-    border-radius: 5px !important;
-    -moz-border-radius: 5px !important;
+/*    box-sizing: border-box;
+    background-color: #AEC7C9 !important; 
+    border: 1px solid #dddddd;*/
     text-align: center;
+    vertical-align: middle;
     font-size: 14px;
     font-weight: bold;
 }
 
-.pendingTimeslot {
-    box-sizing: border-box;
+.pendingBooking {
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
     background-color: #F6EE4E !important;
     border: 2px solid #CD950C !important;
 }
 
-.approvedTimeslot {
-    box-sizing: border-box;
+.approvedBooking {
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
     background-color: #A9DBA9 !important;
     border: 2px solid #415641 !important;
 }
 
-.rejectedTimeslot {
-    box-sizing: border-box;
+.rejectedBooking {
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
     background-color: #F75D59 !important;
     border: 2px solid #722A29 !important;
 }
 
 .legend {  
     font-size: 13px;
+    /*float: right;*/
 	position: absolute;
-	left:59%;
+	left:66%;
 	top:17.5%;
 }
 
-/* To display the number of pending bookings on index.jsp */
+
 .pendingBookings {
 	position: absolute;
 	left:40%;
 	top:9%;
 }
 
-	/* To display the number of pending bookings on index.jsp */
+
 .activeTerms {
 	position: absolute;
 	left:71%;
