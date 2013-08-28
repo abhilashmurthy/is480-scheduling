@@ -86,9 +86,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 			json.put("success", false);
             json.put("message", "Error with SetAvailability: Escalate to developers!");
 		} finally { //Closing the EntityManager to prevent memory leak
-			if (em != null && em.isOpen()) {
-				em.close();
-			}
+			if (em != null && em.isOpen()) em.close();
 		}
 		return SUCCESS;
 	}

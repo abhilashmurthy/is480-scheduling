@@ -45,7 +45,7 @@ public abstract class EmailTemplate {
 				generateEmailSubject(), generateEmailBody());
 			}
 		};
-		Thread t = new Thread(r);
+		Thread t = new Thread(r, "Mail Sender");
 		t.start();
 	}
 	

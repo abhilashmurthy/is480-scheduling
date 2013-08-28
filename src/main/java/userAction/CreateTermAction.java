@@ -18,6 +18,7 @@ import javax.servlet.RequestDispatcher;
 import manager.MilestoneManager;
 import manager.TermManager;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.json.JSONObject;
 import util.MiscUtil;
 
 /**
@@ -28,42 +29,26 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
 
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(CreateTermAction.class);
-    private int year;
-    private String semester;
-    private boolean canAdd;
     private HashMap<String, Object> json = new HashMap<String, Object>();
-
-    public HashMap<String, Object> getJson() {
-        return json;
-    }
-
-    public void setJson(HashMap<String, Object> json) {
-        this.json = json;
-    }
-
-    public boolean isHasBeenAdded() {
-        return canAdd;
-    }
-
-    public void setHasBeenAdded(boolean canAdd) {
-        this.canAdd = canAdd;
-    }
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
             json.put("exception", false);
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-            //To check if this term already exists
-
-            json.put("year", year);
-            json.put("semester", semester);
-
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			
+			//Getting input data
+			JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+			int year = inputData.getInt("year");
+			String semester = inputData.getString("semester");
+			
+			//Checking if the term already exists
             Term existingTerm = TermManager.findByYearAndSemester(em, year, semester);
             if (existingTerm != null) {
                 logger.error("Term already exists");
                 json.put("message", "Term already exists");
-                json.put("canAdd", false);
+				json.put("success", false);
                 return SUCCESS;
             }
             
@@ -75,10 +60,10 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
                 newTerm.setSemester(semester);
                 TermManager.save(em, newTerm, transaction);
                 json.put("message", "Term added");
-                json.put("canAdd", true);
+                json.put("success", true);
             } else {
-                json.put("message", "No term name detected");
-                json.put("canAdd", false);
+                json.put("message", "Term information provided incorrect.");
+                json.put("success", false);
             }
             
         } catch (Exception e) {
@@ -90,26 +75,20 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
             }
             json.put("exception", true);
             json.put("message", "Error with CheckTerm: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 
-    public int getYear() {
-        return year;
+    public HashMap<String, Object> getJson() {
+        return json;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setJson(HashMap<String, Object> json) {
+        this.json = json;
     }
-
-    public String getSemester() {
-        return semester;
-    }
-
-    public void setSemester(String semester) {
-        this.semester = semester;
-    }
-
+	
     public void setServletRequest(HttpServletRequest hsr) {
         this.request = hsr;
     }
