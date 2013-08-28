@@ -42,6 +42,10 @@ public class SettingsManager {
 		return settingsList;
 	}
 	
+	public static Settings getMilestoneSettings(EntityManager em) {
+		return getByName(em, "milestones");
+	}
+	
 	public static Settings getByName(EntityManager em, String name) {
 		Query q = em.createQuery("select s from Settings s where name = :name");
 		return (Settings) q.setParameter("name", name).getSingleResult();
