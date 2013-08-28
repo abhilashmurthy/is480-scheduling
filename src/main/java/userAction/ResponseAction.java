@@ -5,6 +5,7 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Response;
 import constant.Role;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import model.Booking;
 import model.Team;
+import model.User;
 import model.role.Faculty;
 import util.MiscUtil;
 
@@ -43,21 +46,31 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				Faculty faculty = (Faculty) session.getAttribute("user");
 				//Getting all the bookings for the faculty for the active term
 				Set<Booking> bookingsList = faculty.getRequiredBookings();
+				
+				//Getting all bookings for which the user's status is pending
+				Set<Booking> pendingBookingList = new HashSet<Booking>();
+				if (bookingsList.size() > 0) {
+					for (Booking b : bookingsList) {
+						HashMap<User, Response> responseList = b.getResponseList();
+						if (responseList.get(faculty) == Response.PENDING) {
+							pendingBookingList.add(b);
+						}
+					}
+				}
 
 				//Putting all the booking details for the user in a hash map to display it 
-				if (bookingsList.size() > 0) {
-					for (Booking b: bookingsList) {
+				if (pendingBookingList.size() > 0) {
+					for (Booking b : pendingBookingList) {
 						Timeslot timeslot = b.getTimeslot();
 						
 						//Getting all the timeslot and booking details
 						HashMap<String, String> map = new HashMap<String, String>();
 						//SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
-						SimpleDateFormat sdfForDate = new SimpleDateFormat("EEE, dd MMM yyyy");
+						SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd yyyy, EEE");
 						SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
 						String venue = timeslot.getVenue();
 						Long bookingId = b.getId();
 						Team team = b.getTeam();
-						Long teamId = team.getId();
 						String teamName = team.getTeamName();
 						String milestoneName = timeslot.getSchedule().getMilestone().getName();
 						String time = sdfForTime.format(timeslot.getStartTime()) + " - " + 
@@ -98,7 +111,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
                     logger.debug(s.toString());
                 }
             }
-            request.setAttribute("error", "Error with Response: Escalate to developers!");
+            request.setAttribute("error", "Error with ResponseAction: Escalate to developers!");
             return ERROR;
         }
     }

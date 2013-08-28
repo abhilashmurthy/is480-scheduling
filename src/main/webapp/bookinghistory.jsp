@@ -16,6 +16,23 @@
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
         <title>Booking History</title>
 		<%@include file="footer.jsp"%>
+		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+		<script type="text/javascript">
+			
+		//For data tables
+		$(document).ready(function(){
+			$('#bookingHistoryTable').dataTable({
+				"bPaginate": false,
+				"bLengthChange": false,
+//				"bFilter": false,
+//				"bSort": false,
+				"bInfo": false,
+				"bAutoWidth": false,
+				"asStripClasses": null
+			})
+		});
+		</script>
     </head>
     <body>
 		<%@include file="navbar.jsp" %>

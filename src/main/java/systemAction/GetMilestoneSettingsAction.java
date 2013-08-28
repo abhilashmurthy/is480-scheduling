@@ -14,6 +14,7 @@ import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
+import model.Settings;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
@@ -40,8 +41,10 @@ public class GetMilestoneSettingsAction extends ActionSupport implements Servlet
 			//Checking whether the active user is admin/coursee coordinator or not
 			User user = (User) session.getAttribute("user");
 			if (user.getRole().equals(Role.ADMINISTRATOR) || user.getRole().equals(Role.COURSE_COORDINATOR)) {
-				//Getting the current settings for milestones
-				ArrayList<HashMap<String,Object>> settingsList = SettingsManager.getSettings(em);
+				//Getting the current settings object for milestones
+				Settings result = SettingsManager.getByName(em, "milestones");
+				//Getting the milestones value from settings object
+				ArrayList<HashMap<String,Object>> settingsList = SettingsManager.getMilestoneSettings(em, result);
 				try {
 					for (HashMap<String, Object> map : settingsList) {
 						double duration = (Double) map.get("duration");

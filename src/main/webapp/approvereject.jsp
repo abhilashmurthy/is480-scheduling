@@ -174,7 +174,7 @@
 						</table>
 					</form>
 			</s:if><s:else>
-				<h4>No bookings available!</h4>
+				<h4>No pending bookings available!</h4>
 			</s:else>
 		</div>		
 		

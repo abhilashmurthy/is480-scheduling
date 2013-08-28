@@ -31,6 +31,7 @@ import model.Timeslot;
 import model.User;
 import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -108,7 +109,8 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
 			Set<Timeslot> reviewer2Availability = null;
 			User user = (User) request.getSession().getAttribute("user");
 			if (user.getRole() == Role.STUDENT) {
-				Team team = ((Student) user).getTeam();
+				Student student = em.find(Student.class, user.getId());
+				Team team = student.getTeam();
 				supervisorAvailability = team.getSupervisor().getUnavailableTimeslots();
 				reviewer1Availability = team.getReviewer1().getUnavailableTimeslots();
 				reviewer2Availability = team.getReviewer2().getUnavailableTimeslots();
