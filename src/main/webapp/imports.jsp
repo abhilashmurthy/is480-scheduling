@@ -7,6 +7,7 @@
 <link href="css/redmond/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
 <link href="css/redmond/jquery.timepicker.css" rel="stylesheet">
 <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="css/jquery.pnotify.default.css" rel="stylesheet">
 
 <%!
     static final Logger logger = LoggerFactory.getLogger("jspLogger");

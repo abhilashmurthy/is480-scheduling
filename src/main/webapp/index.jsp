@@ -60,7 +60,7 @@
             <!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
             <s:if test="%{pendingBookingCount > 0}">
-                <div class="pendingBookings alert" style="width: 230px; text-align: center">
+                <div class="pendingBookings alert">
                     <button type="button" class="close" data-dismiss="alert">×</button>
                     <a href="approveReject" style="color:#B88A00;">
                         <s:if test="%{pendingBookingCount > 1}">
@@ -71,7 +71,7 @@
                     </a>
                 </div>
             </s:if>
-            <% }%>    
+            <% }%>
 
             <!-- To display legend for the calendar -->
             <table class="legend">
@@ -134,16 +134,22 @@
             viewScheduleLoad = function() {
                 //Index page stuff
                 console.log("index init");
-
-                //Declare common variables
+                
+                /*****************************
+                    DECLARE COMMON VARIABLES
+                ******************************/
+               
                 //Default milestoneStr is ACCEPTANCE
                 var milestoneStr = "<%= session.getAttribute("lastSelectedMilestone") == null ? "ACCEPTANCE" : (String) session.getAttribute("lastSelectedMilestone")%>";
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
-                var self = null;
-                //Logged in team name
+                
+                //Team Name and bookingExists
                 var teamName = "<%= team != null ? team.getTeamName() : null%>";
                 var bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
+                
+                //Booking specific variables
+                var self = null;
                 var teamId = null;
                 var date = null;
                 var startTime = null;
@@ -595,10 +601,7 @@
                             teamId = $("#createTeamSelect").val();
                         }
                         createBooking(self);
-                        showResult(self, "Booked <br/> Confirmation email sent");
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 3000); //Refresh all popovers
+                        showNotification("CREATED", self);
                         return false;
                     });
 
@@ -606,10 +609,8 @@
                     $("td, td > div").on('click', '#deleteBookingBtn', function(e) {
                         e.stopPropagation();
                         deleteBooking(self);
-                        showResult(self, "Deleted <br/> Confirmation email sent");
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 3000); //Refresh all popovers
+                        showNotification("DELETED", self);
+                        //REFRESH POPOVER
                         return false;
                     });
 
@@ -617,32 +618,60 @@
                     $("td").on('click', '#updateBookingBtn', function(e) {
                         e.stopPropagation();
                         updateBooking(self);
-                        showResult(self, "Updated <br/> Confirmation email sent");
-                        window.location.reload();
+                        showNotification("UPDATED", self);
+                        //REFRESH POPOVER
                         return false;
                     });
                 }
 
-                function showResult(self, message) {
-                    //Result popover
-                    self.popover({
-                        container: self,
-                        trigger: "manual",
-                        placement: function() {
-                            if (self.parent().children().index(self) > 9) {
-                                return 'left';
-                            } else {
-                                return 'right';
-                            }
-                        },
-                        content: message,
-                        html: true
+                function showNotification(action, bodyTd) {
+                    var notificationTitle = null;
+                    var notificationMessage = null;
+                    var notificationType = null;
+                    var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
+                    var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
+                
+                    switch (action) {
+                        case "CREATED":
+                            notificationTitle = "Booked";
+                            notificationMessage = "Time: " + dateToView + " " + startTimeToView + "<br/>";
+                            notificationMessage += "Emails have been sent";
+                            notificationType = "success";
+                            break;
+                        case "DELETED":
+                            notificationTitle = "Deleted";
+                            notificationMessage = "Time: " + dateToView + " " + startTimeToView + "<br/>";
+                            notificationMessage += "Emails have been sent";
+                            notificationType = "error";
+                            break;
+                        case "UPDATED":
+                            notificationTitle = "Updated";
+                            notificationMessage = "Time: " + dateToView + " " + startTimeToView + "<br/>";
+                            notificationMessage += "Emails have been sent";
+                            notificationType = "warning";
+                            break;
+                        default:
+                            alert("Something went wrong");
+                    }
+                    
+                    $.pnotify({
+                        title: notificationTitle,
+                        text: notificationMessage,
+                        type: notificationType,
+                        icon: false,
+                        before_open: function(pnotify) {
+                            pnotify.css({
+                               top: "52px",
+                               left: ($(window).width() / 2) - (pnotify.width() / 2)
+                            });
+                        }
                     });
-                    console.log('Toggling D');
-                    self.popover('show');
                 }
-
-                //AJAX CALL functions
+                
+                /***************************
+                    AJAX CALL FUNCTIONS
+                 ***************************/
+                 
                 function createBooking(self) {
                     var data = {
                         timeslotId: self.attr('id').split("_")[1],
