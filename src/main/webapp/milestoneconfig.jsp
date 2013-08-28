@@ -64,9 +64,9 @@
 
                                 </td>
                                 <td style="width:90px">
-                                    <input type='text' style="width:30px; height:20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' disabled/>
 
-                                    <div class="btn-group">
+                                    <div class="input-append">
+                                        <input type='text' style="width:30px; height:20px" cellspacing='0' id='duration<%=counter%>' value='<s:property value="duration" />' disabled/>
                                         <button class="btn" type="button" onclick="upOne(document.getElementById('duration<%=counter%>'));" >&#9650;</button>
                                         <button class="btn" type="button" onclick="downOne(document.getElementById('duration<%=counter%>'));" >&#9660;</button>
                                     </div>
@@ -80,16 +80,16 @@
                                                 <button id="delete" title="Delete Attendee" style="width: 40px;height: 30px;" class="btn" onclick="deleteInput(name<%=counter2%>);
                                                     $(this).remove();"><i class="icon-black icon-minus-sign"></i></button>
                                             </div>
-                                                    
+
                                             <% counter2++;%>
                                         </s:iterator>
                                     </div> 
-                                    
-                                        <div>
-                                    <button class="btn" title="Add New Attendee" style="width:40px; height:25px;" onclick="createInput(document.getElementById('textarea<%=counter%>'));">
-                                        <i class="icon-black icon-plus-sign"></i> 
-                                    </button>
-                                        </div>
+
+                                    <div>
+                                        <button class="btn" title="Add New Attendee" style="width:40px; height:25px;" onclick="createInput(document.getElementById('textarea<%=counter%>'));">
+                                            <i class="icon-black icon-plus-sign"></i> 
+                                        </button>
+                                    </div>
                                 </td>
                                 <td>
                                     <button type="button" title="Delete Milestone" class="btn btn-danger" id="<%=counter%>" onclick='deleteRow(<%=counter%>);'>
@@ -127,275 +127,288 @@
 
         <script type="text/javascript">
 
-                                                var count = <%=counter%>;
-                                                count++;
-                                                var newCount = <%=counter%>;
+            var count = <%=counter%>;
+            count++;
+            var newCount = <%=counter%>;
 
-                                                function addRow() {
+            function addRow() {
 
-                                                    var number = newCount;
-                                                    //alert(number);
-                                                    var onumber = "orderNumber" + number;
-                                                    var myTextArea = document.getElementById(milestoneConfigTable.id);
-                                                    var newOrderNumber = "<tr id='id" + number + "'><td><div class='input-append'>"
-                                                            + "<input id='orderNumber" + number + "'style='width: 18px;height: 20px' type='text' name='orderNumber' value='0' disabled/>'"
-                                                            + "<div class='btn-group'>"
-                                                            + "<button class='btn' type='button' onclick='upOne(" + onumber + ");' >&#9650;</button>"
-                                                            + "<button class='btn' type='button' onclick='downOne(" + onumber + ");' >&#9660;</button>"
-                                                            + "</div></div></td>";
-                                                    var milestoneNumber = "milestone" + number;
-                                                    var newMilestoneId = "<td><input type='text' id='" + milestoneNumber + "' style='width:90px; height:20px'></input></td>";
+                var number = newCount;
+                //alert(number);
+                var onumber = "orderNumber" + number;
+                var myTextArea = document.getElementById(milestoneConfigTable.id);
+                var newOrderNumber = "<tr id='id" + number + "'><td><div class='input-append'>"
+                        + "<input id='orderNumber" + number + "'style='width: 18px;height: 20px' type='text' name='orderNumber' value='" + number + "' disabled/>'"
+                        + "<div class='btn-group'>"
+                        + "<button class='btn' type='button' onclick='upOne(" + onumber + ");' >&#9650;</button>"
+                        + "<button class='btn' type='button' onclick='downOne(" + onumber + ");' >&#9660;</button>"
+                        + "</div></div></td>";
+                var milestoneNumber = "milestone" + number;
+                var newMilestoneId = "<td><input type='text' id='" + milestoneNumber + "' style='width:90px; height:20px'></input></td>";
 
-                                                    var durationNumber = "duration" + number;
-                                                    var newDuration = " <td>"
-                                                            + "<input type='text' style='width: 30px; height: 20px' cellspacing='0' id='" + durationNumber + "' value='60' disabled/>"
-                                                            + "<div class='btn-group'>"
-                                                            + "<button class='btn' type='button' onclick='upOne(" + durationNumber + ");'>&#9650;</button>"
-                                                            + "<button class='btn' type='button' onclick='downOne(" + durationNumber + ");' >&#9660;</button>"
-                                                            + "</div>" + "</td>";
-                                                    var textNumber = "textarea" + number;
+                var durationNumber = "duration" + number;
+                var newDuration = " <td>"
+                        + "<div class='input-append'>"
+                        + "<input type='text' style='width: 30px; height: 20px' cellspacing='0' id='" + durationNumber + "' value='60' disabled/>"
+                        + "<button class='btn' type='button' onclick='upOne(" + durationNumber + ");'>&#9650;</button>"
+                        + "<button class='btn' type='button' onclick='downOne(" + durationNumber + ");' >&#9660;</button>"
+                        + "</div>" + "</td>";
+                var textNumber = "textarea" + number;
 
-                                                    var attendees = "<td>"
-                                                            + "<div id='" + textNumber + "'>"
-                                                            + "<div>"
-                                                            + "<button class='btn' title='Add New Attendee' style='width: 40px;height: 25px;' onclick='createInput(" + textNumber + ");'><i class='icon-black icon-plus-sign'></i></button>"
-                                                            + "</div>"
-                                                            + "</div></td>";
-                                                    //var saveNumber = "save" + number;                      
-                                                    var buttons = "<td>"
-                                                            + "<button type='button' title='Delete Milestone' class='btn btn-danger' id='" + number + "' onclick='deleteRow(" + number + ");'><i class='icon-trash icon-white'></i></button>"
-                                                            + "</td></tr>";
+                var attendees = "<td>"
+                        + "<div id='" + textNumber + "' class='input-append'></div>"
 
-                                                    myTextArea.innerHTML += newOrderNumber + newMilestoneId + newDuration + attendees + buttons;
+                        + "<div><button class='btn' title='Add New Attendee' style='width: 40px;height: 25px;' onclick='createInput(" + textNumber + ");'><i class='icon-black icon-plus-sign'></i></button></div>"
 
-                                                    //number++;
-                                                    newCount++;
-                                                }
+                        + "</td>";
+                //var saveNumber = "save" + number;                      
+                var buttons = "<td>"
+                        + "<button type='button' title='Delete Milestone' class='btn btn-danger' id='" + number + "' onclick='deleteRow(" + number + ");'><i class='icon-trash icon-white'></i></button>"
+                        + "</td></tr>";
 
-                                                function deleteRow(number) {
-                                                    //var id = this.id;
-                                                    //alert(id);
-                                                    var idToPass = "#id" + number;
-                                                    $(idToPass).remove();
-                                                }
+                myTextArea.innerHTML += newOrderNumber + newMilestoneId + newDuration + attendees + buttons;
 
-                                                function edited() {
+                //number++;
+                newCount++;
+            }
 
-                                                    //get total length (here length is +1)
-                                                    //var count2 = $('#milestoneConfigTable :last td');
-                                                    var rows = document.getElementsByTagName("table")[0].rows;
-                                                    //var last = rows[rows.length - 1];
-                                                    //var cell = last.cells[0];
-                                                    //var value = cell.innerHTML;
+            function deleteRow(number) {
+                //var id = this.id;
+                //alert(id);
+                var idToPass = "#id" + number;
+                $(idToPass).remove();
+            }
 
-                                                    var numberChecker = "";
+            function edited() {
 
-                                                    for (var i = 0; i < rows.length; i++) {
-                                                        //console.log(rows[i].id.substring(2));
-                                                        if (i === rows.length - 1) {
-                                                            numberChecker = rows[i].id.substring(2);
-                                                        }
-                                                    }
-                                                    //console.log(rows);
-                                                    //var count = 99;
+                //get total length (here length is +1)
+                //var count2 = $('#milestoneConfigTable :last td');
+                var rows = document.getElementsByTagName("table")[0].rows;
+                //var last = rows[rows.length - 1];
+                //var cell = last.cells[0];
+                //var value = cell.innerHTML;
 
-                                                    var data = "";
+                var numberChecker = "";
 
-                                                    //for each row, get the details
-                                                    for (var number = 1; number <= numberChecker; number++) {
+                for (var i = 0; i < rows.length; i++) {
+                    //console.log(rows[i].id.substring(2));
+                    if (i === rows.length - 1) {
+                        numberChecker = rows[i].id.substring(2);
+                    }
+                }
+                //console.log(rows);
+                //var count = 99;
 
-                                                        var checker = "#" + number;
-                                                        //check if the row exists
-                                                        if ($(checker).length) {
-                                                            //get the past order of this milestone
-                                                            var pastOrder = number;
+                var data = "";
+                
+                var allOrders = "";
 
-                                                            //get the new order number
-                                                            var newOrderNumber = document.getElementById('orderNumber' + number).value;
+                //for each row, get the details
+                for (var number = 1; number <= numberChecker; number++) {
 
-                                                            //get the new milestone name
-                                                            var newMilestoneName = document.getElementById('milestone' + number).value;
+                    var checker = "#" + number;
+                    //check if the row exists
+                    if ($(checker).length) {
 
-                                                            if (newMilestoneName.length < 1) {
+                        //get the new order number
+                        var newOrderNumber = document.getElementById('orderNumber' + number).value;
+                        
+                        
+                        if(allOrders.indexOf(newOrderNumber)!==-1){
+                            
+                            alert("Ensure order numbers are not the same");
+                            return true;
+                        }
+                        
+                        allOrders += newOrderNumber + ",";
+                        //get the new milestone name
+                        var newMilestoneName = document.getElementById('milestone' + number).value;
 
-                                                                newMilestoneName = document.getElementById('milestone' + number).placeholder;
+                        if (newMilestoneName.length < 1) {
 
-                                                            }
+                            newMilestoneName = document.getElementById('milestone' + number).placeholder;
 
-                                                            //get the new duration number
-                                                            var newDuration = document.getElementById('duration' + number).value;
+                        }
 
-                                                            //get the new attendees for this milestone
-                                                            var attendees = document.getElementById('textarea' + number).getElementsByTagName('input');
+                        if (newMilestoneName === "") {
+                            alert("Ensure that all milestone names are entered");
+                            return true;
+                        }
 
-                                                            //new attendees is a string representative of who the new attendees are
-                                                            var newAttendees = "";
-                                                            for (var i = 0; i < attendees.length; i++) {
-                                                                var eachAttendee = attendees[i].id;
-                                                                var toAdd = document.getElementById(eachAttendee).value + ",";
+                        //get the new duration number
+                        var newDuration = document.getElementById('duration' + number).value;
 
-                                                                if (toAdd.length === 1) {
-                                                                    toAdd = document.getElementById(eachAttendee).placeholder + ",";
-                                                                }
+                        //get the new attendees for this milestone
+                        var attendees = document.getElementById('textarea' + number).getElementsByTagName('input');
 
-                                                                newAttendees += toAdd;
-                                                            }
+                        //new attendees is a string representative of who the new attendees are
+                        var newAttendees = "";
+                        for (var i = 0; i < attendees.length; i++) {
+                            var eachAttendee = attendees[i].id;
+                            var toAdd = document.getElementById(eachAttendee).value + ",";
 
-                                                            data += "pastOrderNumber:" + pastOrder + ",newOrderNumber:" + newOrderNumber + ",newMilestoneName:" + newMilestoneName
-                                                                    + ",newDuration:" + newDuration + ",newAttendees:" + newAttendees;
-                                                        }
-                                                    }
-                                                    alert(data);
+                            if (toAdd.length === 1) {
+                                toAdd = document.getElementById(eachAttendee).placeholder + ",";
+                            }
 
-                                                    //code to send the update to backend. url corresponds to action class name defined in struts
-                                                    //uncomment this part
-                                                    /*$.ajax({
-                                                     type: 'POST',
-                                                     async: false,
-                                                     url: 'updateMilestoneSettings',
-                                                     data: data,
-                                                     cache: false,
-                                                     dataType: 'json'
-                                                     
-                                                     }).done(function(response) {
-                                                     if (response.success) {
-                                                     console.log("Milestones updated successfully!");
-                                                     displayMessage("milestoneSettingsUpdateMessage", response.message, false);
-                                                     } else {
-                                                     var eid = btoa(response.message);
-                                                     console.log(response.message);
-                                                     window.location = "error.jsp?eid=" + eid;
-                                                     }
-                                                     }).fail(function(error) {
-                                                     console.log("Updating Milestone settings AJAX FAIL");
-                                                     displayMessage("milestoneSettingsUpdateMessage", "Oops.. something went wrong", true);
-                                                     });*/
-                                                }
+                            newAttendees += toAdd;
+                        }
 
-                                                function createInput(id) {
-                                                    //alert(id.id);
-                                                    //alert(id.id);
-                                                    var textArea = "#" + id.id;
-                                                    //var param = textArea ;
-                                                    //alert(textArea);
-                                                    var count2 = $(textArea + ' :button').length;
-                                                    //alert(count2);
-                                                    var totalAttendees = 0;
+                        data += "newOrderNumber:" + newOrderNumber + ",newMilestoneName:" + newMilestoneName
+                                + ",newDuration:" + newDuration + ",newAttendees:" + newAttendees;
+                    }
+                }
+                alert(data);
 
-                                                    for (var a = 1; a <= count2; a++) {
+                //code to send the update to backend. url corresponds to action class name defined in struts
+                //uncomment this part
+                /*$.ajax({
+                 type: 'POST',
+                 async: false,
+                 url: 'updateMilestoneSettings',
+                 data: data,
+                 cache: false,
+                 dataType: 'json'
 
-                                                        var nameArea = "#name" + a;
+                 }).done(function(response) {
+                 if (response.success) {
+                 console.log("Milestones updated successfully!");
+                 displayMessage("milestoneSettingsUpdateMessage", response.message, false);
+                 } else {
+                 var eid = btoa(response.message);
+                 console.log(response.message);
+                 window.location = "error.jsp?eid=" + eid;
+                 }
+                 }).fail(function(error) {
+                 console.log("Updating Milestone settings AJAX FAIL");
+                 displayMessage("milestoneSettingsUpdateMessage", "Oops.. something went wrong", true);
+                 });*/
+            }
 
-                                                        //var nameArea2 = "textarea" + nameArea;
+            function createInput(id) {
+                //alert(id.id);
+                //alert(id.id);
+                var textArea = "#" + id.id;
+                //var param = textArea ;
+                //alert(textArea);
+                var count2 = $(textArea + ' :button').length;
+                //alert(count2);
+                var totalAttendees = 0;
 
-                                                        //var nameArea2 = "name" + a;
-                                                        if ($(nameArea).is(':hidden')) {
+                for (var a = 1; a <= count2; a++) {
 
-                                                        } else {
-                                                            totalAttendees++;
-                                                            //alert(nameArea);
-                                                        }
-                                                    }
+                    var nameArea = "#name" + a;
 
-                                                    count++;
+                    //var nameArea2 = "textarea" + nameArea;
 
-                                                    if (totalAttendees < 3) {
-                                                        var name = "name" + count;
+                    //var nameArea2 = "name" + a;
+                    if ($(nameArea).is(':hidden')) {
 
-                                                        var text = "#" + id.id;
-                                                        var nameUpdated = "'name" + count + "'";
+                    } else {
+                        totalAttendees++;
+                        //alert(nameArea);
+                    }
+                }
 
-                                                        var myTextArea = document.getElementById(id.id);
+                count++;
 
-                                                        var innerText = document.getElementById(id.id).innerHTML;
+                if (totalAttendees < 3) {
+                    var name = "name" + count;
 
-                                                        var newInput = "";
-                                                        var newButton = "";
+                    var text = "#" + id.id;
+                    var nameUpdated = "'name" + count + "'";
 
-                                                        //if supervisor is not found
-                                                        if (innerText.indexOf("Supervisor") === -1) {
-                                                            newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' value='Supervisor' disabled/>";
-                                                            newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 30px;' class='btn' onclick='deleteInput(" + name + ");  $(this).remove();'><i class='icon-black icon-minus-sign'></i></button></div>";
-                                                        } else if (innerText.indexOf("Reviewer1") === -1) {
-                                                            newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' value='Reviewer1' disabled/>";
-                                                            newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 30px;' class='btn' onclick='deleteInput(" + name + ");  $(this).remove();'><i class='icon-black icon-minus-sign'></i></button></div>";
-                                                        } else if (innerText.indexOf("Reviewer2") === -1) {
-                                                            newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' value='Reviewer2' disabled/>";
-                                                            newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 30px;' class='btn' onclick='deleteInput(" + name + ");  $(this).remove();'><i class='icon-black icon-minus-sign'></i></button></div>";
-                                                        }
+                    var myTextArea = document.getElementById(id.id);
 
-                                                        myTextArea.innerHTML += newInput + newButton;
-                                                        //alert(document.getElementById(name).id);
-                                                        //$(text).append(newInput);
+                    var innerText = document.getElementById(id.id).innerHTML;
 
-                                                        //var div = document.createElement("div");div.id = "generatedDiv" + count;
-                                                        // document.getElementById(id.id).appendChild(div);
-                                                        //div.innerHTML += newInput;
+                    var newInput = "";
+                    var newButton = "";
 
-                                                        //alert(document.getElementById(name).id);
-                                                        return false;
-                                                        //window.attachEvent("onload", func);
-                                                    } else {
-                                                        alert("There are already 3 required attendees for this milestone");
-                                                    }
-                                                }
+                    //if supervisor is not found
+                    if (innerText.indexOf("Supervisor") === -1) {
+                        newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' value='Supervisor' disabled/>";
+                        newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 30px;' class='btn' onclick='deleteInput(" + name + ");  $(this).remove();'><i class='icon-black icon-minus-sign'></i></button></div>";
+                    } else if (innerText.indexOf("Reviewer1") === -1) {
+                        newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' value='Reviewer1' disabled/>";
+                        newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 30px;' class='btn' onclick='deleteInput(" + name + ");  $(this).remove();'><i class='icon-black icon-minus-sign'></i></button></div>";
+                    } else if (innerText.indexOf("Reviewer2") === -1) {
+                        newInput = "<div><input style='width: 80px; height: 20px' type='text' id='" + name + "' value='Reviewer2' disabled/>";
+                        newButton = "<button id='delete' title='Delete Attendee' style='width: 40px;height: 30px;' class='btn' onclick='deleteInput(" + name + ");  $(this).remove();'><i class='icon-black icon-minus-sign'></i></button></div>";
+                    }
 
-                                                function deleteInput(id) {
-                                                    //alert(id.id);
-                                                    //var text = "#" + id;
-                                                    var parsing = parseInt(id, 10);
-                                                    alert(id.id);
-                                                    jQuery(id).remove();
+                    myTextArea.innerHTML += newInput + newButton;
+                    //alert(document.getElementById(name).id);
+                    //$(text).append(newInput);
 
-                                                    //jQuery(text).remove(text);
-                                                }
+                    //var div = document.createElement("div");div.id = "generatedDiv" + count;
+                    // document.getElementById(id.id).appendChild(div);
+                    //div.innerHTML += newInput;
 
-                                                function upOne(id) {
-                                                    //alert(id.id);
-                                                    var formId = id.id;
-                                                    //alert(formId);
-                                                    if (formId.indexOf('duration') !== -1) {
-                                                        var num = id.value;
-                                                        var newNum = parseInt(num, 10) + parseInt(30, 10);
-                                                        if (parseInt(id.value, 10) !== 240) {
-                                                            id.value = newNum;
-                                                        }
-                                                    } else {
-                                                        //var currentNum = parseInt($(formId).val());
-                                                        //$(formId).attr('value', (currentNum + 1));
-                                                        if (parseInt(id.value, 10) !== 240) {
-                                                            id.value++;
-                                                        }
-                                                        //alert(id.id);
-                                                    }
-                                                }
+                    //alert(document.getElementById(name).id);
+                    return false;
+                    //window.attachEvent("onload", func);
+                } else {
+                    alert("There are already 3 required attendees for this milestone");
+                }
+            }
 
-                                                function downOne(id) {
-                                                    formId = id.id;
+            function deleteInput(id) {
+                //alert(id.id);
+                //var text = "#" + id;
+                var parsing = parseInt(id, 10);
+                //alert(id.id);
+                jQuery(id).remove();
 
-                                                    if (formId.indexOf('duration') !== -1) {
-                                                        var num = id.value;
-                                                        var newNum = parseInt(num, 10) - parseInt(30, 10);
-                                                        if (parseInt(id.value, 10) !== 0) {
-                                                            id.value = newNum;
-                                                        }
-                                                    } else {
-                                                        if (parseInt(id.value, 10) !== 0) {
-                                                            id.value--;
-                                                        }
-                                                    }
-                                                }
+                //jQuery(text).remove(text);
+            }
 
-                                                //Display Message
-                                                function displayMessage(id, msg, fade) {
-                                                    //Dislay result
-                                                    var e = $("#" + id);
-                                                    $(e).fadeTo(3000, 0);
-                                                    $(e).css('color', 'darkgreen').html(msg);
-                                                    if (fade) {
-                                                        $(e).css('color', 'darkred').html(msg).fadeTo(3000, 0);
-                                                    }
-                                                }
+            function upOne(id) {
+                //alert(id.id);
+                var formId = id.id;
+                
+                if (formId.indexOf('duration') !== -1) {
+                    var num = id.value;
+                    var newNum = parseInt(num, 10) + parseInt(30, 10);
+                    if (parseInt(id.value, 10) !== 240) {
+                        id.value = newNum;
+                    }
+                } else {
+                    //var currentNum = parseInt($(formId).val());
+                    //$(formId).attr('value', (currentNum + 1));
+                    if (parseInt(id.value, 10) !== 240) {
+                        id.value++;
+                    }
+                    //alert(id.id);
+                }
+            }
+
+            function downOne(id) {
+                formId = id.id;
+
+                if (formId.indexOf('duration') !== -1) {
+                    var num = id.value;
+                    var newNum = parseInt(num, 10) - parseInt(30, 10);
+                    if (parseInt(id.value, 10) !== 0) {
+                        id.value = newNum;
+                    }
+                } else {
+                    if (parseInt(id.value, 10) !== 0) {
+                        id.value--;
+                    }
+                }
+            }
+
+            //Display Message
+            function displayMessage(id, msg, fade) {
+                //Dislay result
+                var e = $("#" + id);
+                $(e).fadeTo(3000, 0);
+                $(e).css('color', 'darkgreen').html(msg);
+                if (fade) {
+                    $(e).css('color', 'darkred').html(msg).fadeTo(3000, 0);
+                }
+            }
 
         </script>
     </body> 
