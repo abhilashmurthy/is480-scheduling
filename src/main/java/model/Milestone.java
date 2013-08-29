@@ -5,6 +5,8 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,17 +33,20 @@ public class Milestone implements Serializable {
 	
 	private String name;
 	private int slotDuration;
-	
+	@Column(length=19000000)
+	private ArrayList<String> requiredAttendees;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
         
-        public Milestone() {}
-        
-        public Milestone(String name, int slotDuration, Term term) {
-            this.name = name;
-            this.slotDuration = slotDuration;
-            this.term = term;
-        }
+	public Milestone() {}
+
+	public Milestone(String name, int slotDuration, Term term, ArrayList<String> requiredAttendees) {
+		this.name = name;
+		this.slotDuration = slotDuration;
+		this.term = term;
+		this.requiredAttendees = requiredAttendees;
+	}
 
 	public Term getTerm() {
 		return term;
@@ -63,14 +68,18 @@ public class Milestone implements Serializable {
 		return slotDuration;
 	}
 
-	/**
-	 * Method to set the duration of the slot.
-	 * @param slotDuration Duration of slot in minutes
-	 */
 	public void setSlotDuration(int slotDuration) {
 		this.slotDuration = slotDuration;
 	}
 
+	public ArrayList<String> getRequiredAttendees() {
+		return requiredAttendees;
+	}
+
+	public void setRequiredAttendees(ArrayList<String> requiredAttendees) {
+		this.requiredAttendees = requiredAttendees;
+	}
+	
 	public Long getId() {
 		return id;
 	}

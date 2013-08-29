@@ -17,20 +17,14 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
-import manager.MilestoneManager;
 import manager.ScheduleManager;
-import manager.TermManager;
 import manager.TimeslotManager;
-import model.Milestone;
 import model.Schedule;
-import model.Term;
 import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static userAction.CreateScheduleAction.logger;
 import util.MiscUtil;
 
 /**

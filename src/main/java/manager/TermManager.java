@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import model.Term;
 import org.slf4j.Logger;
@@ -45,30 +46,6 @@ public class TermManager {
         return false;
     }
 
-    public static boolean save(EntityManager em, Term term, EntityTransaction transaction) {
-        logger.info("Creating new term");
-        try {
-            transaction = em.getTransaction();
-            transaction.begin();
-            if (term != null) {
-                em.persist(term);
-            }
-            transaction.commit();
-            return true;
-        } catch (PersistenceException ex) {
-            //Rolling back data transactions
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            logger.error("Error making database call for Create Term Details");
-            ex.printStackTrace();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public static List<Term> getAllTerms(EntityManager em) {
         logger.info("Getting all term objects");
         List<Term> sourceList = null;
@@ -89,13 +66,13 @@ public class TermManager {
         logger.info("Getting term by year and semester");
         Term result = null;
         try {
-            em.getTransaction().begin();
             Query q = em.createNativeQuery("select * from Term where academicYear = :year "
                     + "and semester = :semester", Term.class);
             q.setParameter("year", year);
             q.setParameter("semester", semester);
             result = (Term) q.getSingleResult();
-            em.getTransaction().commit();
+        } catch (NoResultException e) {
+			return null;
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Database Operation Error");

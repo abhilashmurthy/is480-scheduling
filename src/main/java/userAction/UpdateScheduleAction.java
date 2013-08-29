@@ -5,9 +5,7 @@
 package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
-import systemAction.*;
 import com.opensymphony.xwork2.ActionSupport;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,21 +18,14 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import manager.MilestoneManager;
 import manager.ScheduleManager;
-import manager.TermManager;
 import manager.TimeslotManager;
-import model.Milestone;
 import model.Schedule;
-import model.Term;
 import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static userAction.CreateScheduleAction.logger;
 import util.MiscUtil;
 
 /**
