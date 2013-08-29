@@ -33,9 +33,9 @@
                 <%
                     String semester = activeTerm.getSemester();
                     int startAcademicYear = activeTerm.getAcademicYear();
-                    int endAcademicYear = startAcademicYear + 1;
+                    String endAcademicYear = String.valueOf(startAcademicYear + 1);
                     String academicYear = String.valueOf(startAcademicYear) + "-"
-                            + String.valueOf(endAcademicYear);
+                            + endAcademicYear.substring(2);
                     out.print(academicYear + " " + semester);
                 %>
             </h3>
