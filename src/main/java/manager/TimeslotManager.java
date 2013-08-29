@@ -85,29 +85,6 @@ public class TimeslotManager {
         }
         return false;
     }
-
-    public static Timeslot save(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
-        logger.info("Saving timeslot: " + timeslot);
-        try {
-            transaction = em.getTransaction();
-            transaction.begin();
-            em.persist(timeslot);
-            logger.debug("All timeslots have been saved");
-            transaction.commit();
-            return timeslot;
-        } catch (PersistenceException ex) {
-            //Rolling back data transactions
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            logger.error("Error making database call for update timeslot status");
-            ex.printStackTrace();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-        return null;
-    }
     
     public static boolean delete(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
         logger.info("Deleting timeslot: " + timeslot);

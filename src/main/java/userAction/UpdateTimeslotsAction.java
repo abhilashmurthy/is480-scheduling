@@ -134,7 +134,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setVenue("SIS Seminar Room 2-1");
                 //TODO: Handle write error
                 t.setSchedule(acceptanceSchedule);
-                TimeslotManager.save(em, t, transaction);
+                em.persist(t);
                 acceptanceTimeslots.add(t);
             }
             
@@ -157,7 +157,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(midtermSchedule);
                     //TODO: Handle write error
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     midtermTimeslots.add(t);
                 }
 
@@ -181,7 +181,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                     t.setSchedule(finalSchedule);
                     //Save timeslot
                     //TODO: Handle write error
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     finalTimeslots.add(t);
                 }
                 

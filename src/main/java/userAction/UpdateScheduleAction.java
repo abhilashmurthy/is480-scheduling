@@ -166,7 +166,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
                     t.setEndTime(endTime);
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(acceptanceSchedule);
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     currentTime++;
                     newStartTime = endTime;
                 }
@@ -223,7 +223,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
                     t.setEndTime(endTime);
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(midtermSchedule);
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     currentTime++;
                     newStartTime = endTime;
                 }
@@ -280,7 +280,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
                     t.setEndTime(endTime);
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(finalSchedule);
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     currentTime++;
                     newStartTime = endTime;
                 }
