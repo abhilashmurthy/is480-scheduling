@@ -192,8 +192,9 @@
             }
         });
         
-        //Disable Pines Notify History
+        //Disable Pines Notify Settings
         $.pnotify.defaults.history = false;
+        $.pnotify.defaults.delay = 3000;
     };
     
     addLoadEvent(navbarLoad);
