@@ -39,8 +39,9 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 	
 	@Override
     public String execute() throws Exception {
+		EntityManager em = null;
 		try {
-			EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 			HttpSession session = request.getSession();
 			User user = (User) session.getAttribute("user");
 			
@@ -101,7 +102,10 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
             json.put("success", false);
             json.put("exception", true);
             json.put("message", "Error with Showing Index Page: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
 	} //end of execute
 		

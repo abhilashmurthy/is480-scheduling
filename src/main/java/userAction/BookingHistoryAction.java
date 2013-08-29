@@ -46,8 +46,9 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             HttpSession session = request.getSession();
             //Getting the active role of the user
             Role activeRole = (Role) session.getAttribute("activeRole");
@@ -164,7 +165,10 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 //            json.put("success", false);
 //            json.put("message", "Error with BookingHistory: Escalate to developers!");
 			request.setAttribute("error", "Error with BookingHistory: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return ERROR;
     } //end of execute function
 

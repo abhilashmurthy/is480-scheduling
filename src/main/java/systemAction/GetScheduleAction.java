@@ -248,10 +248,9 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             json.put("success", false);
             json.put("message", "Error with GetSchedule: Escalate to developers!");
         } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
-        }
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
     private HashMap<String, Object> json = new HashMap<String, Object>();

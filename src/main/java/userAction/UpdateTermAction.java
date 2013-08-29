@@ -70,9 +70,10 @@ public class UpdateTermAction extends ActionSupport implements ServletRequestAwa
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
             json.put("exception", false);
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             
             json.put("year", year);
             json.put("semester", semester);
@@ -123,7 +124,10 @@ public class UpdateTermAction extends ActionSupport implements ServletRequestAwa
             }
             json.put("exception", true);
             json.put("message", "Error with CheckTerm: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 

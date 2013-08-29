@@ -71,8 +71,9 @@ public class GetTeamsAction extends ActionSupport implements ServletRequestAware
     
     @Override
     public String execute() throws ServletException, IOException {
+		EntityManager em = null;
         try {
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             
             //Get term
             Term term = TermManager.findByYearAndSemester(em, Integer.parseInt(academicYearString), semesterString);
@@ -109,7 +110,10 @@ public class GetTeamsAction extends ActionSupport implements ServletRequestAware
             }
             json.put("success", false);
             json.put("message", "Error with GetTeams: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
     

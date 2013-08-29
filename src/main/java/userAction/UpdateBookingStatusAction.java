@@ -47,8 +47,9 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
-        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+        em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
         Response response = null;
         if (approve != null) {
@@ -153,7 +154,10 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
             }
             request.setAttribute("error", "Error with UpdateBookingStatus: Escalate to developers!");
             return ERROR;
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
     }
 
     //Getters and Setters

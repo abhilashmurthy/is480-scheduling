@@ -37,7 +37,6 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
     @Override
     public String execute() throws Exception {
         try {
-            //EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             HttpSession session = request.getSession();
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");

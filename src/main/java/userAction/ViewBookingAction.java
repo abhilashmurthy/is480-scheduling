@@ -42,8 +42,9 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             //convert the chosen ID into long
             long chosenID = Long.parseLong(bookingId);
             Booking b = em.find(Booking.class, chosenID);
@@ -138,7 +139,10 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
             json.put("message", "Error with UpdateSchedule: Escalate to developers!");
             json.put("success", false);
             return SUCCESS;
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
     }
 
     public void setServletRequest(HttpServletRequest hsr) {

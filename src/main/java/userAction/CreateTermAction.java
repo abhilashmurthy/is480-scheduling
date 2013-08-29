@@ -4,7 +4,6 @@
  */
 package userAction;
 
-import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.util.ArrayList;

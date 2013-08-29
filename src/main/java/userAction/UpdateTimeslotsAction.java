@@ -47,9 +47,10 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
             json.put("exception", false);
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
             Map parameters = request.getParameterMap();
 
@@ -199,7 +200,10 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
             }
             json.put("success", false);
             json.put("message", "Error with CreateTimeslots: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
     

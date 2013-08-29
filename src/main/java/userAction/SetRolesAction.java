@@ -47,8 +47,9 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             //Getting the session object
             HttpSession session = request.getSession();
             //Getting all the user objects
@@ -165,7 +166,10 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
             }
             request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
             return ERROR;
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
 
     } //end of execute function
 

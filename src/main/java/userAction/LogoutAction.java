@@ -30,10 +30,10 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
     @Override
     public String execute() throws Exception {
         try {
-        logger.info("Reached LogoutAction");
-        HttpSession session = request.getSession();
-        session.invalidate();
-        logger.info("Logout successful");
+			logger.info("Reached LogoutAction");
+			HttpSession session = request.getSession();
+			session.invalidate();
+			logger.info("Logout successful");
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
