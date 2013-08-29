@@ -229,7 +229,7 @@
                         //Setup mouse events
                         setupMouseEvents();
                     } else {
-                        var eid = btoa(response.message);
+                        var eid = btoa(scheduleData.message);
                         window.location = "error.jsp?eid=" + eid;
                     }
                     $("#scheduleProgressBar").hide();
@@ -268,6 +268,11 @@
                     if (<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                         $(".unbookedTimeslot, .unavailableTimeslot").each(function() {
                             appendCreateBookingPopover($(this), timeslots, refreshData);
+                        });
+                    }
+                    if (<%= activeRole.equals(Role.FACULTY) %>) {
+                        $(".unbookedTimeslot, .unavailableTimeslot").each(function() {
+                            appendChangeAvailabilityPopover($(this), timeslots, refreshData);
                         });
                     }
                 }
@@ -456,6 +461,44 @@
                     });
                 }
                 
+                function appendChangeAvailabilityPopover(bodyTd) {
+                    //Initialize variables
+                    if (!bodyTd.attr('id')) return;
+                    //Create Booking outputTable
+                    var outputTable = $(document.createElement('table'));
+                    outputTable.attr('id', 'createTimeslotTable');
+                    var outputData = [];
+                    if (bodyTd.is('.unavailableTimeslot')) {
+                        outputData.push(["", "<button id='availableTimeslotBtn' class='btn btn-primary'><i class='icon-plus-sign icon-white'></i>Mark Available</button>"]);
+                    } else {
+                        outputData.push(["", "<button id='unavailableTimeslotBtn' class='btn btn-primary'><i class='icon-minus-sign icon-white'></i>Mark Unavailable</button>"]);
+                    }
+                    //Print data
+                    for (var i = 0; i < outputData.length; i++) {
+                        var outputTr = $(document.createElement('tr'));
+                        var outputTdKey = $(document.createElement('td')).html('<b>' + outputData[i][0] + '</b>');
+                        var outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
+                        outputTr.append(outputTdKey);
+                        outputTr.append(outputTdValue);
+                        outputTable.append(outputTr);
+                    }
+
+                    bodyTd.popover({
+                        container: bodyTd,
+                        html: 'true',
+                        trigger: 'manual',
+                        placement: function() {
+                            if (bodyTd.parent().children().index(bodyTd) > 9) {
+                                return 'left';
+                            } else {
+                                return 'right';
+                            }
+                        },
+                        content: outputTable,
+                        title: "Change availability"
+                    });
+                }
+                
                 //Function to refresh booking exists
                 function refreshBookingExists() {
                     var toReturn = null;
@@ -611,6 +654,29 @@
                         appendPopovers(scheduleData);
                         return false;
                     });
+                    
+                    //Set Available
+                    $("td").on('click', '#availableTimeslotBtn', function(e) {
+                        e.stopPropagation();
+                        changeAvailability(self, true);
+                        showNotification("WARNING", self, "Set as available");
+                        self.popover('destroy');
+                        console.log("New classes should be :" + self.attr('class'));
+                        appendChangeAvailabilityPopover(self);
+                        return false;
+                    });
+                    
+                    //Set Unavailable
+                    $("td").on('click', '#unavailableTimeslotBtn', function(e) {
+                        e.stopPropagation();
+                        changeAvailability(self, false);
+                        showNotification("WARNING", self, "Set as unavailable");
+                        self.popover('destroy');
+                        console.log("New classes should be :" + self.attr('class'));
+                        appendChangeAvailabilityPopover(self);
+                        return false;
+                    });
+                    
                 }
 
                 function showNotification(action, bodyTd, notificationMessage) {
@@ -639,7 +705,7 @@
                             notificationType = "warning";
                             break;
                         case "WARNING":
-                            notificationTitle = "Warning";
+                            notificationTitle = "Note";
                             notificationType = "warning";
                             $.pnotify_remove_all();
                             break;
@@ -793,6 +859,58 @@
                         alert("Oops. There was an error: " + error);
                     });
                 }
+                
+                //Update Timeslots AJAX Call            
+                function changeAvailability(self, available) {
+                    var timeslotsData = {};
+                    var timeslot_data = new Array();
+                    var allTimeslots = $(".unavailableTimeslot", ".scheduleTable").get();
+                    var timeslotsSet = new HashSet();
+                    for (var i = 0; i < allTimeslots.length; i++) {
+                        var obj = allTimeslots[i];
+                        timeslotsSet.add(obj.id);
+                    }
+                    timeslot_data = timeslotsSet.values().sort();
+                    if (!available) {
+                        timeslot_data.push(self.attr('id'));
+                    } else {
+                        var index = timeslot_data.indexOf(self.attr('id'));
+                        timeslot_data.splice(index, 1);
+                    }
+                    timeslotsData["timeslot_data[]"] = timeslot_data;
+                    console.log('Availability data is: ' + JSON.stringify(timeslotsData));
+                    $.ajax({
+                        type: 'POST',
+                        async: false,
+                        url: 'setAvailabilityJson',
+                        data: timeslotsData,
+                        dataType: 'json'
+                    }).done(function(response) {
+                        if (!response.exception) {
+                            if (response.success) {
+                                if (!available) {
+                                    self.removeClass();
+                                    self.addClass("timeslotCell unavailableTimeslot");
+                                } else {
+                                    self.removeClass();
+                                    self.addClass("timeslotCell unbookedTimeslot");
+                                }
+//                                window.location.reload();
+                            } else {
+                                var eid = btoa(response.message);
+                                console.log(response.message);
+                                window.location = "error.jsp?eid=" + eid;
+                            }
+                        } else {
+                            var eid = btoa(response.message);
+                            window.location="error.jsp?eid=" + eid;
+                        }
+                    }).fail(function(error) {
+                        var eid = btoa("Something went wrong");
+                        window.location="error.jsp?eid=" + eid;
+                    });
+                    return false;
+                }
 
                 //Function to make schedule based on GetScheduleAction response
                 function makeSchedule(data) {
@@ -906,7 +1024,7 @@
                                         bodyTd.html(bookingDiv);
                                         bodyTd.addClass('bookedTimeslot');
                                     } else {
-                                        if (<%= activeRole.equals(Role.STUDENT) %> && !isAvailable) {
+                                        if (<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !isAvailable) {
                                             bodyTd.addClass('unavailableTimeslot');
                                         } else {
                                             bodyTd.addClass('unbookedTimeslot');

@@ -271,7 +271,13 @@
                         var datetimeString = date + " " + timesArray[i] + ":00";
                         var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                         if (timeslot) {
-                            td.attr("value", "timeslot_" + timeslot.id);
+                            if (timeslot.isMyTeam) {
+                                td.html("<b>" + timeslot.team + "</b>");
+                                td.attr("value", "timeslot_" + timeslot.id);
+                            } else {
+                                td.addClass("markable");
+                                td.attr("value", "timeslot_" + timeslot.id);
+                            }
                         }
                         tr.append(td);
                     }
@@ -379,7 +385,7 @@
             function populateTimeslotsTable(tableId, scheduleData) {
                 $("#" + tableId).find("td").each(function(){
                     var self = $(this);
-                    if (self.attr('value')) {
+                    if (self.hasClass("markable")) {
                         triggerTimeslot(this, scheduleData.duration);
                     }
                 });
