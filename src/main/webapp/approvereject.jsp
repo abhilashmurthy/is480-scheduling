@@ -15,84 +15,7 @@
 <html>
     <head>
         <title>Approve Booking</title>
-		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
-		<script type="text/javascript">
-			
-		//For data tables
-		$(document).ready(function(){
-			$('#approveRejectTable').dataTable({
-				"aLengthMenu": [
-					[5, 10, 20, -1],[5, 10, 20, "All"]], 
-				"iDisplayLength" : -1,
-//				"bPaginate": false,
-//				"bLengthChange": false,
-//				"bFilter": false,
-//				"bSort": false,
-				"bInfo": false,
-//				"bAutoWidth": false,
-//				"asStripClasses": null,
-				//To prevent highlighing of sorted column
-				"bSortClasses": false
-			})
-		});
-
-		//To check/uncheck all boxes
-		function toggle(oInput) {
-			var aInputs = document.getElementsByTagName('input');
-			for (var i=0;i<aInputs.length;i++) {
-				if (aInputs[i] != oInput) {
-					aInputs[i].checked = oInput.checked;
-				}
-			}
-		}
-		
-		//To validate the form (Make sure all checkboxes have been checked
-		function valthisform() {
-			var checkboxs=document.getElementsByName("approveRejectArray");
-			var okay = false;
-			for(var i = 0, l = checkboxs.length; i<l; i++) {
-				if(checkboxs[i].checked) {
-					okay = true;
-				}
-			}
-			if(!okay) {
-				alert("Please choose a timeslot!");
-				return false;
-			}
-			return true;
-		}
-		
-		jQuery(document).ready(function(){
-			if(document.getElementById('approveRejectArray') === null) {
-				 document.getElementById("approveButton").style.visibility = "hidden";
-				 document.getElementById("rejectButton").style.visibility = "hidden";
-			} else {
-				document.getElementById("approveButton").style.visibility = "visible";
-				document.getElementById("rejectButton").style.visibility = "visible";
-			}
-		});
-		
-		//Disabling buttons when checkboxes are unchecked and vice-versa
-//		$(document).ready(function (){
-//			$('#approveButton').attr('disabled','disabled');
-//			$('#rejectButton').attr('disabled','disabled');
-//			$('#approveRejectArray').change(function(){
-//			if($(this).is(':checked')){
-//				$('#approveButton').removeAttr('disabled');                
-//				$('#rejectButton').removeAttr('disabled');
-//			}
-//			else {
-//				// remove
-//				$('#approveButton').attr('disabled','disabled');
-//				$('#rejectButton').attr('disabled','disabled');
-//			}
-//		})
-//		});
-		//To show/hide buttons if checkbox exists or not
-		</script>
-		
     </head>
     <body>
         <%@include file="navbar.jsp" %>
@@ -190,5 +113,81 @@
 		
 		<br/>
         </div>
+		<%@include file="footer.jsp"%>
+		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+		<script type="text/javascript">
+			
+		//For data tables
+		$(document).ready(function(){
+			$('#approveRejectTable').dataTable({
+				"aLengthMenu": [
+					[5, 10, 20, -1],[5, 10, 20, "All"]], 
+				"iDisplayLength" : -1,
+//				"bPaginate": false,
+//				"bLengthChange": false,
+//				"bFilter": false,
+//				"bSort": false,
+				"bInfo": false,
+//				"bAutoWidth": false,
+//				"asStripClasses": null,
+				//To prevent highlighing of sorted column
+				"bSortClasses": false
+			})
+		});
+
+		//To check/uncheck all boxes
+		function toggle(oInput) {
+			var aInputs = document.getElementsByTagName('input');
+			for (var i=0;i<aInputs.length;i++) {
+				if (aInputs[i] != oInput) {
+					aInputs[i].checked = oInput.checked;
+				}
+			}
+		}
+		
+		//To validate the form (Make sure all checkboxes have been checked
+		function valthisform() {
+			var checkboxs=document.getElementsByName("approveRejectArray");
+			var okay = false;
+			for(var i = 0, l = checkboxs.length; i<l; i++) {
+				if(checkboxs[i].checked) {
+					okay = true;
+				}
+			}
+			if(!okay) {
+				alert("Please choose a timeslot!");
+				return false;
+			}
+			return true;
+		}
+		
+		jQuery(document).ready(function(){
+			if(document.getElementById('approveRejectArray') === null) {
+				 document.getElementById("approveButton").style.visibility = "hidden";
+				 document.getElementById("rejectButton").style.visibility = "hidden";
+			} else {
+				document.getElementById("approveButton").style.visibility = "visible";
+				document.getElementById("rejectButton").style.visibility = "visible";
+			}
+		});
+		
+		//Disabling buttons when checkboxes are unchecked and vice-versa
+//		$(document).ready(function (){
+//			$('#approveButton').attr('disabled','disabled');
+//			$('#rejectButton').attr('disabled','disabled');
+//			$('#approveRejectArray').change(function(){
+//			if($(this).is(':checked')){
+//				$('#approveButton').removeAttr('disabled');                
+//				$('#rejectButton').removeAttr('disabled');
+//			}
+//			else {
+//				// remove
+//				$('#approveButton').attr('disabled','disabled');
+//				$('#rejectButton').attr('disabled','disabled');
+//			}
+//		})
+//		});
+		//To show/hide buttons if checkbox exists or not
+		</script>
     </body>
 </html>
