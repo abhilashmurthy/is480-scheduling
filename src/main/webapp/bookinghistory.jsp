@@ -15,28 +15,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
         <title>Booking History</title>
-		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
-		<script type="text/javascript">
-			
-		//For data tables
-		$(document).ready(function(){
-			$('#bookingHistoryTable').dataTable({
-				"aLengthMenu": [
-					[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
-				"iDisplayLength" : -1,
-//				"bPaginate": false,
-//				"bLengthChange": false,
-//				"bFilter": false,
-//				"bSort": false,
-				"bInfo": false,
-//				"bAutoWidth": false,
-//				"asStripClasses": null,
-				"bSortClasses": false
-			})
-		});
-		</script>
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
@@ -84,13 +63,13 @@
 						<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
-							<tr class="warning">
+							<tr class="info">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
-							<tr class="info">
+							<tr class="warning">
 						</s:elseif>
 								<td><%= count %></td>
 								<td><s:property value="teamName"/></td>
@@ -113,13 +92,13 @@
 							</tr>
 						<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
-							<tr class="warning">
+							<tr class="info">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
-							<tr class="info">
+							<tr class="warning">
 						</s:elseif>
 							<td><%= count %></td>
 							<td><s:property value="teamName"/></td>
@@ -142,5 +121,27 @@
 			<h4>No bookings have been made!</h4>
 		</s:else>
 		</div>
+		
+		<%@include file="footer.jsp"%>
+		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+		<script type="text/javascript">
+			
+		//For data tables
+		$(document).ready(function(){
+			$('#bookingHistoryTable').dataTable({
+				"aLengthMenu": [
+					[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
+				"iDisplayLength" : -1,
+//				"bPaginate": false,
+//				"bLengthChange": false,
+//				"bFilter": false,
+//				"bSort": false,
+				"bInfo": false,
+//				"bAutoWidth": false,
+//				"asStripClasses": null,
+				"bSortClasses": false
+			})
+		});
+		</script>
     </body>
 </html>

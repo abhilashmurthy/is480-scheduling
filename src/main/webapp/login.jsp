@@ -25,6 +25,7 @@
 
             /* The white background content wrapper */
             .container > .content {
+				text-align: center;
                 background-color: #fff;
                 padding: 20px;
                 margin: 0 -20px; 
@@ -84,7 +85,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="login-form brand">IS480 Scheduling System</a>
+                    <!--<a class="login-form brand">IS480 Scheduling System</a>-->
                 </div>
             </div>
         </div>
@@ -93,12 +94,12 @@
         <div class="container">
             <div class="content">
                 <div>
-                    <img src="img/IS480-logo.jpg"/>
+                    <img src="img/IS480-logo.jpg" style="height:150px; width:450px; display:inline-block;" />
                 </div>
                 <div class="row">
 
                     <h2>IS480 Scheduling System</h2>
-                    <button id="ssoBtn" class="btn btn-primary" data-loading-text="Logging in..." type="submit">SMU Single Sign-On</button>
+                    <button id="ssoBtn" class="btn btn-primary" data-loading-text="Logging in..." type="submit">SMU Login</button>
                 </div>
             </div>
         </div> <!-- /container -->

@@ -65,7 +65,7 @@
 						<tbody> 
 							<s:iterator value="data">
 								<s:if test="%{myStatus.equalsIgnoreCase('Pending')}"> 
-									<tr class="warning">
+									<tr class="info">
 								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Approved')}">
 									<tr class="success">
 								</s:elseif><s:elseif test="%{myStatus.equalsIgnoreCase('Rejected')}">
