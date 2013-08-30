@@ -48,9 +48,10 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
             json.put("exception", false);
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             EntityTransaction transaction = null;
             
             Map parameters = request.getParameterMap();
@@ -166,7 +167,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
                     t.setEndTime(endTime);
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(acceptanceSchedule);
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     currentTime++;
                     newStartTime = endTime;
                 }
@@ -223,7 +224,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
                     t.setEndTime(endTime);
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(midtermSchedule);
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     currentTime++;
                     newStartTime = endTime;
                 }
@@ -280,7 +281,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
                     t.setEndTime(endTime);
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(finalSchedule);
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     currentTime++;
                     newStartTime = endTime;
                 }
@@ -299,7 +300,10 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
             }
             json.put("success", false);
             json.put("message", "Error with CreateSchedule: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 

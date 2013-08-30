@@ -11,22 +11,18 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
-import manager.ScheduleManager;
 import manager.SettingsManager;
 import static manager.SettingsManager.getByName;
-import manager.TimeslotManager;
 import model.Schedule;
 import model.Settings;
 import model.Term;
 import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -41,137 +37,52 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
     static final Logger logger = LoggerFactory.getLogger(CreateTimeslotsAction.class);
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
-    public HashMap<String, Object> getJson() {
-        return json;
-    }
-
-    public void setJson(HashMap<String, Object> json) {
-        this.json = json;
-    }
-
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
-        EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
-        Map parameters = request.getParameterMap();
-//        for (Object key : parameters.keySet()) {
-//            logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[0]);
-//            if (((String[]) parameters.get(key)).length > 1) {
-//                logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[1]);
-//                logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[2]);
-//            }
-//        }
+			//Getting input data
+			JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+			JSONArray schedules = inputData.getJSONArray("schedules");
+			
+			em.getTransaction().begin();
+			for (int i = 0; i < schedules.length(); i++) {
+				JSONObject scheduleData = schedules.getJSONObject(i);
+				Schedule s = em.find(Schedule.class, scheduleData.getLong("scheduleId"));
+				if (s == null) {
+					json.put("success", false);
+					json.put("message", "Schedule with ID: " + scheduleData.getLong("scheduleId") + " not found.");
+					return SUCCESS;
+				}
+				JSONArray timeslotTimes = scheduleData.getJSONArray("timeslots");
+				
+				for (int j = 0; j < timeslotTimes.length(); j++) {
+					//Getting startTime and endTime
+					Timestamp startTime = Timestamp.valueOf(timeslotTimes.getString(j));
+					Calendar cal = Calendar.getInstance();
+					cal.setTimeInMillis(startTime.getTime());
+					cal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
+					Timestamp endTime = new Timestamp(cal.getTimeInMillis());
 
-        //Getting schedule id's
-        int acceptanceId = Integer.parseInt(((String[]) parameters.get("acceptanceId"))[0]);
-        int midtermId = Integer.parseInt(((String[]) parameters.get("midtermId"))[0]);
-        int finalId = Integer.parseInt(((String[]) parameters.get("finalId"))[0]);
+					Timeslot t = new Timeslot();
+					t.setStartTime(startTime);
+					t.setEndTime(endTime);
+					t.setVenue(scheduleData.getString("venue"));
+					t.setSchedule(s);
+					em.persist(t);
+				} //End of timeslot creation loop
+			}
 
-        logger.debug("Got schedule ids");
+			//Setting term for newly created schedules as active
+			Schedule firstSchedule = em.find(Schedule.class, schedules.getJSONObject(0).getLong("scheduleId"));
+			setTermAsActive(em, firstSchedule.getMilestone().getTerm());
+			
+			em.getTransaction().commit();
 
-        //Getting timeslot values
-        String[] acceptanceTimeslotStrings = (String[]) parameters.get("timeslot_acceptance[]");
-        String[] midtermTimeslotStrings = (String[]) parameters.get("timeslot_midterm[]");
-        String[] finalTimeslotStrings = (String[]) parameters.get("timeslot_final[]");
-
-        logger.debug("Got string arrays of schedules");
-
-        for (String s : acceptanceTimeslotStrings) {
-            logger.debug("Acceptance timeslot: " + s);
-        }
-
-        //Making lists of STORED timeslots
-        Set<Timeslot> acceptanceTimeslots = new HashSet<Timeslot>();
-        Set<Timeslot> midtermTimeslots = new HashSet<Timeslot>();
-        Set<Timeslot> finalTimeslots = new HashSet<Timeslot>();
-        Calendar cal = Calendar.getInstance();
-        EntityTransaction transaction = null;
-        
-        Schedule acceptanceSchedule = ScheduleManager.findById(em, acceptanceId);
-        Schedule midtermSchedule = ScheduleManager.findById(em, midtermId);
-        Schedule finalSchedule = ScheduleManager.findById(em, finalId);
-
-        logger.debug("Got all schedules: acceptance[" + acceptanceSchedule + "], midterm[" + midtermSchedule + "], final[" + finalSchedule + "]");
-
-        try {
-            //Set acceptance timeslots
-            for (String s : acceptanceTimeslotStrings) {
-                //Getting startTime and endTime
-                Timestamp startTime = Timestamp.valueOf(s);
-                cal.setTimeInMillis(startTime.getTime());
-                //TODO: Change the 1 to a variable
-                cal.add(Calendar.HOUR, 1);
-                Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-
-                Timeslot t = new Timeslot();
-                t.setStartTime(startTime);
-                t.setEndTime(endTime);
-                //TODO: Change to the venue variable
-                t.setVenue("SIS Seminar Room 2-1");
-                //TODO: Handle write error
-                t.setSchedule(acceptanceSchedule);
-                TimeslotManager.save(em, t, transaction);
-                acceptanceTimeslots.add(t);
-            }
-
-            logger.debug("Persisted acceptance timeslots: count " + acceptanceTimeslots.size());
-
-            //Set midterm timeslots
-            for (String s : midtermTimeslotStrings) {
-                //Getting startTime and endTime
-                Timestamp startTime = Timestamp.valueOf(s);
-                cal.setTimeInMillis(startTime.getTime());
-                //TODO: Change the 1 to a variable
-                cal.add(Calendar.HOUR, 1);
-                cal.add(Calendar.MINUTE, 30);
-                Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-
-                Timeslot t = new Timeslot();
-                t.setStartTime(startTime);
-                t.setEndTime(endTime);
-                //TODO: Change to the venue variable
-                t.setVenue("SIS Seminar Room 2-1");
-                t.setSchedule(midtermSchedule);
-                //TODO: Handle write error
-               TimeslotManager.save(em, t, transaction);
-               midtermTimeslots.add(t);
-            }
-
-            logger.debug("Persisted midterm timeslots: count " + midtermTimeslots.size());
-
-            //Set final timeslots
-            for (String s : finalTimeslotStrings) {
-                //Getting startTime and endTime
-                Timestamp startTime = Timestamp.valueOf(s);
-                cal.setTimeInMillis(startTime.getTime());
-                //TODO: Change the 1 to a variable
-                cal.add(Calendar.HOUR, 1);
-                cal.add(Calendar.MINUTE, 30);
-                Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-
-                Timeslot t = new Timeslot();
-                t.setStartTime(startTime);
-                t.setEndTime(endTime);
-                //TODO: Change to the venue variable
-                t.setVenue("SIS Seminar Room 2-1");
-                t.setSchedule(finalSchedule);
-                //Save timeslot
-                //TODO: Handle write error
-                TimeslotManager.save(em, t, transaction);
-                finalTimeslots.add(t);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        logger.debug("Persisted final timeslots: count " + finalTimeslots.size());
-
-		//Setting newly created term as active
-		setTermAsActive(em, acceptanceSchedule.getMilestone().getTerm());
-		
-        json.put("success", true);
-		json.put("message", "Timeslots stored successfully. Schedule creation complete!");
+			json.put("success", true);
+			json.put("message", "Timeslots stored successfully. Schedule creation complete!");
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -181,16 +92,14 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
             }
             json.put("success", false);
             json.put("message", "Error with CreateTimeslots: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 
-    public void setServletRequest(HttpServletRequest hsr) {
-        request = hsr;
-    }
-
 	private void setTermAsActive(EntityManager em, Term newTerm) {
-		em.getTransaction().begin();
 		Settings result = getByName(em, "activeTerms");
 		ArrayList<Long> activeTermIds = new ArrayList<Long>();
 		for (Term t : SettingsManager.getActiveTerms(em)) {
@@ -199,6 +108,17 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 		activeTermIds.add(newTerm.getId());
 		result.setValue(new Gson().toJson(activeTermIds));
 		em.persist(result);
-		em.getTransaction().commit();
 	}
+
+    public HashMap<String, Object> getJson() {
+        return json;
+    }
+
+    public void setJson(HashMap<String, Object> json) {
+        this.json = json;
+    }
+
+    public void setServletRequest(HttpServletRequest hsr) {
+        request = hsr;
+    }
 }

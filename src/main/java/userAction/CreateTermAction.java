@@ -4,7 +4,6 @@
  */
 package userAction;
 
-import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.util.ArrayList;
@@ -95,7 +94,6 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
             }
             
         } catch (Exception e) {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -105,6 +103,7 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
             json.put("exception", true);
             json.put("message", "Error with CheckTerm: Escalate to developers!");
         } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
 		}
         return SUCCESS;

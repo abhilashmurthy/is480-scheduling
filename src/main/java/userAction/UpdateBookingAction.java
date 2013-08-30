@@ -42,10 +42,11 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws ServletException, IOException {
+		EntityManager em = null;
         try {
             //Code here
             //convert the chosen ID into long and get the corresponding Timeslot object
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             long chosenID = Long.parseLong(timeslotId);
             Timeslot ts = TimeslotManager.findById(em, chosenID);
             //Timeslot oldSlot = (Timeslot)ts.clone();
@@ -279,7 +280,10 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
             }
             request.setAttribute("error", "Error with UpdateBooking: Escalate to developers!");
             return ERROR;
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 

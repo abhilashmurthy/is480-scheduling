@@ -93,7 +93,6 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
             json.put("success", true);
         } catch (Exception e) {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -103,6 +102,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
             json.put("success", false);
             json.put("message", "Error with CreateSchedule: Escalate to developers!");
         } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
 		}
         return SUCCESS;

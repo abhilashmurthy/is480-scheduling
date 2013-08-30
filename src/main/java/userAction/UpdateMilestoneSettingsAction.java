@@ -43,8 +43,9 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 	
 	@Override
     public String execute() {
+		EntityManager em = null;
         try {
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 			HttpSession session = request.getSession();
 			
 			//Checking whether the active user is admin/course coordinator or not
@@ -93,7 +94,10 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
             }
             json.put("success", false);
             json.put("message", "Error with UpdateMilestoneSettings: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
 	 } //end of execute
 	 

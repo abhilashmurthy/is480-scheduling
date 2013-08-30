@@ -47,9 +47,10 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
             json.put("exception", false);
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
             Map parameters = request.getParameterMap();
 
@@ -134,7 +135,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setVenue("SIS Seminar Room 2-1");
                 //TODO: Handle write error
                 t.setSchedule(acceptanceSchedule);
-                TimeslotManager.save(em, t, transaction);
+                em.persist(t);
                 acceptanceTimeslots.add(t);
             }
             
@@ -157,7 +158,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                     t.setVenue("SIS Seminar Room 2-1");
                     t.setSchedule(midtermSchedule);
                     //TODO: Handle write error
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     midtermTimeslots.add(t);
                 }
 
@@ -181,7 +182,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                     t.setSchedule(finalSchedule);
                     //Save timeslot
                     //TODO: Handle write error
-                    TimeslotManager.save(em, t, transaction);
+                    em.persist(t);
                     finalTimeslots.add(t);
                 }
                 
@@ -199,7 +200,10 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
             }
             json.put("success", false);
             json.put("message", "Error with CreateTimeslots: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
     

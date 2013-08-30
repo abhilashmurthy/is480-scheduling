@@ -69,10 +69,6 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 			json.put("success", true);
             json.put("message", "Faculty availability updated successfully");
 		} catch (Exception e) {
-			if (em != null && em.getTransaction().isActive()) {
-				em.getTransaction().rollback();
-			}
-			
 			logger.error(e.getMessage());
 			if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -85,7 +81,8 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 			
 			json.put("success", false);
             json.put("message", "Error with SetAvailability: Escalate to developers!");
-		} finally { //Closing the EntityManager to prevent memory leak
+		} finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
 		}
 		return SUCCESS;

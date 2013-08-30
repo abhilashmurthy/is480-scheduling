@@ -40,9 +40,10 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws ServletException, IOException {
+		EntityManager em = null;
         try {
             json.put("exception", false);
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
@@ -94,7 +95,10 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
             json.put("success", false);
             json.put("exception", true);
             json.put("message", "Error with Delete Booking: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 

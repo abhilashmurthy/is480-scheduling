@@ -53,9 +53,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
             json.put("exception", false);
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             HttpSession session = request.getSession();
 
             User user = (User) session.getAttribute("user");
@@ -156,7 +157,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("success", false);
             json.put("exception", true);
             json.put("message", "Error with CreateBooking: Escalate to developers!");
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 	

@@ -74,8 +74,9 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     @Override
     public String execute() throws Exception {
+		EntityManager em = null;
         try {
-            EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             logger.info("Reached LoginAction");
 			
 			if (true) { //CODE FOR LOCALHOST TESTING
@@ -173,7 +174,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
             request.setAttribute("error", "Error with Login: Escalate to developers!");
             return ERROR;
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
         return SUCCESS;
     }
 	
