@@ -28,9 +28,22 @@ public class Term implements Serializable {
 	
 	private int academicYear;
 	private String semester;
-	
+	private String displayName;
+
 	@OneToMany(mappedBy = "term")
 	private Set<Milestone> milestones;
+	
+	protected Term() {
+		
+	}
+	
+	public Term(int academicYear, String semester) {
+		this.academicYear = academicYear;
+		this.semester = semester;
+		String endAcademicYear = String.valueOf(academicYear + 1);
+		displayName = String.valueOf(academicYear) + "-"
+				+ endAcademicYear.substring(2) + " " + semester;
+	}
 
 	public Set<Milestone> getMilestones() {
 		return milestones;
@@ -56,6 +69,14 @@ public class Term implements Serializable {
 		this.semester = semester;
 	}
 
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+	
 	public Long getId() {
 		return id;
 	}

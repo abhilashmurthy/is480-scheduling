@@ -57,9 +57,7 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
 			//Creating term and milestones in DB
             if (year != 0 && semester != null && !semester.equals("")) {
                 em.getTransaction().begin();
-                Term newTerm = new Term();
-                newTerm.setAcademicYear(year);
-                newTerm.setSemester(semester);
+                Term newTerm = new Term(year, semester);
                 em.persist(newTerm);
 				json.put("termId", newTerm.getId());
 				

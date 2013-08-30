@@ -45,7 +45,7 @@
 		
 		<div id ="confirmBookings"> 
 			<!-- SECTION: Approve/Reject Bookings -->
-			<s:if test="%{data.size() > 0 && data != null}"> 
+			<s:if test="%{data != null && data.size() > 0}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
 				<form id="myform" action="updateBookingStatus" method="post">
 					<table id="approveRejectTable" class="table table-hover">

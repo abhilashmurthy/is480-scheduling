@@ -105,9 +105,7 @@ public class DBInitUtil {
 		/*
 		 * TERM TABLE POPULATION
 		 */		
-		Term term12013 = new Term();
-		term12013.setAcademicYear(2013);
-		term12013.setSemester("Term 1");
+		Term term12013 = new Term(2013, "Term 1");
 		
 		// Persistence
 		em.persist(term12013);
