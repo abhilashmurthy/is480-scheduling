@@ -49,7 +49,10 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 			//Checking whether user is supervisor/reviewer
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			if (activeRole == Role.FACULTY) {
-				Faculty faculty = (Faculty) user;
+				em.clear();
+				Faculty f = (Faculty) user;
+				Faculty faculty = em.find(Faculty.class, f.getId());
+				session.setAttribute("user", faculty);
 				//Getting all bookings for the user
 				for (Booking b : faculty.getRequiredBookings()) {
 					if (b.getResponseList().get(faculty) == Response.PENDING) {

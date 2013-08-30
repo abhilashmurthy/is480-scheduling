@@ -5,6 +5,7 @@
 package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import model.Booking;
 import model.Team;
 import model.User;
@@ -37,12 +40,18 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
     @Override
     public String execute() throws Exception {
         try {
+			EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             HttpSession session = request.getSession();
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			if (activeRole.equals(Role.FACULTY)) {
 
-				Faculty faculty = (Faculty) session.getAttribute("user");
+				Faculty f = (Faculty) session.getAttribute("user");
+				//Setting the updated user object in session
+				em.clear();
+                Faculty faculty = em.find(Faculty.class, f.getId());
+				session.setAttribute("user", faculty);
+				
 				//Getting all the bookings for the faculty for the active term
 				Set<Booking> bookingsList = faculty.getRequiredBookings();
 				
@@ -51,8 +60,11 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				if (bookingsList.size() > 0) {
 					for (Booking b : bookingsList) {
 						HashMap<User, Response> responseList = b.getResponseList();
-						if (responseList.get(faculty) == Response.PENDING) {
-							pendingBookingList.add(b);
+						//If the status of a booking is deleted, dont show it (regardless of the faculty's status)
+						if (b.getBookingStatus() != BookingStatus.DELETED) {
+							if (responseList.get(faculty) == Response.PENDING) {
+								pendingBookingList.add(b);
+							}
 						}
 					}
 				}
