@@ -31,7 +31,7 @@ public class SettingsManager {
 		ArrayList<Long> termIds = new Gson().fromJson(result.getValue(), listType);
 		ArrayList<Term> activeTerms = new ArrayList<Term>();
 		for (Long l : termIds) {
-			activeTerms.add(TermManager.findTermById(em, l));
+			activeTerms.add(em.find(Term.class, l));
 		}
 		return activeTerms;
 	}
