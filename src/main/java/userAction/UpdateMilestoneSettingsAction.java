@@ -15,14 +15,13 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import manager.SettingsManager;
-import static manager.SettingsManager.getByName;
 import model.Settings;
 import model.User;
-import systemAction.GetMilestoneSettingsAction;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import util.MiscUtil;
 
 /**
@@ -33,11 +32,6 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 
     private HashMap<String, Object> json = new HashMap<String, Object>();
 	private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
-	String pastOrderNumber;
-	String newOrderNumber;
-	String newMilestoneName;
-	String newDuration;
-	String newAttendees;
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(UpdateMilestoneSettingsAction.class);
 	
@@ -45,38 +39,130 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
     public String execute() {
 		EntityManager em = null;
         try {
+			json.put("exception", false);
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 			HttpSession session = request.getSession();
 			
 			//Checking whether the active user is admin/course coordinator or not
 			User user = (User) session.getAttribute("user");
 			if (user.getRole().equals(Role.ADMINISTRATOR) || user.getRole().equals(Role.COURSE_COORDINATOR)) {
-				//Getting the current settings object for milestones
-				Settings currentSettings = SettingsManager.getByName(em, "milestones");
-				//Getting the milestones value from settings object
-				ArrayList<HashMap<String,Object>> settingsList = SettingsManager.getMilestoneSettings(em, currentSettings);
-				//New settings for milestone
-				ArrayList<HashMap<String,Object>> updatedSettingsList = new ArrayList<HashMap<String, Object>>();
 			
-				for (HashMap<String, Object> mapToUpdate : settingsList) {
-					double order = (Double) mapToUpdate.get("order");
-					//Updating the milestone based on the past order number
-					if (order == Double.valueOf(pastOrderNumber)) {
-						mapToUpdate.put("order", Double.valueOf(newOrderNumber));
-						mapToUpdate.put("name", newMilestoneName);
-						mapToUpdate.put("duration", Double.valueOf(newDuration));
-						//To remove the comma from the end (CHANGE LATER)
-						newAttendees = newAttendees.substring(0, newAttendees.length() - 1);
-						String[] requiredAttendees = newAttendees.split(",");
-						mapToUpdate.put("requiredAttendees", requiredAttendees);
+				ArrayList<HashMap<String, Object>> milestonesList = new ArrayList<HashMap<String, Object>>();
+				//Getting input data from url
+				JSONArray inputArray = (JSONArray) new JSONArray(request.getParameter("jsonData"));
+
+				boolean error = false;
+				double[] orderList = new double[inputArray.length()];
+
+				for (int i = 0; i < inputArray.length(); i++) {
+					JSONObject milestone = inputArray.getJSONObject(i);
+					HashMap<String, Object> map = new HashMap<String, Object>();
+					//Storing the values in a hashmap
+					String order = milestone.getString("newOrderNumber");
+					orderList[i] = Double.valueOf(order);
+					map.put("order", Double.valueOf(order));
+
+					String milestoneName = milestone.getString("newMilestoneName");
+					map.put("milestone", milestoneName);
+
+					String duration = milestone.getString("newDuration");
+					map.put("duration", Double.valueOf(duration));
+
+					String newAttendees = milestone.getString("newAttendees");
+					//Removing the comma from the end
+					String[] attendees = newAttendees.substring(0, newAttendees.length() - 1).split(",");
+					map.put("attendees", attendees);
+
+					//If more than 3 attendees for a milestone return error
+					if (attendees.length > 3) {
+						json.put("message", "Error! More than 3 attendees for a milestone!");
+						json.put("success", false);
+						return SUCCESS;
 					}
-					updatedSettingsList.add(mapToUpdate);
+					//Checking whether any 2 attendees are same 
+					for (int j = 0; j < attendees.length; j++) {
+						for (int k = j + 1; k < attendees.length; k++) {
+							if (attendees[k].equalsIgnoreCase(attendees[j])) { 
+								error = true;
+								break;
+							}
+						}
+					}
+					if (error == true) {
+						json.put("message", "Error! Required attendees are same for a milestone!");
+						json.put("success", false);
+						return SUCCESS;
+					}
+
+					milestonesList.add(map);
+				} //end of for loop
+
+				//Checking for error whether any 2 order numbers are the same 
+				if (orderList != null) {
+					for (int j = 0; j < orderList.length; j++) {
+						for (int k = j + 1; k < orderList.length; k++) {
+							if (orderList[k] == orderList[j]) { // or use .equals()
+								error = true;
+								break;
+							}
+						}
+					}
 				}
-				//String jsonString = new Gson().toJson(updatedSettingsList);
+				if (error == true) {
+					json.put("message", "Error! Order numbers are same!");
+					json.put("success", false);
+					return SUCCESS;
+				}
+				
+				//Checking whether order numbers are 0 or less than 0
+				if (orderList != null) {
+					for (int j = 0; j < orderList.length; j++) {
+						if (orderList[j] < 1) { // or use .equals()
+							error = true;
+							break;
+						}
+					}
+				}
+				if (error == true) {
+					json.put("message", "Error! Incorrect order number!");
+					json.put("success", false);
+					return SUCCESS;
+				}
+				//-------------Validation Checks completed----------------
+				
+				//Sorting the orders array in ascending order of orders
+				if (orderList != null) {
+					double temp = 0;
+					for (int i = 0; i < orderList.length; i++) { 
+						for (int j = 0; j < orderList.length - 1; j++) {
+							if (orderList[j+1] < orderList[j]) {
+								temp = orderList[j+1];
+								orderList[j+1] = orderList[j];
+								orderList[j] = temp;  
+							}
+						}
+					}
+				}
+				//Sorting the hashmaps according to sorted order numbers
+				ArrayList<HashMap<String, Object>> sortedMilestonesList = new ArrayList<HashMap<String, Object>>();
+				if (orderList != null) {
+					for (int i = 0; i < orderList.length; i++) {
+						for (HashMap<String, Object> map : milestonesList) {
+							double unsortedOrder = (Double) map.get("order");
+							if (orderList[i] == unsortedOrder) {
+								sortedMilestonesList.add(map);
+							}
+						}
+					}
+				}
+				
+				Settings currentSettings = SettingsManager.getByName(em, "milestones");
+				//Storing the milestones list in settings table in db
 				em.getTransaction().begin();
-				currentSettings.setValue(new Gson().toJson(updatedSettingsList));
+				currentSettings.setValue(new Gson().toJson(sortedMilestonesList));
 				em.persist(currentSettings);
 				em.getTransaction().commit();
+				
 				json.put("success", true);
 				json.put("message", "Milestone Settings Updated!");
 
@@ -93,6 +179,7 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
                 }
             }
             json.put("success", false);
+			json.put("exception", true);
             json.put("message", "Error with UpdateMilestoneSettings: Escalate to developers!");
         } finally {
 			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
@@ -127,45 +214,5 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 
 	public void setData(ArrayList<HashMap<String, Object>> data) {
 		this.data = data;
-	}
-
-	public String getPastOrderNumber() {
-		return pastOrderNumber;
-	}
-
-	public void setPastOrderNumber(String pastOrderNumber) {
-		this.pastOrderNumber = pastOrderNumber;
-	}
-
-	public String getNewOrderNumber() {
-		return newOrderNumber;
-	}
-
-	public void setNewOrderNumber(String newOrderNumber) {
-		this.newOrderNumber = newOrderNumber;
-	}
-
-	public String getNewMilestoneName() {
-		return newMilestoneName;
-	}
-
-	public void setNewMilestoneName(String newMilestoneName) {
-		this.newMilestoneName = newMilestoneName;
-	}
-
-	public String getNewDuration() {
-		return newDuration;
-	}
-
-	public void setNewDuration(String newDuration) {
-		this.newDuration = newDuration;
-	}
-
-	public String getNewAttendees() {
-		return newAttendees;
-	}
-
-	public void setNewAttendees(String newAttendees) {
-		this.newAttendees = newAttendees;
 	}
 }  // end of class
