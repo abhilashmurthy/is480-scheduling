@@ -85,6 +85,8 @@
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
+						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+							<tr class="info">
 						</s:elseif>
 								<td><%= count %></td>
 								<td><s:property value="teamName"/></td>
@@ -107,6 +109,8 @@
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
+						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+							<tr class="info">
 						</s:elseif>
 							<td><%= count %></td>
 							<td><s:property value="teamName"/></td>
