@@ -87,6 +87,7 @@ body {
     background-color: #AEC7C9 !important; 
     padding: 5px;
     width: 100px;
+    height: 20px;
 }
 
 .popover {
@@ -161,6 +162,16 @@ body {
     font-weight: bold;
 }
 
+.booking {
+    display: inline-table;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    line-height: 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
 .pendingBooking {
     border-radius: 5px !important;
     -moz-border-radius: 5px !important;
@@ -189,7 +200,6 @@ body {
 	left:66%;
 	top:17.5%;
 }
-
 
 .pendingBookings {
 	position: absolute;
