@@ -34,10 +34,10 @@ public class Student extends User implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Team team;
-	@ManyToMany(mappedBy = "requiredAttendees", cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy = "requiredAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 //	@JoinTable(name="Required_Attendees",
