@@ -85,10 +85,10 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				Faculty faculty = null;
 				Student student = null;
 				if (activeRole.equals(Role.FACULTY)) {
-					faculty = (Faculty) session.getAttribute("user");
+					faculty = em.find(Faculty.class, user.getId());
 					bookings = faculty.getRequiredBookings();
 				} else if (activeRole.equals(Role.STUDENT)) {
-					student = (Student) session.getAttribute("user");
+					student = em.find(Student.class, user.getId());
 					bookings = student.getRequiredBookings();
 					for (Booking b: bookings) {
 						Term term = b.getTimeslot().getSchedule().getMilestone().getTerm();
@@ -117,8 +117,8 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 							sdfForTime.format(timeslot.getEndTime());
 
 					//Only for supervisors/reviewers (or Faculty)
-					if (activeRole.equals(Role.FACULTY)) { 
-						Faculty faculty = (Faculty) session.getAttribute("user");
+					if (activeRole.equals(Role.FACULTY)) {
+						Faculty faculty = em.find(Faculty.class, user.getId());
 						String myStatus = b.getResponseList().get(faculty).toString();
 						map.put("myStatus", myStatus);
 					}

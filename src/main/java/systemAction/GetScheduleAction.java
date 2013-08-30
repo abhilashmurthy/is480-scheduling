@@ -191,7 +191,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 } 
                 
                 if (user.getRole() == Role.STUDENT) {
-                    Team team = ((Student) user).getTeam();
+                    Team team = student.getTeam();
                     boolean available = true;
                     ArrayList<String> unavailable = new ArrayList<String>();
 

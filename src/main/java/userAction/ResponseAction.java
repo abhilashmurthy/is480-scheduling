@@ -46,10 +46,10 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			if (activeRole.equals(Role.FACULTY)) {
 
-				Faculty f = (Faculty) session.getAttribute("user");
+				User user = (User) session.getAttribute("user");
 				//Setting the updated user object in session
 				em.clear();
-                Faculty faculty = em.find(Faculty.class, f.getId());
+                Faculty faculty = em.find(Faculty.class, user.getId());
 				session.setAttribute("user", faculty);
 				
 				//Getting all the bookings for the faculty for the active term
