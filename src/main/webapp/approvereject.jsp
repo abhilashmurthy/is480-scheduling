@@ -23,13 +23,18 @@
 		//For data tables
 		$(document).ready(function(){
 			$('#approveRejectTable').dataTable({
-				"bPaginate": false,
-				"bLengthChange": false,
+				"aLengthMenu": [
+					[5, 10, 20, -1],[5, 10, 20, "All"]], 
+				"iDisplayLength" : -1,
+//				"bPaginate": false,
+//				"bLengthChange": false,
 //				"bFilter": false,
 //				"bSort": false,
 				"bInfo": false,
-				"bAutoWidth": false,
-				"asStripClasses": null
+//				"bAutoWidth": false,
+//				"asStripClasses": null,
+				//To prevent highlighing of sorted column
+				"bSortClasses": false
 			})
 		});
 
@@ -155,7 +160,9 @@
 									<td><s:property value="date"/></td>
 									<td><s:property value="time"/></td>
 									<td><s:property value="venue"/></td>
-									<td><s:property value="myStatus"/></td>
+									<td>
+										<s:property value="myStatus"/><br/><br/>
+									</td>
 								</tr>
 							</s:iterator>
 							</tbody>

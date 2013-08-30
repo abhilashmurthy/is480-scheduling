@@ -23,13 +23,17 @@
 		//For data tables
 		$(document).ready(function(){
 			$('#bookingHistoryTable').dataTable({
-				"bPaginate": false,
-				"bLengthChange": false,
+				"aLengthMenu": [
+					[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
+				"iDisplayLength" : -1,
+//				"bPaginate": false,
+//				"bLengthChange": false,
 //				"bFilter": false,
 //				"bSort": false,
 				"bInfo": false,
-				"bAutoWidth": false,
-				"asStripClasses": null
+//				"bAutoWidth": false,
+//				"asStripClasses": null,
+				"bSortClasses": false
 			})
 		});
 		</script>
@@ -95,9 +99,14 @@
 								<td><s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
 								<td>
+								<% int countRows = 0; %>
 								<s:iterator value="individualBookingStatus">
 									<s:property value="status"/> by <s:property value="name"/> <br/>
-								</s:iterator>
+									<% countRows++ ; %>
+								</s:iterator> 
+								<% if (countRows == 1) { %>
+									<br/>
+								<% } %>
 								</td>
 								<td><s:property value="overallBookingStatus"/></td>
 								<% count = count + 1; %>
@@ -119,13 +128,16 @@
 							<td><s:property value="time"/></td>
 							<td><s:property value="venue"/></td>
 							<td><s:property value="myStatus"/></td>
-							<td><s:property value="overallBookingStatus"/></td>
+							<td>
+								<s:property value="overallBookingStatus"/><br/><br/>
+							</td>
 							<% count = count + 1; %>
 						</tr>
 						<% } %>
 					</s:iterator>
 					</tbody>
 				</table>
+				<br/><br/>
 		</s:if><s:else>
 			<h4>No bookings have been made!</h4>
 		</s:else>
