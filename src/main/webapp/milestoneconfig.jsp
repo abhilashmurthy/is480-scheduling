@@ -60,7 +60,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <input type='text' id="milestone<%=counter%>" style="width:90px; height:20px" value='<s:property value="name"/>'></input>
+                                    <input type='text' id="milestone<%=counter%>" style="width:90px; height:20px" value='<s:property value="milestone"/>' />
 
                                 </td>
                                 <td style="width:90px">
@@ -198,9 +198,7 @@
                 }
                 //console.log(rows);
                 //var count = 99;
-
-                var data = "";
-                
+                var milestoneJson = new Array();
                 var allOrders = "";
 
                 //for each row, get the details
@@ -216,7 +214,7 @@
                         
                         if(allOrders.indexOf(newOrderNumber)!==-1){
                             
-                            alert("Ensure order numbers are not the same");
+                            alert("Please ensure order numbers are not the same!");
                             return true;
                         }
                         
@@ -231,7 +229,7 @@
                         }
 
                         if (newMilestoneName === "") {
-                            alert("Ensure that all milestone names are entered");
+                            alert("Please ensure that all milestone names are entered!");
                             return true;
                         }
 
@@ -255,40 +253,45 @@
                         }
                         
                         if(newAttendees.length < 1){
-                            alert("Ensure that there is at least one required attendee for each milestone");
+                            alert("Please ensure that there is at least one required attendee for each milestone!");
                             return true;
                             
                         }
-
-                        data += "newOrderNumber:" + newOrderNumber + ",newMilestoneName:" + newMilestoneName
-                                + ",newDuration:" + newDuration + ",newAttendees:" + newAttendees;
+						
+						//Creating object and storing in in array
+						var milestone = {};
+						milestone["newOrderNumber"] = newOrderNumber;
+						milestone["newMilestoneName"] = newMilestoneName;
+						milestone["newDuration"] = newDuration;
+						milestone["newAttendees"] = newAttendees;
+						//alert(jsonData);
+						milestoneJson.push(milestone);
                     }
                 }
-                alert(data);
-
+				
                 //code to send the update to backend. url corresponds to action class name defined in struts
                 //uncomment this part
-                /*$.ajax({
+                $.ajax({
                  type: 'POST',
                  async: false,
                  url: 'updateMilestoneSettings',
-                 data: data,
-                 cache: false,
-                 dataType: 'json'
-
+                 data: {jsonData: JSON.stringify(milestoneJson)}
                  }).done(function(response) {
-                 if (response.success) {
-                 console.log("Milestones updated successfully!");
-                 displayMessage("milestoneSettingsUpdateMessage", response.message, false);
-                 } else {
-                 var eid = btoa(response.message);
-                 console.log(response.message);
-                 window.location = "error.jsp?eid=" + eid;
-                 }
+					if (!response.exception) {
+						if (response.success) {
+							displayMessage("milestoneSettingsUpdateMessage", response.message, false);
+						} else {
+							displayMessage("milestoneSettingsUpdateMessage", response.message, true);
+						}
+					} else {
+						var eid = btoa(response.message);
+						window.location = "error.jsp?eid=" + eid;
+					}
                  }).fail(function(error) {
-                 console.log("Updating Milestone settings AJAX FAIL");
-                 displayMessage("milestoneSettingsUpdateMessage", "Oops.. something went wrong", true);
-                 });*/
+					console.log("Updating Milestone settings AJAX FAIL");
+					displayMessage("milestoneSettingsUpdateMessage", "Oops.. something went wrong", true);
+                 });
+				 return false;
             }
 
             function createInput(id) {
@@ -355,7 +358,7 @@
                     return false;
                     //window.attachEvent("onload", func);
                 } else {
-                    alert("There are already 3 required attendees for this milestone");
+                    alert("There are already 3 required attendees for this milestone!");
                 }
             }
 
@@ -395,11 +398,11 @@
                 if (formId.indexOf('duration') !== -1) {
                     var num = id.value;
                     var newNum = parseInt(num, 10) - parseInt(30, 10);
-                    if (parseInt(id.value, 10) !== 0) {
+                    if (parseInt(id.value, 10) !== 30) {
                         id.value = newNum;
                     }
                 } else {
-                    if (parseInt(id.value, 10) !== 0) {
+                    if (parseInt(id.value, 10) !== 1) {
                         id.value--;
                     }
                 }
@@ -412,7 +415,7 @@
                 $(e).fadeTo(3000, 0);
                 $(e).css('color', 'darkgreen').html(msg);
                 if (fade) {
-                    $(e).css('color', 'darkred').html(msg).fadeTo(3000, 0);
+                    $(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
                 }
             }
 

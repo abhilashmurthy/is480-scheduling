@@ -46,34 +46,30 @@ public class GetMilestoneSettingsAction extends ActionSupport implements Servlet
 				Settings result = SettingsManager.getByName(em, "milestones");
 				//Getting the milestones value from settings object
 				ArrayList<HashMap<String,Object>> settingsList = SettingsManager.getMilestoneSettings(em, result);
-				try {
-					for (HashMap<String, Object> map : settingsList) {
-						double duration = (Double) map.get("duration");
-						int dur = (int) duration;
-						map.put("duration", String.valueOf(dur));
-						
-						double order = (Double) map.get("order");
-						int o = (int) order;
-						map.put("order", String.valueOf(o));
-						
-						String milestone = (String) map.get("name");
-						map.put("milestone", milestone);
-						
-						ArrayList<String> attendees = (ArrayList<String>) map.get("requiredAttendees");
-						List<HashMap<String, String>> attendeesList = new ArrayList<HashMap<String, String>>();
-						if (attendees.size() > 0) {
-							for (String attendee: attendees) {
-								HashMap<String, String> userMap = new HashMap<String, String>();
-								userMap.put("attendee", attendee);
-								attendeesList.add(userMap);
-							}
-						}
-						map.put("attendees", attendeesList);
+				for (HashMap<String, Object> map : settingsList) {
+					double duration = (Double) map.get("duration");
+					int dur = (int) duration;
+					map.put("duration", String.valueOf(dur));
 
-						data.add(map);
+					double order = (Double) map.get("order");
+					int o = (int) order;
+					map.put("order", String.valueOf(o));
+
+					String milestone = (String) map.get("milestone");
+					map.put("milestone", milestone);
+
+					ArrayList<String> attendees = (ArrayList<String>) map.get("attendees");
+					List<HashMap<String, String>> attendeesList = new ArrayList<HashMap<String, String>>();
+					if (attendees.size() > 0) {
+						for (String attendee: attendees) {
+							HashMap<String, String> userMap = new HashMap<String, String>();
+							userMap.put("attendee", attendee);
+							attendeesList.add(userMap);
+						}
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
+					map.put("attendees", attendeesList);
+
+					data.add(map);
 				}
 			} else {
 				//Incorrect user role
