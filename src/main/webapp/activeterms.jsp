@@ -80,7 +80,7 @@
 			</table>
 			<br/><br/><br/>
 			
-			<input type="submit" id="saveButton" class="btn btn-primary" name="Save" style="width:80px; height:30px;" />
+			<input type="submit" id="saveButton" class="btn btn-primary" name="Save" value="Save" style="width:100px; height:30px;" />
 			
 			</form>
 			</s:if><s:else>
