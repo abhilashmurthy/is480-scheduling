@@ -6,6 +6,7 @@ package systemAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.util.ArrayList;
@@ -54,9 +55,11 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 				session.setAttribute("user", faculty);
 				//Getting all bookings for the user
 				for (Booking b : faculty.getRequiredBookings()) {
-					if (b.getResponseList().get(faculty) == Response.PENDING) {
-						pendingBookingCount++;
-					}	
+					if (b.getBookingStatus() != BookingStatus.DELETED) {
+						if (b.getResponseList().get(faculty) == Response.PENDING) {
+							pendingBookingCount++;
+						}	
+					}
 				}
 			}  //end of outer if
 			
