@@ -9,10 +9,14 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Response;
 import constant.Role;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +44,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
     private Long timeslotId;
-	private Long teamId;
+    private Long teamId;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     public HttpServletRequest getRequest() {
@@ -53,7 +57,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws Exception {
-		EntityManager em = null;
+        EntityManager em = null;
         try {
             json.put("exception", false);
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
@@ -63,9 +67,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             Role activeRole = (Role) session.getAttribute("activeRole");
             Team team = null;
 
-			//Retrieving the team information
+            //Retrieving the team information
             if (activeRole == Role.STUDENT) {
-				Student s = em.find(Student.class, user.getId());
+                Student s = em.find(Student.class, user.getId());
                 team = s.getTeam();
             } else if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) {
                 try {
@@ -75,46 +79,53 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                     throw new Exception("Unable to find team");
                 }
             }
-			
-			//Retrieving the chosen timeslot
-			Timeslot timeslot = null;
-			if (timeslotId != null) {
-				timeslot = em.find(Timeslot.class, timeslotId);
-			}
-			
-            //Validating information provided by the front end
-            if (!validateInformation(em, team, timeslot)) {
-                    return SUCCESS;
+
+            //Retrieving the chosen timeslot
+            Timeslot timeslot = null;
+            if (timeslotId != null) {
+                timeslot = em.find(Timeslot.class, timeslotId);
             }
 
+            //Validating information provided by the front end
+            if (!validateInformation(em, team, timeslot)) {
+                return SUCCESS;
+            }
+            
+            //JSON Return for create booking
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat viewDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
+            SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
+            
             try {
                 em.getTransaction().begin();
-				
-				Booking booking = new Booking();
-				
-				//Assign information to booking
-				booking.setTimeslot(timeslot);
-                booking.setTeam(team);
-				booking.setCreatedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 
+                Booking booking = new Booking();
+
+                //Assign information to booking
+                booking.setTimeslot(timeslot); 
+                booking.setTeam(team); 
+                booking.setCreatedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+                
                 //Add team members to attendees
                 HashSet<User> reqAttendees = new HashSet<User>();
                 reqAttendees.addAll(team.getMembers());
 
                 //Create booking response entries based on milestone
-				//TODO Remove hardcoding after milestone management is implemented
+                //TODO Remove hardcoding after milestone management is implemented
                 HashMap<User, Response> responseList = new HashMap<User, Response>();
-				Milestone milestone = timeslot.getSchedule().getMilestone();
+                Milestone milestone = timeslot.getSchedule().getMilestone();
                 if (milestone.getName().equalsIgnoreCase("acceptance")) {
                     responseList.put(team.getSupervisor(), Response.PENDING);
                     reqAttendees.add(team.getSupervisor());
                 } else if (milestone.getName().equalsIgnoreCase("midterm")) {
                     responseList.put(team.getReviewer1(), Response.PENDING);
                     reqAttendees.add(team.getReviewer1());
-					responseList.put(team.getReviewer2(), Response.PENDING);
+                    responseList.put(team.getReviewer2(), Response.PENDING);
                     reqAttendees.add(team.getReviewer2());
                 } else if (milestone.getName().equalsIgnoreCase("final")) {
-					responseList.put(team.getSupervisor(), Response.PENDING);
+                    responseList.put(team.getSupervisor(), Response.PENDING);
                     reqAttendees.add(team.getSupervisor());
                     responseList.put(team.getReviewer1(), Response.PENDING);
                     reqAttendees.add(team.getReviewer1());
@@ -126,15 +137,50 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 booking.setResponseList(responseList);
                 booking.setRequiredAttendees(reqAttendees);
                 NewBookingEmail newEmail = new NewBookingEmail(booking);
-				RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
+                RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
                 newEmail.sendEmail();
-				responseEmail.sendEmail();
+                responseEmail.sendEmail();
                 em.persist(booking);
-				
-				//Setting the current active booking in the timeslot object
-				timeslot.setCurrentBooking(booking);
-				em.persist(timeslot);
-				
+
+                //Setting the current active booking in the timeslot object
+                timeslot.setCurrentBooking(booking);
+                em.persist(timeslot);
+                
+                map.put("id", timeslot.getId());
+                map.put("datetime", dateFormat.format(timeslot.getStartTime()) + " " + timeFormat.format(timeslot.getStartTime()));
+                map.put("time", viewTimeFormat.format(timeslot.getStartTime()) + " - " + viewTimeFormat.format(timeslot.getEndTime()));
+                map.put("venue", timeslot.getVenue());
+                map.put("team", team.getTeamName());
+                map.put("startDate", viewDateFormat.format(new Date(timeslot.getStartTime().getTime())));
+                map.put("status", booking.getBookingStatus().toString());
+                
+                //Adding all students
+                List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>();
+                Set<Student> teamMembers = team.getMembers();
+                for (User studentUser : teamMembers) {
+                    HashMap<String, String> studentMap = new HashMap<String, String>();
+                    studentMap.put("name", studentUser.getFullName());
+                    students.add(studentMap);
+                }
+                map.put("students", students);
+                
+                //Adding all faculty and their status
+                List<HashMap<String, String>> faculties = new ArrayList<HashMap<String, String>>();
+                HashMap<User, Response> statusList = responseList;
+                for (User facultyUser : statusList.keySet()) {
+                    HashMap<String, String> facultyMap = new HashMap<String, String>();
+                    facultyMap.put("name", facultyUser.getFullName());
+                    facultyMap.put("status", statusList.get(facultyUser).toString());
+                    faculties.add(facultyMap);
+                }
+                map.put("faculties", faculties);
+                String TA = "-";
+                map.put("TA", TA);
+                String teamWiki = "-";
+                map.put("teamWiki", teamWiki);
+                
+                json.put("booking", map);
+
                 em.getTransaction().commit();
             } catch (Exception e) {
                 //Rolling back write operations
@@ -158,65 +204,68 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("exception", true);
             json.put("message", "Error with CreateBooking: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
-		}
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
         return SUCCESS;
     }
-	
-	private boolean validateInformation(EntityManager em, Team team, Timeslot timeslot) {
-		// Checking if team information is found
-		if (team == null) {
-			logger.error("Team information not found or unauthorized user role");
-			json.put("success", false);
-			json.put("message", "Team not identified or you do not have required"
-					+ " permissions to make a booking.");
-			return false;
-		}
 
-		//Check if the timeslot is found
-		if (timeslot == null) {
-			logger.error("Timeslot not found");
-			json.put("success", false);
-			json.put("message", "Timeslot not found. Please check the ID provided!");
-			return false;
-		}
+    private boolean validateInformation(EntityManager em, Team team, Timeslot timeslot) {
+        // Checking if team information is found
+        if (team == null) {
+            logger.error("Team information not found or unauthorized user role");
+            json.put("success", false);
+            json.put("message", "Team not identified or you do not have required"
+                    + " permissions to make a booking.");
+            return false;
+        }
 
-		//Check if the timeslot is free
-		if (timeslot.getCurrentBooking() != null) { //Slot is full
-			json.put("success", false);
-			json.put("message", "Oops. This timeslot is already taken."
-					+ " Please book another slot!");
-			return false;
-		}
-		
-		//Check if the team has already made a booking for the current schedule
-		ArrayList<Booking> activeBookings = BookingManager.getActiveByTeamAndSchedule(em, team, timeslot.getSchedule());
-		if (!activeBookings.isEmpty()) {
-			json.put("success", false);
-			json.put("message", "Team already has an active booking in the current schedule");
-			return false;	
-		}
-		
-		return true;
-	}
+        //Check if the timeslot is found
+        if (timeslot == null) {
+            logger.error("Timeslot not found");
+            json.put("success", false);
+            json.put("message", "Timeslot not found. Please check the ID provided!");
+            return false;
+        }
 
-    
-	public Long getTeamId() {
-		return teamId;
-	}
+        //Check if the timeslot is free
+        if (timeslot.getCurrentBooking() != null) { //Slot is full
+            json.put("success", false);
+            json.put("message", "Oops. This timeslot is already taken."
+                    + " Please book another slot!");
+            return false;
+        }
 
-	public void setTeamId(Long teamId) {
-		this.teamId = teamId;
-	}
+        //Check if the team has already made a booking for the current schedule
+        ArrayList<Booking> activeBookings = BookingManager.getActiveByTeamAndSchedule(em, team, timeslot.getSchedule());
+        if (!activeBookings.isEmpty()) {
+            json.put("success", false);
+            json.put("message", "Team already has an active booking in the current schedule");
+            return false;
+        }
 
-	public Long getTimeslotId() {
-		return timeslotId;
-	}
+        return true;
+    }
 
-	public void setTimeslotId(Long timeslotId) {
-		this.timeslotId = timeslotId;
-	}
+    public Long getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Long teamId) {
+        this.teamId = teamId;
+    }
+
+    public Long getTimeslotId() {
+        return timeslotId;
+    }
+
+    public void setTimeslotId(Long timeslotId) {
+        this.timeslotId = timeslotId;
+    }
 
     public HashMap<String, Object> getJson() {
         return json;

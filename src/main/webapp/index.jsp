@@ -143,12 +143,12 @@
                 var milestoneStr = "ACCEPTANCE";
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
+                var scheduleData = null; //This state shall be stored here
                 
                 //Student-specific variables
                 //Team Name and bookingExists
                 var teamName = "<%= team != null ? team.getTeamName() : null%>";
                 var teamId = null;
-                var bookingExists = 0;
                 
                 //Admin specific variables - All teams data if for admins
                 var teams = new Array();
@@ -157,13 +157,6 @@
                 
                 //Booking specific variables
                 var self = null;
-                var date = null;
-                var startTime = null;
-                var termId = null;
-
-                //Make schedule rows and columns
-                var datesArray = new Array();
-                var timesArray = new Array();
 
                 loadDefault();
 
@@ -221,11 +214,13 @@
                     $("#milestoneTabContent").hide();
                     $("#scheduleProgressBar").show();
                     //Generate schedule table
-                    var scheduleData = getScheduleData(milestone, year, semester);
+                    scheduleData = getScheduleData(milestone, year, semester);
                     if (scheduleData.success) {
+                        //Convert scheduleData timeslots
+                        convertScheduleData();
                         //Draw the schedule table
-                        makeSchedule(scheduleData);
-                        appendPopovers(scheduleData);
+                        makeSchedule();
+                        appendPopovers();
                         //Setup mouse events
                         setupMouseEvents();
                     } else {
@@ -236,48 +231,63 @@
                     $("#milestoneTabContent").show();
                 }
                 
-                //Append popover data
-                function appendPopovers(scheduleData) {
-
+                //Convert scheduleData to better JSON object
+                function convertScheduleData() {
                     var timeslots = scheduleData.timeslots;
-
+                    var newTimeslots = {};
+                    for (var i = 0; i < timeslots.length; i++) {
+                        var timeslot = timeslots[i];
+                        var key = timeslot.datetime;
+                        newTimeslots[key] = timeslot;
+                    }
+                    scheduleData["timeslots"] = newTimeslots;
+//                    var count = 0;
+//                    for (var key in scheduleData.timeslots) {
+//                        if (scheduleData.timeslots.hasOwnProperty(key)) {
+//                            ++count;
+//                        }
+//                    }
+//                    console.log("New timeslots: " + count + ", Old timeslots: " + timeslots.length);
+                }
+                
+                //Append popover data
+                function appendPopovers() {
+                    //Show progress bar
+                    $("#milestoneTabContent").hide();
+                    $("#scheduleProgressBar").show();
+                    
                     //Delete all old popovers
                     $(".timeslotCell").trigger('mouseleave');
                     $(".timeslotCell").popover('destroy');
+                    
+                    refreshScheduleData();
 
                     //Add View Booking popovers
                     $(".bookedTimeslot").each(function() {
-                        appendViewBookingPopover($(this), timeslots);
+                        appendViewBookingPopover($(this));
                     });
-
-                    //Add Create Booking Popovers
-                    var refreshData = refreshBookingExists();
-                    //Make a dropdown of all teams that have not booked yet if user is admin
-                    if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                        if (refreshData.teams.length === 0) {
-                            createBookingOutputForAdmin = "There are no teams for this term";
-                        } else if (refreshData.teamsPendingBooking.length === 0) {
-                            createBookingOutputForAdmin = "All teams have bookings!";
-                        }
-                    }
 
                     //Add Create Booking popover for all timeslots if is student, admin, or course coordinator
                     if (<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                         $(".unbookedTimeslot, .unavailableTimeslot").each(function() {
-                            appendCreateBookingPopover($(this), timeslots, refreshData);
+                            appendCreateBookingPopover($(this));
                         });
                     }
                     if (<%= activeRole.equals(Role.FACULTY) %>) {
                         $(".unbookedTimeslot, .unavailableTimeslot").each(function() {
-                            appendChangeAvailabilityPopover($(this), timeslots, refreshData);
+                            appendChangeAvailabilityPopover($(this));
                         });
                     }
+                    //Show progress bar
+                    $("#scheduleProgressBar").hide();
+                    $("#milestoneTabContent").show();
                 }
                 
                 
-                function appendViewBookingPopover(bodyTd, timeslots) {
+                function appendViewBookingPopover(bodyTd) {
                     //Get View Booking Data
-                    var viewBookingData = viewBookingData = getTimeslot(timeslots, bodyTd.attr('value').split(" ")[0], bodyTd.attr('value').split(" ")[1]);
+                    var timeslots = scheduleData.timeslots;
+                    var viewBookingData = timeslots[bodyTd.attr('value')];
 
                     //Append bookingDiv classes based on status
                     var bookingDiv = bodyTd.children('div');
@@ -414,11 +424,11 @@
                     });
                 }
                 
-                function appendCreateBookingPopover(bodyTd, timeslots, refreshData) {
+                function appendCreateBookingPopover(bodyTd) {
                     if (bodyTd.hasClass('legendBox')) return;
                     //Initialize variables
                     var popoverTitle = null;
-                    termId = activeAcademicYearStr + "," + activeSemesterStr;
+                    var termId = activeAcademicYearStr + "," + activeSemesterStr;
                     var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
                     var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
                     var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addHours(1).toString('HH:mm');
@@ -435,11 +445,11 @@
                         teamName = "<%= team != null ? team.getTeamName() : null%>";
                         outputData.unshift(["Team", teamName]); //Add to top of table
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
-                        outputData.unshift(["Team", refreshData.teamDropDownSelect.outerHTML()]); //Add to top of table
+                        outputData.unshift(["Team", teamDropDownSelect.outerHTML()]); //Add to top of table
                     }
                     if (bodyTd.is('.unavailableTimeslot')) {
-                        var cellId = bodyTd.attr('id').split("_")[1];
-                        var unavailableTimeslotData = getTimeslot(timeslots, bodyTd.attr('value').split(" ")[0], bodyTd.attr('value').split(" ")[1]);
+                        var timeslots = scheduleData.timeslots;
+                        var unavailableTimeslotData = timeslots[bodyTd.attr('value')];
                         outputData.push(["Unavailable", unavailableTimeslotData.unavailable]);
                         popoverTitle = "Unavailable Timeslot";
                         //TODO: Can create booking still? Add button here
@@ -551,15 +561,17 @@
                 }
                 
                 //Function to refresh booking exists
-                function refreshBookingExists() {
+                function refreshScheduleData() {
                     var toReturn = null;
+                    var bookingExists = null;
+                    var teamsPendingBooking = null;
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
-                        bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teamName + ")").length;
+                        bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(".booking :contains(" + teamName + ")").length;
                         console.log("Does booking exist? " + milestoneStr + " " + teamName + " " + bookingExists);
                         toReturn = {bookingExists:bookingExists};
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
-                        var teams = JSON.parse('<%= session.getAttribute("allTeams")%>');
-                        var teamsPendingBooking = new Array();
+                        teams = JSON.parse('<%= session.getAttribute("allTeams")%>');
+                        teamsPendingBooking = new Array();
                         teamDropDownSelect = $(document.createElement('select'));
                         teamDropDownSelect.attr('name', 'team');
                         teamDropDownSelect.attr('id', 'createTeamSelect');
@@ -573,11 +585,10 @@
                                 teamsPendingBooking.push(teams[t].teamName);
                             }
                         }
-                        toReturn = {teams: teams, teamDropDownSelect:teamDropDownSelect, teamsPendingBooking:teamsPendingBooking};
+                        toReturn = {teamsPendingBooking:teamsPendingBooking};
                     }
                     return toReturn;
                 }
-
 
                 //Function to create mouse UI events
                 function setupMouseEvents() {
@@ -587,6 +598,10 @@
                             $('.popover').parent().popover('hide');
                         }
                     });
+                    
+                    /*****************************
+                     CALENDAR UI INTERACTION
+                     ****************************/
 
                     //Removed clicked
                     $(".timeslotCell").mouseleave(function() {
@@ -594,61 +609,47 @@
                     });
 
                     //Popover for booked timeslot
-                    $('.bookedTimeslot, .bookedTimeslot > .booking').on('click', function(e) {
-                        if (e.target === this) {
-                            console.log(".bookedTimeslot clicked");
-                            self = $(this).is('div') ? $(this).parent() : $(this);
-                            $('.timeslotCell').not(self).popover('hide');
-                            self.popover('show');
-                        }
+                    $('.bookedTimeslot').on('click', function(e) {
+                        if ($(e.target).parents('.popover').length) return false;
+                        console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
+                        self = $(this).is('.booking') ? $(this).parent('.timeslotCell') : $(this);
+                        $('.timeslotCell').not(self).popover('hide');
+                        self.popover('show');
                         return false;
                     });
 
-                    $('.unbookedTimeslot, .unbookedTimeslot > .booking').on('click', function(e) {
+                    $('.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking').on('click', function(e) {
                         if (e.target === this) {
-                            self = $(this).is('div') ? $(this).parent() : $(this);
+                            self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
                             $('.timeslotCell').not(self).popover('hide');
-                            if (<%= activeRole.equals(Role.STUDENT) %> && bookingExists !== 0) {
+                            var refreshData = refreshScheduleData();
+                            if (<%= activeRole.equals(Role.STUDENT) %> && refreshData.bookingExists !== 0) {
                                 showNotification("WARNING", self, "You already have a booking!");
                                 return false;
                             }
-                            if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%> && createBookingOutputForAdmin) {
-                                console.log(createBookingOutputForAdmin);
-                                return false;
+                            if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+                                //Make a dropdown of all teams that have not booked yet if user is admin
+                                if (teams.length === 0) {
+                                    createBookingOutputForAdmin = "There are no teams for this term";
+                                } else if (refreshData.teamsPendingBooking.length === 0) {
+                                    createBookingOutputForAdmin = "All teams have bookings!";
+                                }
+                                if (createBookingOutputForAdmin) {
+                                    showNotification("WARNING", self, createBookingOutputForAdmin);
+                                    createBookingOutputForAdmin = null;
+                                    return false;
+                                }
                             }
                             console.log(".unbookedTimeslot clicked.");
                             self.popover('show');
-                            date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
-                            startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
-                            termId = activeAcademicYearStr + "," + activeSemesterStr;
                         }
                         return false;
                     });
                     
-                    $('.unavailableTimeslot, .unavailableTimeslot > .booking').on('click', function(e) {
-                        if (e.target === this) {
-                            self = $(this).is('div') ? $(this).parent() : $(this);
-                            $('.timeslotCell').not(self).popover('hide');
-                            if (<%= activeRole.equals(Role.STUDENT) %> && bookingExists !== 0) {
-                                showNotification("WARNING", self, "You already have a booking!");
-                                return false;
-                            }
-                            if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%> && createBookingOutputForAdmin) {
-                                console.log(createBookingOutputForAdmin);
-                                return false;
-                            }
-//                            console.log(".unavailableTimeslot clicked");
-                            self.popover('show');
-                            date = Date.parse(self.attr('value')).toString("yyyy-MM-dd");
-                            startTime = Date.parse(self.attr('value')).toString("HH:mm:ss");
-                            termId = activeAcademicYearStr + "," + activeSemesterStr;
-                        }
-                        return false;
-                    });
+                    /*****************************
+                     POPOVER INTERACTION
+                     ****************************/
 
-                    //
-                    //Dynamic button bindings
-                    //Use this kind of event trigger for dynamic buttons
                     //Close Booking Button
                     $("td, td > div").on('click', '.close', function(e) {
                         e.stopPropagation();
@@ -660,16 +661,21 @@
                     //Create Booking Button
                     $("td, td > div").on('click', '#createBookingBtn', function(e) {
                         e.stopPropagation();
-                        createBooking(self);
+                        var returnData = createBooking(self);
+                        //REFRESH STATE OF scheduleData
+                        var bookingDiv = $(document.createElement('div'));
+                        bookingDiv.addClass('booking pendingBooking');
+                        bookingDiv.html(returnData.booking.team);
+                        self.removeClass('unbookedTimeslot');
+                        self.addClass('bookedTimeslot');
+                        self.html(bookingDiv);
+                        scheduleData.timeslots[self.attr('value')] = returnData.booking;
                         showNotification("CREATED", self, null);
-                        //REFRESH POPOVER
-                        var refreshData = refreshBookingExists();
-                        var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
                             self.popover('destroy');
-                            appendViewBookingPopover(self, scheduleData.timeslots);
+                            appendViewBookingPopover(self);
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                            appendPopovers(scheduleData);
+                            appendPopovers();
                         }
                         return false;
                     });
@@ -679,13 +685,18 @@
                         e.stopPropagation();
                         deleteBooking(self);
                         showNotification("DELETED", self, null);
-                        var refreshData = refreshBookingExists();
-                        var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                        //REFRESH STATE OF scheduleData
+                        self.popover('destroy');
+                        self.html("");
+                        self.removeClass();
+                        self.addClass("timeslotCell unbookedTimeslot");
+                        delete scheduleData.timeslots[self.attr('value')];
+                        scheduleData.timeslots[self.attr('value')] = {id:self.attr('id').split(" ")[1], venue:"SIS Seminar Room 2-1", datetime: self.attr('value')};
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
                             self.popover('destroy');
-                            appendCreateBookingPopover(self, scheduleData.timeslots, refreshData);
+                            appendCreateBookingPopover(self);
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                            appendPopovers(scheduleData);
+                            appendPopovers();
                         }
                         return false;
                     });
@@ -701,10 +712,10 @@
                         }
                         updateBooking(self, newDateTime);
                         showNotification("UPDATED", self, null);
-                        var refreshData = refreshBookingExists();
+                        var refreshData = refreshScheduleData();
                         var scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
                         appendPopovers(scheduleData);
-                        refreshBookingExists();
+                        refreshScheduleData();
                         return false;
                     });
                     
@@ -729,8 +740,11 @@
                         appendChangeAvailabilityPopover(self);
                         return false;
                     });
-                    
                 }
+                
+                /*****************************
+                 NOTIFICATIONS
+                 ****************************/
 
                 function showNotification(action, bodyTd, notificationMessage) {
                     var notificationTitle = null;
@@ -788,6 +802,7 @@
                  ***************************/
                  
                 function createBooking(bodyTd) {
+                    var toReturn = null;
                     var data = null;
                     var tName = null;
                     if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
@@ -815,15 +830,7 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (!response.exception) {
-                            console.log('Destroying A');
-                            bodyTd.popover('destroy');
-                            var bookingDiv = $(document.createElement('div'));
-                            bookingDiv.addClass('booking');
-                            bookingDiv.addClass('pendingBooking');
-                            bookingDiv.html(tName);
-                            bodyTd.removeClass();
-                            bodyTd.addClass("timeslotCell bookedTimeslot");
-                            bodyTd.html(bookingDiv);
+                            toReturn = response;
                         } else {
                             var eid = btoa(response.message);
                             window.location = "error.jsp?eid=" + eid;
@@ -831,6 +838,7 @@
                     }).fail(function(error) {
                         alert("Oops. There was an error: " + JSON.stringify(error));
                     });
+                    return toReturn;
                 }
 
                 function deleteBooking(bodyTd) {
@@ -848,13 +856,7 @@
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
-                        if (!response.exception) {
-                            console.log('Destroying C');
-                            bodyTd.popover('destroy');
-                            bodyTd.html("");
-                            bodyTd.removeClass();
-                            bodyTd.addClass("timeslotCell unbookedTimeslot");
-                        } else {
+                        if (response.exception) {
                             var eid = btoa(response.message);
                             window.location = "error.jsp?eid=" + eid;
                         }
@@ -948,7 +950,6 @@
                                     bodyTd.removeClass();
                                     bodyTd.addClass("timeslotCell unbookedTimeslot");
                                 }
-//                                window.location.reload();
                             } else {
                                 var eid = btoa(response.message);
                                 console.log(response.message);
@@ -966,132 +967,125 @@
                 }
 
                 //Function to make schedule based on GetScheduleAction response
-                function makeSchedule(data) {
+                function makeSchedule() {
+                    var tableClass = "scheduleTable";
+                    var timeslots = scheduleData.timeslots;
+                    
+                    //TODO: Get from server/admin console/whatevs
+                    var minTime = 9;
+                    var maxTime = 19;
 
-                    makeSchedule("scheduleTable", data.timeslots);
+                    var timesArray = new Array();
+                    for (var i = minTime; i < maxTime; i++) {
+                        var timeVal = Date.parse(i + ":00:00");
+                        timesArray.push(timeVal.toString("HH:mm:ss"));
+                        timeVal.addMinutes(30);
+                        timesArray.push(timeVal.toString("HH:mm:ss"));
+                    }
+                    
+                    var datesArray = getDateArrayBetween(Date.parse(scheduleData.startDate), Date.parse(scheduleData.endDate)); //Gets whole range of dates
+//                    var datesArray = datesHashArray; //Gets only specific dates
 
-                    function makeSchedule(tableClass, timeslots) {
-
-                        //TODO: Get from server/admin console/whatevs
-                        var minTime = 9;
-                        var maxTime = 19;
-
-                        timesArray = new Array();
-                        for (var i = minTime; i < maxTime; i++) {
-                            var timeVal = Date.parse(i + ":00:00");
-                            timesArray.push(timeVal.toString("HH:mm"));
-                            timeVal.addMinutes(30);
-                            timesArray.push(timeVal.toString("HH:mm"));
+                    //Get dates between minDate and maxDate
+                    function getDateArrayBetween(startDate, stopDate) {
+                        var dateArray = new Array();
+                        var currentDate = startDate;
+                        while (currentDate <= stopDate) {
+                            dateArray.push(currentDate);
+                            currentDate = new Date(currentDate).addDays(1);
                         }
+                        return dateArray;
+                    }
 
-                        //Get unique dates, minDate, and maxDate
-                        var datesSet = new HashSet();
-                        for (i = 0; i < timeslots.length; i++) {
-                            datesSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
-                        }
-                        var datesHashArray = datesSet.values().sort();
-                        var minDate = new Date(datesHashArray[0]);
-                        var maxDate = new Date(datesHashArray[datesHashArray.length - 1]);
-                        datesArray = getDates(minDate, maxDate);
-
-                        //Get dates between minDate and maxDate
-                        function getDates(startDate, stopDate) {
-                            var dateArray = new Array();
-                            var currentDate = startDate;
-                            while (currentDate <= stopDate) {
-                                dateArray.push(currentDate);
-                                currentDate = new Date(currentDate).addDays(1);
-                            }
-                            return dateArray;
-                        }
-
-                        //Append header names
-                        var headerDom = $(document.createElement('thead'));
-                        var headerTr = $(document.createElement('tr'));
-                        var headerTd = $(document.createElement('th'));
-                        headerTr.attr('id', 'scheduleHeader');
+                    //Append header names
+                    var headerDom = $(document.createElement('thead'));
+                    var headerTr = $(document.createElement('tr'));
+                    var headerTd = $(document.createElement('th'));
+                    headerTr.attr('id', 'scheduleHeader');
+                    headerTr.append(headerTd);
+                    for (i = 0; i < datesArray.length; i++) {
+                        var headerVal = new Date(datesArray[i]).toString('dd MMM') + "<br/>" + new Date(datesArray[i]).toString('ddd');
+                        headerTd = $(document.createElement('th'));
+                        headerTd.html(headerVal);
                         headerTr.append(headerTd);
-                        for (i = 0; i < datesArray.length; i++) {
-                            var headerVal = new Date(datesArray[i]).toString('dd MMM') + "<br/>" + new Date(datesArray[i]).toString('ddd');
-                            headerTd = $(document.createElement('th'));
-                            headerTd.html(headerVal);
-                            headerTr.append(headerTd);
-                        }
-                        headerDom.append(headerTr);
-                        $("." + tableClass).append(headerDom);
+                    }
+                    headerDom.append(headerTr);
+                    $("." + tableClass).append(headerDom);
 
-                        //Append timeslot data
-                        var rowspanArr = new Array();
-                        for (var i = 0; i < timesArray.length; i++) {
+                    //Append timeslot data
+                    var rowspanArr = new Array();
+                    for (var i = 0; i < timesArray.length; i++) {
+                        //Append time column
+                        var bodyTr = $(document.createElement('tr'));
+                        var bodyTd = $(document.createElement('td'));
+                        var time = timesArray[i];
+                        bodyTd.html(time.substring(0, 5));
+                        bodyTd.addClass('timeDisplayCell');
+                        bodyTr.append(bodyTd);
 
-                            //Append time column
-                            var bodyTr = $(document.createElement('tr'));
-                            var bodyTd = $(document.createElement('td'));
-                            var time = timesArray[i];
-                            bodyTd.html(time);
-                            bodyTd.addClass('timeDisplayCell');
-                            bodyTr.append(bodyTd);
+                        //Append timeslot td's row by row
+                        rowloop:
+                        for (var j = 0; j < datesArray.length; j++) {
+                            var date = datesArray[j];
+                            date = new Date(date).toString("yyyy-MM-dd");
+                            var datetimeString = date + " " + time;
 
-                            //Append timeslot td's row by row
-                            rowloop:
-                                    for (var j = 0; j < datesArray.length; j++) {
-                                var date = datesArray[j];
-                                date = new Date(date).toString("yyyy-MM-dd");
-                                var datetimeString = date + " " + time + ":00";
-
-                                //Checking if table cell is part of a timeslot
-                                for (var k = 0; k < rowspanArr.length; k++) {
-                                    if (datetimeString === rowspanArr[k]) {
-                                        continue rowloop;
-                                    }
+                            //Checking if table cell is part of a timeslot
+                            for (var k = 0; k < rowspanArr.length; k++) {
+                                if (datetimeString === rowspanArr[k]) {
+                                    continue rowloop;
                                 }
+                            }
 
-                                //Table cell not part of timeslot yet. Proceed.
-                                var timeslot = getTimeslot(timeslots, date, time); //Get the timeslot
+                            //Table cell not part of timeslot yet. Proceed.
+                            var timeslot = timeslots[datetimeString]; //Get the timeslot
+                            bodyTd = $(document.createElement('td'));
+                            bodyTd.addClass('timeslotCell');
+                            
+                            //If timeslot is available
+                            //TODO: Remove hardcoding of milestone data
+                            if (timeslot) {
                                 var id = timeslot.id;
                                 var team = timeslot.team;
                                 var isAvailable = timeslot.available;
-                                bodyTd = $(document.createElement('td'));
-                                bodyTd.addClass('timeslotCell');
+                                bodyTd.attr('id', 'timeslot_' + id);
+                                bodyTd.attr('value', datetimeString);
 
-                                //If timeslot is available
-                                if (id) {
-                                    var temp = null;
-                                    if (milestoneStr === "ACCEPTANCE") {
-                                        bodyTd.attr('rowspan', '2'); //If acceptance, set 2
-                                        temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
-                                        rowspanArr.push(temp);
-                                    } else {
-                                        bodyTd.attr('rowspan', '3'); //else, set 3
-                                        temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
-                                        rowspanArr.push(temp);
-                                        temp = Date.parse(datetimeString).addHours(1).toString("yyyy-MM-dd HH:mm:ss");
-                                        rowspanArr.push(temp);
-                                    }
-                                    bodyTd.attr('id', 'timeslot_' + id);
-                                    bodyTd.attr('value', datetimeString);
-
-                                    if (team) {
-                                        var bookingDiv = $(document.createElement('div'));
-                                        bookingDiv.html(team);
-                                        bodyTd.html(bookingDiv);
-                                        bodyTd.addClass('bookedTimeslot');
-                                    } else {
-                                        if (<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !isAvailable) {
-                                            bodyTd.addClass('unavailableTimeslot');
-                                        } else {
-                                            bodyTd.addClass('unbookedTimeslot');
-                                        }
-                                    }
+                                if (team) {
+                                    var bookingDiv = $(document.createElement('div'));
+                                    bookingDiv.html(team);
+                                    bookingDiv.addClass('booking pendingBooking');
+                                    bodyTd.append(bookingDiv);
+                                    bodyTd.addClass('bookedTimeslot');
                                 } else {
-                                    bodyTd.addClass('noTimeslot');
+                                    if (<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !isAvailable) {
+                                        bodyTd.addClass('unavailableTimeslot');
+                                    } else {
+                                        bodyTd.addClass('unbookedTimeslot');
+                                    }
                                 }
-
-                                //Append to row
-                                bodyTr.append(bodyTd);
+                                
+                                var temp = null;
+                                bodyTd.attr('align', 'center');
+                                if (milestoneStr === "ACCEPTANCE") {
+                                    bodyTd.attr('rowspan', '2'); //If acceptance, set 2
+                                    temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
+                                    rowspanArr.push(temp);
+                                } else {
+                                    bodyTd.attr('rowspan', '3'); //else, set 3
+                                    temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
+                                    rowspanArr.push(temp);
+                                    temp = Date.parse(datetimeString).addHours(1).toString("yyyy-MM-dd HH:mm:ss");
+                                    rowspanArr.push(temp);
+                                }
+                            } else {
+                                bodyTd.addClass('noTimeslot');
                             }
-                            $("." + tableClass).append(bodyTr);
+
+                            //Append to row
+                            bodyTr.append(bodyTd);
                         }
+                        $("." + tableClass).append(bodyTr);
                     }
                 }
                 
