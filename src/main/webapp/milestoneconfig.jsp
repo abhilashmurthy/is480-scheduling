@@ -105,7 +105,7 @@
                 <table>
                     <tr>
                         <td>
-                            <button type="button" class="btn btn-primary" style="width:80px; height:30px;" id="save<%=counter%>" class="btn-info" onclick="edited();">
+                            <button type="button" id="saveButton" class="btn btn-primary" style="width:80px; height:30px;" id="save<%=counter%>" onclick="edited();">
                                 <b>Save</b>
                             </button>
                         </td>
@@ -419,6 +419,16 @@
                 }
             }
 
+			$(function(){
+				var $btn = $('#saveButton');
+				$btn.click(function(){
+					var $this = $(this);
+					$this.attr('disabled', 'disabled').html("Saving...");
+					setTimeout(function () {
+						$this.removeAttr('disabled').html('Save');
+					}, 2000)
+				});
+			})
         </script>
     </body> 
 </html>

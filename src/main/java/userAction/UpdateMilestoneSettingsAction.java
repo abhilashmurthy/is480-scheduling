@@ -164,7 +164,7 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 				em.getTransaction().commit();
 				
 				json.put("success", true);
-				json.put("message", "Milestone Settings Updated!");
+				json.put("message", "Your settings have been updated!");
 
 			} else {
 				//Incorrect user role
