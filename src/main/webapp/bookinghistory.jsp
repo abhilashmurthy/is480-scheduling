@@ -63,14 +63,15 @@
 						<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
-							<tr class="info">
+							<tr class="warning">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
-						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
-							<tr class="warning">
 						</s:elseif>
+						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+							<tr class="info">
+						</s:elseif>--%>
 								<td><%= count %></td>
 								<td><s:property value="teamName"/></td>
 								<td><s:property value="milestone"/></td>
@@ -92,14 +93,15 @@
 							</tr>
 						<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
-							<tr class="info">
+							<tr class="warning">
 						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
 						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
-						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
-							<tr class="warning">
 						</s:elseif>
+						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+							<tr class="warning">
+						</s:elseif>--%>
 							<td><%= count %></td>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
