@@ -62,8 +62,8 @@
 				</tbody>
 			</table>
 			</div>
-			<div>
-			<table class="table table-hover" style="width:auto">
+			<div style="float: left;">
+			<table class="table" style="width:auto">
 			<thead>
 				<tr>
 				<th>
@@ -86,9 +86,13 @@
 			</tbody>
 			</table>
 			</div>
-			<br />
-			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
-			<p id="serverResponse"></p>
+			<div style="clear: both;">
+			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
+			<!-- SECTION: Response Banner -->
+			<div id="responseBanner" class="alert fade in" hidden>
+				<span id="responseMessage" style="font-weight: bold"></span>
+			</div>
+			</div>
 			</s:if><s:else>
 				<h4>No Terms Exist!</h4>
 			</s:else>
@@ -97,6 +101,7 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
 			$(function() {
+				//Method to update the dropdown list based on the radio buttons selected
 				$(":radio").click(function(){
 					var dropdown = $("#defaultActiveTermList");
 					var tr = $(this).parents("tr");
@@ -126,13 +131,38 @@
 					}
 				});
 				
+				//Submit changes to backend
 				$('#submitFormBtn').click(function() {
-					var jsonData = new Object();
-					jsonData["defaultTerm"] = $("#defaultActiveTermList").find(":selected").val();
-					jsonData["activeTerms"] = generateArray($(":radio:checked[value='true']"));
-					console.log(JSON.stringify(jsonData));
+					$(this).button('loading');
+					var activeTermData = new Object();
+					activeTermData["defaultTerm"] = $("#defaultActiveTermList").find(":selected").val();
+					activeTermData["activeTerms"] = generateArray($(":radio:checked[value='true']"));
+					$.ajax({
+						type: 'POST',
+						async: false,
+						url: 'updateActiveTerms',
+						data: {jsonData: JSON.stringify(activeTermData)}	
+					}).done(function(response) {
+						$("#submitFormBtn").button('reset');
+						console.log(response);
+						$("#responseBanner").show().delay(2000).fadeOut(400);
+						if (response.success) {
+							$("#responseBanner").removeClass("alert-error").addClass("alert-success");
+							$("#responseMessage").text(response.message);
+						} else {
+							$("#responseBanner").removeClass("alert-success").addClass("alert-error");
+							$("#responseMessage").text(response.message);
+						}
+					}).fail(function(response) {
+						$("#submitFormBtn").button('reset');
+						console.log(response);
+						$("#responseBanner").show().delay(2000).fadeOut(400);
+						$("#responseBanner").removeClass("alert-success").addClass("alert-error");
+						$("#responseMessage").text("Oops. Something went wrong. Please try again!");
+					});
 				});
 				
+				//Generate array of active term IDs
 				function generateArray(list) {
 					var arr = new Array();
 					for (var i = 0; i < list.length; i++) {
