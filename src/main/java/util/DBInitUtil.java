@@ -73,7 +73,7 @@ public class DBInitUtil {
         private static void resetDB() throws Exception {
             String url = "jdbc:mysql://localhost:3306/";
             String username = "root";
-            String password = "root";
+            String password = null;
             String dbName = "is480-scheduling";
             Connection conn = null;
             Statement stmt = null;
