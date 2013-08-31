@@ -1000,12 +1000,12 @@
                     //Append header names
                     var headerDom = $(document.createElement('thead'));
                     var headerTr = $(document.createElement('tr'));
-                    var headerTd = $(document.createElement('th'));
+                    var headerTd = $(document.createElement('td'));
                     headerTr.attr('id', 'scheduleHeader');
                     headerTr.append(headerTd);
                     for (i = 0; i < datesArray.length; i++) {
                         var headerVal = new Date(datesArray[i]).toString('dd MMM') + "<br/>" + new Date(datesArray[i]).toString('ddd');
-                        headerTd = $(document.createElement('th'));
+                        headerTd = $(document.createElement('td'));
                         headerTd.html(headerVal);
                         headerTr.append(headerTd);
                     }

@@ -19,8 +19,11 @@
         <title>Create Term</title>
         <style type="text/css">
             table {
-                margin-left: 20px;
                 table-layout: fixed;
+            }
+            
+            #createTermTable, #createScheduleTable, #createTimeslotsTable {
+                margin-left: 20px;
             }
 
             th {
@@ -173,7 +176,7 @@
                         <div id="createTermPanel" class="schedulePanel">
                             <h3>Create Term</h3>
                             <form id="createTermForm">
-                                <table>
+                                <table id="createTermTable">
                                     <tr>
                                         <td class="formLabelTd">
                                             Choose Year
@@ -219,20 +222,11 @@
                         <!-- Create Timeslots -->
                         <div id="createTimeslotsPanel" class="schedulePanel">
                             <h3 id="createTimeslotsTitle">Create Timeslots</h3>
-                            <div id="timeslotsTableSection">
-                                <table id="acceptanceTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
-                                </table> 
-                                <br/>
-                                <table id="midtermTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
-                                </table>
-                                <br/>
-                                <table id="finalTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
-                                </table>
-                                <br/>
-                                <button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button>
-                                <h4 id="timeslotResultMessage"></h4>
-                                <br />
-                            </div>
+                            <table id="createTimeslotsTable">
+                                <tr><td>Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td><td><button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button></td></tr>
+                                <tr><td></td><td><table class="timeslotsTable table-condensed table-hover table-bordered table-striped" hidden></table></td><td></td></tr>
+                            </table>
+                            <h4 id="timeslotResultMessage"></h4>
                         </div>
                     </div>
                 </div>
@@ -254,6 +248,7 @@
                 //Initialize variables
                 var milestones = null;
                 var schedules = null;
+                var selectedSchedule = null;
 
                 /*----------------------------------------
                  CREATE TERM
@@ -452,9 +447,10 @@
                     }).done(function(response) {
                         if (response.success) {
                             console.log("Received: " + JSON.stringify(response));
+                            schedules = response.schedules;
 			    $("#createScheduleSubmitBtn").button('loading');
                             //Display create timeslots forms
-                            displayCreateTimeslots(response);
+                            setTimeout(function(){displayCreateTimeslots();}, 2000);
                         } else {
                             var eid = btoa(response.message);
                             window.location = "error.jsp?eid=" + eid;
@@ -472,165 +468,136 @@
 
                 //Display create timeslots
                 //TODO: Change to MilestoneConfig
-                function displayCreateTimeslots(data) {
+                function displayCreateTimeslots() {
                     //Display create timeslots
                     $("#createTimeslotsPanel").show();
                     $("#createTimeslotsPanel").css('padding-top', '20px');
-
-                    //Scroll to the bottom
-                    $("html, body").animate({scrollTop: $(document).height()}, "slow");
                     
-                    acceptanceId = data.acceptance.scheduleId;
-                    midtermId = data.midterm.scheduleId;
-                    finalId = data.final.scheduleId;
-
-                    var acceptanceDates = $("#acceptanceDatePicker").multiDatesPicker('getDates');
-                    var midtermDates = $("#midtermDatePicker").multiDatesPicker('getDates');
-                    var finalDates = $("#finalDatePicker").multiDatesPicker('getDates');
-
-                    //Append timeslot form details
-                    if (acceptanceDates.length > 0) {
-                        $("#acceptanceTimeslotsTable").show();
-                        $("#acceptanceTimeslotsTable").before("<h4>Acceptance</h4>");
-                        makeTimeslotTable("acceptanceTimeslotsTable", acceptanceDates, data.acceptance.dayStartTime, data.acceptance.dayEndTime);
-                        populateTimeslotsTable("acceptanceTimeslotsTable", data);
+                    for (var i = 0; i < schedules.length; i++) {
+                        var schedule = schedules[i];
+                        var milestoneOption = $(document.createElement('option'));
+                        milestoneOption.attr('value', schedule.id);
+                        milestoneOption.html(schedule.milestoneName);
+                        $("#milestoneTimeslotsSelect").append(milestoneOption);
                     }
-                    if (midtermDates.length > 0) {
-                        $("#midtermTimeslotsTable").show();
-                        $("#midtermTimeslotsTable").before("<h4>Midterm</h4>");
-                        makeTimeslotTable("midtermTimeslotsTable", midtermDates, data.midterm.dayStartTime, data.midterm.dayEndTime);
-                        populateTimeslotsTable("midtermTimeslotsTable", data);
-                    }
-                    if (finalDates.length > 0) {
-                        $("#finalTimeslotsTable").show();
-                        $("#finalTimeslotsTable").before("<h4>Final</h4>");
-                        makeTimeslotTable("finalTimeslotsTable", finalDates, data.final.dayStartTime, data.final.dayEndTime);
-                        populateTimeslotsTable("finalTimeslotsTable", data);
-                    }
-
-                    //OVERALL SUBMIT TO SERVER
-                    $("#createTimeslotsSubmitBtn").on('click', function() {
-                        $("#createTimeslotsSubmitBtn").button('loading');
-                        var scheduleIdData = {acceptanceId: acceptanceId, midtermId: midtermId, finalId: finalId};
-                        //SerializeArray not functional for timeslots
-                        timeslotsData = {};
-                        var timeslot_acceptance = new Array();
-                        var timeslot_midterm = new Array();
-                        var timeslot_final = new Array();
-
-                        var accData = $("div.start-marker", "#acceptanceTimeslotsTable").get();
-                        for (var i = 0; i < accData.length; i++) {
-                            var obj = accData[i];
-                            timeslot_acceptance.push($(obj).parent().attr("value"));
-                        }
-
-                        var midData = $("div.start-marker", "#midtermTimeslotsTable").get();
-                        for (var i = 0; i < midData.length; i++) {
-                            var obj = midData[i];
-                            timeslot_midterm.push($(obj).parent().attr("value"));
-                        }
-
-                        var finData = $("div.start-marker", "#finalTimeslotsTable").get();
-                        for (var i = 0; i < finData.length; i++) {
-                            var obj = finData[i];
-                            timeslot_final.push($(obj).parent().attr("value"));
-                        }
-
-                        timeslotsData["timeslot_acceptance[]"] = timeslot_acceptance;
-                        timeslotsData["timeslot_midterm[]"] = timeslot_midterm;
-                        timeslotsData["timeslot_final[]"] = timeslot_final;
-
-                        console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
-                        var extendData = $.extend(scheduleIdData, timeslotsData);
-                        var mergeData = $.merge(scheduleIdData, timeslotsData);
-                        console.log('Final data is: ' + JSON.stringify(extendData));
-                        console.log('Merge data is: ' + JSON.stringify(mergeData));
-                        $.ajax({
-                            type: 'POST',
-                            url: 'createTimeslotsJson',
-                            data: mergeData,
-                            dataType: 'json'
-                        }).done(function(response) {
-                            $("#createTimeslotsSubmitBtn").button('reset');
-                            if (response.success) {
-                                console.log("createTimeslotsJson was successful");
-                                displayMessage("timeslotResultMessage", response.message, false);
-                            } else {
-                                var eid = btoa(response.message);
-                                console.log(response.message);
-                                window.location = "error.jsp?eid=" + eid;
-                            }
-                        }).fail(function(error) {
-                            console.log("createTimeslotsJson AJAX FAIL");
-                            displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
-                        });
-
-                        return false;
-                    });
-
-                    function makeTimeslotTable(tableId, dateArray, dayStart, dayEnd) {
-                        var thead = $(document.createElement("thead"));
-                        var minTime = dayStart;
-                        var maxTime = dayEnd;
-
-                        //Creating table header with dates
-                        thead.append("<th></th>"); //Empty cell for time column
-                        for (i = 0; i < dateArray.length; i++) {
-                            var th = $(document.createElement("th"));
-                            var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                            th.html(headerVal);
-                            thead.append(th);
-                        }
-                        //Inserting constructed table header into table
-                        $("#" + tableId).append(thead);
-
-                        //Creating table body with times and empty cells
-                        var tbody = $(document.createElement("tbody"));
-
-                        //Generating list of times
-                        var timesArray = new Array();
-                        for (var i = minTime; i < maxTime; i++) {
-                            var timeVal = Date.parse(i + ":00:00");
-                            timesArray.push(timeVal.toString("HH:mm"));
-                            timeVal.addMinutes(30);
-                            timesArray.push(timeVal.toString("HH:mm"));
-                        }
-
-                        //Constructing table body
-                        for (i = 0; i < timesArray.length; i++) {
-                            var tr = $(document.createElement("tr"));
-                            var timeTd = $(document.createElement("td"));
-                            timeTd.html(timesArray[i]);
-                            tr.append(timeTd);
-
-                            for (var j = 0; j < dateArray.length; j++) {
-                                var td = $(document.createElement("td"));
-                                td.addClass("timeslotcell");
-                                var date = dateArray[j];
-                                date = new Date(date).toString("yyyy-MM-dd");
-                                var datetimeString = date + " " + timesArray[i] + ":00";
-                                td.attr("value", datetimeString);
-                                tr.append(td);
-                            }
-                            tbody.append(tr);
-                        }
-
-                        //Inserting constructed table body into table
-                        $("#" + tableId).append(tbody);
-                    }
-
-
-
-                    $("td.timeslotcell", "#acceptanceTimeslotsTable").on("click", function() {
-                        triggerTimeslot(this, 60);
-                    });
-                    $("td.timeslotcell", "#midtermTimeslotsTable").on("click", function() {
-                        triggerTimeslot(this, 90);
-                    });
-                    $("td.timeslotcell", "#finalTimeslotsTable").on("click", function() {
-                        triggerTimeslot(this, 90);
-                    });
+                    
+                    $("#milestoneTimeslotsSelect").val(schedules[0].milestoneName); //Select first milestone
+                    
+                    $(".createTimeslotsTab a").tab('show');
                 }
+                
+                $("#milestoneTimeslotsSelect").on('change', function(e){
+                    $(".timeslotsTable").empty();
+                    var selectedMilestone = $(this).val();
+                    selectedSchedule = null;
+                    for (var i = 0; i < schedules.length; i++) {
+                        var schedule = schedules[i];
+                        if ((schedule.milestoneName) === selectedMilestone) {
+                            selectedSchedule = schedule;
+                            break;
+                        }
+                    }
+                    makeTimeslotTable("timeslotsTable", selectedSchedule.dates, selectedSchedule.dayStartTime, selectedSchedule.dayEndTime);
+                    populateTimeslotsTable(selectedSchedule.duration);
+                    $(".timeslotsTable").show();
+                    return false; 
+                });
+                
+                //OVERALL SUBMIT TO SERVER
+                $("#createTimeslotsSubmitBtn").on('click', function() {
+                    $("#createTimeslotsSubmitBtn").button('loading');
+                    timeslotsData = {};
+                    var timeslots_array = new Array();;
+
+                    var inputData = $("div.start-marker", ".timeslotsTable").get();
+                    for (var i = 0; i < inputData.length; i++) {
+                        var obj = inputData[i];
+                        timeslots_array.push($(obj).parent().attr("value"));
+                    }
+                    
+                    timeslotsData["scheduleId"] = selectedSchedule.scheduleId;
+                    timeslotsData["timeslots"] = timeslots_array;
+
+//                    console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
+//                    $.ajax({
+//                        type: 'POST',
+//                        url: 'createTimeslotsJson',
+//                        data: {jsonData: JSON.stringify(timeslotsData)},
+//                        dataType: 'json'
+//                    }).done(function(response) {
+//                        if (response.success) {
+//                            console.log("createTimeslotsJson was successful");
+//                            displayMessage("timeslotResultMessage", response.message, false);
+//                        } else {
+//                            var eid = btoa(response.message);
+//                            console.log(response.message);
+//                            window.location = "error.jsp?eid=" + eid;
+//                        }
+//                    }).fail(function(error) {
+//                        console.log("createTimeslotsJson AJAX FAIL");
+//                        displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
+//                    });
+//                     $("#createTimeslotsSubmitBtn").button('reset');
+                    return false;
+                });
+                
+                
+                function makeTimeslotTable(tableClass, dateArray, dayStart, dayEnd) {
+                    var thead = $(document.createElement("thead"));
+                    var minTime = dayStart;
+                    var maxTime = dayEnd;
+
+                    //Creating table header with dates
+                    thead.append("<th></th>"); //Empty cell for time column
+                    for (i = 0; i < dateArray.length; i++) {
+                        var th = $(document.createElement("th"));
+                        var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
+                        th.html(headerVal);
+                        thead.append(th);
+                    }
+                    //Inserting constructed table header into table
+                    $("." + tableClass).append(thead);
+
+                    //Creating table body with times and empty cells
+                    var tbody = $(document.createElement("tbody"));
+
+                    //Generating list of times
+                    var timesArray = new Array();
+                    for (var i = minTime; i < maxTime; i++) {
+                        var timeVal = Date.parse(i + ":00:00");
+                        timesArray.push(timeVal.toString("HH:mm"));
+                        timeVal.addMinutes(30);
+                        timesArray.push(timeVal.toString("HH:mm"));
+                    }
+
+                    //Constructing table body
+                    for (i = 0; i < timesArray.length; i++) {
+                        var tr = $(document.createElement("tr"));
+                        var timeTd = $(document.createElement("td"));
+                        timeTd.html(timesArray[i]);
+                        tr.append(timeTd);
+
+                        for (var j = 0; j < dateArray.length; j++) {
+                            var td = $(document.createElement("td"));
+                            td.addClass("timeslotcell");
+                            var date = dateArray[j];
+                            date = new Date(date).toString("yyyy-MM-dd");
+                            var datetimeString = date + " " + timesArray[i] + ":00";
+                            td.attr("value", datetimeString);
+                            tr.append(td);
+                        }
+                        tbody.append(tr);
+                    }
+
+                    //Inserting constructed table body into table
+                    $("." + tableClass).append(tbody);
+                }
+                
+                $('body').on('click', '.timeslotcell', function(e) {
+                    console.log("clicked timeslotcell");
+                    triggerTimeslot(this, selectedSchedule.duration);
+                    return false;
+                });
                 
                 /*
                  * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
@@ -680,10 +647,9 @@
                     }
                 }
 
-                function populateTimeslotsTable(tableId, data) {
-                    $("#" + tableId).find("td.timeslotcell").each(function() {
-                        var milestone = tableId.split("TimeslotsTable")[0];
-                        triggerTimeslot(this, data[milestone].duration);
+                function populateTimeslotsTable(duration) {
+                    $(".timeslotsTable").find(".timeslotcell").each(function() {
+                        triggerTimeslot(this, duration);
                     });
                 }
 
