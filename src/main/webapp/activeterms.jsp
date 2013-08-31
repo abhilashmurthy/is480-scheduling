@@ -88,6 +88,7 @@
 			</div>
 			<br />
 			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
+			<p id="serverResponse"></p>
 			</s:if><s:else>
 				<h4>No Terms Exist!</h4>
 			</s:else>
@@ -98,12 +99,11 @@
 			$(function() {
 				$(":radio").click(function(){
 					var dropdown = $("#defaultActiveTermList");
-					var selected = $(this);
-					var tr = selected.parents("tr");
+					var tr = $(this).parents("tr");
 					var termId = $(tr).children(":hidden").text();
 					
 					//Checking if the term was set as Active or Inactive
-					if ($(selected).val() === "true") {
+					if ($(this).val() === "true") {
 						//Checking if the term is already in the list
 						var options = $(dropdown).children();
 						for (var i = 0; i < options.length; i++) {
@@ -127,8 +127,20 @@
 				});
 				
 				$('#submitFormBtn').click(function() {
-					
+					var jsonData = new Object();
+					jsonData["defaultTerm"] = $("#defaultActiveTermList").find(":selected").val();
+					jsonData["activeTerms"] = generateArray($(":radio:checked[value='true']"));
+					console.log(JSON.stringify(jsonData));
 				});
+				
+				function generateArray(list) {
+					var arr = new Array();
+					for (var i = 0; i < list.length; i++) {
+						var tr = $(list[i]).parents("tr");
+						arr.push(parseInt($(tr).children(":hidden").text()));
+					}
+					return arr;
+				}
 			});
 		</script>
     </body>
