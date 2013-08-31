@@ -97,6 +97,10 @@
             .tab-content {
                 padding-top: 50px;
             }
+            
+            .scheduleDayTimeSelect {
+                width: 45px;
+            }
         </style>
     </head>
     <body>
@@ -204,7 +208,7 @@
                             <h3 id="createScheduleTitle">Create Schedule</h3>
                             <form id="createScheduleForm">
                                 <table id="createScheduleTable">
-                                    <tr><th>Milestone</th><th>Dates</th></tr>
+                                    <tr><th>Milestone</th><th>Dates</th><th>Day Start</th><th>Day End</th></tr>
                                     <tr id="createScheduleSubmitRow"><td></td><td><input id="createScheduleSubmitBtn" type="submit" value="Create" data-loading-text="Done" class="btn btn-primary"/></td></tr>
                                 </table>
                             </form>
@@ -323,16 +327,18 @@
                     for (var i = 0; i < milestones.length; i++) {
                         var milestone = milestones[i];
                         var milestoneTr = $(document.createElement('tr'));
+                        //Milestone name
                         var milestoneTd = $(document.createElement('td'));
                             milestoneTd.addClass('formLabelTd');
                             milestoneTd.html(milestone.name);
                             milestoneTr.append(milestoneTd);
+                        //Milestone dates[]
                         var milestoneDatesTd = $(document.createElement('td'));
                             var milestoneInput = $(document.createElement('input'));
                             milestoneInput.attr('type', 'text');
+                            milestoneInput.attr('name', milestone.name.toLowerCase() + "Dates");
                             milestoneInput.attr('id', "milestone_" + milestone.id);
                             milestoneInput.attr('class', "milestoneOrder_" + milestone.order);
-                            milestoneInput.attr('name', milestone.name + "Dates");
                             milestoneInput.addClass('input-medium datepicker');
                             milestoneInput.multiDatesPicker({
                                 dateFormat: "yy-mm-dd",
@@ -341,8 +347,43 @@
                                 beforeShowDay: $.datepicker.noWeekends
                             });
                             milestoneDatesTd.append(milestoneInput);
-                            milestoneTr.append(milestoneDatesTd);
-                            milestoneTr.insertBefore('#createScheduleSubmitRow');
+                        milestoneTr.append(milestoneDatesTd);
+                        //Milestone Day Start
+                        var milestoneDayStartTd = $(document.createElement('td'));
+                            var milestoneInput = $(document.createElement('input'));
+                                milestoneInput.attr('type', 'text');
+                                milestoneInput.attr('id', "milestoneDayStart_" + milestone.id);
+                                milestoneInput.attr('class', "scheduleDayTimeSelect");
+                                milestoneInput.attr('name', milestone.name.toLowerCase() + "DayStartTime");
+                                milestoneInput.timepicker({
+                                    minTime: '07:00',
+                                    maxTime: '20:00',
+                                    step: 60,
+                                    forceRoundTime: true,
+                                    timeFormat: 'H:i',
+                                    scrollDefaultTime: '09:00'
+                                });
+                                milestoneInput.attr('value', '09:00');
+                            milestoneDayStartTd.append(milestoneInput);
+                        milestoneTr.append(milestoneDayStartTd);
+                        var milestoneDayEndTd = $(document.createElement('td'));
+                            var milestoneInput = $(document.createElement('input'));
+                                milestoneInput.attr('type', 'text');
+                                milestoneInput.attr('id', "milestoneDayEnd_" + milestone.id);
+                                milestoneInput.attr('class', "scheduleDayTimeSelect");
+                                milestoneInput.attr('name', milestone.name.toLowerCase() + "DayEndTime");
+                                milestoneInput.timepicker({
+                                    minTime: '07:00',
+                                    maxTime: '20:00',
+                                    step: 60,
+                                    forceRoundTime: true,
+                                    timeFormat: 'H:i',
+                                    scrollDefaultTime: '18:00'
+                                });
+                                milestoneInput.attr('value', '18:00');
+                            milestoneDayEndTd.append(milestoneInput);
+                        milestoneTr.append(milestoneDayEndTd);
+                        milestoneTr.insertBefore('#createScheduleSubmitRow');
                     }
                     $(".createScheduleTab a").tab('show');
                     console.log("Showed tab");
@@ -381,20 +422,36 @@
                 }
 
                 //Create Schedule Submit - Show timeslots panel
-                $("#createScheduleForm").on('submit', function() {
+                $("#createScheduleForm").on('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     //AJAX call to save term and schedule dates
-                    scheduleData = $("#createScheduleForm").serializeArray();
-                    var createScheduleData = $.merge(termData, scheduleData);
-                    console.log('\n\nData to be sent to create schedule and term: ' + createScheduleData);
+                    var milestoneArray = $(this).serializeArray();
+                    for (var i = 0; i < milestoneArray.length; i++) {
+                        var milestoneItem = milestoneArray[i];
+                        for (var j = 0; j < milestones.length; j++) {
+                            var milestone = milestones[j];
+                            if (milestoneItem.name.split("Dates")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                                milestone["dates[]"] = milestoneItem.value.split(",");
+                            }
+                            if (milestoneItem.name.split("DayStartTime")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                                milestone["dayStartTime"] = Date.parse(milestoneItem.value).toString('H');
+                            }
+                            if (milestoneItem.name.split("DayEndTime")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                                milestone["dayEndTime"] = Date.parse(milestoneItem.value).toString('H');
+                            }
+                        }
+                    }
+//                    console.log("Milestone array is now: " + JSON.stringify(milestones));
+                    var createScheduleData = {"milestones[]":milestones};
                     $.ajax({
                         type: 'POST',
                         url: 'createScheduleJson',
-                        data: createScheduleData,
+                        data: {jsonData: JSON.stringify(createScheduleData)},
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
                             console.log("Received: " + JSON.stringify(response));
-                            console.log("Schedules have been created successfully");
 			    $("#createScheduleSubmitBtn").button('loading');
                             //Display create timeslots forms
                             displayCreateTimeslots(response);

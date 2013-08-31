@@ -38,59 +38,56 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
     @Override
     public String execute() throws Exception {
-		EntityManager em = null;
+        EntityManager em = null;
         try {
             json.put("exception", false);
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-			
-			//Getting input data
-			JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
-			JSONArray milestones = inputData.getJSONArray("milestones");
-			
-			//Creating schedule objects for all milestones
-			em.getTransaction().begin();
-			ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
-			for (int i = 0; i < milestones.length(); i++) {
-				HashMap<String, Object> scheduleJson = new HashMap<String, Object>();
-				JSONObject obj = milestones.getJSONObject(i);
-				long milestoneId = obj.getLong("id");
-				Milestone m = em.find(Milestone.class, milestoneId);
-				if (m == null) {
-					json.put("success", false);
-					json.put("message", "Milestone with ID: " + milestoneId + " not found");
-					return SUCCESS;
-				}
-				scheduleJson.put("milestoneName", m.getName());
-				scheduleJson.put("duration", m.getSlotDuration());
-				scheduleJson.put("dayStartTime", obj.getInt("dayStartTime"));
-				scheduleJson.put("dayEndTime", obj.getInt("dayEndTime"));
-				JSONArray milestoneDates = obj.getJSONArray("dates");
-				ArrayList<String> dates = new ArrayList<String>();
-				for (int j = 0; j < milestoneDates.length(); j++) {
-					dates.add(milestoneDates.getString(j));
-				}
-				scheduleJson.put("dates", dates);
-				Timestamp startTimestamp = Timestamp.valueOf
-						(milestoneDates.getString(0) + " 00:00:00");
-                Timestamp endTimestamp = Timestamp.valueOf
-						(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
-				int dayStartTime = obj.getInt("dayStartTime");
-				int dayEndTime = obj.getInt("dayEndTime");
-				
-				Schedule s = new Schedule();
-				s.setMilestone(m);
-				s.setStartDate(startTimestamp);
-				s.setEndDate(endTimestamp);
-				s.setDayStartTime(dayStartTime);
-				s.setDayEndTime(dayEndTime);
-				
-				em.persist(s);
-				scheduleJson.put("scheduleId", s.getId());
-				scheduleList.add(scheduleJson);
-			}
-			em.getTransaction().commit();
-			json.put("schedules", scheduleList);
 
+            //Getting input data
+            JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+            JSONArray milestones = inputData.getJSONArray("milestones[]");
+
+            //Creating schedule objects for all milestones
+            em.getTransaction().begin();
+            ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
+            for (int i = 0; i < milestones.length(); i++) {
+                HashMap<String, Object> scheduleJson = new HashMap<String, Object>();
+                JSONObject obj = milestones.getJSONObject(i);
+                long milestoneId = obj.getLong("id");
+                Milestone m = em.find(Milestone.class, milestoneId);
+                if (m == null) {
+                    json.put("success", false);
+                    json.put("message", "Milestone with ID: " + milestoneId + " not found");
+                    return SUCCESS;
+                }
+                scheduleJson.put("milestoneName", m.getName());
+                scheduleJson.put("duration", m.getSlotDuration());
+                scheduleJson.put("dayStartTime", obj.getInt("dayStartTime"));
+                scheduleJson.put("dayEndTime", obj.getInt("dayEndTime"));
+                JSONArray milestoneDates = obj.getJSONArray("dates[]");
+                ArrayList<String> dates = new ArrayList<String>();
+                for (int j = 0; j < milestoneDates.length(); j++) {
+                    dates.add(milestoneDates.getString(j));
+                }
+                scheduleJson.put("dates", dates);
+                Timestamp startTimestamp = Timestamp.valueOf(milestoneDates.getString(0) + " 00:00:00");
+                Timestamp endTimestamp = Timestamp.valueOf(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
+                int dayStartTime = obj.getInt("dayStartTime");
+                int dayEndTime = obj.getInt("dayEndTime");
+
+                Schedule s = new Schedule();
+                s.setMilestone(m);
+                s.setStartDate(startTimestamp);
+                s.setEndDate(endTimestamp);
+                s.setDayStartTime(dayStartTime);
+                s.setDayEndTime(dayEndTime);
+
+                em.persist(s);
+                scheduleJson.put("scheduleId", s.getId());
+                scheduleList.add(scheduleJson);
+            }
+            em.getTransaction().commit();
+            json.put("schedules", scheduleList);
             json.put("success", true);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
@@ -102,9 +99,13 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
             json.put("success", false);
             json.put("message", "Error with CreateSchedule: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
-		}
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
         return SUCCESS;
     }
 
