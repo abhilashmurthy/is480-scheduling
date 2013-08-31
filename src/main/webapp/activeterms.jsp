@@ -24,7 +24,7 @@
         <div class="container">
 			<h3>Manage Active Terms</h3>
 			<s:if test="%{allTerms != null && allTerms.size() > 0}">
-			<form id="myform" action="updateActiveTerms" method="post">
+			<div style="float: left; margin-right: 50px;">
 			<table id="termTable" class="table table-hover">
 				<thead>
 					<tr>
@@ -36,6 +36,7 @@
 				<tbody>
 					<s:iterator value="allTerms">
 					<tr align="center">
+						<form>
 						<td hidden><s:property value="id"/></td>
 						<td style="text-align:center; vertical-align:middle;">
 							<s:property value="displayName"/>
@@ -55,11 +56,13 @@
 								<input type="radio" name="isActive" value="false" checked />
 							</td>
 						</s:else>
+						</form>
 					</tr>
 					</s:iterator>
 				</tbody>
 			</table>
-			<br/>
+			</div>
+			<div>
 			<table class="table table-hover" style="width:auto">
 			<thead>
 				<tr>
@@ -72,17 +75,14 @@
 				<tr>
 				<td>
 					<select name="defaultActiveTerm" id="defaultActiveTermList">
-						<option value=""></option>
 					</select>
 				</td>
 				</tr>
 			</tbody>
 			</table>
-			<br/><br/><br/>
-			
+			</div>
+			<br />
 			<input type="submit" id="saveButton" class="btn btn-primary" name="Save" value="Save" style="width:100px; height:30px;" />
-			
-			</form>
 			</s:if><s:else>
 				<h4>No Terms Exist!</h4>
 			</s:else>
@@ -90,16 +90,39 @@
 		
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
-			$(function(){
-				var $btn = $('#saveButton');
-				$btn.click(function(){
+			$(function() {
+				$('#saveButton').click(function() {
 					var $this = $(this);
 					$this.attr('disabled', 'disabled').html("Saving...");
-					setTimeout(function () {
+					setTimeout(function() {
 						$this.removeAttr('disabled').html('Save');
-					}, 2000)
+					}, 2000);
 				});
-			})
+				$(":radio").click(function(){
+					var dropdown = $("#defaultActiveTermList");
+					var selected = $(this);
+					var tr = selected.parents("tr");
+					var termId = $(tr).children(":hidden").text();
+					
+					//Checking if the term was set as Active or Inactive
+					if ($(selected).val() === "true") {
+						var newOption = document.createElement("option");
+						var termName = $($(tr).children()[2]).text();
+						$(newOption).val(termId);
+						$(newOption).text(termName);
+						$(dropdown).append(newOption);
+					} else {
+						//Remove the term from the dropdown list
+						var options = $(dropdown).children();
+						for (var i = 0; i < options.length; i++) {
+							if ($(options[i]).val() === termId) {
+								$(dropdown).find("option[value=" + termId + "]").remove();
+								return;
+							}
+						}	
+					}
+				});
+			});
 		</script>
     </body>
 </html>

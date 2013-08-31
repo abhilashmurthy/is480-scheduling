@@ -29,16 +29,7 @@
 
         <!-- Welcome Text -->
         <div class="container page" >
-            <h3 id="activeTermName">
-                <%
-                    String semester = activeTerm.getSemester();
-                    int startAcademicYear = activeTerm.getAcademicYear();
-                    String endAcademicYear = String.valueOf(startAcademicYear + 1);
-                    String academicYear = String.valueOf(startAcademicYear) + "-"
-                            + endAcademicYear.substring(2);
-                    out.print(academicYear + " " + semester);
-                %>
-            </h3>
+            <h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>
 
             <!-- To display the list of active terms -->
             <div class="activeTerms">
@@ -47,7 +38,7 @@
                         <td style="width:90px; padding-bottom:11px"><b>Select Term</b></td>
                         <td><form id="activeTermForm" action="index" method="post">
                                 <select name="termId" style="float:right" onchange="this.form.submit()"> 
-                                    <option value=""><% out.print(academicYear + " " + semester);%></option>
+                                    <option value=""><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
                                     <s:iterator value="data">
                                         <option value="<s:property value="termId"/>"><s:property value="termName"/></option>
                                     </s:iterator>
