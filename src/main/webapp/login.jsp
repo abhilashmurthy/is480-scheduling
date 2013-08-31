@@ -59,6 +59,15 @@
                 text-align: center;
                 font-size: 16px;
             }
+			
+			#testBtn {
+				display: block;
+				margin: auto;
+			}
+			
+			#testLoginMsg {
+				text-align: center;
+			}
 
             .loadingContainer {
                 padding-top: 60px;
@@ -103,13 +112,9 @@
                 </div>
             </div>
         </div> <!-- /container -->
-        <div class="container">
-            <div class="loadingContainer">
-            </div>
-        </div>
 
         <!-- To display the login message error -->
-        <div class="container">
+        <div class="container" style="margin-top: 50px; margin-bottom: 10px">
             <div class="row">
                 <% Object loginMsg = request.getAttribute("error");
                     String loginError = "";
@@ -122,27 +127,29 @@
                 </p>
             </div>
         </div> <!-- /container -->
+		
+		<button id="testBtn" class="btn btn-inverse" data-loading-text="Logging in..." type="submit">Testing Login*</button>
+		<br />
+		<p id="testLoginMsg">* - To be used by developers for testing purposes only!</p>
 
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-            <% if (true) {%>
-            $("#ssoBtn").on('click', function() {
+            $("#testBtn").click(function() {
                 $(this).button('loading');
                 var userId = prompt('Please enter the Username', '');
                 if (userId !== null && userId !== '') {
-                    window.location = 'login?smu_username=' + userId;
+                    window.location = 'login?bypass=true&smu_username=' + userId;
                 } else {
                     alert('Invalid Username');
                     $(this).button('reset');
                 }
             });
-            <% } else {%>
-            $("#ssoBtn").on('click', function() {
+			
+            $("#ssoBtn").click(function() {
                 $(this).button('loading');
                 //blink(this);
                 window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
             });
-            <% }%>
         </script>
     </body>
 </html>

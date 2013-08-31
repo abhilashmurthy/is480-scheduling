@@ -30,6 +30,7 @@ public class MailSender {
 	private static Session session;
 	private static String USERNAME;
 	private static String PASSWORD;
+	private static boolean TRUE_RECIPIENTS;
 
 	static {
 		InputStream in = null;
@@ -39,6 +40,7 @@ public class MailSender {
 			props.load(in);
 			USERNAME = MiscUtil.getProperty("General", "USERNAME");
 			PASSWORD = MiscUtil.getProperty("General", "PASSWORD");
+			TRUE_RECIPIENTS = Boolean.parseBoolean(MiscUtil.getProperty("General", "TRUE_RECIPIENTS"));
 			session = Session.getInstance(props,
 					new javax.mail.Authenticator() {
 				@Override
@@ -68,7 +70,7 @@ public class MailSender {
 					"IS480 Scheduling"));
 			
 			//Setting TO emails
-			if (MiscUtil.DEV_MODE) {
+			if (TRUE_RECIPIENTS) {
 				message.setRecipients(Message.RecipientType.TO,
 						InternetAddress.parse(
 						MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
@@ -80,7 +82,7 @@ public class MailSender {
 			
 			//Setting CC emails
 			if (ccEmails != null) {
-				if (MiscUtil.DEV_MODE) {
+				if (TRUE_RECIPIENTS) {
 					message.setRecipients(Message.RecipientType.CC,
 							InternetAddress.parse(
 							MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
