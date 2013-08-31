@@ -42,6 +42,11 @@ public class SettingsManager {
 		return settingsList;
 	}
 	
+	public static Term getDefaultTerm (EntityManager em) {
+		Settings s = getByName(em, "defaultTerm");
+		return em.find(Term.class, Long.parseLong(s.getValue()));
+	}
+	
 	public static Settings getMilestoneSettings(EntityManager em) {
 		return getByName(em, "milestones");
 	}

@@ -29,16 +29,7 @@
 
         <!-- Welcome Text -->
         <div class="container page" >
-            <h3 id="activeTermName">
-                <%
-                    String semester = activeTerm.getSemester();
-                    int startAcademicYear = activeTerm.getAcademicYear();
-                    String endAcademicYear = String.valueOf(startAcademicYear + 1);
-                    String academicYear = String.valueOf(startAcademicYear) + "-"
-                            + endAcademicYear.substring(2);
-                    out.print(academicYear + " " + semester);
-                %>
-            </h3>
+            <h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>
 
             <!-- To display the list of active terms -->
             <div class="activeTerms">
@@ -47,7 +38,7 @@
                         <td style="width:90px; padding-bottom:11px"><b>Select Term</b></td>
                         <td><form id="activeTermForm" action="index" method="post">
                                 <select name="termId" style="float:right" onchange="this.form.submit()"> 
-                                    <option value=""><% out.print(academicYear + " " + semester);%></option>
+                                    <option value=""><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
                                     <s:iterator value="data">
                                         <option value="<s:property value="termId"/>"><s:property value="termName"/></option>
                                     </s:iterator>
@@ -290,16 +281,16 @@
                     var viewBookingData = timeslots[bodyTd.attr('value')];
 
                     //Append bookingDiv classes based on status
-                    var bookingDiv = bodyTd.children('div');
-                    bookingDiv.addClass('booking');
-                    if (viewBookingData.status === "APPROVED") {
-                        bookingDiv.addClass('approvedBooking');
-                    } else if (viewBookingData.status === "REJECTED") {
-                        bookingDiv.addClass('rejectedBooking');
-                    } else {
-                        bookingDiv.addClass('pendingBooking');
+                    var bookingDiv = bodyTd.children('.booking');
+                    if (bookingDiv) {
+                        if (viewBookingData.status === "APPROVED") {
+                            bookingDiv.addClass('approvedBooking');
+                        } else if (viewBookingData.status === "REJECTED") {
+                            bookingDiv.addClass('rejectedBooking');
+                        } else {
+                            bookingDiv.addClass('pendingBooking');
+                        }
                     }
-                    bodyTd.html(bookingDiv);
 
                     //Popover
                     bodyTd.popover({
@@ -564,6 +555,7 @@
                 function refreshScheduleData() {
                     var toReturn = null;
                     var bookingExists = 0;
+                    var existingTimeslot = null;
                     var teamsPendingBooking = null;
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
                         for (var key in scheduleData.timeslots) {
@@ -571,12 +563,14 @@
                                 var timeslot = scheduleData.timeslots[key];
                                 if (timeslot.team && timeslot.team === teamName) {
                                     bookingExists = 1;
+                                    existingTimeslot = $(document.createElement('div'));
+                                    existingTimeslot.attr('value', timeslot.datetime);
                                     break;
                                 }
                             }
                         }
-                        console.log("Does booking exist? " + milestoneStr + " " + teamName + " " + bookingExists);
-                        toReturn = {bookingExists:bookingExists};
+//                        console.log("Does booking exist? " + milestoneStr + " " + teamName + " " + bookingExists);
+                        toReturn = {bookingExists:bookingExists, existingTimeslot: existingTimeslot};
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
                         teams = JSON.parse('<%= session.getAttribute("allTeams")%>');
                         teamsPendingBooking = new Array();
@@ -591,7 +585,6 @@
                                 if (scheduleData.timeslots.hasOwnProperty(key)) {
                                     var timeslot = scheduleData.timeslots[key];
                                     if (timeslot.team && timeslot.team === adminTeamName) {
-                                        bookingExists = 1;
                                         continue outerTeams;
                                     }
                                 }
@@ -628,7 +621,7 @@
                     //Popover for booked timeslot
                     $('body').on('click', '.bookedTimeslot', function(e) {
                         if ($(e.target).parents('.popover').length) return false;
-                        console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
+//                        console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
                         self = $(this).is('.booking') ? $(this).parent('.timeslotCell') : $(this);
                         $('.timeslotCell').not(self).popover('hide');
                         self.popover('show');
@@ -641,7 +634,7 @@
                             $('.timeslotCell').not(self).popover('hide');
                             var refreshData = refreshScheduleData();
                             if (<%= activeRole.equals(Role.STUDENT) %> && refreshData.bookingExists !== 0) {
-                                showNotification("WARNING", self, "You already have a booking!");
+                                showNotification("WARNING", refreshData.existingTimeslot, "You already have a booking!");
                                 return false;
                             }
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
@@ -657,7 +650,7 @@
                                     return false;
                                 }
                             }
-                            console.log(".unbookedTimeslot clicked.");
+//                            console.log(".unbookedTimeslot clicked.");
                             self.popover('show');
                         }
                         return false;
@@ -680,12 +673,14 @@
                         e.stopPropagation();
                         var returnData = createBooking(self);
                         //REFRESH STATE OF scheduleData
+                        self.removeClass('unbookedTimeslot');
+                        self.addClass('bookedTimeslot');
                         var bookingDiv = $(document.createElement('div'));
                         bookingDiv.addClass('booking pendingBooking');
                         bookingDiv.html(returnData.booking.team);
-                        self.removeClass('unbookedTimeslot');
-                        self.addClass('bookedTimeslot');
-                        self.html(bookingDiv);
+                        bookingDiv.css('display', 'none');
+                        self.append(bookingDiv);
+                        self.children('.booking').show('clip', 'slow');
                         scheduleData.timeslots[self.attr('value')] = returnData.booking;
                         showNotification("CREATED", self, null);
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
@@ -704,8 +699,8 @@
                         deleteBooking(self);
                         showNotification("DELETED", self, null);
                         //REFRESH STATE OF scheduleData
+                        self.children('.booking').effect('clip', 'slow');
                         self.popover('destroy');
-                        self.html("");
                         self.removeClass();
                         self.addClass("timeslotCell unbookedTimeslot");
                         delete scheduleData.timeslots[self.attr('value')];
@@ -744,7 +739,7 @@
                         changeAvailability(self, true);
                         showNotification("WARNING", self, "Set as available");
                         self.popover('destroy');
-                        console.log("New classes should be :" + self.attr('class'));
+//                        console.log("New classes should be :" + self.attr('class'));
                         appendChangeAvailabilityPopover(self);
                         return false;
                     });
@@ -755,7 +750,7 @@
                         changeAvailability(self, false);
                         showNotification("WARNING", self, "Set as unavailable");
                         self.popover('destroy');
-                        console.log("New classes should be :" + self.attr('class'));
+//                        console.log("New classes should be :" + self.attr('class'));
                         appendChangeAvailabilityPopover(self);
                         return false;
                     });
@@ -766,42 +761,10 @@
                  ****************************/
 
                 function showNotification(action, bodyTd, notificationMessage) {
-                    var notificationTitle = null;
-                    var notificationType = null;
-                    var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
-                    var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
-                    switch (action) {
-                        case "CREATED":
-                            notificationTitle = "Booked";
-                            notificationMessage = "Time: " + dateToView + " " + startTimeToView;
-                            notificationMessage += "<br/> Emails have been sent";
-                            notificationType = "success";
-                            break;
-                        case "DELETED":
-                            notificationTitle = "Deleted";
-                            notificationMessage = "Time: " + dateToView + " " + startTimeToView;
-                            notificationMessage += "<br/> Emails have been sent";
-                            notificationType = "error";
-                            break;
-                        case "UPDATED":
-                            notificationTitle = "Updated";
-                            notificationMessage = "Time: " + dateToView + " " + startTimeToView;
-                            notificationMessage += "<br/> Emails have been sent";
-                            notificationType = "warning";
-                            break;
-                        case "WARNING":
-                            notificationTitle = "Note";
-                            notificationType = "warning";
-                            $.pnotify_remove_all();
-                            break;
-                        default:
-                            alert("Something went wrong");
-                    }
-                    
-                    $.pnotify({
-                        title: notificationTitle,
+                    var opts = {
+                        title: "Note",
                         text: notificationMessage,
-                        type: notificationType,
+                        type: "warning",
                         icon: false,
                         sticker: false,
                         mouse_reset: false,
@@ -813,7 +776,38 @@
                                left: ($(window).width() / 2) - (pnotify.width() / 2)
                             });
                         }
-                    });
+                    };
+                    var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
+                    var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
+                    switch (action) {
+                        case "CREATED":
+                            opts.title = "Booked";
+                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            opts.type = "success";
+                            break;
+                        case "DELETED":
+                            opts.title = "Deleted";
+                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            opts.type = "error";
+                            break;
+                        case "UPDATED":
+                            opts.title = "Updated";
+                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            opts.type = "info";
+                            break;
+                        case "WARNING":
+                            $.pnotify_remove_all();
+                            opts.title = "Note";
+                            opts.text += "<br/> Time: " + dateToView + " " + startTimeToView;
+                            opts.type = "warning";
+                            var id = scheduleData.timeslots[bodyTd.attr('value')].id;
+                            $("#timeslot_" + id).children('.booking').effect('bounce', {distance: 50}, 'slow');
+                            $("#timeslot_" + id).css('height', $("#timeslot_" + id).parent('.timeslotCell').css('height'));
+                            break;
+                        default:
+                            alert("Something went wrong");
+                    }
+                    $.pnotify(opts);
                 }
                 
                 /***************************
@@ -838,7 +832,7 @@
                             teamId: teamId
                         };
                     }
-                    console.log("Submitting create booking data: " + JSON.stringify(data));
+//                    console.log("Submitting create booking data: " + JSON.stringify(data));
                     //Create Booking AJAX
                     $.ajax({
                         type: 'POST',
@@ -864,8 +858,7 @@
                     //get the timeslotID for that cell and send as request
                     var cellId = $(bodyTd).attr('id').split("_")[1];
                     var data = {timeslotId: cellId};
-                    console.log("Submitting delete booking data: " + JSON.stringify(data));
-                    console.log("data");
+//                    console.log("Submitting delete booking data: " + JSON.stringify(data));
                     //Delete Booking AJAX
                     $.ajax({
                         type: 'POST',
@@ -889,7 +882,7 @@
                     //getfunction up the timeslotID for that cell and send as request
                     var cellId = bodyTd.attr('id').split("_")[1];
                     var data = {timeslotId: cellId, changedDate: newDateTime};
-                    console.log("Submitting update booking data: " + JSON.stringify(data));
+//                    console.log("Submitting update booking data: " + JSON.stringify(data));
                     $.ajax({
                         type: 'POST',
                         async: false,
@@ -899,10 +892,8 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (!response.exception) {
-                            console.log('Destroying C');
                             bodyTd.popover('destroy');
                             var msg = response.message + "";
-                            console.log(msg);
                             if (msg === ('Booking updated successfully! Update email has been sent to all attendees. (Coming soon..)')) {
                                 bodyTd.html("");
                                 bodyTd.removeClass();
@@ -952,7 +943,7 @@
                         timeslot_data.splice(index, 1);
                     }
                     timeslotsData["timeslot_data[]"] = timeslot_data;
-                    console.log('Availability data is: ' + JSON.stringify(timeslotsData));
+//                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
                     $.ajax({
                         type: 'POST',
                         async: false,
@@ -971,7 +962,7 @@
                                 }
                             } else {
                                 var eid = btoa(response.message);
-                                console.log(response.message);
+//                                console.log(response.message);
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         } else {

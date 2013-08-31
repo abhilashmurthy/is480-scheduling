@@ -400,6 +400,17 @@ public class UserTestingDB {
 		Student u67 = new Student("xi.chen.2011","CHEN Xi",term22013);
 		
 		Student u68 = new Student("dewi.zana.2011","Dewi ZANA",term22013);
+                
+                Student u69 = new Student("weizhenglai.2011","LAI Weizheng",term22013);
+		
+		Student u70 = new Student("robyn.cheng.2011","Robyn  CHENG King",term22013);
+		
+		Student u71 = new Student("jingyi.lim.2011","LIM Jing Yi",term22013);
+		
+		Student u72 = new Student("hanhui.koh.2011","KOH Han Hui",term22013);
+		
+		Student u73 = new Student("chelsea.toh.2011","Chelsea TOH Miaoxing",term22013);
+
 
 		// Persistence
 		em.persist(uAdmin);
@@ -472,6 +483,11 @@ public class UserTestingDB {
 		em.persist(u66);
 		em.persist(u67);
 		em.persist(u68);
+                em.persist(u69);
+		em.persist(u70);
+		em.persist(u71);
+		em.persist(u72);
+		em.persist(u73);
 		
 		logger.info("Users persisted");
 		
@@ -640,6 +656,20 @@ public class UserTestingDB {
 		t11members.add(u68);
 		t11.setMembers(t11members);
                 
+                Team t12 = new Team();
+		t12.setTerm(term22013);
+		t12.setTeamName("The Partners");
+		t12.setSupervisor(u7);
+		t12.setReviewer1(u6);
+		t12.setReviewer2(u8);
+		HashSet<Student> t12members = new HashSet<Student>();
+		t12members.add(u69);
+		t12members.add(u70);
+		t12members.add(u71);
+		t12members.add(u72);
+		t12members.add(u73);
+		t12.setMembers(t12members);
+                
 		// Persistence
 		em.persist(t1);
 		em.persist(t2);
@@ -652,6 +682,7 @@ public class UserTestingDB {
 		em.persist(t9);
 		em.persist(t10);
 		em.persist(t11);
+                em.persist(t12);
 		logger.info("Teams persisted");
 		
 		/*
@@ -726,6 +757,12 @@ public class UserTestingDB {
 		u66.setTeam(t11);
 		u67.setTeam(t11);
 		u68.setTeam(t11);
+                
+                u69.setTeam(t12);
+		u70.setTeam(t12);
+		u71.setTeam(t12);
+		u72.setTeam(t12);
+		u73.setTeam(t12);
 		
 		
 		em.persist(u1);
@@ -793,6 +830,11 @@ public class UserTestingDB {
 		em.persist(u66);
 		em.persist(u67);
 		em.persist(u68);
+                em.persist(u69);
+		em.persist(u70);
+		em.persist(u71);
+		em.persist(u72);
+		em.persist(u73);
 		logger.info("User --> Team links persisted");
 		
 		/*
