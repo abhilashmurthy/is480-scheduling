@@ -205,11 +205,34 @@ public class UserTestingDB {
 			
 			for (int b = 9; b <= 18; b++) {
 				Timeslot t = new Timeslot();
-				t.setStartTime(new Timestamp(2013 - 1900, 10, a, b, 0, 0, 0));
-				t.setEndTime(new Timestamp(2013 - 1900, 10, a, b + 1, 0, 0, 0));
-				t.setVenue("SIS Seminar Room 2-1");
-				t.setSchedule(acceptance12013);
-				em.persist(t);
+                                if(a==5 && (b == 13 || b == 14 || b== 15 || b==16 || b==17 || b == 18)){
+                                    t.setStartTime(new Timestamp(2013 - 1900, 10, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 10, a, b + 1, 0, 0, 0));
+                                    t.setVenue("SIS Seminar Room 2-1");
+                                    t.setSchedule(acceptance12013);
+                                    em.persist(t);
+                                    
+                                }else if(a==6 && (b == 10 || b == 11 || b== 13 || b==14 || b==15 || b == 16 || b==17 || b==18)){
+                                    t.setStartTime(new Timestamp(2013 - 1900, 10, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 10, a, b + 1, 0, 0, 0));
+                                    t.setVenue("SIS Seminar Room 2-1");
+                                    t.setSchedule(acceptance12013);
+                                    em.persist(t);
+                                }else if(a==7 && (b == 10 || b == 11 || b== 13 || b==14 || b==15 || b == 16 || b==17 || b==18) ){
+                                    t.setStartTime(new Timestamp(2013 - 1900, 10, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 10, a, b + 1, 0, 0, 0));
+                                    t.setVenue("SIS Seminar Room 2-1");
+                                    t.setSchedule(acceptance12013);
+                                    em.persist(t);
+                                }else if(a==8 && (b == 10 || b == 11 || b== 13 || b==14)){
+                                    t.setStartTime(new Timestamp(2013 - 1900, 10, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2013 - 1900, 10, a, b + 1, 0, 0, 0));
+                                    t.setVenue("SIS Seminar Room 2-1");
+                                    t.setSchedule(acceptance12013);
+                                    em.persist(t);
+                                }
+                                
+				
 			}	
 		}
                 
@@ -221,21 +244,35 @@ public class UserTestingDB {
 			}
 			
                         boolean change = true;
-			for (int b = 9; (b + 2) <= 18; b++) {
+			for (int b = 9; b <= 18; b++) {
 				Timeslot t = new Timeslot();
-                                if (change) {
-                                    t.setStartTime(new Timestamp(2014 - 1900, 1, a, b, 0, 0, 0));
-                                    t.setEndTime(new Timestamp(2014 - 1900, 1, a, b + 1, 30, 0, 0));
-                                } else {
-                                    t.setStartTime(new Timestamp(2014 - 1900, 1, a, b, 30, 0, 0));
-                                    t.setEndTime(new Timestamp(2014 - 1900, 1, a, b + 2, 00, 0, 0));
-                                    b++;
-                                }
-				t.setVenue("SIS Seminar Room 2-1");
-				t.setSchedule(midterm22013);
-				em.persist(t);
-                                change = !change;
-			}	
+                               
+                                    if((b == 9)){
+                                        t.setStartTime(new Timestamp(2014 - 1900, 1, a, b, 30, 0, 0));
+                                        t.setEndTime(new Timestamp(2014 - 1900, 1, a, b + 2, 0, 0, 0));
+                                        t.setVenue("SIS Seminar Room 2-1");
+                                        t.setSchedule(midterm22013);
+                                        em.persist(t);
+                                    }
+                               
+                                    if((b == 11 || b==15 || b==18)){
+                                        t.setStartTime(new Timestamp(2014 - 1900, 1, a, b, 00, 0, 0));
+                                        t.setEndTime(new Timestamp(2014 - 1900, 1, a, b +1, 30, 0, 0));
+                                        t.setVenue("SIS Seminar Room 2-1");
+                                        t.setSchedule(midterm22013);
+                                        em.persist(t);
+                                        //b++;
+                                    }else if((b == 13 || b == 16)){
+                                        t.setStartTime(new Timestamp(2014 - 1900, 1, a, b, 30, 0, 0));
+                                        t.setEndTime(new Timestamp(2014 - 1900, 1, a, b + 2, 0, 0, 0));
+                                        t.setVenue("SIS Seminar Room 2-1");
+                                        t.setSchedule(midterm22013);
+                                        em.persist(t);
+                                        //b++;
+                                    }
+                                
+                        }
+                                
 		}
                 
 		//Final
@@ -246,20 +283,33 @@ public class UserTestingDB {
 			}
 			
                         boolean change = true;
-			for (int b = 9; (b + 2) <= 18; b++) {
+			for (int b = 9; b <= 18; b++) {
 				Timeslot t = new Timeslot();
-                                if (change) {
-                                    t.setStartTime(new Timestamp(2014 - 1900, 3, a, b, 0, 0, 0));
-                                    t.setEndTime(new Timestamp(2014 - 1900, 3, a, b + 1, 30, 0, 0));
-                                } else {
-                                    t.setStartTime(new Timestamp(2014 - 1900, 3, a, b, 30, 0, 0));
-                                    t.setEndTime(new Timestamp(2014 - 1900, 3, a, b + 2, 00, 0, 0));
-                                    b++;
-                                }
-				t.setVenue("SIS Seminar Room 2-1");
-				t.setSchedule(final12013);
-				em.persist(t);
-                                change = !change;
+                                
+                                 if((b == 9)){
+                                        t.setStartTime(new Timestamp(2014 - 1900, 3, a, b, 30, 0, 0));
+                                        t.setEndTime(new Timestamp(2014 - 1900, 3, a, b + 2, 0, 0, 0));
+                                        t.setVenue("SIS Seminar Room 2-1");
+                                        t.setSchedule(final12013);
+                                        em.persist(t);
+                                    }
+                               
+                                    if((b == 11 || b==15 || b==18)){
+                                        t.setStartTime(new Timestamp(2014 - 1900, 3, a, b, 00, 0, 0));
+                                        t.setEndTime(new Timestamp(2014 - 1900, 3, a, b +1, 30, 0, 0));
+                                        t.setVenue("SIS Seminar Room 2-1");
+                                        t.setSchedule(final12013);
+                                        em.persist(t);
+                                        //b++;
+                                    }else if((b == 13 || b == 16)){
+                                        t.setStartTime(new Timestamp(2014 - 1900, 3, a, b, 30, 0, 0));
+                                        t.setEndTime(new Timestamp(2014 - 1900, 3, a, b + 2, 0, 0, 0));
+                                        t.setVenue("SIS Seminar Room 2-1");
+                                        t.setSchedule(final12013);
+                                        em.persist(t);
+                                        //b++;
+                                    }
+                                
 			}	
 		}
 		/*
