@@ -563,10 +563,18 @@
                 //Function to refresh booking exists
                 function refreshScheduleData() {
                     var toReturn = null;
-                    var bookingExists = null;
+                    var bookingExists = 0;
                     var teamsPendingBooking = null;
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
-                        bookingExists = $("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(".booking :contains(" + teamName + ")").length;
+                        for (var key in scheduleData.timeslots) {
+                            if (scheduleData.timeslots.hasOwnProperty(key)) {
+                                var timeslot = scheduleData.timeslots[key];
+                                if (timeslot.team && timeslot.team === teamName) {
+                                    bookingExists = 1;
+                                    break;
+                                }
+                            }
+                        }
                         console.log("Does booking exist? " + milestoneStr + " " + teamName + " " + bookingExists);
                         toReturn = {bookingExists:bookingExists};
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
@@ -575,15 +583,24 @@
                         teamDropDownSelect = $(document.createElement('select'));
                         teamDropDownSelect.attr('name', 'team');
                         teamDropDownSelect.attr('id', 'createTeamSelect');
+                        outerTeams: 
                         for (var t = 0; t < teams.length; t++) {
                             //Append only teams without bookings
-                            if (!$("#" + milestoneStr.toLowerCase() + "ScheduleTable").find(":contains(" + teams[t].teamName + ")").length) {
-                                var teamDropDownOption = $(document.createElement('option'));
-                                teamDropDownOption.attr('value', teams[t].teamId);
-                                teamDropDownOption.html(teams[t].teamName);
-                                teamDropDownSelect.append(teamDropDownOption);
-                                teamsPendingBooking.push(teams[t].teamName);
+                            var adminTeamName = teams[t].teamName;
+                            for (var key in scheduleData.timeslots) {
+                                if (scheduleData.timeslots.hasOwnProperty(key)) {
+                                    var timeslot = scheduleData.timeslots[key];
+                                    if (timeslot.team && timeslot.team === adminTeamName) {
+                                        bookingExists = 1;
+                                        continue outerTeams;
+                                    }
+                                }
                             }
+                            var teamDropDownOption = $(document.createElement('option'));
+                            teamDropDownOption.attr('value', teams[t].teamId);
+                            teamDropDownOption.html(adminTeamName);
+                            teamDropDownSelect.append(teamDropDownOption);
+                            teamsPendingBooking.push(adminTeamName);
                         }
                         toReturn = {teamsPendingBooking:teamsPendingBooking};
                     }
@@ -609,7 +626,7 @@
                     });
 
                     //Popover for booked timeslot
-                    $('.bookedTimeslot').on('click', function(e) {
+                    $('body').on('click', '.bookedTimeslot', function(e) {
                         if ($(e.target).parents('.popover').length) return false;
                         console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
                         self = $(this).is('.booking') ? $(this).parent('.timeslotCell') : $(this);
@@ -618,7 +635,7 @@
                         return false;
                     });
 
-                    $('.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking').on('click', function(e) {
+                    $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking', function(e) {
                         if (e.target === this) {
                             self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
                             $('.timeslotCell').not(self).popover('hide');
@@ -677,6 +694,7 @@
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                             appendPopovers();
                         }
+                        refreshScheduleData();
                         return false;
                     });
 
@@ -698,6 +716,7 @@
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                             appendPopovers();
                         }
+                        refreshScheduleData();
                         return false;
                     });
 

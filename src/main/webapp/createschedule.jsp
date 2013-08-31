@@ -223,8 +223,9 @@
                         <div id="createTimeslotsPanel" class="schedulePanel">
                             <h3 id="createTimeslotsTitle">Create Timeslots</h3>
                             <table id="createTimeslotsTable">
-                                <tr><td>Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td><td><button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button></td></tr>
-                                <tr><td></td><td><table class="timeslotsTable table-condensed table-hover table-bordered table-striped" hidden></table></td><td></td></tr>
+                                <tr><td>Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td></tr>
+                                <tr><td>Venue</td><td><input id="venueInput" type="text" name="venue" placeholder="SIS Seminar Room 2-1"/></td><td><button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button></td></tr>
+                                <tr><td></td><td><table class="timeslotsTable table-condensed table-hover table-bordered table-striped" hidden></table></td></tr>
                             </table>
                             <h4 id="timeslotResultMessage"></h4>
                         </div>
@@ -305,7 +306,6 @@
                 
                     //Display Create Schedule
                     $("#createSchedulePanel").show();
-                    $("#createSchedulePanel").css('padding-top', '20px');
                         
                     //Order comparator
                     function compare(a, b) {
@@ -471,7 +471,6 @@
                 function displayCreateTimeslots() {
                     //Display create timeslots
                     $("#createTimeslotsPanel").show();
-                    $("#createTimeslotsPanel").css('padding-top', '20px');
                     
                     for (var i = 0; i < schedules.length; i++) {
                         var schedule = schedules[i];
@@ -499,6 +498,10 @@
                     }
                     makeTimeslotTable("timeslotsTable", selectedSchedule.dates, selectedSchedule.dayStartTime, selectedSchedule.dayEndTime);
                     populateTimeslotsTable(selectedSchedule.duration);
+                    $("#createTimeslotsSubmitBtn").button('reset');
+                    if (selectedSchedule.isCreated) { //Don't let them create again
+                        $("#createTimeslotsSubmitBtn").button('loading');
+                    }
                     $(".timeslotsTable").show();
                     return false; 
                 });
@@ -507,7 +510,7 @@
                 $("#createTimeslotsSubmitBtn").on('click', function() {
                     $("#createTimeslotsSubmitBtn").button('loading');
                     timeslotsData = {};
-                    var timeslots_array = new Array();;
+                    var timeslots_array = new Array();
 
                     var inputData = $("div.start-marker", ".timeslotsTable").get();
                     for (var i = 0; i < inputData.length; i++) {
@@ -517,27 +520,27 @@
                     
                     timeslotsData["scheduleId"] = selectedSchedule.scheduleId;
                     timeslotsData["timeslots"] = timeslots_array;
-
-//                    console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
-//                    $.ajax({
-//                        type: 'POST',
-//                        url: 'createTimeslotsJson',
-//                        data: {jsonData: JSON.stringify(timeslotsData)},
-//                        dataType: 'json'
-//                    }).done(function(response) {
-//                        if (response.success) {
-//                            console.log("createTimeslotsJson was successful");
-//                            displayMessage("timeslotResultMessage", response.message, false);
-//                        } else {
-//                            var eid = btoa(response.message);
-//                            console.log(response.message);
-//                            window.location = "error.jsp?eid=" + eid;
-//                        }
-//                    }).fail(function(error) {
-//                        console.log("createTimeslotsJson AJAX FAIL");
-//                        displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
-//                    });
-//                     $("#createTimeslotsSubmitBtn").button('reset');
+                    timeslotsData["venue"] = $("#venueInput").val();
+                    console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
+                    $.ajax({
+                        type: 'POST',
+                        url: 'createTimeslotsJson',
+                        data: {jsonData: JSON.stringify(timeslotsData)},
+                        dataType: 'json'
+                    }).done(function(response) {
+                        if (response.success) {
+                            console.log("createTimeslotsJson was successful");
+                            displayMessage("timeslotResultMessage", response.message, false);
+                            selectedSchedule["isCreated"] = true;
+                        } else {
+                            var eid = btoa(response.message);
+                            console.log(response.message);
+                            window.location = "error.jsp?eid=" + eid;
+                        }
+                    }).fail(function(error) {
+                        console.log("createTimeslotsJson AJAX FAIL");
+                        displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
+                    });
                     return false;
                 });
                 
