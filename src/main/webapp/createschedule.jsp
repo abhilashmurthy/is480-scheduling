@@ -76,7 +76,7 @@
                 width: 180px;
             }
             
-            .createScheduleTab a, .createScheduleTab p {
+            .createScheduleTabList li a, .createScheduleTabList li p {
                 font-size: 20px;
                 font-weight: bold;
                 padding: 20px 10px 20px 10px !important;
@@ -150,16 +150,16 @@
             
             <div class="createScheduleTabList tabbable tabs-left">
                 <ul class="scheduleLeftNav nav nav-tabs">
-                    <li class="createScheduleTab">
+                    <li class="emptyHiddenTab">
                         <p></p>
                     </li>
-                    <li class="createScheduleTab active">
+                    <li class="createTermTab active">
                         <a href="#createTermTab" data-toggle="tab">Create Term</a>
                     </li>
                     <li class="createScheduleTab">
                         <a href="#createScheduleTab" data-toggle="tab">Create Schedule</a>
                     </li>
-                    <li class="createScheduleTab">
+                    <li class="createTimeslotsTab">
                         <a href="#createTimeslotsTab" data-toggle="tab">Create Timeslots</a>
                     </li>
                 </ul>
@@ -189,7 +189,7 @@
                                             Semester Name
                                         </td>
                                         <td>
-                                            <input type="text" name="semester" placeholder="<%= nextSem %>"/>
+                                            <input id="semesterInput" type="text" name="semester" placeholder="<%= nextSem %>"/>
                                         </td>
                                     </tr>
                                     <tr id="createTermSubmitRow"><td></td><td><input id="createTermSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td></tr>
@@ -201,26 +201,11 @@
                     <div class="tab-pane" id="createScheduleTab">
                         <!-- Create Schedule -->
                         <div id="createSchedulePanel" class="schedulePanel">
-                            <h3>Create Schedule</h3>
+                            <h3 id="createScheduleTitle">Create Schedule</h3>
                             <form id="createScheduleForm">
-                                <table>
-                                    <th>Milestone</th><th>Dates</th>
-                                    <tr>
-                                        <td class="formLabelTd">Acceptance</td>
-                                        <td><input type="text" id="acceptanceDatePicker" class="input-medium datepicker" name="acceptanceDates"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="formLabelTd">Midterm</td>
-                                        <td><input type="text" id="midtermDatePicker" class="input-medium datepicker" name="midtermDates"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="formLabelTd">Final</td>
-                                        <td><input type="text" id="finalDatePicker" class="input-medium datepicker" name="finalDates"/></td>
-                                    </tr>
-                                    <tr class="createScheduleSubmitRow">
-                                        <td></td>
-                                        <td><input id="createScheduleSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td>
-                                    </tr>
+                                <table id="createScheduleTable">
+                                    <tr><th>Milestone</th><th>Dates</th></tr>
+                                    <tr id="createScheduleSubmitRow"><td></td><td><input id="createScheduleSubmitBtn" type="submit" value="Create" data-loading-text="Done" class="btn btn-primary"/></td></tr>
                                 </table>
                             </form>
                             <h4 id="scheduleResultMessage"></h4>
@@ -229,7 +214,7 @@
                     <div class="tab-pane" id="createTimeslotsTab">
                         <!-- Create Timeslots -->
                         <div id="createTimeslotsPanel" class="schedulePanel">
-                            <h3>Create Timeslots</h3>
+                            <h3 id="createTimeslotsTitle">Create Timeslots</h3>
                             <div id="timeslotsTableSection">
                                 <table id="acceptanceTimeslotsTable" class="table-condensed table-hover table-bordered table-striped" hidden>
                                 </table> 
@@ -244,7 +229,6 @@
                                 <h4 id="timeslotResultMessage"></h4>
                                 <br />
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -262,6 +246,10 @@
                 var acceptanceId = null;
                 var midtermId = null;
                 var finalId = null;
+                
+                //Initialize variables
+                var milestones = null;
+                var schedules = null;
 
                 /*----------------------------------------
                  CREATE TERM
@@ -280,31 +268,23 @@
                 //Create Term AJAX Call
                 $("#createTermForm").on('submit', function() {
                     $("#yearInput").attr('disabled', false);
-                    termData = $("#createTermForm").serializeArray();
+                    termData = {
+                        year: $("#yearInput").val(),
+                        semester: $("#semesterInput").val()
+                    };
                     $.ajax({
                         type: 'GET',
                         url: 'createTermJson',
-                        data: termData,
+                        data: {jsonData: JSON.stringify(termData)},
                         dataType: 'json'
                     }).done(function(response) {
-
-                        if (!response.exception) {
-                            console.log("Checked year: " + response.year);
-                            console.log("Checked semester: " + response.semester);
-                            console.log("Can Add: " + response.canAdd);
-
-                            if (response.canAdd) {
-                                //Remove Create Button - Brought it back
-                                displayMessage("termResultMessage", "Term added", false);
-				$("#createTermSubmitBtn").button('loading');
-                                displayCreateSchedule();
-                            } else {
-                                //Display error message
-                                displayMessage("termResultMessage", response.message, true);
-                            }
+                        if (response.success) {
+                            displayMessage("termResultMessage", "Term added", false);
+                            $("#createTermSubmitBtn").button('loading');
+                            setTimeout(function(){displayCreateSchedule(response);}, 2000);
                         } else {
-                            var eid = btoa(response.message);
-                            window.location = "error.jsp?eid=" + eid;
+                            //Display error message
+                            displayMessage("termResultMessage", response.message, true);
                         }
 
                     }).fail(function(error) {
@@ -313,49 +293,88 @@
                     $("#yearInput").attr('disabled', true);
                     return false;
                 });
-
-                //Display Schedule
-                function displayCreateSchedule() {
-                    //Display Create Schedule
-                    $("#createSchedulePanel").show();
-                    $("#createSchedulePanel").css('padding-top', '20px');
-
-                    //Scroll to the bottom
-                    $("html, body").animate({scrollTop: $(document).height()}, "slow");
-                }
-
+                
                 /*----------------------------------------
                  CREATE SCHEDULE
                  ------------------------------------------*/
 
-                /* Datepicker validation */
-                $(".datepicker").multiDatesPicker({
-                    dateFormat: "yy-mm-dd",
-                    minDate: Date.today(),
-                    beforeShowDay: $.datepicker.noWeekends
-                });
-
-                resetDisabledDates("acceptanceDatePicker", "midtermDatePicker");
-                resetDisabledDates("midtermDatePicker", "finalDatePicker");
+                //Display Schedule
+                function displayCreateSchedule(data) {
+                
+                    //Add milestones info
+                    milestones = data.milestones;
+                
+                    //Display Create Schedule
+                    $("#createSchedulePanel").show();
+                    $("#createSchedulePanel").css('padding-top', '20px');
+                        
+                    //Order comparator
+                    function compare(a, b) {
+                        if (a.order < b.order) {
+                            return -1;
+                        } else if (a.order > b.order) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                        
+                    milestones.sort(compare); //Sort by order first
+                    for (var i = 0; i < milestones.length; i++) {
+                        var milestone = milestones[i];
+                        var milestoneTr = $(document.createElement('tr'));
+                        var milestoneTd = $(document.createElement('td'));
+                            milestoneTd.addClass('formLabelTd');
+                            milestoneTd.html(milestone.name);
+                            milestoneTr.append(milestoneTd);
+                        var milestoneDatesTd = $(document.createElement('td'));
+                            var milestoneInput = $(document.createElement('input'));
+                            milestoneInput.attr('type', 'text');
+                            milestoneInput.attr('id', "milestone_" + milestone.id);
+                            milestoneInput.attr('class', "milestoneOrder_" + milestone.order);
+                            milestoneInput.attr('name', milestone.name + "Dates");
+                            milestoneInput.addClass('input-medium datepicker');
+                            milestoneInput.multiDatesPicker({
+                                dateFormat: "yy-mm-dd",
+                                defaultDate: Date.today(),
+                                minDate: Date.today(),
+                                beforeShowDay: $.datepicker.noWeekends
+                            });
+                            milestoneDatesTd.append(milestoneInput);
+                            milestoneTr.append(milestoneDatesTd);
+                            milestoneTr.insertBefore('#createScheduleSubmitRow');
+                    }
+                    $(".createScheduleTab a").tab('show');
+                    console.log("Showed tab");
+                    
+                    //Reset Disabled Dates for validation
+                    for (var i = 0; i < milestones.length; i++) {
+                        var milestone = milestones[i];
+                        if (milestone.order > 1) {
+                            resetDisabledDates("milestoneOrder_" + (milestone.order - 1), "milestoneOrder_" + milestone.order);
+                        }
+                    }
+                }
 
                 function resetDisabledDates(first, second) {
                     //Mouseover required to completely reset the datepicker
-                    $("#" + second).on('mouseover', function() {
-                        $("#" + second).datepicker("destroy");
+                    $("." + second).on('mouseover', function() {
+                        $("." + second).datepicker("destroy");
                     });
 
                     //Limits the dates to > end date of previous milestone
-                    $("#" + second).on('mousedown', function() {
+                    $("." + second).on('mousedown', function() {
                         //Enable only if acceptance has values
-                        var acceptanceDates = $("#" + first).multiDatesPicker('getDates');
+                        var acceptanceDates = $("." + first).multiDatesPicker('getDates');
                         if (acceptanceDates) {
                             var lastAcceptanceDate = acceptanceDates[acceptanceDates.length - 1];
                             if (lastAcceptanceDate) {
-                                $("#" + second).multiDatesPicker({
+                                $("." + second).multiDatesPicker({
                                     dateFormat: "yy-mm-dd",
                                     minDate: new Date(lastAcceptanceDate).addDays(1),
                                     beforeShowDay: $.datepicker.noWeekends
                                 });
+                                console.log("Reset");
                             }
                         }
                     });
@@ -363,9 +382,6 @@
 
                 //Create Schedule Submit - Show timeslots panel
                 $("#createScheduleForm").on('submit', function() {
-
-                    //TODO: Check to ensure that all acceptance, midterm, and final dates have values
-
                     //AJAX call to save term and schedule dates
                     scheduleData = $("#createScheduleForm").serializeArray();
                     var createScheduleData = $.merge(termData, scheduleData);
@@ -619,7 +635,7 @@
                     //Dislay result
                     var e = $("#" + id);
                     $(e).fadeTo('slow', 2000);
-                    $(e).css('color', 'darkgreen').html(msg);
+                    $(e).css('color', 'darkgreen').html(msg).fadeTo('slow', 0);
                     if (fade) {
                         $(e).css('color', 'darkred').html(msg).fadeTo('slow', 0);
                     }
