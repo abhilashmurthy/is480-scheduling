@@ -79,7 +79,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             logger.info("Reached LoginAction");
 			
-			if (true) { //CODE FOR LOCALHOST TESTING
+			if (request.getParameter("bypass") != null) { //BYPASS SSO LOGIN
 				initializeUser(em);
 			} else { //CODE FOR PRODUCTION SERVER
 				//return to login
@@ -198,7 +198,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
 		} else {
 			//Kick user out
-			request.setAttribute("error", "Yo, understand you're from SMU, but you can't login here yo!");
+			request.setAttribute("error", "Login failed. Please login with an authorized User ID!");
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 		}
 	}
