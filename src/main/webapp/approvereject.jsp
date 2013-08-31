@@ -96,13 +96,40 @@
 								<td><input type="submit" class="btn btn-success" id="approveButton" value="Approve" name="Approve" onclick="return valthisform();"/></td>
 								<td>
 									<span class="button-divider">
-										<input type="submit" class="btn btn-danger" id="rejectButton" value="Reject" name="Reject" onclick="return valthisform();"/>
+										<input type="submit" class="btn btn-danger" id="rejectButton" value="Reject" name="Reject" onclick="return validateProxyReason();"/>
 									</span>
 								</td>
 								<!--<td><input type="hidden" name="approveRejectArray" id="approveRejectArray" value="approveRejectArray" /></td> -->
 							</tr>
 						</table>
 					</form>
+					
+				<!--<-- Modal -->
+				<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 id="myModalLabel">Information Required</h3>
+					</div>
+					<div class="modal-body">
+						<table>
+							<thead>
+							<tr>
+								<th>Team</th>
+								<th>Presentation</th>
+								<th>Time</th>
+								<th>Reason for Rejection</th>
+								<th>Add Proxy</th>
+							</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+						<button class="btn btn-primary">Save changes</button>
+					</div>
+				</div>
 			</s:if><s:else>
 				<h4>No pending bookings available!</h4>
 			</s:else>
@@ -116,6 +143,17 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<script type="text/javascript">
+		
+		function validateProxyReason() {
+			if (valthisform() === false) {
+				return false;
+			} else {
+				$('#rejectionModal').modal({
+					keyboard: true
+				});
+//				return false;
+			}
+		}
 			
 		//For data tables
 		$(document).ready(function(){
@@ -171,6 +209,11 @@
 			}
 		});
 		
+		function proxy() {
+			$('#myModal').modal({
+				keyboard: true
+			});
+		}
 		//Disabling buttons when checkboxes are unchecked and vice-versa
 //		$(document).ready(function (){
 //			$('#approveButton').attr('disabled','disabled');

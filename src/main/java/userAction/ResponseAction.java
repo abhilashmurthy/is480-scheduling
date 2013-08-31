@@ -61,7 +61,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 					for (Booking b : bookingsList) {
 						HashMap<User, Response> responseList = b.getResponseList();
 						//If the status of a booking is deleted, dont show it (regardless of the faculty's status)
-						if (b.getBookingStatus() != BookingStatus.DELETED) {
+						if (b.getBookingStatus() != BookingStatus.DELETED && 
+								b.getBookingStatus() != BookingStatus.REJECTED) {
 							if (responseList.get(faculty) == Response.PENDING) {
 								pendingBookingList.add(b);
 							}
