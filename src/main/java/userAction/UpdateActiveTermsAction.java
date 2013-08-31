@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
 import model.Settings;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,6 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
     private static Logger logger = LoggerFactory.getLogger(UpdateActiveTermsAction.class);
 	private HashMap<String, Object> json = new HashMap<String, Object>();
 	private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
-	//Getting the default active term set by the user
-	private String defaultActiveTerm;
 
     @Override
     public String execute() throws Exception {
@@ -48,17 +47,27 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 				Settings activeTerms = SettingsManager.getByName(em, "activeTerms");
 				
 				//Getting input data from url
-				JSONObject activeTermsJson = (JSONObject) new JSONObject(request.getParameter("jsonData"));
+				JSONObject activeTermsObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
+				JSONArray activeTermsArray = (JSONArray) activeTermsObject.getJSONArray("activeTerms");
+				
 				//Constructing the active terms list to be stored in db
 				ArrayList<Long> activeTermIds = new ArrayList<Long>();
-				//Convert json object to array list
-				//activeTermIds.add(term12013.getId());
+				for (int i = 0; i < activeTermsArray.length(); i++) {
+					long id = Long.valueOf(activeTermsArray.getString(i));
+					if (id < 1) {
+						json.put("message", "Error! Incorrect semesters selected!");
+						json.put("success", false);
+						return SUCCESS;
+					}
+					activeTermIds.add(activeTermsArray.getLong(i));
+				}
 				
 				//Do validation check to make sure all of them are unique and numbers
 				
 				
+				
 				//Now set the default active term in the first position of the list
-				long defaultActiveTermId = Long.valueOf(defaultActiveTerm);
+				long defaultActiveTermId = Long.valueOf(activeTermsObject.getString("defaultTerm"));
 				activeTermIds.add(0, defaultActiveTermId);
 				
 				//Storing the active terms list in settings table in db
@@ -117,12 +126,4 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 	public void setServletRequest(HttpServletRequest hsr) {
         this.request = hsr;
     }
-
-	public String getDefaultActiveTerm() {
-		return defaultActiveTerm;
-	}
-
-	public void setDefaultActiveTerm(String defaultActiveTerm) {
-		this.defaultActiveTerm = defaultActiveTerm;
-	}
 } //end of class
