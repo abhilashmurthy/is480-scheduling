@@ -43,41 +43,38 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         try {
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
-            //Getting input data
-            JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
-            JSONArray schedules = inputData.getJSONArray("schedules");
+			//Getting input data
+			JSONObject scheduleData = new JSONObject(request.getParameter("jsonData"));
+			
+			em.getTransaction().begin();
+			Schedule s = em.find(Schedule.class, scheduleData.getLong("scheduleId"));
+			if (s == null) {
+				json.put("success", false);
+				json.put("message", "Schedule with ID: " + scheduleData.getLong("scheduleId") + " not found.");
+				return SUCCESS;
+			}
+			JSONArray timeslotTimes = scheduleData.getJSONArray("timeslots");
 
-            em.getTransaction().begin();
-            for (int i = 0; i < schedules.length(); i++) {
-                JSONObject scheduleData = schedules.getJSONObject(i);
-                Schedule s = em.find(Schedule.class, scheduleData.getLong("scheduleId"));
-                if (s == null) {
-                    json.put("success", false);
-                    json.put("message", "Schedule with ID: " + scheduleData.getLong("scheduleId") + " not found.");
-                    return SUCCESS;
-                }
-                JSONArray timeslotTimes = scheduleData.getJSONArray("timeslots");
+			for (int j = 0; j < timeslotTimes.length(); j++) {
+				//Getting startTime and endTime
+				Timestamp startTime = Timestamp.valueOf(timeslotTimes.getString(j));
+				Calendar cal = Calendar.getInstance();
+				cal.setTimeInMillis(startTime.getTime());
+				cal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
+				Timestamp endTime = new Timestamp(cal.getTimeInMillis());
 
-                for (int j = 0; j < timeslotTimes.length(); j++) {
-                    //Getting startTime and endTime
-                    Timestamp startTime = Timestamp.valueOf(timeslotTimes.getString(j));
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(startTime.getTime());
-                    cal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
-                    Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-
-                    Timeslot t = new Timeslot();
-                    t.setStartTime(startTime);
-                    t.setEndTime(endTime);
-                    t.setVenue(scheduleData.getString("venue"));
-                    t.setSchedule(s);
-                    em.persist(t);
-                } //End of timeslot creation loop
-            }
-
-            //Setting term for newly created schedules as active
-            Schedule firstSchedule = em.find(Schedule.class, schedules.getJSONObject(0).getLong("scheduleId"));
-            setTermAsActive(em, firstSchedule.getMilestone().getTerm());
+				Timeslot t = new Timeslot();
+				t.setStartTime(startTime);
+				t.setEndTime(endTime);
+				t.setVenue(scheduleData.getString("venue"));
+				t.setSchedule(s);
+				em.persist(t);
+			} //End of timeslot creation loop
+			
+			//Setting term as active for the created schedule
+			setTermAsActive(em, s.getMilestone().getTerm());
+			
+			em.getTransaction().commit();
 
             em.getTransaction().commit();
 
