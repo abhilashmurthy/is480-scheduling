@@ -38,21 +38,21 @@
 					<tr align="center">
 						<form>
 						<td hidden><s:property value="id"/></td>
-						<td style="text-align:center; vertical-align:middle;">
+						<td>
 							<s:property value="displayName"/>
 						</td>
-						<s:if test="%{activeTerms.contains(id)}">
-							<td style="text-align:center; vertical-align:middle;">
+						<s:if test="%{activeTermIds.contains(id)}">
+							<td>
 								<input type="radio" name="isActive" value="true" checked />
 							</td>
-							<td style="text-align:center; vertical-align:middle;">
+							<td>
 								<input type="radio" name="isActive" value="false" />
 							</td>
 						</s:if><s:else>
-							<td style="text-align:center; vertical-align:middle;">
+							<td>
 								<input type="radio" name="isActive" value="true" />
 							</td>
-							<td style="text-align:center; vertical-align:middle;">
+							<td>
 								<input type="radio" name="isActive" value="false" checked />
 							</td>
 						</s:else>
@@ -74,7 +74,12 @@
 			<tbody>
 				<tr>
 				<td>
-					<select name="defaultActiveTerm" id="defaultActiveTermList">
+					<select id="defaultActiveTermList">
+						<s:iterator value="activeTermObjects">
+							<option value="<s:property value="id"/>" <s:if test="%{id == defaultTerm}">selected</s:if> >
+								<s:property value="displayName"/>
+							</option>
+						</s:iterator>
 					</select>
 				</td>
 				</tr>
@@ -82,7 +87,7 @@
 			</table>
 			</div>
 			<br />
-			<input type="submit" id="saveButton" class="btn btn-primary" name="Save" value="Save" style="width:100px; height:30px;" />
+			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
 			</s:if><s:else>
 				<h4>No Terms Exist!</h4>
 			</s:else>
@@ -91,13 +96,6 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
 			$(function() {
-				$('#saveButton').click(function() {
-					var $this = $(this);
-					$this.attr('disabled', 'disabled').html("Saving...");
-					setTimeout(function() {
-						$this.removeAttr('disabled').html('Save');
-					}, 2000);
-				});
 				$(":radio").click(function(){
 					var dropdown = $("#defaultActiveTermList");
 					var selected = $(this);
@@ -106,6 +104,11 @@
 					
 					//Checking if the term was set as Active or Inactive
 					if ($(selected).val() === "true") {
+						//Checking if the term is already in the list
+						var options = $(dropdown).children();
+						for (var i = 0; i < options.length; i++) {
+							if ($(options[i]).val() === termId) { return; }
+						}
 						var newOption = document.createElement("option");
 						var termName = $($(tr).children()[2]).text();
 						$(newOption).val(termId);
@@ -121,6 +124,10 @@
 							}
 						}	
 					}
+				});
+				
+				$('#submitFormBtn').click(function() {
+					
 				});
 			});
 		</script>

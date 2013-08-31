@@ -10,6 +10,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -18,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
 import model.Term;
-import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,9 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(ManageActiveTermsAction.class);
 	private ArrayList<Term> allTerms = new ArrayList<Term>();
-	private ArrayList<Long> activeTerms = new ArrayList<Long>();
+	private ArrayList<Long> activeTermIds = new ArrayList<Long>();
+	private ArrayList<Term> activeTermObjects = new ArrayList<Term>();
+	private Long defaultTerm;
 
     @Override
     public String execute() throws ServletException, IOException {
@@ -46,10 +48,13 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
 				Query q = em.createQuery("SELECT t FROM Term t");
 				allTerms = (ArrayList<Term>) q.getResultList();
-				ArrayList<Term> activeTermObjects = SettingsManager.getActiveTerms(em);
+				activeTermObjects = SettingsManager.getActiveTerms(em);
 				for (Term t : activeTermObjects) {
-					activeTerms.add(t.getId());
+					activeTermIds.add(t.getId());
 				}
+				
+				defaultTerm = SettingsManager.getDefaultTerm(em).getId();
+				
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
 				logger.error("User cannot access this page");
@@ -80,14 +85,30 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
 		this.allTerms = allTerms;
 	}
 
-	public ArrayList<Long> getActiveTerms() {
-		return activeTerms;
+	public ArrayList<Long> getActiveTermIds() {
+		return activeTermIds;
 	}
 
-	public void setActiveTerms(ArrayList<Long> activeTerms) {
-		this.activeTerms = activeTerms;
+	public void setActiveTermIds(ArrayList<Long> activeTermIds) {
+		this.activeTermIds = activeTermIds;
 	}
 	
+	public ArrayList<Term> getActiveTermObjects() {
+		return activeTermObjects;
+	}
+
+	public void setActiveTermObjects(ArrayList<Term> activeTermObjects) {
+		this.activeTermObjects = activeTermObjects;
+	}
+
+	public Long getDefaultTerm() {
+		return defaultTerm;
+	}
+
+	public void setDefaultTerm(Long defaultTerm) {
+		this.defaultTerm = defaultTerm;
+	}
+
     public void setServletRequest(HttpServletRequest hsr) {
         request = hsr;
     }
