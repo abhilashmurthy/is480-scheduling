@@ -45,6 +45,7 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
 				Settings activeTerms = SettingsManager.getByName(em, "activeTerms");
+				Settings defaultTerm = SettingsManager.getByName(em, "defaultTerm");
 				
 				//Getting input data from url
 				JSONObject activeTermsObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
@@ -62,18 +63,23 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 					activeTermIds.add(activeTermsArray.getLong(i));
 				}
 				
-				//Do validation check to make sure all of them are unique and numbers
-				
-				
-				
-				//Now set the default active term in the first position of the list
+				//Now setting the default active term
 				long defaultActiveTermId = Long.valueOf(activeTermsObject.getString("defaultTerm"));
-				activeTermIds.add(0, defaultActiveTermId);
+				
+				if (activeTermIds.size() > 0) {
+					if (!activeTermIds.contains(defaultActiveTermId)) {
+						json.put("message", "Error! Incorrect semesters selected!");
+						json.put("success", false);
+						return SUCCESS;
+					}
+				}
 				
 				//Storing the active terms list in settings table in db
 				em.getTransaction().begin();
 				activeTerms.setValue(new Gson().toJson(activeTermIds));
+				defaultTerm.setValue(String.valueOf(defaultActiveTermId));
 				em.persist(activeTerms);
+				em.persist(defaultTerm);
 				em.getTransaction().commit();
 				
 				json.put("success", true);
