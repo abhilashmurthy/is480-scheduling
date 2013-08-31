@@ -575,6 +575,7 @@
                                 }
                             }
                         }
+                        
                         console.log("Does booking exist? " + milestoneStr + " " + teamName + " " + bookingExists);
                         toReturn = {bookingExists:bookingExists};
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
