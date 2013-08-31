@@ -140,8 +140,10 @@ public class UserTestingDB {
 		 */
 		Schedule acceptance12013 = new Schedule();
 		acceptance12013.setMilestone(acceptance);
-		acceptance12013.setStartDate(new Timestamp(2013 - 1900, 7, 7, 0, 0, 0, 0));
-		acceptance12013.setEndDate(new Timestamp(2013 - 1900, 7, 20, 0, 0, 0, 0));
+		//acceptance12013.setStartDate(new Timestamp(2013 - 1900, 7, 7, 0, 0, 0, 0));
+		//acceptance12013.setEndDate(new Timestamp(2013 - 1900, 7, 20, 0, 0, 0, 0));
+                acceptance12013.setStartDate(new Timestamp(2013 - 1900, 10, 5, 0, 0, 0, 0));
+		acceptance12013.setEndDate(new Timestamp(2013 - 1900, 10, 8, 0, 0, 0, 0));
 		/*
 		 Acceptance Dates for Term 2
 		 5 Nov Tue: 1pm, 2pm, 3pm, 4pm, 5pm, 6pm
@@ -153,8 +155,10 @@ public class UserTestingDB {
 		
 		Schedule midterm22013 = new Schedule();
 		midterm22013.setMilestone(midterm);
-		midterm22013.setStartDate(new Timestamp(2013 - 1900, 9, 19, 0, 0, 0, 0));
-		midterm22013.setEndDate(new Timestamp(2013 - 1900, 9, 30, 0, 0, 0, 0));
+		//midterm22013.setStartDate(new Timestamp(2013 - 1900, 9, 19, 0, 0, 0, 0));
+		//midterm22013.setEndDate(new Timestamp(2013 - 1900, 9, 30, 0, 0, 0, 0));
+                midterm22013.setStartDate(new Timestamp(2014 - 1900, 1, 17, 0, 0, 0, 0));
+		midterm22013.setEndDate(new Timestamp(2014 - 1900, 1, 26, 0, 0, 0, 0));
         /*
 		 Mid Term Dates for Term 2
 		 17 Feb Mon: 9.30am, 11am, 1.30pm, 3pm, 4.30pm, 6pm
@@ -169,8 +173,8 @@ public class UserTestingDB {
         
 		Schedule final12013 = new Schedule();
 		final12013.setMilestone(finalMilestone);
-		final12013.setStartDate(new Timestamp(2013 - 1900, 11, 1, 0, 0, 0, 0));
-		final12013.setEndDate(new Timestamp(2013 - 1900, 11, 15, 0, 0, 0, 0));
+		final12013.setStartDate(new Timestamp(2014 - 1900, 3, 14, 0, 0, 0, 0));
+		final12013.setEndDate(new Timestamp(2014 - 1900, 3, 23, 0, 0, 0, 0));
 		/*
 		 Final Dates for Term 2
 		 14 Apr Mon: 9.30am, 11am, 1.30pm, 3pm, 4.30pm, 6pm
@@ -193,16 +197,16 @@ public class UserTestingDB {
 		 * TIMESLOT TABLE POPULATION
 		 */
                 //Acceptance
-		for (int a = 7; a <= 20; a++) {
+		for (int a = 5; a <= 8; a++) {
 			// Skipping weekends
-			if (a == 10 || a == 11 || a == 17 || a == 18) {
+			/*if (a == 10 || a == 11 || a == 17 || a == 18) {
 				continue;
-			}
+			}*/
 			
 			for (int b = 9; b <= 18; b++) {
 				Timeslot t = new Timeslot();
-				t.setStartTime(new Timestamp(2013 - 1900, 7, a, b, 0, 0, 0));
-				t.setEndTime(new Timestamp(2013 - 1900, 7, a, b + 1, 0, 0, 0));
+				t.setStartTime(new Timestamp(2013 - 1900, 10, a, b, 0, 0, 0));
+				t.setEndTime(new Timestamp(2013 - 1900, 10, a, b + 1, 0, 0, 0));
 				t.setVenue("SIS Seminar Room 2-1");
 				t.setSchedule(acceptance12013);
 				em.persist(t);
@@ -210,9 +214,9 @@ public class UserTestingDB {
 		}
                 
 		//Midterm
-		for (int a = 19; a <= 30; a++) {
+		for (int a = 17; a <= 26; a++) {
 			// Skipping weekends
-			if (a == 19 || a == 20 || a == 26 || a == 27) {
+			if (a == 22 || a == 23) {
 				continue;
 			}
 			
@@ -220,11 +224,11 @@ public class UserTestingDB {
 			for (int b = 9; (b + 2) <= 18; b++) {
 				Timeslot t = new Timeslot();
                                 if (change) {
-                                    t.setStartTime(new Timestamp(2013 - 1900, 9, a, b, 0, 0, 0));
-                                    t.setEndTime(new Timestamp(2013 - 1900, 9, a, b + 1, 30, 0, 0));
+                                    t.setStartTime(new Timestamp(2014 - 1900, 1, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2014 - 1900, 1, a, b + 1, 30, 0, 0));
                                 } else {
-                                    t.setStartTime(new Timestamp(2013 - 1900, 9, a, b, 30, 0, 0));
-                                    t.setEndTime(new Timestamp(2013 - 1900, 9, a, b + 2, 00, 0, 0));
+                                    t.setStartTime(new Timestamp(2014 - 1900, 1, a, b, 30, 0, 0));
+                                    t.setEndTime(new Timestamp(2014 - 1900, 1, a, b + 2, 00, 0, 0));
                                     b++;
                                 }
 				t.setVenue("SIS Seminar Room 2-1");
@@ -235,9 +239,9 @@ public class UserTestingDB {
 		}
                 
 		//Final
-		for (int a = 1; a <= 15; a++) {
+		for (int a = 14; a <= 23; a++) {
 			// Skipping weekends
-			if (a == 1 || a == 7 || a == 8 || a == 14 || a == 15) {
+			if (a == 19 || a == 20) {
 				continue;
 			}
 			
@@ -245,11 +249,11 @@ public class UserTestingDB {
 			for (int b = 9; (b + 2) <= 18; b++) {
 				Timeslot t = new Timeslot();
                                 if (change) {
-                                    t.setStartTime(new Timestamp(2013 - 1900, 11, a, b, 0, 0, 0));
-                                    t.setEndTime(new Timestamp(2013 - 1900, 11, a, b + 1, 30, 0, 0));
+                                    t.setStartTime(new Timestamp(2014 - 1900, 3, a, b, 0, 0, 0));
+                                    t.setEndTime(new Timestamp(2014 - 1900, 3, a, b + 1, 30, 0, 0));
                                 } else {
-                                    t.setStartTime(new Timestamp(2013 - 1900, 11, a, b, 30, 0, 0));
-                                    t.setEndTime(new Timestamp(2013 - 1900, 11, a, b + 2, 00, 0, 0));
+                                    t.setStartTime(new Timestamp(2014 - 1900, 3, a, b, 30, 0, 0));
+                                    t.setEndTime(new Timestamp(2014 - 1900, 3, a, b + 2, 00, 0, 0));
                                     b++;
                                 }
 				t.setVenue("SIS Seminar Room 2-1");

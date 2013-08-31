@@ -111,7 +111,7 @@
                         </td>
                         <td style="width:20px"></td>
                         <td>
-                            <button class="btn btn-warning" style="width:160px; height:30px" onclick="addRow(<%=counter%>)"><i class="icon-black icon-plus-sign"></i><b>&nbsp;Add Milestone</b> </button>
+                            <button class="btn btn-warning" id="addRowBtn" style="width:160px; height:30px"><i class="icon-black icon-plus-sign"></i><b>&nbsp;Add Milestone</b> </button>
                         </td>
                         <td style="width:600px"></td>
                         <td>
@@ -131,8 +131,8 @@
             count++;
             var newCount = <%=counter%>;
 
-            function addRow() {
-
+            $("td").on('click', '#addRowBtn', function(e){
+                
                 var number = newCount;
                 //alert(number);
                 var onumber = "orderNumber" + number;
@@ -165,12 +165,19 @@
                 var buttons = "<td>"
                         + "<button type='button' title='Delete Milestone' class='btn btn-danger' id='" + number + "' onclick='deleteRow(" + number + ");'><i class='icon-trash icon-white'></i></button>"
                         + "</td></tr>";
-
-                myTextArea.innerHTML += newOrderNumber + newMilestoneId + newDuration + attendees + buttons;
-
+               
+               
+                
+                var area = '#' + myTextArea.id;
+                
+                $(area).append(newOrderNumber + newMilestoneId + newDuration + attendees + buttons);
+                
+                
                 //number++;
                 newCount++;
-            }
+                return false;
+            });       
+
 
             function deleteRow(number) {
                 //var id = this.id;
