@@ -18,7 +18,11 @@ body {
 
 .brand {
     font-size: 20px !important;
-    /*margin-top: -20px;*/
+    color: white !important;
+}
+
+.brand:hover {
+    color: gainsboro !important;
 }
 
 .nav-collapse .nav {
@@ -163,7 +167,6 @@ body {
 }
 
 .booking {
-    display: inline-table;
     margin: auto;
     width: 100%;
     height: 100%;
@@ -274,9 +277,9 @@ body {
 }
 
 .navbar-title:hover {
-        border: 2px solid white !important;
         border-radius: 5px;
         box-sizing: border-box;
+        color: gainsboro !important;
 }
 
 .popoverBtn {
