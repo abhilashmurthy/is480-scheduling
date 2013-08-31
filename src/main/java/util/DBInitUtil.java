@@ -73,7 +73,7 @@ public class DBInitUtil {
         private static void resetDB() throws Exception {
             String url = "jdbc:mysql://localhost:3306/";
             String username = "root";
-            String password = null;
+            String password = "root";
             String dbName = "is480-scheduling";
             Connection conn = null;
             Statement stmt = null;
@@ -724,6 +724,10 @@ public class DBInitUtil {
 		activeTermIds.add(term12013.getId());
 		activeTerms.setValue(new Gson().toJson(activeTermIds));
 		
+		Settings defaultTerm = new Settings();
+		defaultTerm.setName("defaultTerm");
+		defaultTerm.setValue(term12013.getId().toString());
+		
 		Settings milestones = new Settings();
 		milestones.setName("milestones");
 		ArrayList<HashMap<String,Object>> milestoneList = new ArrayList<HashMap<String, Object>>();
@@ -752,6 +756,7 @@ public class DBInitUtil {
 		
 		//Persistence
 		em.persist(activeTerms);
+		em.persist(defaultTerm);
 		em.persist(milestones);
 	}
 }
