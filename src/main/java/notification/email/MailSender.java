@@ -6,8 +6,6 @@ package notification.email;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -34,8 +32,9 @@ public class MailSender {
 	private static String PASSWORD;
 
 	static {
+		InputStream in = null;
 		try {
-			InputStream in = MailSender.class.getClassLoader()
+			in = MailSender.class.getClassLoader()
 					.getResourceAsStream("Properties/Mail.properties");
 			props.load(in);
 			USERNAME = MiscUtil.getProperty("General", "USERNAME");
@@ -50,6 +49,14 @@ public class MailSender {
 		} catch (IOException ex) {
 			logger.error("Mail Properties could not be loaded");
 			logger.error(ex.getMessage());
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ex) {
+					logger.error("Error in closing InputStream for Mail Properties");
+				}	
+			}
 		}
 	}
 
