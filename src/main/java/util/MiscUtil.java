@@ -39,15 +39,6 @@ public class MiscUtil {
 		logger.info("DEV_MODE: " + DEV_MODE);
 	}
 	
-	public static Term getActiveTerm(EntityManager em) {
-		return TermManager.findByYearAndSemester(em, 2013, "Term 1");
-	}
-	
-	public static Schedule getActiveSchedule(EntityManager em) {
-		Term activeTerm = getActiveTerm(em);
-		return ScheduleManager.findActiveByTerm(em, activeTerm);
-	}
-	
 	public static String getProperty(String fileName, String propertyName) {
 		try {
 			Properties p = new Properties();	
@@ -60,19 +51,5 @@ public class MiscUtil {
 		}
 		
 		return null;
-	}
-	
-	public static void toggleTermRoleFilter(boolean activate, EntityManager em, Long termId) {
-		 Session session;
-		if (em instanceof HibernateEntityManager) {
-			HibernateEntityManager hem = (HibernateEntityManager) em;
-			session = hem.getSession();
-		} else { return; }
-		
-		if (activate) {
-			session.enableFilter("activeTermFilter").setParameter("termId", termId);
-		} else {
-			session.disableFilter("activeTermFilter");
-		}
 	}
 }
