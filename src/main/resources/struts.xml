@@ -61,9 +61,9 @@
         </action>
 		
         <!-- This action class calls another action class through chaining -->
-        <action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
+<!--        <action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
             <result name="success" type="chain">approveReject</result>
-        </action>
+        </action>-->
 		
 		<action name="getMilestoneSettings" class="systemAction.GetMilestoneSettingsAction" method="execute">
             <result name="success">/milestoneconfig.jsp</result>
@@ -186,6 +186,12 @@
             <result type="json">
                 <param name="root">json</param>
             </result>
+        </action>
+		
+		 <action name="updateBookingStatus" class="userAction.UpdateBookingStatusAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
         </action>
     </package>
 

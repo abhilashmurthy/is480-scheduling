@@ -41,6 +41,7 @@ import util.MiscUtil;
 public class UpdateBookingStatusAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
+	private HashMap<String, Object> json = new HashMap<String, Object>();
     private static Logger logger = LoggerFactory.getLogger(UpdateBookingStatusAction.class);
 
     @Override
@@ -147,13 +148,19 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					em.clear();
 					Faculty newF = em.find(Faculty.class, f.getId());
 					session.setAttribute("user", newF);
+					
+					json.put("success", true);
+					if (response == Response.APPROVED) {
+						json.put("message", "Your booking has been approved!");
+					} else if (response == Response.REJECTED) {
+						json.put("message", "Your booking has been rejected!");
+					}
 				}
 			} else {
 				request.setAttribute("error", "No timeslot selected!");
 				logger.error("User hasn't selected a timeslot to approve/reject!");
 				return ERROR;
 			}
-			return SUCCESS;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -161,16 +168,26 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                     logger.debug(s.toString());
                 }
             }
-            request.setAttribute("error", "Error with UpdateBookingStatus: Escalate to developers!");
-            return ERROR;
+			json.put("success", false);
+			json.put("exception", true);
+            json.put("message", "Error with UpdateBookingStatus: Escalate to developers!");
         } finally {
 			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
 		}
+		return SUCCESS;
     }
 
     //Getters and Setters
     public void setServletRequest(HttpServletRequest hsr) {
         this.request = hsr;
     }
+
+	public HashMap<String, Object> getJson() {
+		return json;
+	}
+
+	public void setJson(HashMap<String, Object> json) {
+		this.json = json;
+	}
 }

@@ -55,7 +55,8 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 				session.setAttribute("user", faculty);
 				//Getting all bookings for the user
 				for (Booking b : faculty.getRequiredBookings()) {
-					if (b.getBookingStatus() != BookingStatus.DELETED) {
+					if (b.getBookingStatus() != BookingStatus.DELETED && 
+								b.getBookingStatus() != BookingStatus.REJECTED) {
 						if (b.getResponseList().get(faculty) == Response.PENDING) {
 							pendingBookingCount++;
 						}	

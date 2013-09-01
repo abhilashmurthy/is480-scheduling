@@ -42,12 +42,10 @@
 			   <input type="submit" class="btn btn-primary" value="Search"/>
 			</p>
         </form> -->
-		
-		<div id ="confirmBookings"> 
 			<!-- SECTION: Approve/Reject Bookings -->
 			<s:if test="%{data != null && data.size() > 0}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
-				<form id="myform" action="updateBookingStatus" method="post">
+				<!--<form id="myform" action="updateBookingStatus" method="post">-->
 					<table id="approveRejectTable" class="table table-hover">
 						<thead>
 							<tr>
@@ -73,7 +71,6 @@
 									<tr class="error">
 								</s:elseif>
 								<!--<tr>-->	
-								<form action="updateBookingStatus" method="post">
 									<%--<s:if test='myStatus.equals("PENDING")'>
 										<td><input type="checkbox" id="approveRejectArray" name="approveRejectArray" value="<s:property value="bookingId"/>"/></td>
 									</s:if><s:else>
@@ -89,13 +86,17 @@
 										<s:property value="myStatus"/><br/><br/>
 									</td>
 									<td>
-										<input type="submit" class="btn btn-success" id="approveButton" value="Approve" name="Approve"/>
+										<button type="button" class="btn btn-success" id="approve" value="<s:property value="bookingId"/>" 
+												name="approve" onClick="approveRejectBooking(this);">
+											Approve
+										</button>
 										<span class="button-divider">
-											<input type="submit" class="btn btn-danger" id="rejectButton" value="Reject" name="Reject" onclick="return validateProxyReason();"/>
+										<button type="button" class="btn btn-danger" id="reject" value="<s:property value="bookingId"/>" 
+												name="reject" onClick="approveRejectBooking(this);">
+											Reject
+										</button>
 										</span>
-										<input type="hidden" name="bookingId" id="bookingId" value="<s:property value="bookingId"/>" />
 									</td>
-								</form>
 								</tr>
 							</s:iterator>
 							</tbody>
@@ -113,9 +114,8 @@
 							<tr>
 								<td width="150px">Reason for Rejection</td>
 								<!--<th>Add Proxy</th>-->
-								<td><textarea rows="1" name="rejectiontText" style="width:300px; height:75px;" 
+								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:300px; height:75px;" 
 											  placeholder="Unexpected Meeting..." maxlength="100"></textarea>
-									
 							</tr>
 						</table>
 					</div>
@@ -127,23 +127,73 @@
 			</s:if><s:else>
 				<h4>No pending bookings available!</h4>
 			</s:else>
-		</div>		
 		
         <script src="js/plugins/bootstrap.js" type="text/javascript"></script>
         <%-- <% String statuses = '<s:property value="message" />'; %> --%>
 		
-		<br/>
+		<h4 id="approveRejectMessage"></h4>
         </div>
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<script type="text/javascript">
-		
-		function validateProxyReason() {
-			$('#rejectionModal').modal({
-				keyboard: true
-			});
-			return false;
+
+		function approveRejectBooking(e) {
+			var bookingId =  $(e).val();
+			console.log(bookingId);
+			var id = $(e).attr("id");
+			console.log(id);
+			
+			var bookingArray = {};
+			if (id === 'approve') {
+				bookingArray['bookingId'] = bookingId;
+				bookingArray['status'] = "approve";
+			} else if (id === 'reject') {
+				bookingArray['bookingId'] = bookingId;
+				bookingArray['status'] = "reject";
+//				$('#rejectionModal').modal({
+//					keyboard: true
+//				});
+				bookingArray['rejectReason'] = "Got a meeting!";
+			}
+			
+//			alert(JSON.stringify(bookingArray));
+			
+			$.ajax({
+				type: 'POST',
+				async: false,
+				url: 'updateBookingStatus',
+				data: {jsonData: JSON.stringify(bookingArray)}
+				}).done(function(response) {
+				   if (!response.exception) {
+					   if (response.success) {
+						   displayMessage("approveRejectMessage", response.message, false);
+					   } else {
+						   displayMessage("approveRejectMessage", response.message, true);
+					   }
+//					   window.location.reload(true);
+					   timedRefresh(2000);
+				   } else {
+					   var eid = btoa(response.message);
+					   window.location = "error.jsp?eid=" + eid;
+				   }
+				}).fail(function(error) {
+				   console.log("Updating Booking Status AJAX FAIL");
+				   displayMessage("approveRejectMessage", "Oops.. something went wrong", true);
+				});
+				return false;
 		}
+		
+		function timedRefresh(timeoutPeriod) {
+			setTimeout("location.reload(true);", timeoutPeriod);
+		}
+//		function validateProxyReason() {
+//			$('#rejectionModal').modal({
+//				keyboard: true
+//			});
+//			return false;
+//			var rejectionReason = document.getElementById("rejectiontText");
+//			alert(rejectionReason);
+//		}
 			
 		//For data tables
 		$(document).ready(function(){
@@ -162,7 +212,18 @@
 				"bSortClasses": false
 			})
 		});
-
+		
+		//Display Message
+		function displayMessage(id, msg, fade) {
+			//Dislay result
+			var e = $("#" + id);
+			$(e).fadeTo(3000, 0);
+			$(e).css('color', 'darkgreen').html(msg);
+			if (fade) {
+				$(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
+			}
+		}
+		
 		//To check/uncheck all boxes
 //		function toggle(oInput) {
 //			var aInputs = document.getElementsByTagName('input');
