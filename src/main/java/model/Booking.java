@@ -63,7 +63,9 @@ public class Booking implements Serializable {
 	
 	@Column(length=19000000)
 	private HashSet<String> externalAttendees = new HashSet<String>();
-
+	
+	private String rejectReason;
+	
 	public Timeslot getTimeslot() {
 		return timeslot;
 	}
@@ -110,6 +112,14 @@ public class Booking implements Serializable {
 
 	public void setOptionalAttendees(Set<User> optionalAttendees) {
 		this.optionalAttendees = optionalAttendees;
+	}
+
+	public String getRejectReason() {
+		return rejectReason;
+	}
+
+	public void setRejectReason(String rejectReason) {
+		this.rejectReason = rejectReason;
 	}
 
 	public BookingStatus getBookingStatus() {

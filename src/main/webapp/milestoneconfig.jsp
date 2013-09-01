@@ -290,6 +290,7 @@
 						} else {
 							displayMessage("milestoneSettingsUpdateMessage", response.message, true);
 						}
+						timedRefresh(2000);
 					} else {
 						var eid = btoa(response.message);
 						window.location = "error.jsp?eid=" + eid;
@@ -301,6 +302,10 @@
 				 return false;
             }
 
+			function timedRefresh(timeoutPeriod) {
+				setTimeout("location.reload(true);", timeoutPeriod);
+			}
+			
             function createInput(id) {
                 //alert(id.id);
                 //alert(id.id);
