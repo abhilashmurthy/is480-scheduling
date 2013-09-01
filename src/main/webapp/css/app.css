@@ -99,7 +99,7 @@ body {
 }
 
 .popover {
-    width: 100% !important;
+/*    width: 100%;*/
     font-weight: normal;
     z-index: 1031 !important;
 }
