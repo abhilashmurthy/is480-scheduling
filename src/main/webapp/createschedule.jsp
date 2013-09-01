@@ -404,7 +404,7 @@
                                 milestoneInput.attr('name', milestone.name.toLowerCase() + "DayStartTime");
                                 milestoneInput.timepicker({
                                     minTime: '07:00',
-                                    maxTime: '20:00',
+                                    maxTime: '18:00',
                                     step: 60,
                                     forceRoundTime: true,
                                     timeFormat: 'H:i',
@@ -421,7 +421,7 @@
                                 milestoneInput.attr('name', milestone.name.toLowerCase() + "DayEndTime");
                                 milestoneInput.timepicker({
                                     minTime: '07:00',
-                                    maxTime: '20:00',
+                                    maxTime: '21:00',
                                     step: 60,
                                     forceRoundTime: true,
                                     timeFormat: 'H:i',
@@ -443,7 +443,8 @@
                         }
                     }
                 }
-
+                
+                //Reset Dates On Change
                 function resetDisabledDates(first, second) {
                     var firstDates = $("." + first).multiDatesPicker('getDates');
                     var lastFirstDate = null;
@@ -485,6 +486,25 @@
                         }
                     });
                 }
+                
+                //Reset Start and End Times
+                $("body").on('mouseover', '.scheduleDayTimeSelect', function(e){
+                    var id = $(this).attr('id');
+                    var endTimeSelect = id.split("milestoneDayEnd_")[1];
+                    if (endTimeSelect) {
+                        var startTimeVal = $("#milestoneDayStart_" + endTimeSelect).val();
+                        $(this).timepicker('remove');
+                        $(this).timepicker({
+                            minTime: Date.parse(startTimeVal).addHours(2).toString('HH:mm'),
+                            maxTime: '21:00',
+                            step: 60,
+                            forceRoundTime: true,
+                            timeFormat: 'H:i',
+                            scrollDefaultTime: '18:00'
+                       });
+                    }
+                    return false;
+                });
 
                 //Create Schedule Submit - Show timeslots panel
                 $("#createScheduleForm").on('submit', function(e) {
@@ -493,6 +513,20 @@
                     e.stopPropagation();
                     //AJAX call to save term and schedule dates
                     var milestoneArray = $(this).serializeArray();
+                    var wrongDate = false;
+                    $(".scheduleDayTimeSelect").each(function(){
+                        var id = $(this).attr('id');
+                        var endTimeSelect = id.split("milestoneDayEnd_")[1];
+                        if (endTimeSelect) {
+                            var startTimeVal = $("#milestoneDayStart_" + endTimeSelect).val();
+                            if (Date.parse(startTimeVal) >= Date.parse($(this).val())) {
+                                showNotification("WARNING", "Start time should be less than end time");
+                                $("#createScheduleSubmitBtn").button('reset');
+                                wrongDate = true;
+                            }
+                        }
+                    });
+                    if (wrongDate) return false;
                     var errorMessage = "Please type in dates for all milestones!";
                     for (var i = 0; i < milestoneArray.length; i++) {
                         var milestoneItem = milestoneArray[i];
@@ -694,6 +728,7 @@
                  * METHOD TO CHOOSE TIMESLOTS ON THE CREATED TABLE
                  */
                 function triggerTimeslot(e, duration) {
+                    if (!$(e).hasClass('timeslotcell')) return false;
                     var col = $(e).parent().children().index(e);
                     var tr = $(e).parent();
                     var row = $(tr).parent().children().index(tr);
@@ -739,7 +774,7 @@
                 }
 
                 function populateTimeslotsTable(duration) {
-                    $(".timeslotsTable").find(".timeslotcell").each(function() {
+                    $(".timeslotcell").each(function() {
                         triggerTimeslot(this, duration);
                     });
                 }
