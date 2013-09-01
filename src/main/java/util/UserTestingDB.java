@@ -900,6 +900,10 @@ public class UserTestingDB {
 		activeTermIds.add(term22013.getId());
 		activeTerms.setValue(new Gson().toJson(activeTermIds));
 		
+		Settings defaultTerm = new Settings();
+		defaultTerm.setName("defaultTerm");
+		defaultTerm.setValue(term22013.getId().toString());
+		
 		Settings milestones = new Settings();
 		milestones.setName("milestones");
 		ArrayList<HashMap<String,Object>> milestoneList = new ArrayList<HashMap<String, Object>>();
@@ -928,6 +932,7 @@ public class UserTestingDB {
 		
 		//Persistence
 		em.persist(activeTerms);
+		em.persist(defaultTerm);
 		em.persist(milestones);
 	}
 }
