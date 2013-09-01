@@ -732,7 +732,7 @@
                     var col = $(e).parent().children().index(e);
                     var tr = $(e).parent();
                     var row = $(tr).parent().children().index(tr);
-                    var tbody = $(e).parents("tbody");
+                    var tbody = $(e).parents('.timeslotsTable').children('tbody');
                     var slotSize = duration / 30;
 
                     if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted

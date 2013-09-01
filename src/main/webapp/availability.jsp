@@ -348,11 +348,11 @@
                  * METHOD TO MARK TIMESLOTS ON TABLE
                  */
                 function triggerTimeslot(e, duration) {
-                    if (!$(e).children('.start-marker')) return false;
+                    if (!$(e).hasClass('markable')) return false;
                     var col = $(e).parent().children().index(e);
                     var tr = $(e).parent();
                     var row = $(tr).parent().children().index(tr);
-                    var tbody = $(e).parents("tbody");
+                    var tbody = $(e).parents('.timeslotsTable').children('tbody');
                     var slotSize = duration / 30;
                     
                     if ($(e).hasClass("chosen")) {
@@ -429,12 +429,12 @@
                     }
                 }
 
-                $('body').on('click', 'td.chosen , td.unavailable', function(){
-                    triggerTimeslot(this, scheduleData.duration);
+                $('body').on('click', 'td.chosen , td.unavailable', function(e){
+                    triggerTimeslot(e.target, scheduleData.duration);
                 });
 
                 function populateTimeslotsTable(tableId, scheduleData) {
-                    $(".timeslotcell").each(function() {
+                    $(".timeslotcell").each(function(e) {
                         var self = $(this);
                         if (self.hasClass("markable")) {
                             triggerTimeslot(this, scheduleData.duration);
