@@ -105,10 +105,11 @@
                     <table id="finalTimeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped">
                     </table>
                     <br/>
-                    <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Waiting...">Save</button>
+                    <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
                     <br />
                 </div>
                 <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
+			<br/><br/>
             </div>
         </div>
 

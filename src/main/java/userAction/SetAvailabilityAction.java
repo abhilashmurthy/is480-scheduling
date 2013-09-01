@@ -67,7 +67,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 			request.getSession().setAttribute("user", faculty);
 			
 			json.put("success", true);
-            json.put("message", "Faculty availability updated successfully");
+            json.put("message", "Your availability has been updated successfully!");
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			if (MiscUtil.DEV_MODE) {
