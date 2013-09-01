@@ -94,7 +94,13 @@ body {
     height: 20px;
 }
 
+#userDashboard > .popover {
+    width: inherit !important;
+}
+
 .popover {
+    width: 100% !important;
+    font-weight: normal;
     z-index: 1031 !important;
 }
 
@@ -224,11 +230,6 @@ body {
 	position: absolute;
 	top:22%;
 	left:76%;
-}
-
-.popover {
-    max-width: 100% !important;
-    font-weight: normal;
 }
 
 #viewTimeslotTable {

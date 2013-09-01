@@ -101,7 +101,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         Settings result = getByName(em, "activeTerms");
         ArrayList<Long> activeTermIds = new ArrayList<Long>();
         for (Term t : SettingsManager.getActiveTerms(em)) {
-            activeTermIds.add(t.getId());
+            if (t.getId() != newTerm.getId()) {
+                activeTermIds.add(t.getId());
+            }
         }
         activeTermIds.add(newTerm.getId());
         result.setValue(new Gson().toJson(activeTermIds));

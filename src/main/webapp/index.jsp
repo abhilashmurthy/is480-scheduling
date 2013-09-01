@@ -780,7 +780,7 @@
                             newBodyTd.removeClass('unbookedTimeslot');
                             newBodyTd.addClass('bookedTimeslot');
                             var bookingDiv = $(document.createElement('div'));
-                            bookingDiv.addClass('booking pendingBooking');
+                            bookingDiv.addClass(self.children('.booking').attr('class'));
                             bookingDiv.html(self.children('.booking').text());
                             bookingDiv.css('display', 'none');
                             newBodyTd.append(bookingDiv);
