@@ -238,6 +238,9 @@
         <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             createScheduleLoad = function() {
+                
+                $(".createScheduleTab a").removeAttr('data-toggle');
+                $(".createTimeslotsTab a").removeAttr('data-toggle');
 
                 var termData = null;
                 var scheduleData = null;
@@ -250,6 +253,53 @@
                 var milestones = null;
                 var schedules = null;
                 var selectedSchedule = null;
+                
+                /*----------------------------------------
+                 NAV
+                 ------------------------------------------*/
+                 
+                 $(".scheduleLeftNav li a").on('click', function(){
+                     if (!$(this).attr('data-toggle')) {
+                        var activeTab = $('.scheduleLeftNav').children('.active').children('a').html();
+                        showNotification("WARNING", "Please " + activeTab + " First!");
+                     }
+                 });
+                 
+                 function showNotification(action, message) {
+                     var opts = {
+                        title: "Note",
+                        text: message,
+                        type: "warning",
+                        icon: false,
+                        sticker: false,
+                        mouse_reset: false,
+                        animation: "fade",
+                        animate_speed: "fast",
+                        before_open: function(pnotify) {
+                           pnotify.css({
+                              top: "52px",
+                              left: ($(window).width() / 2) - (pnotify.width() / 2)
+                           });
+                        }
+                     };
+                     switch (action) {
+                         case "WARNING":
+                             opts.type = "warning";
+                             opts.title = "Note";
+                             break;
+                         case "SUCCESS":
+                            opts.type = "success";
+                            opts.title = "Created";
+                            break;
+                         case "ERROR":
+                            opts.type = "error";
+                            opts.title = "Warning";
+                            break;
+                         default:
+                             alert("Something went wrong");
+                     }
+                    $.pnotify(opts);
+                 }
 
                 /*----------------------------------------
                  CREATE TERM
@@ -280,11 +330,11 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
-                            displayMessage("termResultMessage", "Term added", false);
+                            showNotification("SUCCESS", "Term added");
                             setTimeout(function(){displayCreateSchedule(response);}, 2000);
                         } else {
                             //Display error message
-                            displayMessage("termResultMessage", response.message, true);
+                            showNotification("ERROR", response.message);
                             $("#createTermSubmitBtn").button('reset');
                         }
 
@@ -307,6 +357,7 @@
                 
                     //Display Create Schedule
                     $("#createSchedulePanel").show();
+                    $(".createScheduleTab a").attr('data-toggle', 'tab');
                         
                     //Order comparator
                     function compare(a, b) {
@@ -394,6 +445,29 @@
                 }
 
                 function resetDisabledDates(first, second) {
+                    var firstDates = $("." + first).multiDatesPicker('getDates');
+                    var lastFirstDate = null;
+                    if (firstDates) lastFirstDate = firstDates[firstDates.length - 1];
+                    
+                    //Disable consequent select dates when first dates are not selected 
+                    if (!lastFirstDate) {
+                        $("." + second).attr('disabled', true);
+                    } else {
+                        $("." + second).attr('disabled', false);
+                    }
+                    
+                    $("body").on('mouseover', function(){
+                        firstDates = $("." + first).multiDatesPicker('getDates');
+                        if (firstDates) {
+                            lastFirstDate = firstDates[firstDates.length - 1];
+                            if (lastFirstDate) {
+                                $("." + second).attr('disabled', false);
+                            } else {
+                                $("." + second).attr('disabled', true);
+                            };
+                        }
+                    });
+                    
                     //Mouseover required to completely reset the datepicker
                     $("." + second).on('mouseover', function() {
                         $("." + second).datepicker("destroy");
@@ -402,17 +476,12 @@
                     //Limits the dates to > end date of previous milestone
                     $("." + second).on('mousedown', function() {
                         //Enable only if acceptance has values
-                        var acceptanceDates = $("." + first).multiDatesPicker('getDates');
-                        if (acceptanceDates) {
-                            var lastAcceptanceDate = acceptanceDates[acceptanceDates.length - 1];
-                            if (lastAcceptanceDate) {
-                                $("." + second).multiDatesPicker({
-                                    dateFormat: "yy-mm-dd",
-                                    minDate: new Date(lastAcceptanceDate).addDays(1),
-                                    beforeShowDay: $.datepicker.noWeekends
-                                });
-                                console.log("Reset");
-                            }
+                        if (lastFirstDate) {
+                            $("." + second).multiDatesPicker({
+                                dateFormat: "yy-mm-dd",
+                                minDate: new Date(lastFirstDate).addDays(1),
+                                beforeShowDay: $.datepicker.noWeekends
+                            });
                         }
                     });
                 }
@@ -424,17 +493,33 @@
                     e.stopPropagation();
                     //AJAX call to save term and schedule dates
                     var milestoneArray = $(this).serializeArray();
+                    var errorMessage = "Please type in dates for all milestones!";
                     for (var i = 0; i < milestoneArray.length; i++) {
                         var milestoneItem = milestoneArray[i];
                         for (var j = 0; j < milestones.length; j++) {
                             var milestone = milestones[j];
                             if (milestoneItem.name.split("Dates")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                                if (milestoneItem.value.length < 1) {
+                                    showNotification("WARNING", errorMessage);
+                                    $("#createScheduleSubmitBtn").button('reset');
+                                    return false;
+                                }
                                 milestone["dates[]"] = milestoneItem.value.split(",");
                             }
                             if (milestoneItem.name.split("DayStartTime")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                                if (milestoneItem.value.length < 1) {
+                                    showNotification("WARNING", errorMessage);
+                                    $("#createScheduleSubmitBtn").button('reset');
+                                    return false;
+                                }
                                 milestone["dayStartTime"] = Date.parse(milestoneItem.value).toString('H');
                             }
                             if (milestoneItem.name.split("DayEndTime")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                                if (milestoneItem.value.length < 1) {
+                                    showNotification("WARNING", errorMessage);
+                                    $("#createScheduleSubmitBtn").button('reset');
+                                    return false;
+                                }
                                 milestone["dayEndTime"] = Date.parse(milestoneItem.value).toString('H');
                             }
                         }
@@ -450,6 +535,7 @@
                         if (response.success) {
                             console.log("Received: " + JSON.stringify(response));
                             schedules = response.schedules;
+                            showNotification("SUCCESS", "Created dates successfully");
                             //Display create timeslots forms
                             setTimeout(function(){displayCreateTimeslots();}, 2000);
                         } else {
@@ -458,7 +544,8 @@
                         }
                     }).fail(function(error) {
                         console.log("createScheduleData AJAX FAIL");
-                        displayMessage("scheduleResultMessage", "Oops.. something went wrong", true);
+                        showNotification("ERROR", "Oops.. something went wrong");
+//                        displayMessage("scheduleResultMessage", "Oops.. something went wrong", true);
                     });
                     return false;
                 });
@@ -468,11 +555,10 @@
                  ------------------------------------------*/
 
                 //Display create timeslots
-                //TODO: Change to MilestoneConfig
                 function displayCreateTimeslots() {
                     //Display create timeslots
                     $("#createTimeslotsPanel").show();
-                    
+                    $(".createTimeslotsTab a").attr('data-toggle', 'tab');
                     for (var i = 0; i < schedules.length; i++) {
                         var schedule = schedules[i];
                         var milestoneOption = $(document.createElement('option'));
@@ -506,7 +592,7 @@
                     return false; 
                 });
                 
-                //OVERALL SUBMIT TO SERVER
+                //Submit to server
                 $("#createTimeslotsSubmitBtn").on('click', function() {
                     $("#createTimeslotsSubmitBtn").button('loading');
                     timeslotsData = {};
@@ -530,7 +616,8 @@
                     }).done(function(response) {
                         if (response.success) {
                             console.log("createTimeslotsJson was successful");
-                            displayMessage("timeslotResultMessage", response.message, false);
+                            showNotification("SUCCESS", response.message);
+//                            displayMessage("timeslotResultMessage", response.message, false);
                             selectedSchedule["isCreated"] = true;
                         } else {
                             var eid = btoa(response.message);
@@ -539,7 +626,8 @@
                         }
                     }).fail(function(error) {
                         console.log("createTimeslotsJson AJAX FAIL");
-                        displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
+                        showNotification("ERROR", "Oops.. something went wrong");
+//                        displayMessage("timeslotResultMessage", "Oops.. something went wrong", true);
                     });
                     return false;
                 });
@@ -655,18 +743,6 @@
                         triggerTimeslot(this, duration);
                     });
                 }
-
-                //Display termMessage
-                function displayMessage(id, msg, fade) {
-                    //Dislay result
-                    var e = $("#" + id);
-                    $(e).fadeTo('slow', 2000);
-                    $(e).css('color', 'darkgreen').html(msg).fadeTo('slow', 0);
-                    if (fade) {
-                        $(e).css('color', 'darkred').html(msg).fadeTo('slow', 0);
-                    }
-                }
-
             };
             
             addLoadEvent(createScheduleLoad);

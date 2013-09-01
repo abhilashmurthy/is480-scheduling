@@ -565,6 +565,7 @@
                                     bookingExists = 1;
                                     existingTimeslot = $(document.createElement('div'));
                                     existingTimeslot.attr('value', timeslot.datetime);
+                                    existingTimeslot.addClass('existingTimeslot');
                                     break;
                                 }
                             }
@@ -619,6 +620,7 @@
                     });
 
                     //Popover for booked timeslot
+                    $('body').off('click', '.bookedTimeslot');
                     $('body').on('click', '.bookedTimeslot', function(e) {
                         if ($(e.target).parents('.popover').length) return false;
 //                        console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
@@ -627,15 +629,23 @@
                         self.popover('show');
                         return false;
                     });
-
+                    
+                    $('body').off('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking');
                     $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking', function(e) {
                         if (e.target === this) {
                             self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
                             $('.timeslotCell').not(self).popover('hide');
                             var refreshData = refreshScheduleData();
-                            if (<%= activeRole.equals(Role.STUDENT) %> && refreshData.bookingExists !== 0) {
-                                showNotification("WARNING", refreshData.existingTimeslot, "You already have a booking!");
-                                return false;
+                            if (<%= activeRole.equals(Role.STUDENT) %>) {
+                                if (refreshData.bookingExists !== 0) {
+                                    showNotification("WARNING", refreshData.existingTimeslot, "You already have a booking!");
+                                    return false;
+                                }
+                                var teamTerm = "<% try { out.print(!team.getTerm().equals(activeTerm)?team.getTerm().getAcademicYear() + " " + team.getTerm().getSemester():"thisTerm");} catch (Exception e) {out.print("thisTerm");} %>";
+                                if (teamTerm !== "thisTerm") {
+                                    showNotification("WARNING", self, "You can only book for Term " + teamTerm);
+                                    return false;
+                                }
                             }
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                                 //Make a dropdown of all teams that have not booked yet if user is admin
@@ -661,7 +671,8 @@
                      ****************************/
 
                     //Close Booking Button
-                    $("td, td > div").on('click', '.close', function(e) {
+                    $(".timeslotCell").off('click', '.close');
+                    $(".timeslotCell").on('click', '.close', function(e) {
                         e.stopPropagation();
                         self.popover('hide');
                         self.trigger('mouseleave');
@@ -669,10 +680,11 @@
                     });
 
                     //Create Booking Button
-                    $("td, td > div").on('click', '#createBookingBtn', function(e) {
-                        e.stopPropagation();
+                    $(".timeslotCell").off('click', '#createBookingBtn');
+                    $(".timeslotCell").on('click', '#createBookingBtn', function(e) {
                         var returnData = createBooking(self);
                         //REFRESH STATE OF scheduleData
+                        self.empty();
                         self.removeClass('unbookedTimeslot');
                         self.addClass('bookedTimeslot');
                         var bookingDiv = $(document.createElement('div'));
@@ -694,7 +706,8 @@
                     });
 
                     //Delete Booking Button
-                    $("td, td > div").on('click', '#deleteBookingBtn', function(e) {
+                    $(".timeslotCell").off('click', '#deleteBookingBtn');
+                    $(".timeslotCell").on('click', '#deleteBookingBtn', function(e) {
                         e.stopPropagation();
                         deleteBooking(self);
                         showNotification("DELETED", self, null);
@@ -716,7 +729,8 @@
                     });
 
                     //Update Booking Button
-                    $("td").on('click', '#updateBookingBtn', function(e) {
+                    $(".timeslotCell").off('click', '#updateBookingBtn');
+                    $(".timeslotCell").on('click', '#updateBookingBtn', function(e) {
                         e.stopPropagation();
                         var startDate = document.getElementById('updateFormDate').value;
                         var startTime = document.getElementById('updateFormStartTime').value;
@@ -734,7 +748,8 @@
                     });
                     
                     //Set Available
-                    $("td").on('click', '#availableTimeslotBtn', function(e) {
+                    $(".timeslotCell").off('click', '#availableTimeslotBtn');
+                    $(".timeslotCell").on('click', '#availableTimeslotBtn', function(e) {
                         e.stopPropagation();
                         changeAvailability(self, true);
                         showNotification("WARNING", self, "Set as available");
@@ -745,7 +760,8 @@
                     });
                     
                     //Set Unavailable
-                    $("td").on('click', '#unavailableTimeslotBtn', function(e) {
+                    $(".timeslotCell").off('click', '#unavailableTimeslotBtn');
+                    $(".timeslotCell").on('click', '#unavailableTimeslotBtn', function(e) {
                         e.stopPropagation();
                         changeAvailability(self, false);
                         showNotification("WARNING", self, "Set as unavailable");
@@ -798,11 +814,13 @@
                         case "WARNING":
                             $.pnotify_remove_all();
                             opts.title = "Note";
-                            opts.text += "<br/> Time: " + dateToView + " " + startTimeToView;
                             opts.type = "warning";
-                            var id = scheduleData.timeslots[bodyTd.attr('value')].id;
-                            $("#timeslot_" + id).children('.booking').effect('bounce', {distance: 50}, 'slow');
-                            $("#timeslot_" + id).css('height', $("#timeslot_" + id).parent('.timeslotCell').css('height'));
+                            if (bodyTd.hasClass('existingTimeslot')){
+                                opts.text += "<br/> Time: " + dateToView + " " + startTimeToView;
+                                var id = scheduleData.timeslots[bodyTd.attr('value')].id;
+                                $("#timeslot_" + id).children('.booking').effect('bounce', {distance: 50}, 'slow');
+                                $("#timeslot_" + id).css('height', $("#timeslot_" + id).parent('.timeslotCell').css('height'));
+                            }
                             break;
                         default:
                             alert("Something went wrong");

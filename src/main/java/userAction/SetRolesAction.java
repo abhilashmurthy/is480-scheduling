@@ -70,11 +70,9 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
                     } else if (user.getRole().equals(Role.ADMINISTRATOR)) {
                         isAdministrator = true;
                         administratorId = user.getId();
-                        addTeamsJson(em, session);
                     } else if (user.getRole().equals(Role.COURSE_COORDINATOR)) {
                         isCourseCoordinator = true;
                         courseCoordinatorId = user.getId();
-                        addTeamsJson(em, session);
                     }
                 }
 
@@ -141,10 +139,8 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
             session.setAttribute("activeRole", userRoles.get(0).getRole());
             if (userRoles.get(0).getRole().equals(Role.ADMINISTRATOR)) {
                 session.setAttribute("user", userRoles.get(0));
-                addTeamsJson(em, session);
             } else if (userRoles.get(0).getRole().equals(Role.COURSE_COORDINATOR)) {
                 session.setAttribute("user", userRoles.get(0));
-                addTeamsJson(em, session);
             } else if (userRoles.get(0).getRole().equals(Role.FACULTY)) {
                 Faculty faculty = em.find(Faculty.class, userRoles.get(0).getId());
                 session.setAttribute("user", faculty);
@@ -172,32 +168,6 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 		}
 
     } //end of execute function
-
-    public void addTeamsJson(EntityManager em, HttpSession session) {
-        //Get Teams from here and populate into session
-        Term term = (Term) session.getAttribute("currentActiveTerm");
-        List<Team> teamList = null;
-        EntityTransaction transaction = em.getTransaction();
-        try {
-            transaction.begin();
-            Query q = em.createQuery("Select t from Team t where term_id = :term")
-                    .setParameter("term", term);
-            teamList = q.getResultList();
-            transaction.commit();
-        } catch (Exception e) {
-            logger.error("Database Operation Error");
-        }
-        if (teamList != null) {
-            ArrayList<HashMap<String, Object>> teamJsonList = new ArrayList<HashMap<String, Object>>();
-            for (Team t : teamList) {
-                HashMap<String, Object> teamMap = new HashMap<String, Object>();
-                teamMap.put("teamName", t.getTeamName());
-                teamMap.put("teamId", t.getId());
-                teamJsonList.add(teamMap);
-            }
-            session.setAttribute("allTeams", new Gson().toJson(teamJsonList));
-        }
-    }
 
     public void setServletRequest(HttpServletRequest hsr) {
         this.request = hsr;
