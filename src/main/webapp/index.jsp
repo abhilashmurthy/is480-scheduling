@@ -422,7 +422,7 @@
                     var termId = activeAcademicYearStr + "," + activeSemesterStr;
                     var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
                     var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
-                    var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addHours(1).toString('HH:mm');
+                    var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addMinutes(scheduleData.duration).toString('HH:mm');
 
                     //Create Booking outputTable
                     var outputTable = $(document.createElement('table'));
