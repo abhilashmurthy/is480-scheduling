@@ -187,14 +187,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 		//Check if user exists in our DB
 		String smuUsername = request.getParameter("smu_username");
 		//Getting the active term
-		ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+		Term activeTerm = SettingsManager.getDefaultTerm(em);
 		//Getting the user based on username and active term
-		ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerms.get(0));
+		ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerm);
 		
 		if (users.size() > 0) {
 			//Welcome to the system. 
 			session.setAttribute("userRoles", users);
-			session.setAttribute("currentActiveTerm", activeTerms.get(0));
+			session.setAttribute("currentActiveTerm", activeTerm);
 
 		} else {
 			//Kick user out

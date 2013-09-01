@@ -4,10 +4,6 @@
  */
 package constant;
 
-import model.User;
-import model.role.Faculty;
-import model.role.Student;
-
 /**
  * List of all the roles present in the system
  * @author suresh
