@@ -267,6 +267,7 @@
 
                 //Create Term AJAX Call
                 $("#createTermForm").on('submit', function() {
+                    $("#createTermSubmitBtn").button('loading');
                     $("#yearInput").attr('disabled', false);
                     termData = {
                         year: $("#yearInput").val(),
@@ -280,11 +281,11 @@
                     }).done(function(response) {
                         if (response.success) {
                             displayMessage("termResultMessage", "Term added", false);
-                            $("#createTermSubmitBtn").button('loading');
                             setTimeout(function(){displayCreateSchedule(response);}, 2000);
                         } else {
                             //Display error message
                             displayMessage("termResultMessage", response.message, true);
+                            $("#createTermSubmitBtn").button('reset');
                         }
 
                     }).fail(function(error) {
@@ -418,6 +419,7 @@
 
                 //Create Schedule Submit - Show timeslots panel
                 $("#createScheduleForm").on('submit', function(e) {
+                    $("#createScheduleSubmitBtn").button('loading');
                     e.preventDefault();
                     e.stopPropagation();
                     //AJAX call to save term and schedule dates
@@ -448,7 +450,6 @@
                         if (response.success) {
                             console.log("Received: " + JSON.stringify(response));
                             schedules = response.schedules;
-			    $("#createScheduleSubmitBtn").button('loading');
                             //Display create timeslots forms
                             setTimeout(function(){displayCreateTimeslots();}, 2000);
                         } else {
@@ -480,8 +481,7 @@
                         $("#milestoneTimeslotsSelect").append(milestoneOption);
                     }
                     
-                    $("#milestoneTimeslotsSelect").val(schedules[0].milestoneName); //Select first milestone
-                    
+                    $("#milestoneTimeslotsSelect").val(schedules[0].milestoneName).change(); //Select first milestone
                     $(".createTimeslotsTab a").tab('show');
                 }
                 

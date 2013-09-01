@@ -1074,20 +1074,14 @@
                                         bodyTd.addClass('unbookedTimeslot');
                                     }
                                 }
-                                
                                 var temp = null;
                                 bodyTd.attr('align', 'center');
-                                if (milestoneStr === "ACCEPTANCE") {
-                                    bodyTd.attr('rowspan', '2'); //If acceptance, set 2
-                                    temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
-                                    rowspanArr.push(temp);
-                                } else {
-                                    bodyTd.attr('rowspan', '3'); //else, set 3
-                                    temp = Date.parse(datetimeString).addMinutes(30).toString("yyyy-MM-dd HH:mm:ss");
-                                    rowspanArr.push(temp);
-                                    temp = Date.parse(datetimeString).addHours(1).toString("yyyy-MM-dd HH:mm:ss");
+                                var duration = scheduleData.duration;
+                                for (var t = 30; t < duration; t++) {
+                                    temp = Date.parse(datetimeString).addMinutes(t).toString("yyyy-MM-dd HH:mm:ss");
                                     rowspanArr.push(temp);
                                 }
+                                bodyTd.attr('rowspan', (scheduleData.duration/30));
                             } else {
                                 bodyTd.addClass('noTimeslot');
                             }
