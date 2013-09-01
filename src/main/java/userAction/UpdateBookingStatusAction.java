@@ -28,6 +28,7 @@ import notification.email.ApprovedBookingEmail;
 import notification.email.ConfirmedBookingEmail;
 import notification.email.RejectedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -82,6 +83,11 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
                 String bookingId = approveRejectArray[i];
                 //Retrieving the timeslot to update
                 Booking booking = em.find(Booking.class, Long.parseLong(bookingId));
+				
+				//Forcing initialization for sending email
+				Hibernate.initialize(booking.getTeam().getMembers());
+				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				
                 //Retrieving the status list of the timeslot
                 HashMap<User, Response> responseList = booking.getResponseList();
 				if (responseList.containsKey(user)) { //Checking if the faculty is part of the response list for required attendees

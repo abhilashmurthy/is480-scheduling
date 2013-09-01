@@ -23,6 +23,7 @@ import model.Timeslot;
 import model.User;
 import notification.email.DeletedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -51,12 +52,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 
             try {
                 em.getTransaction().begin();
-                //Sending email
-                //TODO Bad code. Change after booking and timeslot have been separated!
-//				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(ts, user, ts.getTeam(), ts.getStatusList());
-//				deletedEmail.sendEmail();
-
-
+				
                 //set the current booking's status to deleted
                 Booking b = ts.getCurrentBooking();
 
@@ -69,6 +65,13 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
                 em.persist(ts);
 
                 em.getTransaction().commit();
+				
+				//Forcing initialization for sending email
+				Hibernate.initialize(b.getTeam().getMembers());
+				Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
+				//Sending email
+				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(b, (User)request.getSession().getAttribute("user"));
+				deletedEmail.sendEmail();
 
                 //if the booking has been removed successfully
                 json.put("message", "Booking deleted successfully! Deletion email has been sent to all attendees. (Coming soon..)");

@@ -4,13 +4,11 @@
  */
 package notification.email;
 
-import constant.Response;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import model.Booking;
-import model.Team;
 import model.User;
 
 /**
@@ -19,17 +17,12 @@ import model.User;
  */
 public class DeletedBookingEmail extends EmailTemplate{
 	Booking b;
-	Team team;
-	HashMap<User, Response> statusList;
 	User deletor;
 	
-	public DeletedBookingEmail(Booking b, User deletor, Team team,
-			HashMap<User, Response> statusList) {
+	public DeletedBookingEmail(Booking b, User deletor) {
 		super("deleted_booking.html");
 		this.b = b;
 		this.deletor = deletor;
-		this.team = team;
-		this.statusList = statusList;
 	}
 
 	@Override
@@ -40,7 +33,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateToAddressList() {
 		Set<String> emails = new HashSet<String>();
-		for (User u : team.getMembers()) {
+		for (User u : b.getTeam().getMembers()) {
 			emails.add(u.getUsername() + "@smu.edu.sg");
 		}
 		
@@ -52,7 +45,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 		HashSet<String> emails = new HashSet<String>();
 		
 		//Adding required attendees
-		for (User u : statusList.keySet()) {
+		for (User u : b.getResponseList().keySet()) {
 			emails.add(u.getUsername() + "@smu.edu.sg");
 		}
 		return emails;
@@ -69,7 +62,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 		map.put("[DELETOR_NAME]", deletor.getFullName());
 		
 		//Insert team name
-		map.put("[TEAM_NAME]", team.getTeamName());
+		map.put("[TEAM_NAME]", b.getTeam().getTeamName());
 		
 		//Insert start date
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
