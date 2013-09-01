@@ -135,14 +135,13 @@
             var unavailableTimeslots = new Array();
             
             loadUnavailableTimeslots();
+			console.log(unavailableTimeslots.toString());
             loadScheduleDates();
             
             function loadUnavailableTimeslots() {
-                <%
-                    Set<Timeslot> unavailableTimeslots = facultyUser.getUnavailableTimeslots();
-                    for (Timeslot t : unavailableTimeslots) { %>
-                        unavailableTimeslots.push("timeslot_" + <%= t.getId() %>);
-                <%  } %>
+				<s:iterator value="unavailableTimeslotIds">
+						unavailableTimeslots.push("timeslot_<s:property/>");
+                </s:iterator>
             }
             
             function loadScheduleDates() {

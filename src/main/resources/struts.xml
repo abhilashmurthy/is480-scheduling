@@ -84,6 +84,10 @@
 		<action name="manageActiveTerms" class="systemAction.ManageActiveTermsAction" method="execute">
             <result name="success">/activeterms.jsp</result>
         </action>
+		
+		<action name="yourAvailability" class="systemAction.LoadAvailabilityAction" method="execute">
+            <result name="success">/availability.jsp</result>
+        </action>
 				
     </package>
 

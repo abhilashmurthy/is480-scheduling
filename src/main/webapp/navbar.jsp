@@ -80,7 +80,7 @@
 						<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
-						<li id="bookingHistory"><a href="availability.jsp" class="navbar-title"><b>Your Availability</b></a></li>
+						<li id="bookingHistory"><a href="yourAvailability" class="navbar-title"><b>Your Availability</b></a></li>
 				<% } else if (activeRole.equals(Role.STUDENT)) { %>
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
