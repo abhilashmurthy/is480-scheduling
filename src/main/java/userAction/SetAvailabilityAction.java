@@ -68,7 +68,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
             Set<Timeslot> existingAvailability = faculty.getUnavailableTimeslots();
             for (Timeslot existingTimeslot : existingAvailability) {
                 //Add other schedules' unavailable timeslots
-                if (!existingTimeslot.getSchedule().equals(dealingWithSchedule)) {
+                if (existingTimeslot.getSchedule().getId() != dealingWithSchedule.getId()) {
                     availability.add(existingTimeslot);
                 }
             }
