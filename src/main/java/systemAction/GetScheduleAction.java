@@ -105,6 +105,8 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             json.put("startDate", dateFormat.format(activeSchedule.getStartDate()));
             json.put("endDate", dateFormat.format(activeSchedule.getEndDate()));
             json.put("duration", milestone.getSlotDuration());
+            json.put("dayStartTime", activeSchedule.getDayStartTime());
+            json.put("dayEndTime", activeSchedule.getDayEndTime());
 
             //Get unavailable timeslots if user is a student
             Set<Timeslot> supervisorAvailability = null;

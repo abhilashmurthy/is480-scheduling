@@ -974,8 +974,8 @@
                     var timeslots = scheduleData.timeslots;
                     
                     //TODO: Get from server/admin console/whatevs
-                    var minTime = 9;
-                    var maxTime = 19;
+                    var minTime = scheduleData.dayStartTime;
+                    var maxTime = scheduleData.dayEndTime;
 
                     var timesArray = new Array();
                     for (var i = minTime; i < maxTime; i++) {
