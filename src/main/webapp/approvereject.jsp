@@ -138,10 +138,27 @@
 		<script type="text/javascript">
 
 		function approveRejectBooking(e) {
+			//Disabling all buttons on page to avoid multiple clicking
+			$('button[type=button]').attr('disabled', true);
+			
 			var bookingId =  $(e).val();
 			console.log(bookingId);
 			var id = $(e).attr("id");
 			console.log(id);
+			
+//			$.blockUI({ 
+//				message:'<h3>Loading...</h3>',
+//				css: { 
+//				border: 'none', 
+//				padding: '5px', 
+//				backgroundColor: '#000', 
+//				'-webkit-border-radius': '10px', 
+//				'-moz-border-radius': '10px', 
+//				opacity: .5, 
+//				color: '#fff', 
+//			} }); 
+//			setTimeout($.unblockUI, 3000); 
+//			return false;
 			
 			var bookingArray = {};
 			if (id === 'approve') {
@@ -155,8 +172,6 @@
 //				});
 				bookingArray['rejectReason'] = "Got a meeting!";
 			}
-			
-//			alert(JSON.stringify(bookingArray));
 			
 			$.ajax({
 				type: 'POST',
@@ -177,6 +192,7 @@
 					   window.location = "error.jsp?eid=" + eid;
 				   }
 				}).fail(function(error) {
+				   $('button[type=button]').attr('disabled', false);
 				   console.log("Updating Booking Status AJAX FAIL");
 				   showNotification("WARNING", "Oops.. something went wrong");
 				});
@@ -186,14 +202,6 @@
 		function timedRefresh(timeoutPeriod) {
 			setTimeout("location.reload(true);", timeoutPeriod);
 		}
-//		function validateProxyReason() {
-//			$('#rejectionModal').modal({
-//				keyboard: true
-//			});
-//			return false;
-//			var rejectionReason = document.getElementById("rejectiontText");
-//			alert(rejectionReason);
-//		}
 			
 		//For data tables
 		$(document).ready(function(){

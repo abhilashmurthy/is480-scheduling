@@ -187,7 +187,6 @@
             }
 
             function edited() {
-
                 //get total length (here length is +1)
                 //var count2 = $('#milestoneConfigTable :last td');
                 var rows = document.getElementsByTagName("table")[0].rows;
@@ -295,7 +294,9 @@
 						var eid = btoa(response.message);
 						window.location = "error.jsp?eid=" + eid;
 					}
-                 }).fail(function(error) {
+                 }).fail(function(response) {
+					$("#saveButton").button('reset');
+					$("#addRowBtn").button('reset');
 					console.log("Updating Milestone settings AJAX FAIL");
 					showNotification("WARNING", "Oops.. something went wrong");
                  });
@@ -435,9 +436,12 @@
 				var $btn = $('#saveButton');
 				$btn.click(function(){
 					var $this = $(this);
+					var addRowBtn = document.getElementById('addRowBtn');
+					addRowBtn.disabled = true;
 					$this.attr('disabled', 'disabled').html("Saving...");
 					setTimeout(function () {
 						$this.removeAttr('disabled').html('<b>Save</b>');
+						$(addRowBtn).removeAttr('disabled');
 					}, 2000);
 				});
 			});

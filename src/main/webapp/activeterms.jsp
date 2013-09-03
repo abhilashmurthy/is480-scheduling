@@ -89,9 +89,9 @@
 			<div style="clear: both;">
 			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
 			<!-- SECTION: Response Banner -->
-			<div id="responseBanner" class="alert fade in" hidden>
+<!--			<div id="responseBanner" class="alert fade in" hidden>
 				<span id="responseMessage" style="font-weight: bold"></span>
-			</div>
+			</div>-->
 			</div>
 			</s:if><s:else>
 				<h4>No Terms Exist!</h4>
@@ -145,20 +145,23 @@
 					}).done(function(response) {
 						$("#submitFormBtn").button('reset');
 						console.log(response);
-						$("#responseBanner").show().delay(2000).fadeOut(400);
+//						$("#responseBanner").show().delay(2000).fadeOut(400);
 						if (response.success) {
-							$("#responseBanner").removeClass("alert-error").addClass("alert-success");
-							$("#responseMessage").text(response.message);
+//							$("#responseBanner").removeClass("alert-error").addClass("alert-success");
+//							$("#responseMessage").text(response.message);
+							showNotification("SUCCESS", response.message);
 						} else {
-							$("#responseBanner").removeClass("alert-success").addClass("alert-error");
-							$("#responseMessage").text(response.message);
+//							$("#responseBanner").removeClass("alert-success").addClass("alert-error");
+//							$("#responseMessage").text(response.message);
+							showNotification("ERROR", response.message);
 						}
 					}).fail(function(response) {
 						$("#submitFormBtn").button('reset');
 						console.log(response);
-						$("#responseBanner").show().delay(2000).fadeOut(400);
-						$("#responseBanner").removeClass("alert-success").addClass("alert-error");
-						$("#responseMessage").text("Oops. Something went wrong. Please try again!");
+//						$("#responseBanner").show().delay(2000).fadeOut(400);
+//						$("#responseBanner").removeClass("alert-success").addClass("alert-error");
+//						$("#responseMessage").text("Oops. Something went wrong. Please try again!");
+						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
 					});
 				});
 				
@@ -172,6 +175,48 @@
 					return arr;
 				}
 			});
+			
+			//Notification-------------
+			function showNotification(action, notificationMessage) {
+				var opts = {
+					title: "Note",
+					text: notificationMessage,
+					type: "warning",
+					icon: false,
+					sticker: false,
+					mouse_reset: false,
+					animation: "fade",
+					animate_speed: "fast",
+					before_open: function(pnotify) {
+						pnotify.css({
+						   top: "52px",
+						   left: ($(window).width() / 2) - (pnotify.width() / 2)
+						});
+					}
+				};
+				switch (action) {
+					case "SUCCESS":
+						opts.title = "Updated";
+						opts.type = "success";
+						break;
+					case "ERROR":
+						opts.title = "Error";
+						opts.type = "error";
+						break;
+					case "INFO":
+						opts.title = "Error";
+						opts.type = "info";
+						break;
+					case "WARNING":
+						$.pnotify_remove_all();
+						opts.title = "Note";
+						opts.type = "warning";
+						break;
+					default:
+						alert("Something went wrong");
+				}
+				$.pnotify(opts);
+			}
 		</script>
     </body>
 </html>
