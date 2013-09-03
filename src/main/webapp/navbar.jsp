@@ -187,11 +187,16 @@
         });
         
         //Hide all popovers on page click
-        $("body").on('click', function(){
-            if ($('.popover').hasClass("in")) {
-                $('.popover').parent().popover('hide');
-            }
-        });
+        $("body").on('click', function(e) {
+            $('.popover.in').each(function(f){
+                var self = $(this);
+                //Don't detect datepicker and timepicker
+                if (!$(e.target).closest("div#ui-datepicker-div").length && !$(e.target).closest(".ui-timepicker-wrapper").length) {
+                    self.parent().popover('hide');
+                }
+            });
+        });    
+            
         
         //Disable Pines Notify Settings
         $.pnotify.defaults.history = false;

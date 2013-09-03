@@ -50,6 +50,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 
             //Getting timeslot values
             String[] timeslotIdArray = (String[]) parameters.get("timeslot_data[]");
+            int scheduleId = Integer.parseInt(((String[])parameters.get("scheduleId"))[0]);
             Schedule dealingWithSchedule = null;
 
             HashSet<Timeslot> availability = new HashSet<Timeslot>();
@@ -65,24 +66,29 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
                 }
             }
             
-            Set<Timeslot> existingAvailability = faculty.getUnavailableTimeslots();
-            for (Timeslot existingTimeslot : existingAvailability) {
-                //Add other schedules' unavailable timeslots
-                if (existingTimeslot.getSchedule().getId() != dealingWithSchedule.getId()) {
-                    availability.add(existingTimeslot);
+            try {
+                Set<Timeslot> existingAvailability = faculty.getUnavailableTimeslots();
+                for (Timeslot existingTimeslot : existingAvailability) {
+                    //Add other schedules' unavailable timeslots
+                    if (existingTimeslot.getSchedule().getId() != scheduleId) {
+                        availability.add(existingTimeslot);
+                    }
                 }
+                em.getTransaction().begin();
+                faculty.setUnavailableTimeslots(availability);
+                em.persist(faculty);
+                em.getTransaction().commit();
+
+                //Reloading the user object in the session
+                request.getSession().setAttribute("user", faculty);
+
+                json.put("success", true);
+                json.put("message", "Your availability has been updated successfully!");
+            } catch (NullPointerException n) {
+                json.put("success", false);
+                json.put("message", "An error was detected. Please reload and try again.");
             }
             
-            em.getTransaction().begin();
-            faculty.setUnavailableTimeslots(availability);
-            em.persist(faculty);
-            em.getTransaction().commit();
-
-            //Reloading the user object in the session
-            request.getSession().setAttribute("user", faculty);
-
-            json.put("success", true);
-            json.put("message", "Your availability has been updated successfully!");
         } catch (Exception e) {
             logger.error(e.getMessage());
             if (MiscUtil.DEV_MODE) {

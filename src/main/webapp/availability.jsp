@@ -496,6 +496,7 @@
                     }
 
                     timeslotsData["timeslot_data[]"] = timeslot_data;
+                    timeslotsData["scheduleId"] = scheduleData.id;
 
                     console.log('Availability data is: ' + JSON.stringify(timeslotsData));
                     $.ajax({
