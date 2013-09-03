@@ -55,14 +55,14 @@ public class Booking implements Serializable {
             inverseJoinColumns=@JoinColumn(name="user_id"))
 	private Set<User> requiredAttendees = new HashSet<User>();
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name="Booking_Optional_Attendees",
-            joinColumns=@JoinColumn(name="booking_id"),
-            inverseJoinColumns=@JoinColumn(name="user_id"))
-	private Set<User> optionalAttendees = new HashSet<User>();
+//	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//	@JoinTable(name="Booking_Optional_Attendees",
+//            joinColumns=@JoinColumn(name="booking_id"),
+//            inverseJoinColumns=@JoinColumn(name="user_id"))
+//	private Set<User> optionalAttendees = new HashSet<User>();
 	
 	@Column(length=19000000)
-	private HashSet<String> externalAttendees = new HashSet<String>();
+	private HashSet<String> optionalAttendees = new HashSet<String>();
 	
 	private String rejectReason;
 	
@@ -106,14 +106,6 @@ public class Booking implements Serializable {
 		this.requiredAttendees = attendees;
 	}
 
-	public Set<User> getOptionalAttendees() {
-		return optionalAttendees;
-	}
-
-	public void setOptionalAttendees(Set<User> optionalAttendees) {
-		this.optionalAttendees = optionalAttendees;
-	}
-
 	public String getRejectReason() {
 		return rejectReason;
 	}
@@ -130,12 +122,12 @@ public class Booking implements Serializable {
 		this.bookingStatus = bookingStatus;
 	}
 
-	public HashSet<String> getExternalAttendees() {
-		return externalAttendees;
+	public HashSet<String> getOptionalAttendees() {
+		return optionalAttendees;
 	}
 
-	public void setExternalAttendees(HashSet<String> externalAttendees) {
-		this.externalAttendees = externalAttendees;
+	public void setOptionalAttendees(HashSet<String> optionalAttendees) {
+		this.optionalAttendees = optionalAttendees;
 	}
 
 	public Long getId() {
