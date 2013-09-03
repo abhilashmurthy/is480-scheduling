@@ -142,16 +142,22 @@ public class DBInitUtil {
 		acceptance12013.setMilestone(acceptance);
 		acceptance12013.setStartDate(new Timestamp(2013 - 1900, 7, 7, 0, 0, 0, 0));
 		acceptance12013.setEndDate(new Timestamp(2013 - 1900, 7, 20, 0, 0, 0, 0));
+		acceptance12013.setDayStartTime(9);
+		acceptance12013.setDayEndTime(19);
 		
 		Schedule midterm12013 = new Schedule();
 		midterm12013.setMilestone(midterm);
 		midterm12013.setStartDate(new Timestamp(2013 - 1900, 9, 19, 0, 0, 0, 0));
 		midterm12013.setEndDate(new Timestamp(2013 - 1900, 9, 30, 0, 0, 0, 0));
+		midterm12013.setDayStartTime(9);
+		midterm12013.setDayEndTime(19);
                 
 		Schedule final12013 = new Schedule();
 		final12013.setMilestone(finalMilestone);
 		final12013.setStartDate(new Timestamp(2013 - 1900, 11, 1, 0, 0, 0, 0));
 		final12013.setEndDate(new Timestamp(2013 - 1900, 11, 15, 0, 0, 0, 0));
+		final12013.setDayStartTime(9);
+		final12013.setDayEndTime(19);
 		
 		// Persistence
 		em.persist(acceptance12013);
