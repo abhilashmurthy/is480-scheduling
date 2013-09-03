@@ -54,8 +54,8 @@ public class User implements Serializable {
 	
 	private Role role;
 	
-	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Booking> subscribedBookings = new HashSet<Booking>();
+//	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//	private Set<Booking> subscribedBookings = new HashSet<Booking>();
 	
 	public String getUsername() {
 		return username;
@@ -89,13 +89,13 @@ public class User implements Serializable {
 		this.role = role;
 	}
 	
-	public Set<Booking> getSubscribedBookings() {
-		return subscribedBookings;
-	}
-
-	public void setSubscribedBookings(Set<Booking> subscribedBookings) {
-		this.subscribedBookings = subscribedBookings;
-	}
+//	public Set<Booking> getSubscribedBookings() {
+//		return subscribedBookings;
+//	}
+//
+//	public void setSubscribedBookings(Set<Booking> subscribedBookings) {
+//		this.subscribedBookings = subscribedBookings;
+//	}
 	
 	public Long getId() {
 		return id;
