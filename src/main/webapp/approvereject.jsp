@@ -138,10 +138,27 @@
 		<script type="text/javascript">
 
 		function approveRejectBooking(e) {
+			//Disabling all buttons on page to avoid multiple clicking
+			$('button[type=button]').attr('disabled', true);
+			
 			var bookingId =  $(e).val();
 			console.log(bookingId);
 			var id = $(e).attr("id");
 			console.log(id);
+			
+//			$.blockUI({ 
+//				message:'<h3>Loading...</h3>',
+//				css: { 
+//				border: 'none', 
+//				padding: '5px', 
+//				backgroundColor: '#000', 
+//				'-webkit-border-radius': '10px', 
+//				'-moz-border-radius': '10px', 
+//				opacity: .5, 
+//				color: '#fff', 
+//			} }); 
+//			setTimeout($.unblockUI, 3000); 
+//			return false;
 			
 			var bookingArray = {};
 			if (id === 'approve') {
@@ -156,8 +173,6 @@
 				bookingArray['rejectReason'] = "Got a meeting!";
 			}
 			
-//			alert(JSON.stringify(bookingArray));
-			
 			$.ajax({
 				type: 'POST',
 				async: false,
@@ -166,9 +181,9 @@
 				}).done(function(response) {
 				   if (!response.exception) {
 					   if (response.success) {
-						   displayMessage("approveRejectMessage", response.message, false);
+						   showNotification("SUCCESS", response.message);
 					   } else {
-						   displayMessage("approveRejectMessage", response.message, true);
+						   showNotification("ERROR", response.message);
 					   }
 //					   window.location.reload(true);
 					   timedRefresh(2000);
@@ -177,8 +192,9 @@
 					   window.location = "error.jsp?eid=" + eid;
 				   }
 				}).fail(function(error) {
+				   $('button[type=button]').attr('disabled', false);
 				   console.log("Updating Booking Status AJAX FAIL");
-				   displayMessage("approveRejectMessage", "Oops.. something went wrong", true);
+				   showNotification("WARNING", "Oops.. something went wrong");
 				});
 				return false;
 		}
@@ -186,14 +202,6 @@
 		function timedRefresh(timeoutPeriod) {
 			setTimeout("location.reload(true);", timeoutPeriod);
 		}
-//		function validateProxyReason() {
-//			$('#rejectionModal').modal({
-//				keyboard: true
-//			});
-//			return false;
-//			var rejectionReason = document.getElementById("rejectiontText");
-//			alert(rejectionReason);
-//		}
 			
 		//For data tables
 		$(document).ready(function(){
@@ -214,16 +222,57 @@
 		});
 		
 		//Display Message
-		function displayMessage(id, msg, fade) {
-			//Dislay result
-			var e = $("#" + id);
-			$(e).fadeTo(3000, 0);
-			$(e).css('color', 'darkgreen').html(msg);
-			if (fade) {
-				$(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
-			}
-		}
+//		function displayMessage(id, msg, fade) {
+//			//Dislay result
+//			var e = $("#" + id);
+//			$(e).fadeTo(3000, 0);
+//			$(e).css('color', 'darkgreen').html(msg);
+//			if (fade) {
+//				$(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
+//			}
+//		}
 		
+		//Notification-------------
+		function showNotification(action, notificationMessage) {
+			var opts = {
+				title: "Note",
+				text: notificationMessage,
+				type: "warning",
+				icon: false,
+				sticker: false,
+				mouse_reset: false,
+				animation: "fade",
+				animate_speed: "fast",
+				before_open: function(pnotify) {
+					pnotify.css({
+					   top: "52px",
+					   left: ($(window).width() / 2) - (pnotify.width() / 2)
+					});
+				}
+			};
+			switch (action) {
+				case "SUCCESS":
+					opts.title = "Updated";
+					opts.type = "success";
+					break;
+				case "ERROR":
+					opts.title = "Error";
+					opts.type = "error";
+					break;
+				case "INFO":
+					opts.title = "Error";
+					opts.type = "info";
+					break;
+				case "WARNING":
+					$.pnotify_remove_all();
+					opts.title = "Note";
+					opts.type = "warning";
+					break;
+				default:
+					alert("Something went wrong");
+			}
+			$.pnotify(opts);
+		}
 		//To check/uncheck all boxes
 //		function toggle(oInput) {
 //			var aInputs = document.getElementsByTagName('input');
