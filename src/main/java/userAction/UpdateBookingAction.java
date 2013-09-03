@@ -81,11 +81,12 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     return SUCCESS;
                 }
                 //Constructing the optional attendees list to be stored in db
-                HashSet<String> optionalAttendees = new HashSet<String>();
+                HashSet<String> optionalAttendees = null;
                 
                 try {
                     //Getting the optional attendees and storing in a list
                     JSONArray optionalAttendeesArray = (JSONArray) inputData.getJSONArray("attendees");
+                    optionalAttendees = new HashSet<String>();
                     StringBuilder invalidEmails = new StringBuilder();
 
                     for (int i = 0; i < optionalAttendeesArray.length(); i++) {
@@ -107,7 +108,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     }
                 } catch (JSONException j) {
                     //No optional attendees change detected
-                    optionalAttendees = null;
+                    optionalAttendees = new HashSet<String>();;
                 }
 
                 //------------To update the booking date and start time----------------------
@@ -153,7 +154,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 map.put("teamWiki", teamWiki);
                 json.put("booking", map);
                 
-                if (newBookingTimestamp == null && optionalAttendees == null) {
+                if (newBookingTimestamp == null && optionalAttendees.equals(booking.getOptionalAttendees())) {
                     json.put("success", false);
                     json.put("message", "No change made.. ");
                     return SUCCESS;

@@ -642,13 +642,6 @@
                             theme: "facebook",
                             allowNewTokens: true,
                             propertyToSearch: "name",
-                            resultsFormatter: function(item) {
-                                if (item && item.id) {
-                                    return "<li><p>" + item.id + "</p></li>";
-                                } else if (item) {
-                                    return "<li><p>" + item.name + "</p></li>";
-                                }
-                            },
                             tokenFormatter: function(item) {
                                 if (item && item.id) {
                                     return "<li><p>" + item.id + "</p></li>";
