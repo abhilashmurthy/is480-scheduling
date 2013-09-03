@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import model.role.TA;
 
 /**
  *
@@ -36,6 +37,9 @@ public class Timeslot implements Serializable {
 	
 	@OneToOne(fetch = FetchType.LAZY) //Stores the current active booking for the timeslot. If null, then the timeslot is available
 	private Booking currentBooking;
+	
+	@ManyToOne
+	private TA TA;
 
 	public Timestamp getStartTime() {
 		return startTime;
@@ -83,6 +87,14 @@ public class Timeslot implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public TA getTA() {
+		return TA;
+	}
+
+	public void setTA(TA TA) {
+		this.TA = TA;
 	}
 
 	@Override
