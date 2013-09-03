@@ -50,6 +50,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 
             //Getting timeslot values
             String[] timeslotIdArray = (String[]) parameters.get("timeslot_data[]");
+            int scheduleId = Integer.parseInt(((String[])parameters.get("scheduleId"))[0]);
             Schedule dealingWithSchedule = null;
 
             HashSet<Timeslot> availability = new HashSet<Timeslot>();
@@ -69,7 +70,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
                 Set<Timeslot> existingAvailability = faculty.getUnavailableTimeslots();
                 for (Timeslot existingTimeslot : existingAvailability) {
                     //Add other schedules' unavailable timeslots
-                    if (existingTimeslot.getSchedule().getId() != dealingWithSchedule.getId()) {
+                    if (existingTimeslot.getSchedule().getId() != scheduleId) {
                         availability.add(existingTimeslot);
                     }
                 }

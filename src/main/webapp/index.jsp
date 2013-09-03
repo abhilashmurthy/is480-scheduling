@@ -326,6 +326,11 @@
                                         input.attr('type', 'text');
                                         input.attr('placeholder', outputData[i][1]);
                                         input.attr('title', 'Enter a new date (YYYY-MM-DD)');
+                                        input.addClass('updateFormDate');
+                                        input.datepicker({
+                                            dateFormat: "yy-mm-dd",
+                                            beforeShowDay: $.datepicker.noWeekends
+                                        });
                                         outputData[i][1] = input;
                                     }
                                     if (outputData[i][0] === "Time") {
@@ -334,6 +339,14 @@
                                         input.attr('type', 'text');
                                         input.attr('placeholder', outputData[i][1]);
                                         input.attr('title', 'Enter a new start time (HH:MM)');
+                                        input.addClass('updateFormStartTime');
+                                        input.timepicker({
+                                            minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
+                                            maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
+                                            step: 30,
+                                            forceRoundTime: true,
+                                            timeFormat: 'H:i'
+                                        });
                                         outputData[i][1] = input;
                                     }
                                 }
@@ -596,12 +609,6 @@
 
                 //Function to create mouse UI events
                 function setupMouseEvents() {
-                    //Hide all popovers on page click
-                    $("body").on('click', function() {
-                        if ($('.popover').hasClass("in")) {
-                            $('.popover').parent().popover('hide');
-                        }
-                    });
                     
                     /*****************************
                      CALENDAR UI INTERACTION
@@ -616,13 +623,14 @@
                     $('body').off('click', '.bookedTimeslot');
                     $('body').on('click', '.bookedTimeslot', function(e) {
                         if ($(e.target).parents('.popover').length) return false;
-//                        console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
-                        self = $(this).is('.booking') ? $(this).parent('.timeslotCell') : $(this);
+                        console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
+                        self = (!$(this).is('.timeslotCell')) ? $(this).parents('.timeslotCell') : $(this);
                         $('.timeslotCell').not(self).popover('hide');
                         self.popover('show');
                         return false;
                     });
                     
+                    //Popover for unbooked or unavailable timeslot
                     $('body').off('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking');
                     $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking', function(e) {
                         if (e.target === this) {
@@ -718,6 +726,27 @@
                             appendPopovers();
                         }
                         refreshScheduleData();
+                        return false;
+                    });
+                    
+                    //Datepicker
+                    $('body').off('click', '#updateFormDate');
+                    $('body').on('click', '#updateFormDate', function(e){
+                        //Add date and timepickers
+                        if (e.target === this) {
+                            console.log("clicked " + $(this).parents(".bookedTimeslot").attr('value'));
+                            $(this).datepicker('show');
+                        }
+                        return false;
+                    });
+                    
+                    //Timepicker
+                    $('body').off('click', '#updateFormStartTime');
+                    $('body').on('click', '#updateFormStartTime', function(e){
+                        //Add timepicker
+                        if (e.target === this) {
+                            $(this).timepicker('show');
+                        }
                         return false;
                     });
                     
@@ -935,6 +964,7 @@
                         timeslot_data.splice(index, 1);
                     }
                     timeslotsData["timeslot_data[]"] = timeslot_data;
+                    timeslotsData["scheduleId"] = scheduleData.id;
 //                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
                     $.ajax({
                         type: 'POST',
