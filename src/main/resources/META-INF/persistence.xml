@@ -14,6 +14,7 @@
     <class>model.Booking</class>
     <class>model.role.Student</class>
     <class>model.role.Faculty</class>
+    <class>model.role.TA</class>
     <properties>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/is480-scheduling"/>
