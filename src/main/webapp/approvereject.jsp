@@ -166,9 +166,9 @@
 				}).done(function(response) {
 				   if (!response.exception) {
 					   if (response.success) {
-						   displayMessage("approveRejectMessage", response.message, false);
+						   showNotification("SUCCESS", response.message);
 					   } else {
-						   displayMessage("approveRejectMessage", response.message, true);
+						   showNotification("ERROR", response.message);
 					   }
 //					   window.location.reload(true);
 					   timedRefresh(2000);
@@ -178,7 +178,7 @@
 				   }
 				}).fail(function(error) {
 				   console.log("Updating Booking Status AJAX FAIL");
-				   displayMessage("approveRejectMessage", "Oops.. something went wrong", true);
+				   showNotification("WARNING", "Oops.. something went wrong");
 				});
 				return false;
 		}
@@ -214,16 +214,57 @@
 		});
 		
 		//Display Message
-		function displayMessage(id, msg, fade) {
-			//Dislay result
-			var e = $("#" + id);
-			$(e).fadeTo(3000, 0);
-			$(e).css('color', 'darkgreen').html(msg);
-			if (fade) {
-				$(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
-			}
-		}
+//		function displayMessage(id, msg, fade) {
+//			//Dislay result
+//			var e = $("#" + id);
+//			$(e).fadeTo(3000, 0);
+//			$(e).css('color', 'darkgreen').html(msg);
+//			if (fade) {
+//				$(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
+//			}
+//		}
 		
+		//Notification-------------
+		function showNotification(action, notificationMessage) {
+			var opts = {
+				title: "Note",
+				text: notificationMessage,
+				type: "warning",
+				icon: false,
+				sticker: false,
+				mouse_reset: false,
+				animation: "fade",
+				animate_speed: "fast",
+				before_open: function(pnotify) {
+					pnotify.css({
+					   top: "52px",
+					   left: ($(window).width() / 2) - (pnotify.width() / 2)
+					});
+				}
+			};
+			switch (action) {
+				case "SUCCESS":
+					opts.title = "Updated";
+					opts.type = "success";
+					break;
+				case "ERROR":
+					opts.title = "Error";
+					opts.type = "error";
+					break;
+				case "INFO":
+					opts.title = "Error";
+					opts.type = "info";
+					break;
+				case "WARNING":
+					$.pnotify_remove_all();
+					opts.title = "Note";
+					opts.type = "warning";
+					break;
+				default:
+					alert("Something went wrong");
+			}
+			$.pnotify(opts);
+		}
 		//To check/uncheck all boxes
 //		function toggle(oInput) {
 //			var aInputs = document.getElementsByTagName('input');

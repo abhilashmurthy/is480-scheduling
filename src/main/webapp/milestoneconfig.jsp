@@ -106,7 +106,7 @@
                     <tr>
                         <td>
                             <button type="button" id="saveButton" class="btn btn-primary" style="width:80px; height:30px;" id="save<%=counter%>" onclick="edited();">
-                                <b>Save</b>
+                                <strong>Save</strong>
                             </button>
                         </td>
                         <td style="width:20px"></td>
@@ -221,7 +221,7 @@
                         
                         if(allOrders.indexOf(newOrderNumber)!==-1){
                             
-                            alert("Please ensure order numbers are not the same!");
+                            showNotification("ERROR", "Please ensure order numbers are not the same!");
                             return true;
                         }
                         
@@ -236,7 +236,7 @@
                         }
 
                         if (newMilestoneName === "") {
-                            alert("Please ensure that all milestone names are entered!");
+                            showNotification("ERROR" , "Please ensure that all milestone names are entered!");
                             return true;
                         }
 
@@ -260,7 +260,7 @@
                         }
                         
                         if(newAttendees.length < 1){
-                            alert("Please ensure that there is at least one required attendee for each milestone!");
+                            showNotification("ERROR", "Please ensure that there is at least one required attendee for each milestone!");
                             return true;
                             
                         }
@@ -286,9 +286,9 @@
                  }).done(function(response) {
 					if (!response.exception) {
 						if (response.success) {
-							displayMessage("milestoneSettingsUpdateMessage", response.message, false);
+							showNotification("SUCCESS", response.message);
 						} else {
-							displayMessage("milestoneSettingsUpdateMessage", response.message, true);
+							showNotification("INFO", response.message);
 						}
 						timedRefresh(2000);
 					} else {
@@ -297,7 +297,7 @@
 					}
                  }).fail(function(error) {
 					console.log("Updating Milestone settings AJAX FAIL");
-					displayMessage("milestoneSettingsUpdateMessage", "Oops.. something went wrong", true);
+					showNotification("WARNING", "Oops.. something went wrong");
                  });
 				 return false;
             }
@@ -370,7 +370,7 @@
                     return false;
                     //window.attachEvent("onload", func);
                 } else {
-                    alert("There are already 3 required attendees for this milestone!");
+                    showNotification("ERROR" , "There are already 3 required attendees for this milestone!");
                 }
             }
 
@@ -437,10 +437,53 @@
 					var $this = $(this);
 					$this.attr('disabled', 'disabled').html("Saving...");
 					setTimeout(function () {
-						$this.removeAttr('disabled').html('Save');
-					}, 2000)
+						$this.removeAttr('disabled').html('<b>Save</b>');
+					}, 2000);
 				});
-			})
+			});
+			
+			//Notification-------------
+			function showNotification(action, notificationMessage) {
+				var opts = {
+					title: "Note",
+					text: notificationMessage,
+					type: "warning",
+					icon: false,
+					sticker: false,
+					mouse_reset: false,
+					animation: "fade",
+					animate_speed: "fast",
+					before_open: function(pnotify) {
+						pnotify.css({
+						   top: "52px",
+						   left: ($(window).width() / 2) - (pnotify.width() / 2)
+						});
+					}
+				};
+				switch (action) {
+					case "SUCCESS":
+						opts.title = "Updated";
+						opts.type = "success";
+						break;
+					case "ERROR":
+						opts.title = "Error";
+						opts.type = "error";
+						break;
+					case "INFO":
+						opts.title = "Error";
+						opts.type = "info";
+						break;
+					case "WARNING":
+						$.pnotify_remove_all();
+						opts.title = "Note";
+						opts.type = "warning";
+						break;
+					default:
+						alert("Something went wrong");
+				}
+				$.pnotify(opts);
+			}
+
         </script>
     </body> 
 </html>
