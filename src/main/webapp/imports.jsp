@@ -6,6 +6,8 @@
 <link href="css/redmond/jquery.timepicker.css" rel="stylesheet">
 <link href="css/bootstrap.css" rel="stylesheet" media="screen">
 <link href="css/jquery.pnotify.default.css" rel="stylesheet">
+<link href="css/token-input.css" rel="stylesheet">
+<link href="css/token-input-facebook.css" rel="stylesheet">
 
 <!-- Ensure user has logged in -->
 <% User user = (User) session.getAttribute("user");

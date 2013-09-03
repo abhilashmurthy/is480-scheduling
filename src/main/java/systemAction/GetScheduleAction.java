@@ -155,6 +155,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     //This list contains all the attendees for the timeslot (Team Members, Supervisors, Reviewers)
                     List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>();
                     List<HashMap<String, String>> faculties = new ArrayList<HashMap<String, String>>();
+                    List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>();
 
                     //Adding all students
                     Set<Student> teamMembers = b.getTeam().getMembers();
@@ -177,10 +178,19 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                             faculties.add(facultyMap);
                         }
                     }
+                    
+                    //Adding all optional attendees
+                    Set<String> optionaAttendees = b.getOptionalAttendees();
+                    for (String optionalAttendee : optionaAttendees) {
+                        HashMap<String, String> optionalMap = new HashMap<String, String>();
+                        optionalMap.put("name", optionalAttendee);
+                        optionals.add(optionalMap);
+                    }
 
                     //Setting the list of attendees
                     map.put("students", students);
                     map.put("faculties", faculties);
+                    map.put("optionals", optionals);
 
                     //TODO: Things this code cannot get as of now (can only do this when database has values)
                     String TA = "-";

@@ -5,6 +5,7 @@
 package manager;
 
 import constant.Response;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -155,6 +156,23 @@ public class TimeslotManager {
             em.getTransaction().rollback();
         }
         return result;
+    }
+     
+     public static Timeslot getByTimestampAndSchedule(EntityManager em, Timestamp ts, Schedule s) {
+        logger.info("Getting Timeslot by Timestamp: " + ts + " and schedule: " + s);
+        Timeslot timeslot = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createQuery("select o from Timeslot o where o.startTime = :startTime and o.schedule = :schedule")
+                    .setParameter("startTime", ts)
+                    .setParameter("schedule", s);
+            timeslot = (Timeslot) q.getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return timeslot;
     }
     
 

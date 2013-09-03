@@ -12,3 +12,5 @@
 <script type="text/javascript" src="js/plugins/outerHTML-2.1.0-min.js"></script>
 <!-- Pines Notify -->
 <script type="text/javascript" src="js/plugins/jquery.pnotify.min.js"></script>
+<!-- jQuery tokenInput -->
+<script type="text/javascript" src="js/plugins/jquery.tokeninput.js"></script>

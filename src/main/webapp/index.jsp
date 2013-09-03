@@ -294,6 +294,7 @@
                             //Output in the form of a table
                             var outputTable = $(document.createElement('table'));
                             outputTable.attr('id', 'viewTimeslotTable');
+                            var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
                             var outputData = [
                                 ["Team", viewBookingData.team],
                                 ["Status", viewBookingData.status],
@@ -301,7 +302,8 @@
                                 ["Time", viewBookingData.time],
                                 ["Team Wiki", viewBookingData.teamWiki],
                                 ["Students", viewBookingData.students],
-                                ["Faculty", viewBookingData.faculties]
+                                ["Faculty", viewBookingData.faculties],
+                                ["Optional", optionalAttendees]
                             ];
                             
                             //Add Delete button if user if part of team
@@ -326,7 +328,7 @@
                                         input.attr('type', 'text');
                                         input.attr('placeholder', outputData[i][1]);
                                         input.attr('title', 'Enter a new date (YYYY-MM-DD)');
-                                        input.addClass('updateFormDate');
+                                        input.addClass('updateFormDate popoverInput');
                                         input.datepicker({
                                             dateFormat: "yy-mm-dd",
                                             beforeShowDay: $.datepicker.noWeekends
@@ -339,7 +341,7 @@
                                         input.attr('type', 'text');
                                         input.attr('placeholder', outputData[i][1]);
                                         input.attr('title', 'Enter a new start time (HH:MM)');
-                                        input.addClass('updateFormStartTime');
+                                        input.addClass('updateFormStartTime popoverInput');
                                         input.timepicker({
                                             minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
                                             maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
@@ -388,6 +390,12 @@
                                     if (outputData[i][0] === "Faculty") {
                                         for (var j = 0; j < outputArray.length; j++) {
                                             outputArrayStr += outputArray[j].name + " (" + outputArray[j].status.toLowerCase() + ")" + "<br/>";
+                                        }
+                                    }
+                                    //If print optionals
+                                    if (outputData[i][0] === "Optional") {
+                                        for (var j = 0; j < outputArray.length; j++) {
+                                            outputArrayStr += outputArray[j].email + "<br/>";
                                         }
                                     }
                                     outputTdValue = $(document.createElement('td')).html(outputArrayStr);
@@ -620,6 +628,7 @@
                     });
 
                     //Popover for booked timeslot
+                    var users = JSON.parse('<%= session.getAttribute("allUsers") %>');
                     $('body').off('click', '.bookedTimeslot');
                     $('body').on('click', '.bookedTimeslot', function(e) {
                         if ($(e.target).parents('.popover').length) return false;
@@ -627,6 +636,32 @@
                         self = (!$(this).is('.timeslotCell')) ? $(this).parents('.timeslotCell') : $(this);
                         $('.timeslotCell').not(self).popover('hide');
                         self.popover('show');
+                        //Optional attendees
+                        var opts = {
+                            preventDuplicates: true,
+                            theme: "facebook",
+                            allowNewTokens: true,
+                            propertyToSearch: "name",
+                            resultsFormatter: function(item) {
+                                if (item && item.id) {
+                                    return "<li><p>" + item.id + "</p></li>";
+                                } else if (item) {
+                                    return "<li><p>" + item.name + "</p></li>";
+                                }
+                            },
+                            tokenFormatter: function(item) {
+                                if (item && item.id) {
+                                    return "<li><p>" + item.id + "</p></li>";
+                                } else if (item) {
+                                    return "<li><p>" + item.name + "</p></li>";
+                                }
+                            }
+                        };
+                        var viewBookingData = scheduleData.timeslots[self.attr('value')];
+                        if (viewBookingData.optionals && viewBookingData.optionals.length > 0) {
+                            opts["prePopulate"] = viewBookingData.optionals;
+                        }
+                        self.find('.optionalAttendees').tokenInput(users, opts);
                         return false;
                     });
                     
@@ -786,38 +821,44 @@
                     $(".timeslotCell").off('click', '#updateBookingBtn');
                     $(".timeslotCell").on('click', '#updateBookingBtn', function(e) {
                         e.stopPropagation();
-                        var startDateVal = document.getElementById('updateFormDate').value;
-                        var startTimeVal = document.getElementById('updateFormStartTime').value;
+                        var startDateVal = $('#updateFormDate').val();
+                        var startTimeVal = $('#updateFormStartTime').val();
                         var newDateTime = "";
                         if (startDateVal !== null && startTimeVal !== null) {
                             var startDate = Date.parse(startDateVal);
                             var startTime = Date.parse($.trim(startTimeVal.split(" - ")[0]));
-                            if (!startDate || !startTime) {
-                                showNotification("WARNING", self, "Please enter a proper date and time");
-                                return false;
+                            if (startDate && startTime) {
+                                newDateTime = startDate.toString("yyyy-MM-dd") + " " + startTime.toString("HH:mm:ss");
                             }
-                            newDateTime = startDate.toString("yyyy-MM-dd") + " " + startTime.toString("HH:mm:ss");
                         }
                         console.log("New time: " + newDateTime);
-                        var returnData = updateBooking(self, newDateTime);
+                        var attendees = $(".optionalAttendees").tokenInput('get');
+                        console.log("Attendees: " + JSON.stringify(attendees));
+                        var returnData = updateBooking(self, newDateTime, attendees);
                         if (returnData && returnData.success) {
                             showNotification("INFO", self, null);
-                            scheduleData.timeslots[newDateTime] = returnData.booking;
-                            var newId = scheduleData.timeslots[newDateTime].id; //Add new booking
-                            var newBodyTd = $("#timeslot_" + newId);
-                            newBodyTd.empty();
-                            newBodyTd.removeClass('unbookedTimeslot');
-                            newBodyTd.addClass('bookedTimeslot');
-                            var bookingDiv = $(document.createElement('div'));
-                            bookingDiv.addClass(self.children('.booking').attr('class'));
-                            bookingDiv.html(self.children('.booking').text());
-                            bookingDiv.css('display', 'none');
-                            newBodyTd.append(bookingDiv);
-                            newBodyTd.children('.booking').show('clip', 'slow');
-                            self.children('.booking').effect('clip', 'slow'); //Delete old booking
-                            self.popover('destroy');
-                            newBodyTd.popover('destroy');
-                            appendViewBookingPopover(newBodyTd);
+                            if (newDateTime) {
+                                scheduleData.timeslots[newDateTime] = returnData.booking;
+                                var newId = scheduleData.timeslots[newDateTime].id; //Add new booking
+                                var newBodyTd = $("#timeslot_" + newId);
+                                newBodyTd.empty();
+                                newBodyTd.removeClass('unbookedTimeslot');
+                                newBodyTd.addClass('bookedTimeslot');
+                                var bookingDiv = $(document.createElement('div'));
+                                bookingDiv.addClass(self.children('.booking').attr('class'));
+                                bookingDiv.html(self.children('.booking').text());
+                                bookingDiv.css('display', 'none');
+                                newBodyTd.append(bookingDiv);
+                                newBodyTd.children('.booking').show('clip', 'slow');
+                                self.children('.booking').effect('clip', 'slow'); //Delete old booking
+                                self.popover('destroy');
+                                newBodyTd.popover('destroy');
+                                appendViewBookingPopover(newBodyTd);
+                            } else {
+                                scheduleData.timeslots[self.attr('value')] = returnData.booking;
+                                self.popover('destroy');
+                                appendViewBookingPopover(self);
+                            }
                         } else {
                             showNotification("WARNING", self, returnData.message);
                         }
@@ -920,18 +961,22 @@
                 }
 
                 //update booking function
-                function updateBooking(bodyTd, newDateTime) {
+                function updateBooking(bodyTd, newDateTime, attendees) {
                     //getfunction up the timeslotID for that cell and send as request
                     var toReturn = null;
                     var cellId = bodyTd.attr('id').split("_")[1];
-                    var data = {timeslotId: cellId, changedDate: newDateTime};
-//                    console.log("Submitting update booking data: " + JSON.stringify(data));
+                    var attendeesArray = new Array();
+                    for (var i = 0; i < attendees.length; i++) {
+                        attendeesArray.push(attendees[i].id?attendees[i].id:attendees[i].name);
+                    }
+                    var data = {timeslotId: cellId, changedDate: newDateTime, attendees: attendeesArray};
+                    console.log("Submitting update booking data: " + JSON.stringify(data));
                     //Update booking AJAX
                     $.ajax({
                         type: 'POST',
                         async: false,
                         url: 'updateBookingJson',
-                        data: data,
+                        data: {jsonData: JSON.stringify(data)},
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {

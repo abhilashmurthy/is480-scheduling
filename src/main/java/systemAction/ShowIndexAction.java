@@ -105,6 +105,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
             //Add teams into session if user is admin/course coordinator
             if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) {
                 addTeamsJson(em, session);
+                addUsersJson(em, session);
             }
 
         } catch (Exception e) {
@@ -151,6 +152,32 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                 teamJsonList.add(teamMap);
             }
             session.setAttribute("allTeams", new Gson().toJson(teamJsonList));
+        }
+    }
+    
+    public void addUsersJson(EntityManager em, HttpSession session) {
+        //Get Teams from here and populate into session
+        Term term = (Term) session.getAttribute("currentActiveTerm");
+        List<User> userList = null;
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            Query q = em.createQuery("select u from User u where term_id = :term")
+                    .setParameter("term", term);
+            userList = q.getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+        }
+        if (userList != null) {
+            ArrayList<HashMap<String, Object>> userJsonList = new ArrayList<HashMap<String, Object>>();
+            for (User u : userList) {
+                HashMap<String, Object> userMap = new HashMap<String, Object>();
+                userMap.put("id", u.getUsername() + "@smu.edu.sg");
+                userMap.put("name", u.getFullName());
+                userJsonList.add(userMap);
+            }
+            session.setAttribute("allUsers", new Gson().toJson(userJsonList));
         }
     }
 

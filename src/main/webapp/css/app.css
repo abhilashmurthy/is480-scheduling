@@ -100,12 +100,27 @@ body {
 
 .popover {
 /*    width: 100%;*/
+    max-width: 400px !important;
     font-weight: normal;
     z-index: 1031 !important;
 }
 
-#updateFormDate, #updateFormStartTime {
-    width: 150px;
+.token-input-list {
+    display: none;
+}
+
+.token-input-token-facebook, .token-input-list, .token-input-list-facebook, .token-input-dropdown-facebook, #token-input- {
+    max-width: 200px !important;
+    z-index: 1032 !important;
+}
+
+.token-input-dropdown-facebook, .token-input-list, .token-input-list-facebook {
+    max-height: 150px !important;
+    overflow: hidden !important;
+}
+
+.popoverInput {
+    width: 200px;
 }
 
 .bookedTimeslot:hover, .unbookedTimeslot:hover {
