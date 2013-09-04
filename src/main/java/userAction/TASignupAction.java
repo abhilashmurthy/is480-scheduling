@@ -21,6 +21,8 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.MiscUtil;
 
 /**
@@ -28,13 +30,10 @@ import util.MiscUtil;
  * @author Tarlochan
  */
 public class TASignupAction extends ActionSupport implements ServletRequestAware {
-   private HttpServletRequest request;
-   private HashMap<String, Object> json = new HashMap<String, Object>();
+	private static Logger logger = LoggerFactory.getLogger(TASignupAction.class);
+	private HttpServletRequest request;
+	private HashMap<String, Object> json = new HashMap<String, Object>();
    
-    public void setServletRequest(HttpServletRequest hsr) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     @Override
     public String execute() throws ServletException, IOException, JSONException {
         
@@ -70,9 +69,7 @@ public class TASignupAction extends ActionSupport implements ServletRequestAware
             //loop through the list to get timeslotID
             for(int i=0;i<inputData.length();i++){
                 
-                //convert each ID to long
-                JSONObject obj = inputData.getJSONObject(i);
-                long timeslotId = obj.getLong("id");
+                long timeslotId = inputData.getLong(i);
                 
                 //get the respective timeslot object
                 Timeslot t = TimeslotManager.findById(em, timeslotId);
@@ -102,7 +99,13 @@ public class TASignupAction extends ActionSupport implements ServletRequestAware
         }catch(Exception e){
             json.put("success", false);
             json.put("exception", true);
-            json.put("message", "Error with Delete Booking: Escalate to developers!");
+            json.put("message", "Error with TA Sign Up: Escalate to developers!");
+			logger.error("Exception caught: " + e.getMessage());
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
         }finally {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -115,15 +118,10 @@ public class TASignupAction extends ActionSupport implements ServletRequestAware
         return SUCCESS; //To change body of generated methods, choose Tools | Templates.
     }
     
-    public HttpServletRequest getRequest() {
-        
-        return request;
+    public void setServletRequest(HttpServletRequest hsr) {
+        request = hsr;
     }
 
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }
-    
     public HashMap<String, Object> getJson() {
         return json;
     }
