@@ -487,11 +487,12 @@
                     }
 
                     console.log('TA chosen data is: ' + JSON.stringify(timeslot_data));
-					timeslotsData["jsonData"] = JSON.stringify(timeslot_data);
+					timeslotData["timeslots"] = timeslot_data;
+					timeslotsData["scheduleId"] = scheduleData.id;
                     $.ajax({
                         type: 'POST',
                         url: 'taSignupJson',
-                        data: timeslotsData,
+                        data: JSON.stringify(timeslotsData),
                         dataType: 'json'
                     }).done(function(response) {
                         if (!response.exception) {
