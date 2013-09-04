@@ -183,6 +183,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     Set<String> optionaAttendees = b.getOptionalAttendees();
                     for (String optionalAttendee : optionaAttendees) {
                         HashMap<String, String> optionalMap = new HashMap<String, String>();
+                        optionalMap.put("id", optionalAttendee);
                         optionalMap.put("name", optionalAttendee);
                         optionals.add(optionalMap);
                     }

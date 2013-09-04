@@ -9,6 +9,7 @@
 body {
     padding-top: 50px; /* 1px to make the container go all the way to the bottom of the topbar */
     padding-left: 10px;
+    font-family: 'Droid Sans', sans-serif !important;
     /*font: 0.7em/1.5em "Trebuchet MS",Verdana,sans-serif !important;*/
 }
 

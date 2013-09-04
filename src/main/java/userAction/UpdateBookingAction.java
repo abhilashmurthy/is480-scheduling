@@ -68,21 +68,23 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 long chosenID = Long.parseLong(inputData.getString("timeslotId"));
                 Timeslot oldTimeslot = TimeslotManager.findById(em, chosenID);
 
+                //Update booking parameters
                 Timestamp newBookingTimestamp = null;
-                //Check whether the edited start date and time is in the correct format
+                HashSet<String> optionalAttendees = null;
+                
+                //Parse Timestamp
                 try {
-                    String changedDate = inputData.getString("changedDate");
-                    if (changedDate != null && !changedDate.equals("")) {
-                        newBookingTimestamp = Timestamp.valueOf(changedDate);
+                    String newDateTime = inputData.getString("newDateTime");
+                    if (newDateTime != null && !newDateTime.equals("")) {
+                        newBookingTimestamp = Timestamp.valueOf(newDateTime);
                     }
                 } catch (Exception e) {
                     json.put("success", false);
                     json.put("message", "Start Date and Time in the wrong format!");
                     return SUCCESS;
-                }
-                //Constructing the optional attendees list to be stored in db
-                HashSet<String> optionalAttendees = null;
+                }                
                 
+                //Parse Optional Attendees
                 try {
                     //Getting the optional attendees and storing in a list
                     JSONArray optionalAttendeesArray = (JSONArray) inputData.getJSONArray("attendees");
@@ -108,15 +110,18 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     }
                 } catch (JSONException j) {
                     //No optional attendees change detected
-                    optionalAttendees = new HashSet<String>();;
+                    optionalAttendees = new HashSet<String>();
                 }
 
                 //------------To update the booking date and start time----------------------
                 //update timeslot and change it based on date
                 //go through timeslot to compare start time with the user
                 //suggested start time and see if the timeslot is taken.
+                
+                //Old Timeslot details
                 Schedule scheduleOfBooking = oldTimeslot.getSchedule();
                 Booking booking = oldTimeslot.getCurrentBooking();
+                
                 //Return parameters for Update Booking
                 HashMap<String, Object> map = new HashMap<String, Object>();
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
@@ -148,20 +153,43 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     faculties.add(facultyMap);
                 }
                 map.put("faculties", faculties);
+                Set<String> oldOptionals = booking.getOptionalAttendees();
+                List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>(); //Adding all students
+                for (String oldOptional : oldOptionals) {
+                    HashMap<String, String> optionalMap = new HashMap<String, String>();
+                    optionalMap.put("id", oldOptional);
+                    optionalMap.put("name", oldOptional);
+                    optionals.add(optionalMap);
+                }
+                map.put("optionals", optionals);
+                
                 String TA = "-";
                 map.put("TA", TA);
                 String teamWiki = "-";
                 map.put("teamWiki", teamWiki);
-                json.put("booking", map);
                 
+                //Return if no change detected
                 if (newBookingTimestamp == null && optionalAttendees.equals(booking.getOptionalAttendees())) {
                     json.put("success", false);
                     json.put("message", "No change made.. ");
                     return SUCCESS;
-                } else if (newBookingTimestamp != null) {
-                    //if the timeslot is not assigned to any team, update timeslot to
-                    //the new timeslot
-                    //get the present timeslot's schedule id
+                }
+                
+                //New optional attendees
+                if (!optionalAttendees.equals(booking.getOptionalAttendees())) {
+                    booking.setOptionalAttendees(optionalAttendees);
+                    List<HashMap<String, String>> newOptionals = new ArrayList<HashMap<String, String>>(); //Adding all students
+                    for (String optionalAttendee : optionalAttendees) {
+                        HashMap<String, String> optionalMap = new HashMap<String, String>();
+                        optionalMap.put("id", optionalAttendee);
+                        optionalMap.put("name", optionalAttendee);
+                        newOptionals.add(optionalMap);
+                    }
+                    map.put("optionals", newOptionals);
+                }
+                
+                //New Timestamp
+                if (newBookingTimestamp != null && !oldTimeslot.getStartTime().equals(newBookingTimestamp)) {
                     Timeslot newTimeslot = TimeslotManager.getByTimestampAndSchedule(em, newBookingTimestamp, scheduleOfBooking);
                     if (newTimeslot == null) {
                         json.put("success", false);
@@ -172,60 +200,29 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                         json.put("message", "Another team already booked that slot");
                         return SUCCESS;
                     }
-                    em.getTransaction().begin();
-   
-                    //Update the old and new timeslot
-                    booking.setTimeslot(newTimeslot);
-                    booking.setOptionalAttendees(optionalAttendees);
-                    oldTimeslot.setCurrentBooking(null);
-                    newTimeslot.setCurrentBooking(booking);
-                    
-                    //New booking details
+                    //Updated booking details
                     map.put("id", newTimeslot.getId());
                     map.put("datetime", dateFormat.format(newTimeslot.getStartTime()) + " " + timeFormat.format(newTimeslot.getStartTime()));
                     map.put("time", viewTimeFormat.format(newTimeslot.getStartTime()) + " - " + viewTimeFormat.format(newTimeslot.getEndTime()));
                     map.put("venue", newTimeslot.getVenue());
                     map.put("startDate", viewDateFormat.format(new Date(newTimeslot.getStartTime().getTime())));
-                    List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>(); //Adding all students
-                    for (String optionalAttendee : optionalAttendees) {
-                        HashMap<String, String> optionalMap = new HashMap<String, String>();
-                        optionalMap.put("name", optionalAttendee);
-                        optionals.add(optionalMap);
-                    }
-                    map.put("optionals", optionals);
                     
+                    booking.setTimeslot(newTimeslot);
+                    oldTimeslot.setCurrentBooking(null);
+                    newTimeslot.setCurrentBooking(booking);
+                    //Begin database changes
+                    em.getTransaction().begin();
                     em.persist(newTimeslot);
                     em.persist(oldTimeslot);
-                    em.persist(booking);
-                    em.getTransaction().commit();
-                    json.put("success", true);
-                    json.put("message", "Booking updated successfully!");
-                } else if (optionalAttendees != null && optionalAttendees.size() > 0) {
-                    //This is the case when a student adds optional attendees
-                    Booking b = oldTimeslot.getCurrentBooking();
-                    if (b != null) {
-                        em.getTransaction().begin();
-                        b.setOptionalAttendees(optionalAttendees);
-                        em.persist(b);
-                        em.getTransaction().commit();
-                        
-                        //New booking details
-                        List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>(); //Adding all students
-                        for (String optionalAttendee : optionalAttendees) {
-                            HashMap<String, String> optionalMap = new HashMap<String, String>();
-                            optionalMap.put("name", optionalAttendee);
-                            optionals.add(optionalMap);
-                        }
-                        map.put("optionals", optionals);
-                        
-                        json.put("success", true);
-                        json.put("message", "Attendees have been invited for your booking!");
-                    } else {
-                        json.put("success", false);
-                        json.put("message", "No booking has been made at this timeslot!");
-                    }
-                    return SUCCESS;
                 }
+                
+                if (!em.getTransaction().isActive()) em.getTransaction().begin();
+                em.persist(booking);
+                em.getTransaction().commit();
+                
+                json.put("booking", map);
+                json.put("success", true);
+                json.put("message", "Booking updated successfully!");
             } else {
                 //Incorrect user role
                 json.put("success", false);

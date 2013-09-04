@@ -170,6 +170,7 @@ public class TimeslotManager {
             em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+            logger.debug(e.getMessage());
             em.getTransaction().rollback();
         }
         return timeslot;

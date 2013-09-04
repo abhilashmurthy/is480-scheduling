@@ -173,7 +173,18 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                     facultyMap.put("status", statusList.get(facultyUser).toString());
                     faculties.add(facultyMap);
                 }
-                map.put("faculties", faculties);
+                 map.put("faculties", faculties);
+                
+                //Adding all optionals
+                List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>();
+                for (User studentUser : teamMembers) {
+                    HashMap<String, String> optionalMap = new HashMap<String, String>();
+                    optionalMap.put("id", studentUser.getUsername() + "@smu.edu.sg");
+                    optionalMap.put("name", studentUser.getUsername() + "@smu.edu.sg");
+                    optionals.add(optionalMap);
+                }
+                map.put("optionals", optionals);
+               
                 String TA = "-";
                 map.put("TA", TA);
                 String teamWiki = "-";
