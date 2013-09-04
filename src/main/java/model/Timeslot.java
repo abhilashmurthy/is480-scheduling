@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import model.role.TA;
 
 /**
@@ -21,6 +23,8 @@ import model.role.TA;
  */
 
 @Entity
+@Table(uniqueConstraints = {
+		@UniqueConstraint(name = "Timeslot_unique_constraint", columnNames = {"schedule_id", "startTime"})})
 public class Timeslot implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
