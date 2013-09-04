@@ -87,12 +87,12 @@
 									</td>
 									<td>
 										<button type="button" class="btn btn-success" id="approve" value="<s:property value="bookingId"/>" 
-												name="approve" onClick="approveRejectBooking(this);">
+												name="approve" onClick="approveBooking(this);">
 											Approve
 										</button>
 										<span class="button-divider">
 										<button type="button" class="btn btn-danger" id="reject" value="<s:property value="bookingId"/>" 
-												name="reject" onClick="approveRejectBooking(this);">
+												name="reject" onClick="rejectBooking(this);">
 											Reject
 										</button>
 										</span>
@@ -110,18 +110,27 @@
 						<h3 id="myModalLabel">Information Required</h3>
 					</div>
 					<div class="modal-body">
+						<form id="rejectForm">
 						<table>
 							<tr>
 								<td width="150px">Reason for Rejection</td>
 								<!--<th>Add Proxy</th>-->
-								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:300px; height:75px;" 
+								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
 											  placeholder="Unexpected Meeting..." maxlength="100"></textarea>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
+								</td>
 							</tr>
 						</table>
+						</form>
 					</div>
 					<div class="modal-footer">
 						<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-						<button class="btn btn-primary">Save</button>
+						<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
 					</div>
 				</div>
 			</s:if><s:else>
@@ -137,7 +146,7 @@
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<script type="text/javascript">
 
-		function approveRejectBooking(e) {
+		function approveBooking(e) {
 			//Disabling all buttons on page to avoid multiple clicking
 			$('button[type=button]').attr('disabled', true);
 			
@@ -146,33 +155,17 @@
 			var id = $(e).attr("id");
 			console.log(id);
 			
-//			$.blockUI({ 
-//				message:'<h3>Loading...</h3>',
-//				css: { 
-//				border: 'none', 
-//				padding: '5px', 
-//				backgroundColor: '#000', 
-//				'-webkit-border-radius': '10px', 
-//				'-moz-border-radius': '10px', 
-//				opacity: .5, 
-//				color: '#fff', 
-//			} }); 
-//			setTimeout($.unblockUI, 3000); 
-//			return false;
-			
 			var bookingArray = {};
 			if (id === 'approve') {
 				bookingArray['bookingId'] = bookingId;
 				bookingArray['status'] = "approve";
-			} else if (id === 'reject') {
-				bookingArray['bookingId'] = bookingId;
-				bookingArray['status'] = "reject";
-//				$('#rejectionModal').modal({
-//					keyboard: true
-//				});
-				bookingArray['rejectReason'] = "Got a meeting!";
-			}
-			
+			} 			
+			submitBookingData(bookingArray);
+		}
+		
+		//AJAX call
+		function submitBookingData(bookingArray) {
+//			alert(JSON.stringify(bookingArray));
 			$.ajax({
 				type: 'POST',
 				async: false,
@@ -187,6 +180,7 @@
 					   }
 //					   window.location.reload(true);
 					   timedRefresh(2000);
+//					   $('button[type=button]').attr('disabled', false);
 				   } else {
 					   var eid = btoa(response.message);
 					   window.location = "error.jsp?eid=" + eid;
@@ -198,6 +192,45 @@
 				});
 				return false;
 		}
+		
+		function rejectBooking(e) {
+			//Disabling all buttons on page to avoid multiple clicking
+//			$('button[type=button]').attr('disabled', true);
+//			$("#rejectionModal").modal('show');
+			$('#rejectionModal').modal({
+				keyboard: true
+			});
+			
+			var bookingId =  $(e).val();
+			console.log(bookingId);
+			var id = $(e).attr("id");
+			console.log(id);
+			
+			$('#rejectionTextSubmit').click(function(){
+				if ($('#rejectionText').val() === "") {
+				  //$('#rejectionText').next('.help-inline').show();
+				  $('#errorMsg').show();
+				  return false;
+				} else {
+					var bookingArray = {};
+					bookingArray['bookingId'] = bookingId;
+					bookingArray['status'] = "reject";
+					bookingArray['rejectReason'] = $('#rejectionText').val();
+					//return true;
+					alert(JSON.stringify(bookingArray));	
+					submitBookingData(bookingArray);
+				}
+			});
+		} //end of reject
+		
+		//Deleting the data in the modal once it is hidden
+		$('#rejectionModal').on('hidden', function() {
+//			console.log("hidden");
+//			$(this).removeData('#rejectionText');
+//			$("#rejectionText").val(null);
+//			$("#errorMsg").hide();
+			location.reload(true);
+		});
 		
 		function timedRefresh(timeoutPeriod) {
 			setTimeout("location.reload(true);", timeoutPeriod);

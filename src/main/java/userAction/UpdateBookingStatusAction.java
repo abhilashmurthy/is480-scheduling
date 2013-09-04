@@ -55,7 +55,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			//Status containing either approve or reject
 			String status = inputObject.getString("status");
 
-			String rejectReason = "";
+			String rejectReason = null;
 			Response response = null;
 			if (status.equalsIgnoreCase("approve")) {
 				response = Response.APPROVED;
@@ -105,6 +105,11 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				} else {
 					logger.error("Faculty not found in responseList for required attendees");
 					return ERROR;
+				}
+				
+				//Storing the reason for rejection
+				if (response == Response.REJECTED && rejectReason != null) {
+					booking.setRejectReason(rejectReason);
 				}
 
 				//Computing the overall status of the booking based on the new response

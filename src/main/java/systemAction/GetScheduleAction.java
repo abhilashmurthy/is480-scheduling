@@ -239,13 +239,16 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     map.put("unavailable", unavailable);
                 } 
                 
+				//Miscellaneous Role specific information
                 if (user.getRole() == Role.FACULTY) {
                     boolean available = true;
                     if (supervisorAvailability.contains(t)) {
                         available = false;
                     }
                     map.put("available", available);
-                }
+                } else if (user.getRole() == Role.TA && t.getTA() != null) {
+					map.put("taId", t.getTA().getId());
+				}
                 mapList.add(map);
             }
             logger.info("mapList size: " + mapList.size());
