@@ -169,7 +169,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 map.put("teamWiki", teamWiki);
                 
                 //Return if no change detected
-                if (newBookingTimestamp == null && optionalAttendees.equals(booking.getOptionalAttendees())) {
+                if (oldTimeslot.getStartTime().equals(newBookingTimestamp) && optionalAttendees.equals(booking.getOptionalAttendees())) {
                     json.put("success", false);
                     json.put("message", "No change made.. ");
                     return SUCCESS;

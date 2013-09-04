@@ -12,6 +12,9 @@ body {
     font-family: 'Droid Sans', sans-serif !important;
     /*font: 0.7em/1.5em "Trebuchet MS",Verdana,sans-serif !important;*/
 }
+input, button, select, textarea {
+    font-family: 'Droid Sans', sans-serif !important;
+}
 
 .navbar .container {
     height: 40px;
