@@ -19,7 +19,7 @@
 %>
 <html>
     <head>
-        <title>Faculty Availability</title>
+        <title>TA Availability</title>
         <style type="text/css">
             .timeslotsTable tr:first-child {
                 font-size: 16px !important;
@@ -89,15 +89,11 @@
 
         <!-- Kick unauthorized user -->
         <%
-            if (activeRole != Role.FACULTY) {
-                request.setAttribute("error", "You need to be a faculty member to view this page");
+            if (activeRole != Role.TA) {
+                request.setAttribute("error", "You need to be a TA to view this page");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
             }
-        %>
-
-        <%
-                        Faculty facultyUser = (Faculty) session.getAttribute("user");
         %>
 
         <!-- Edit Availability -->
@@ -119,14 +115,14 @@
                                 <table class='availabilityLegend'>
                                     <tr>
                                         <!-- <td style="width:50px"><b>Legend:</b></td>-->
-                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Available</td> 
+                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
                                         <!--<td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Unavailable</td>--> 
                                     </tr>
                                     <tr>
-                                        <td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Unavailable</td> 
+                                        <td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Chosen</td> 
                                     </tr>
                                     <tr>
-                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Oh dear, there's a team</td> 
+                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Taken</td> 
                                     </tr>
                                 </table>
                             </td>
@@ -151,7 +147,7 @@
         <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             //Makes use of footer.jsp's jQuery and bootstrap imports
-            supervisorAvailabilityLoad = function() {
+            taAvailabilityLoad = function() {
 
                 //------------------------------------------//
                 // View Schedule Data
@@ -159,6 +155,7 @@
 
                 //Declare common variables
                 //Default milestoneStr is ACCEPTANCE
+				var loggedInTaId = <%= user.getId() %>;
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
                 var acceptanceId = null;
@@ -226,18 +223,6 @@
                     makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeString"));
                     populateTimeslotsTable(tableId, scheduleData);
                     populateUnavailableTimeslots(tableId, scheduleData);
-                }
-
-                function getDatesBetween(startDate, endDate) {
-                    var dateArray = new Array();
-                    var currentDate = Date.parse(startDate);
-                    while (currentDate <= Date.parse(endDate)) {
-                        if (currentDate.isWeekday()) {
-                            dateArray.push(new Date(currentDate));
-                        }
-                        currentDate = currentDate.addDays(1);
-                    }
-                    return dateArray;
                 }
 
                 function getScheduleData(milestoneString, academicYearString, semesterString) {
@@ -325,15 +310,17 @@
                             var datetimeString = date + " " + timesArray[i] + ":00";
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                             if (timeslot) {
-                                if (timeslot.isMyTeam) {
-                                    td.html("<b>" + timeslot.team + "</b>");
-                                    td.attr("value", "timeslot_" + timeslot.id);
-                                    td.attr("align", "center");
-                                    td.addClass("teamExists");
-                                } else {
-                                    td.addClass("markable");
-                                    td.attr("value", "timeslot_" + timeslot.id);
-                                }
+                                td.attr("value", "timeslot_" + timeslot.id);
+                                if (timeslot.hasOwnProperty("taId")) { //Timeslot has been chosen by some TA
+									if (timeslot.taId === loggedInTaId) { //Slot chosen by logged in TA
+										td.addClass("markable");
+										td.addClass("unavailable");
+									} else { //Slot chosen by someone else
+										td.addClass("teamExists");
+									}
+								} else { //Timeslot is free for TA to choose
+									td.addClass("markable");
+								}
                             }
                             tr.append(td);
                         }
@@ -440,6 +427,9 @@
                             triggerTimeslot(this, scheduleData.duration);
                         }
                     });
+					$(".unavailable").each(function(e) {
+                        triggerTimeslot(this, scheduleData.duration);
+                    });
                     $(".teamExists").each(function(){
                         var tr = $(this).parent();
                         var tbody = $(this).parents("tbody");
@@ -486,28 +476,27 @@
                 $("#editTimeslotsSubmitBtn").on('click', function() {
                     $("#editTimeslotsSubmitBtn").button('loading');
                     //SerializeArray not functional for timeslots
-                    var timeslotsData = {};
+					var timeslotsData = {};
                     var timeslot_data = new Array();
 
                     var allTimeslots = $("td.unavailable > div.start-marker", "#timeslotsTable").get();
                     for (var i = 0; i < allTimeslots.length; i++) {
                         var obj = allTimeslots[i];
-                        timeslot_data.push($(obj).parent().attr("value"));
+						var timeslotId = parseInt(($(obj).parent().attr("value").split("_"))[1]);
+                        timeslot_data.push(timeslotId);
                     }
 
-                    timeslotsData["timeslot_data[]"] = timeslot_data;
-                    timeslotsData["scheduleId"] = scheduleData.id;
-
-                    console.log('Availability data is: ' + JSON.stringify(timeslotsData));
+                    console.log('TA chosen data is: ' + JSON.stringify(timeslot_data));
+					timeslotsData["jsonData"] = JSON.stringify(timeslot_data);
                     $.ajax({
                         type: 'POST',
-                        url: 'setAvailabilityJson',
+                        url: 'taSignupJson',
                         data: timeslotsData,
                         dataType: 'json'
                     }).done(function(response) {
                         if (!response.exception) {
                             if (response.success) {
-                                showNotification("SUCCESS", "Timeslots saved");
+                                showNotification("SUCCESS", "Chosen slots saved");
                                 $("#editTimeslotsSubmitBtn").button('reset');
                                 setTimeout(function(){window.location.reload();}, 1000);
                             } else {
@@ -573,7 +562,7 @@
 
             };
 
-            addLoadEvent(supervisorAvailabilityLoad);
+            addLoadEvent(taAvailabilityLoad);
         </script>
     </body>
 </html>

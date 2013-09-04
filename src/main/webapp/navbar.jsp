@@ -90,7 +90,7 @@
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
 				<% } else if (activeRole.equals(Role.TA)) { %>	
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
-						<!--Nothing for now!-->
+						<li id="bookingHistory"><a href="taAvailability" class="navbar-title"><b>Your Availability</b></a></li>
 				<% } %>
                 </ul>
             </div>
