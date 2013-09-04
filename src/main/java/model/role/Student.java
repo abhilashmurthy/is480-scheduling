@@ -60,6 +60,11 @@ public class Student extends User implements Serializable {
 	public void setRequiredBookings(Set<Booking> requiredBookings) {
 		this.requiredBookings = requiredBookings;
 	}
+
+	@Override
+	public void setRole(Role role) {
+		super.setRole(Role.STUDENT);
+	}
 	
 	@Override
 	public String toString() {

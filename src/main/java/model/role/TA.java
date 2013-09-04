@@ -4,17 +4,12 @@
  */
 package model.role;
 
+import constant.Role;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import model.Term;
 import model.Timeslot;
 import model.User;
 
@@ -28,7 +23,13 @@ public class TA extends User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	//Constructors
+	public TA() {
+		
+	}
 	
+	public TA(String username, String fullName, Term term) {
+		super(username, fullName, Role.TA, term);
+	}
 	
 	@OneToMany(mappedBy = "TA")
 	private List<Timeslot> chosenTimeslots;
@@ -41,6 +42,11 @@ public class TA extends User implements Serializable {
 		this.chosenTimeslots = chosenTimeslots;
 	}
 
+	@Override
+	public void setRole(Role role) {
+		super.setRole(Role.TA);
+	}
+	
 	@Override
 	public String toString() {
 		return "model.role.TA[ id=" + super.getId() + " ]";

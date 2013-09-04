@@ -59,6 +59,11 @@ public class Faculty extends User implements Serializable {
 	}
 
 	@Override
+	public void setRole(Role role) {
+		super.setRole(Role.FACULTY);
+	}
+
+	@Override
 	public String toString() {
 		return "model.role.Faculty[ id=" + super.getId() + " ]";
 	}
