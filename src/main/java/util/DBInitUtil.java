@@ -26,6 +26,7 @@ import model.Timeslot;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
+import model.role.TA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -241,6 +242,8 @@ public class DBInitUtil {
 		
 		User uCourseCoordinator = new User("benjamingan", "Benjamin GAN Kok Siew", Role.COURSE_COORDINATOR, null);
 		
+		TA ta1 = new TA("kjsebastian.2011", "SEBASTIAN Kiran Joy", term12013);
+		
 		Student u1 = new Student("suresh.s.2010", "Suresh SUBRAMANIAM", term12013);
 		
 		Student u2 = new Student("abhilashm.2010", "Abhilash MURTHY", term12013);
@@ -366,6 +369,7 @@ public class DBInitUtil {
 		// Persistence
 		em.persist(uAdmin);
 		em.persist(uCourseCoordinator);
+		em.persist(ta1);
 		em.persist(u1);
 		em.persist(u2);
 		em.persist(u3);
