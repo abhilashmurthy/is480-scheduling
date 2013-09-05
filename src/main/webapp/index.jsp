@@ -177,9 +177,9 @@
                 function getScheduleData(milestone, year, semester) {
                     var toReturn = null;
                     var data = {
-                        milestoneString: milestone,
-                        academicYearString: year,
-                        semesterString: semester
+                        milestone: milestone,
+                        year: year,
+                        semester: semester
                     };
                     //View Schedule AJAX
                     $.ajax({
