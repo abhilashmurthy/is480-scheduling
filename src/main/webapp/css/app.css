@@ -129,7 +129,7 @@ input, button, select, textarea {
     -o-transition: border linear 0.2s, box-shadow linear 0.2s;
     transition: border linear 0.2s, box-shadow linear 0.2s;
     display: inline-block;
-    height: 20px;
+    height: 30px;
     padding: 4px 6px;
     margin-bottom: 10px;
     font-size: 14px;
