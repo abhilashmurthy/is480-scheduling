@@ -47,12 +47,16 @@ public class TimeslotManager {
     public static List<Timeslot> findBySchedule(EntityManager em, Schedule schedule) {
         logger.info("Getting timeslot based on Schedule ID: " + schedule);
         List<Timeslot> timeslots;
+        boolean justHere = false;
         try {
-            em.getTransaction().begin();
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+                justHere = true;
+            }
             Query q = em.createQuery("select t from Timeslot t where t.schedule = :schedule")
                     .setParameter("schedule", schedule);
             timeslots = (List<Timeslot>) q.getResultList();
-            em.getTransaction().commit();
+            if (justHere) em.getTransaction().commit();
             return timeslots;
         } catch (Exception e) {
             logger.error("Database Operation Error");
@@ -89,12 +93,16 @@ public class TimeslotManager {
     
     public static boolean delete(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
         logger.info("Deleting timeslot: " + timeslot);
+        boolean justHere = true;
         try {
             transaction = em.getTransaction();
-            transaction.begin();
+            if (!transaction.isActive()) {
+                transaction.begin();
+                justHere = false;
+            }
             em.remove(timeslot);
             logger.debug("All timeslots have been saved");
-            transaction.commit();
+            if (justHere) transaction.commit();
             return true;
         } catch (PersistenceException ex) {
             //Rolling back data transactions

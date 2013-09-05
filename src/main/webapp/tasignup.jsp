@@ -228,9 +228,9 @@
                 function getScheduleData(milestoneString, academicYearString, semesterString) {
                     var toReturn = null;
                     var data = {
-                        milestoneString: milestoneString,
-                        academicYearString: academicYearString,
-                        semesterString: semesterString
+                        milestone: milestoneString,
+                        year: academicYearString,
+                        semester: semesterString
                     };
                     console.log("Submitting data: " + JSON.stringify(data));
                     //Get schedule action
