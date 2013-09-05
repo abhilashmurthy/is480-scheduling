@@ -15,7 +15,7 @@
 
 <!-- Ensure user has logged in -->
 <% User user = (User) session.getAttribute("user");
-if (session.getAttribute("user") == null) {
+if (session.getAttribute("user") == null && !request.getRequestURI().contains("login.jsp")) {
 	response.sendRedirect("login.jsp");
 	return; 
 }

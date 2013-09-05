@@ -1,3 +1,4 @@
+<%@page import="manager.UserManager"%>
 <%@page import="model.role.Student"%>
 <%@page import="model.Team"%>
 <%@page import="model.Term"%>
@@ -16,12 +17,11 @@
     <body>
         <!-- Navigation -->
         <%@include file="navbar.jsp" %>
-
         <%
             Team team = null;
             String fullName = null;
             if (activeRole.equals(Role.STUDENT)) {
-                Student studentUser = (Student) session.getAttribute("user");
+                Student studentUser = UserManager.getUser(user.getId(), Student.class);
                 team = studentUser.getTeam();
                 fullName = studentUser.getFullName();
             }

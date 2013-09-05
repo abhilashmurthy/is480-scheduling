@@ -4,6 +4,7 @@
     Author     : ABHILASHM.2010
 --%>
 
+<%@page import="manager.UserManager"%>
 <%@page import="model.role.Student"%>
 <%@page import="constant.Role"%>
 <%@page import="java.util.ArrayList"%>
@@ -114,7 +115,7 @@
     <!--<p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>-->
 	
 	 <% if (activeRole.equals(Role.STUDENT)) { 
-			Student student = (Student) session.getAttribute("user");
+			Student student = UserManager.getUser(user.getId(), Student.class);
 	 %>
 		<p><strong>Team</strong><br/><% out.print(student.getTeam().getTeamName());%></p>
 	 <% } %>

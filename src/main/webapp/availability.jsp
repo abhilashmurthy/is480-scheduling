@@ -4,6 +4,7 @@
     Author     : Prakhar
 --%>
 
+<%@page import="manager.UserManager"%>
 <%@page import="java.util.Set"%>
 <%@page import="model.role.Faculty"%>
 <%@page import="com.opensymphony.xwork2.ActionContext"%>
@@ -97,7 +98,7 @@
         %>
 
         <%
-                        Faculty facultyUser = (Faculty) session.getAttribute("user");
+             Faculty facultyUser = UserManager.getUser(user.getId(), Faculty.class);
         %>
 
         <!-- Edit Availability -->
