@@ -189,7 +189,7 @@ public class ScheduleManager {
         Schedule schedule = null;
         EntityTransaction transaction = em.getTransaction();
         try {
-            transaction.begin();
+            if (!transaction.isActive()) transaction.begin();
             Query q = em.createQuery("select o from Schedule o where o.id = :id", Schedule.class)
                     .setParameter("id", id);
             schedule = (Schedule) q.getSingleResult();

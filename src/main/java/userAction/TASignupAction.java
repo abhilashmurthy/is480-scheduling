@@ -8,12 +8,15 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import manager.ScheduleManager;
 import manager.TimeslotManager;
+import model.Schedule;
 import model.Timeslot;
 import model.User;
 import model.role.TA;
@@ -62,11 +65,40 @@ public class TASignupAction extends ActionSupport implements ServletRequestAware
             
             //set TA object
             TA ta = em.find(TA.class, user.getId());
-     
+            
+            
             //get a list of timeslots in array format
-            JSONArray inputData = new JSONArray(request.getParameter("jsonData"));
+            //JSONArray inputData = new JSONArray(request.getParameter("jsonData[timeslots]"));
+            JSONObject allData = new JSONObject(request.getParameter("jsonData"));
+            JSONArray inputData = allData.getJSONArray("timeslots");
+            long scheduleId = allData.getLong("scheduleId");
+            
+            Schedule sc = ScheduleManager.findById(em, scheduleId);
+            
+            //get all timeslots for this schedule
+            List<Timeslot> ts = TimeslotManager.findBySchedule(em, sc);
+            
+            for(Timeslot obj: ts){
+                
+                TA check = obj.getTA();
+                if(check==ta){
+                   em.getTransaction().begin();
 
-            //loop through the list to get timeslotID
+                   obj.setTA(null);
+
+                   em.persist(obj);
+
+                   em.getTransaction().commit();
+                    
+                    
+                }
+                
+                
+            }
+            
+            
+            
+            //loop through the list to get timeslotID and set the new slots
             for(int i=0;i<inputData.length();i++){
                 
                 long timeslotId = inputData.getLong(i);
@@ -74,22 +106,23 @@ public class TASignupAction extends ActionSupport implements ServletRequestAware
                 //get the respective timeslot object
                 Timeslot t = TimeslotManager.findById(em, timeslotId);
                 
-                //if timeslot doesn't exists or if TA already signed up
+                //if timeslot doesn't exists
                 if (t == null) {
                     json.put("success", false);
                     json.put("message", "Timeslot with ID: " + timeslotId + " already taken");
                     return SUCCESS;
                 }
-                
+
                 //else proceed to add this timeslot for that respective TA
                 //set this timeslot's TA
                 em.getTransaction().begin();
-             
+
                 t.setTA(ta);
-              
+
                 em.persist(t);
 
                 em.getTransaction().commit();
+                
             }
             
             //succesfully updated

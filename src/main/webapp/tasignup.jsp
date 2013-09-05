@@ -16,6 +16,7 @@
 <!DOCTYPE html>
 <%
     Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
+    //User user = (User) session.getAttribute("user");
 %>
 <html>
     <head>
@@ -228,9 +229,9 @@
                 function getScheduleData(milestoneString, academicYearString, semesterString) {
                     var toReturn = null;
                     var data = {
-                        milestoneString: milestoneString,
-                        academicYearString: academicYearString,
-                        semesterString: semesterString
+                        milestone: milestoneString,
+                        year: academicYearString,
+                        semester: semesterString
                     };
                     console.log("Submitting data: " + JSON.stringify(data));
                     //Get schedule action
@@ -487,13 +488,19 @@
                     }
 
                     console.log('TA chosen data is: ' + JSON.stringify(timeslot_data));
-					timeslotData["timeslots"] = timeslot_data;
+					timeslotsData["timeslots"] = timeslot_data;
 					timeslotsData["scheduleId"] = scheduleData.id;
+                    
+                    console.log(JSON.stringify(timeslotsData));
+                    
                     $.ajax({
+                        
                         type: 'POST',
                         url: 'taSignupJson',
-                        data: JSON.stringify(timeslotsData),
+                        data: {jsonData: JSON.stringify(timeslotsData)},
                         dataType: 'json'
+                        
+                        
                     }).done(function(response) {
                         if (!response.exception) {
                             if (response.success) {

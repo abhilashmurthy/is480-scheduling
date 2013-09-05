@@ -71,6 +71,12 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 //Update booking parameters
                 Timestamp newBookingTimestamp = null;
                 HashSet<String> optionalAttendees = null;
+                String newVenue = null;
+                try {
+                    newVenue = inputData.getString("newVenue");
+                } catch (JSONException j) {
+                    logger.debug("newVenue not found");
+                }
                 
                 //Parse Timestamp
                 try {
@@ -78,11 +84,13 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     if (newDateTime != null && !newDateTime.equals("")) {
                         newBookingTimestamp = Timestamp.valueOf(newDateTime);
                     }
+                } catch (JSONException j) {
+                    logger.debug("newDateTime not found");
                 } catch (Exception e) {
                     json.put("success", false);
                     json.put("message", "Start Date and Time in the wrong format!");
                     return SUCCESS;
-                }                
+                }
                 
                 //Parse Optional Attendees
                 try {
@@ -109,8 +117,9 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                         return SUCCESS;
                     }
                 } catch (JSONException j) {
-                    //No optional attendees change detected
+                    //No optional attendees json found
                     optionalAttendees = new HashSet<String>();
+                    logger.error("Erm should not reach here");
                 }
 
                 //------------To update the booking date and start time----------------------
@@ -169,10 +178,30 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 map.put("teamWiki", teamWiki);
                 
                 //Return if no change detected
-                if (newBookingTimestamp == null && optionalAttendees.equals(booking.getOptionalAttendees())) {
+                if ((oldTimeslot.getStartTime().equals(newBookingTimestamp)
+                        && optionalAttendees.equals(booking.getOptionalAttendees())
+                        && oldTimeslot.getVenue().equals(newVenue))
+                        ||
+                        (newBookingTimestamp == null
+                            && optionalAttendees.equals(booking.getOptionalAttendees())
+                            && oldTimeslot.getVenue().equals(newVenue))
+                        ||
+                        (newVenue == null
+                            && optionalAttendees.equals(booking.getOptionalAttendees())
+                            && oldTimeslot.getStartTime().equals(newBookingTimestamp))
+                        ||
+                        (newVenue == null
+                            && newBookingTimestamp == null
+                            && optionalAttendees.equals(booking.getOptionalAttendees()))) {
                     json.put("success", false);
                     json.put("message", "No change made.. ");
                     return SUCCESS;
+                }
+                
+                //New venue
+                if (newVenue != null) {
+                    oldTimeslot.setVenue(newVenue);
+                    map.put("venue", oldTimeslot.getVenue());
                 }
                 
                 //New optional attendees
@@ -200,16 +229,18 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                         json.put("message", "Another team already booked that slot");
                         return SUCCESS;
                     }
-                    //Updated booking details
+                    //Update booking details
+                    newTimeslot.setVenue(oldTimeslot.getVenue());
+                    booking.setTimeslot(newTimeslot);
+                    oldTimeslot.setCurrentBooking(null);
+                    newTimeslot.setCurrentBooking(booking);
+                    
                     map.put("id", newTimeslot.getId());
                     map.put("datetime", dateFormat.format(newTimeslot.getStartTime()) + " " + timeFormat.format(newTimeslot.getStartTime()));
                     map.put("time", viewTimeFormat.format(newTimeslot.getStartTime()) + " - " + viewTimeFormat.format(newTimeslot.getEndTime()));
                     map.put("venue", newTimeslot.getVenue());
                     map.put("startDate", viewDateFormat.format(new Date(newTimeslot.getStartTime().getTime())));
-                    
-                    booking.setTimeslot(newTimeslot);
-                    oldTimeslot.setCurrentBooking(null);
-                    newTimeslot.setCurrentBooking(booking);
+
                     //Begin database changes
                     em.getTransaction().begin();
                     em.persist(newTimeslot);

@@ -5,11 +5,11 @@
         <meta charset="utf-8">
         <title>IS480 Scheduling System | Login</title>
 
-        <!-- Le styles -->
-        <link href="css/bootstrap.css" rel="stylesheet">
+        <!-- Le imports -->
         <% if (session.getAttribute("user") != null) {
                 response.sendRedirect("index.jsp");
             }%>
+        <%@include file="imports.jsp"%>
 
         <style type="text/css">
             /* Override some defaults */
@@ -20,12 +20,12 @@
                 padding-top: 100px; 
             }
             .container {
-                width: 600px;
+                width: 600px !important;
             }
 
             /* The white background content wrapper */
             .container > .content {
-				text-align: center;
+		text-align: center;
                 background-color: #fff;
                 padding: 20px;
                 margin: 0 -20px; 

@@ -12,7 +12,9 @@ import constant.Response;
 import constant.Role;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
@@ -160,14 +162,13 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
     }
     
     public void addUsersJson(EntityManager em, HttpSession session) {
-        //Get Teams from here and populate into session
+        //Get all users
         Term term = (Term) session.getAttribute("currentActiveTerm");
         List<User> userList = null;
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            Query q = em.createQuery("select u from User u where term_id = :term")
-                    .setParameter("term", term);
+            Query q = em.createQuery("select u from User u");
             userList = q.getResultList();
             transaction.commit();
         } catch (Exception e) {
@@ -181,7 +182,8 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                 userMap.put("name", u.getFullName());
                 userJsonList.add(userMap);
             }
-            session.setAttribute("allUsers", new Gson().toJson(userJsonList));
+            HashSet<HashMap<String, Object>> uniqueUsers = new HashSet<HashMap<String, Object>>(userJsonList);
+            session.setAttribute("allUsers", new Gson().toJson(uniqueUsers.toArray()));
         }
     }
 

@@ -11,11 +11,13 @@ import constant.Role;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -62,6 +64,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("exception", false);
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
             HttpSession session = request.getSession();
+            Map parameters = request.getParameterMap();
+            String[] optionalAttendeesArray = (String[]) parameters.get("attendees[]");
+            if (optionalAttendeesArray != null) logger.debug("Optional 1: " + optionalAttendeesArray[0]);
 
             User user = (User) session.getAttribute("user");
             Role activeRole = (Role) session.getAttribute("activeRole");
@@ -133,9 +138,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                     logger.error("FATAL ERROR: Code not to be reached!");
                     throw new Exception();
                 }
+                
+                //Add optional attendees
+                HashSet<String> optionalAttendees = new HashSet<String>();
+                if (optionalAttendeesArray != null) optionalAttendees = new HashSet<String>(Arrays.asList(optionalAttendeesArray));
 
                 booking.setResponseList(responseList);
                 booking.setRequiredAttendees(reqAttendees);
+                booking.setOptionalAttendees(optionalAttendees);
                 NewBookingEmail newEmail = new NewBookingEmail(booking);
                 RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
                 newEmail.sendEmail();
@@ -177,10 +187,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 
                 //Adding all optionals
                 List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>();
-                for (User studentUser : teamMembers) {
+                for (String optional : optionalAttendees) {
                     HashMap<String, String> optionalMap = new HashMap<String, String>();
-                    optionalMap.put("id", studentUser.getUsername() + "@smu.edu.sg");
-                    optionalMap.put("name", studentUser.getUsername() + "@smu.edu.sg");
+                    optionalMap.put("id", optional);
+                    optionalMap.put("name", optional);
                     optionals.add(optionalMap);
                 }
                 map.put("optionals", optionals);
@@ -195,8 +205,13 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 em.getTransaction().commit();
             } catch (Exception e) {
                 //Rolling back write operations
+                logger.error("Exception caught: " + e.getMessage());
+                if (MiscUtil.DEV_MODE) {
+                    for (StackTraceElement s : e.getStackTrace()) {
+                        logger.debug(s.toString());
+                    }
+                }
                 em.getTransaction().rollback();
-                logger.error("FATAL ERROR: Database Write Error. Code not to be reached!");
                 json.put("success", false);
                 json.put("message", "Oops. Something went wrong on our end. Please try again!");
                 return SUCCESS;
