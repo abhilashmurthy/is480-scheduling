@@ -45,17 +45,26 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-		HashSet<String> emails = new HashSet<String>();
-		
-		//Adding required attendees
-		for (User u : b.getResponseList().keySet()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+		EntityManager em = null;
+		try {
+			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			HashSet<String> emails = new HashSet<String>();
+
+			//Adding required attendees
+			for (User u : b.getResponseList().keySet()) {
+				emails.add(u.getUsername() + "@smu.edu.sg");
+			}
+			//Adding the course coordinator
+			emails.add(UserManager.getCourseCoordinator(em).getUsername() + "@smu.edu.sg");
+
+			//Adding the optional attendees
+			for (String s : b.getOptionalAttendees()) {
+				emails.add(s);
+			}
+			return emails;
+		} finally {
+			if (em != null && em.isOpen()) em.close();
 		}
-		//Adding the course coordinator
-		emails.add(UserManager.getCourseCoordinator(em).getUsername() + "@smu.edu.sg");
-		
-		return emails;
 	}
 
 	@Override
