@@ -113,10 +113,13 @@
 						<form id="rejectForm">
 						<table>
 							<tr>
-								<td width="150px">Reason for Rejection</td>
+								<td width="150px">
+									Reason for Rejecting <br/>
+									<i style="font-size: 13px;">(55 characters max.)</i>
+								</td>
 								<!--<th>Add Proxy</th>-->
 								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
-											  placeholder="Unexpected Meeting..." maxlength="100"></textarea>
+											  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
 								</td>
 							</tr>
 							<tr>
