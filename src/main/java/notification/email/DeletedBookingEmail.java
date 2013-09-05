@@ -4,12 +4,17 @@
  */
 package notification.email;
 
+import constant.Response;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
+import manager.UserManager;
 import model.Booking;
 import model.User;
+import util.MiscUtil;
 
 /**
  *
@@ -42,13 +47,38 @@ public class DeletedBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		HashSet<String> emails = new HashSet<String>();
-		
-		//Adding required attendees
-		for (User u : b.getResponseList().keySet()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+		EntityManager em = null;
+		try {
+			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			HashSet<String> emails = new HashSet<String>();
+
+			//Adding required attendees
+			for (User u : b.getResponseList().keySet()) {
+				emails.add(u.getUsername() + "@smu.edu.sg");
+			}
+
+			//Check if the booking was previously confirmed
+			boolean confirmed = true;
+			for (Response r : b.getResponseList().values()) {
+				if (r == Response.PENDING || r == Response.REJECTED) {
+					confirmed = false;
+					break;
+				}
+			}
+			//Adding the course coordinator and optional attendees if this is a previously confirmed booking
+			if (confirmed) {
+				//Adding the course coordinator
+				emails.add(UserManager.getCourseCoordinator(em).getUsername() + "@smu.edu.sg");
+
+				//Adding the optional attendees
+				for (String s : b.getOptionalAttendees()) {
+					emails.add(s);
+				}
+			}
+			return emails;
+		} finally {
+			if (em != null && em.isOpen()) em.close();
 		}
-		return emails;
 	}
 
 	@Override
