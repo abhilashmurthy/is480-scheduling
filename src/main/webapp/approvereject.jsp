@@ -217,7 +217,7 @@
 					bookingArray['status'] = "reject";
 					bookingArray['rejectReason'] = $('#rejectionText').val();
 					//return true;
-					alert(JSON.stringify(bookingArray));	
+//					alert(JSON.stringify(bookingArray));	
 					submitBookingData(bookingArray);
 				}
 			});

@@ -439,7 +439,7 @@
                             if (timeslot.team === teamName) {
                                 return "<b>Your Booking</b>" + buttonClose.outerHTML();
                             } else {
-                                return "Team Booking" + buttonClose.outerHTML();
+                                return "<b>Team Booking</b>" + buttonClose.outerHTML();
                             }
                         }
                     });
