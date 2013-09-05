@@ -24,12 +24,12 @@
 		
 		<!-- SECTION: Booking History -->
 		<s:if test="%{data != null && data.size() > 0}"> 
-			<table id="bookingHistoryTable" class="table table-hover zebra-striped">
+			<table id="bookingHistoryTable" class="table table-hover zebra-striped" style="font-size: 13px;">
 				<thead>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<tr>
-							<th>#</th>
+							<!--<th>#</th>-->
 							<th>
 							<% if (activeRole.equals(Role.STUDENT)) { %>
 								My Team
@@ -38,27 +38,27 @@
 							<% } %>
 							</th>
 							<th>Presentation</th>
-							<th>Date</th>
-							<th>Time</th>
+							<th>Date & Time</th>
 							<th>Venue</th>
 							<th>Booking Status</th>
 							<th>Overall Booking Status</th>
+							<th>Reason for Rejection</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<tr>
 							<th>#</th>
 							<th>Team</th>
 							<th>Presentation</th>
-							<th>Date</th>
-							<th>Time</th>
+							<th>Date & Time</th>
 							<th>Venue</th>
 							<th>My Status</th>
 							<th>Overall Booking Status</th>
+							<th>Reason for Rejection</th>
 						</tr>
 					<% } %>
 				</thead>
 				<tbody> 
-					<% int count = 1; %>
+					<%--<% int count = 1; %> --%>
 					<s:iterator value="data">
 						<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
@@ -72,11 +72,10 @@
 						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
 							<tr class="info">
 						</s:elseif>--%>
-								<td><%= count %></td>
+								<%--<td><%= count %></td>--%>
 								<td><s:property value="teamName"/></td>
 								<td><s:property value="milestone"/></td>
-								<td><s:property value="date"/></td>
-								<td><s:property value="time"/></td>
+								<td><s:property value="date"/> <s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
 								<td>
 								<% int countRows = 0; %>
@@ -89,7 +88,12 @@
 								<% } %>
 								</td>
 								<td><s:property value="overallBookingStatus"/></td>
-								<% count = count + 1; %>
+								<s:if test="%{rejectReason != null)}"> 
+									<td><s:property value="rejectReason"/></td>
+								</s:if><s:else>
+									<td>-</td>
+								</s:else>
+								<%--<% count = count + 1; %>--%>
 							</tr>
 						<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
@@ -102,17 +106,21 @@
 						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
 							<tr class="warning">
 						</s:elseif>--%>
-							<td><%= count %></td>
+							<%--<td><%= count %></td>--%>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
-							<td><s:property value="date"/></td>
-							<td><s:property value="time"/></td>
+							<td><s:property value="date"/> <s:property value="time"/></td>
 							<td><s:property value="venue"/></td>
 							<td><s:property value="myStatus"/></td>
 							<td>
 								<s:property value="overallBookingStatus"/><br/><br/>
 							</td>
-							<% count = count + 1; %>
+							<s:if test="%{rejectReason != null)}"> 
+								<td><s:property value="rejectReason"/></td>
+							</s:if><s:else>
+								<td>-</td>
+							</s:else>
+							<%--<% count = count + 1; %>--%>
 						</tr>
 						<% } %>
 					</s:iterator>
