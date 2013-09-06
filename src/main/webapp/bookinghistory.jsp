@@ -24,6 +24,19 @@
 		
 		<!-- SECTION: Booking History -->
 		<s:if test="%{data != null && data.size() > 0}"> 
+			<!-- To hide/show columns -->
+<!--			<table class="table" style="font-size: 13px;">
+				<tr>
+					<td>Show/Hide Columns: </td>
+					<td>Team &nbsp;<input type="checkbox" id="teamHide"/></td>
+					<td>Presentation &nbsp;<input type="checkbox" id="presentationHide"/></td>
+					<td>Date & Time &nbsp;<input type="checkbox" id="dateHide"/></td>
+					<td>Venue &nbsp;<input type="checkbox" id="venueHide"/></td>
+					<td>Booking Status &nbsp;<input type="checkbox" id="bookingStatusHide"/></td>
+					<td>Overall Booking Status &nbsp;<input type="checkbox" id="overallBookingStatusHide"/></td>
+					<td>Reason to Reject &nbsp;<input type="checkbox" id="rejectReasonHide"/></td>
+				</tr>
+			</table>-->
 			<table id="bookingHistoryTable" class="table table-hover zebra-striped" style="font-size: 13px;">
 				<thead>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
@@ -42,18 +55,18 @@
 							<th>Venue</th>
 							<th>Booking Status</th>
 							<th>Overall Booking Status</th>
-							<th>Reason for Rejection</th>
+							<th>Reason to Reject</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<tr>
-							<th>#</th>
+							<!--<th>#</th>-->
 							<th>Team</th>
 							<th>Presentation</th>
 							<th>Date & Time</th>
 							<th>Venue</th>
 							<th>My Status</th>
 							<th>Overall Booking Status</th>
-							<th>Reason for Rejection</th>
+							<th>Reason to Reject</th>
 						</tr>
 					<% } %>
 				</thead>
@@ -88,11 +101,11 @@
 								<% } %>
 								</td>
 								<td><s:property value="overallBookingStatus"/></td>
-								<s:if test="%{rejectReason != null)}"> 
+								<%--<s:if test="%{rejectReason != null)}">--%> 
 									<td><s:property value="rejectReason"/></td>
-								</s:if><s:else>
-									<td>-</td>
-								</s:else>
+								<%--</s:if><s:else>--%>
+									<!--<td>-</td>-->
+								<%--</s:else>--%>
 								<%--<% count = count + 1; %>--%>
 							</tr>
 						<% } else if (activeRole.equals(Role.FACULTY)) { %>
@@ -115,11 +128,11 @@
 							<td>
 								<s:property value="overallBookingStatus"/><br/><br/>
 							</td>
-							<s:if test="%{rejectReason != null)}"> 
+							<%--<s:if test="%{rejectReason != null)}">--%> 
 								<td><s:property value="rejectReason"/></td>
-							</s:if><s:else>
-								<td>-</td>
-							</s:else>
+							<%--</s:if><s:else>--%>
+								<!--<td>-</td>-->
+							<%--</s:else>--%>
 							<%--<% count = count + 1; %>--%>
 						</tr>
 						<% } %>
@@ -152,6 +165,19 @@
 				"bSortClasses": false
 			})
 		});
+		
+		 $(document).ready(function() {
+           $("#teamHide").click(function() {
+//                $('td:nth-child(2)').hide();
+                // if your table has header(th), use this
+				var thisCheck = $(this);
+				if (thisCheck.is (':checked')) {
+					$('td:nth-child(1),th:nth-child(1)').hide();
+				} else {
+					$('td:nth-child(1),th:nth-child(1)').show();
+				}
+            });
+        });
 		</script>
     </body>
 </html>
