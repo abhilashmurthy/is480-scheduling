@@ -69,7 +69,7 @@
                 background-color: #B8F79E !important ;
             }
             .unavailable {
-                background-color: #F7A8A8 !important ;
+                background-color: #00C918 !important ;
             }
             
             .teamExists {
@@ -116,14 +116,14 @@
                                 <table class='availabilityLegend'>
                                     <tr>
                                         <!-- <td style="width:50px"><b>Legend:</b></td>-->
-                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
+                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Presentation Slot</td> 
                                         <!--<td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Unavailable</td>--> 
                                     </tr>
                                     <tr>
-                                        <td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Chosen</td> 
+                                        <td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Chosen By You</td> 
                                     </tr>
                                     <tr>
-                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Taken</td> 
+                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Taken By Others</td> 
                                     </tr>
                                 </table>
                             </td>
@@ -487,11 +487,8 @@
                         timeslot_data.push(timeslotId);
                     }
 
-                    console.log('TA chosen data is: ' + JSON.stringify(timeslot_data));
 					timeslotsData["timeslots"] = timeslot_data;
 					timeslotsData["scheduleId"] = scheduleData.id;
-                    
-                    console.log(JSON.stringify(timeslotsData));
                     
                     $.ajax({
                         
@@ -509,7 +506,6 @@
                                 setTimeout(function(){window.location.reload();}, 1000);
                             } else {
                                 var eid = btoa(response.message);
-                                console.log(response.message);
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         } else {
