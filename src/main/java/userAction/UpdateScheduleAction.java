@@ -164,6 +164,10 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
                             }
                         }
                         //This must be a new timeslot -- Add it
+                        cal.clear();
+                        cal.setTimeInMillis(currentDayTimestamp.getTime());
+                        cal.add(Calendar.MINUTE, m.getSlotDuration());
+                        endTimeslotTimestamp = new Timestamp(cal.getTimeInMillis());
                         if (endTimeslotTimestamp.before(endDayTimestamp) || endTimeslotTimestamp.equals(endDayTimestamp)) { //Add only fitting timeslots
                             Timeslot newT = new Timeslot();
                             newT.setStartTime(currentDayTimestamp);
