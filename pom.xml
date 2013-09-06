@@ -51,6 +51,12 @@
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
 			<version>1.0.1.Final</version>
 		</dependency>
+			<!-- Connection Pool -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>4.2.5.Final</version>
+		</dependency>
         
 	
 		<!-- MySQL JDBC Connector -->

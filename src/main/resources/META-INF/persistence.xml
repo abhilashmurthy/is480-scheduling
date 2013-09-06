@@ -16,14 +16,21 @@
     <class>model.role.Faculty</class>
     <class>model.role.TA</class>
     <properties>
-      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/is480-scheduling"/>
-      <property name="javax.persistence.jdbc.user" value="root"/>
-      <property name="javax.persistence.jdbc.password" value=""/>
-      <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
-      <property name="hibernate.hbm2ddl.auto" value="update"/>
-      <property name="hibernate.show_sql" value="false"/>
-      <property name="hibernate.format_sql" value="true"/>
+		<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+		<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/is480-scheduling"/>
+		<property name="javax.persistence.jdbc.user" value="root"/>
+		<property name="javax.persistence.jdbc.password" value=""/>
+		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
+		<property name="hibernate.hbm2ddl.auto" value="update"/>
+		<property name="hibernate.show_sql" value="false"/>
+		<property name="hibernate.format_sql" value="true"/>
+		
+		<!-- Hibernate C3P0 Connection Pool Settings -->
+		<property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider" />
+		<property name="hibernate.c3p0.max_size" value="100" />
+		<property name="hibernate.c3p0.idle_test_period" value="3000" />
+		<property name="hibernate.c3p0.max_statements" value="50" />
+		<property name="hibernate.c3p0.timeout" value="300" />
     </properties>
   </persistence-unit>
 </persistence>
