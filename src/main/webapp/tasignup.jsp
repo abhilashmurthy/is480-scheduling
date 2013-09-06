@@ -503,7 +503,6 @@
                             if (response.success) {
                                 showNotification("SUCCESS", "Chosen slots saved");
                                 $("#editTimeslotsSubmitBtn").button('reset');
-                                setTimeout(function(){window.location.reload();}, 1000);
                             } else {
                                 var eid = btoa(response.message);
                                 window.location = "error.jsp?eid=" + eid;
@@ -552,7 +551,7 @@
                              break;
                          case "SUCCESS":
                             opts.type = "success";
-                            opts.title = "Created";
+                            opts.title = "Updated";
                             break;
                          case "ERROR":
                             opts.type = "error";
