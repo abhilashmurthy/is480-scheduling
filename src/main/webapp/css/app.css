@@ -209,13 +209,26 @@ input, button, select, textarea {
     font-weight: bold;
 }
 
-.booking {
+.deletedBookingOnTimeslot {
+    opacity: 0.3;
+    border-radius: 5px;
+    background-color: #F75D59 !important;
+    background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGUlEQVQY02P8//8/AzGAkSYKrQbO6sHuRgB90h5hFaCnewAAAABJRU5ErkJggg==);
+    pointer-events: none;
+}
+
+.booking, .deletedBookingOnTimeslot {
     margin: auto;
-    width: 100%;
-    height: 100%;
+    width: 100px;
+    height: 40px;
     line-height: 20px;
     text-align: center;
     vertical-align: middle;
+    z-index: 10;
+}
+
+.tooltip {
+    z-index: 9;
 }
 
 .pendingBooking {
@@ -241,10 +254,17 @@ input, button, select, textarea {
 
 .legend {  
     font-size: 13px;
-    /*float: right;*/
-	position: absolute;
-	left:66%;
-	top:17.5%;
+    float: right;
+    margin-top: 5px;
+}
+
+.legendBox {
+    height: 20px;
+    max-height: 20px;
+}
+
+.scheduleContainer {
+    margin-top: -30px;
 }
 
 .pendingBookings {
@@ -257,9 +277,11 @@ input, button, select, textarea {
 
 
 .activeTerms {
-	position: absolute;
+    float: right;
+    margin-top: -45px;
+/*	position: absolute;
 	left:71%;
-	top:10%;
+	top:10%;*/
 }
 
 

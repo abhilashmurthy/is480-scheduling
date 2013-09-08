@@ -247,6 +247,8 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     em.persist(oldTimeslot);
                 }
                 
+                booking.setLastEditedBy(user.getFullName());
+                
                 if (!em.getTransaction().isActive()) em.getTransaction().begin();
                 em.persist(booking);
                 em.getTransaction().commit();

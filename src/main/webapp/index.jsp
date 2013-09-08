@@ -37,7 +37,7 @@
             <div class="activeTerms">
                 <table>
                     <tr>
-                        <td style="width:90px; padding-bottom:11px"><b>Select Term</b></td>
+                        <td style="padding-right:10px"><b>Select Term</b></td>
                         <td><form id="activeTermForm" action="index" method="post">
                                 <select name="termId" style="float:right" onchange="this.form.submit()"> 
                                     <option value=""><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
@@ -76,6 +76,8 @@
                     <td style="width:15px"></td>
                     <td class="legendBox approvedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
                     <td style="width:15px"></td>
+                    <td class="legendBox deletedBookingOnTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Removed</td> 
+                    <td style="width:15px"></td>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
                 </tr>
             </table>
@@ -83,7 +85,7 @@
         </div>
 
         <!-- Main schedule navigation -->
-        <div class="container page">
+        <div class="scheduleContainer container page">
             <ul id="milestoneTab" class="nav nav-tabs">
                 <!-- TODO: populate dynamic milestones -->
                 <li class="active">
@@ -444,6 +446,14 @@
                     //Additional details
                     var timeslot = scheduleData.timeslots[bodyTd.attr('value')];
                     var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
+                    
+                    //If booking was deleted, 
+                    if (timeslot.bookingWasDeleted) {
+                        var deletedDiv = $(document.createElement('div'));
+                        deletedDiv.addClass('deletedBookingOnTimeslot');
+                        makeTooltip(bodyTd, 'Removed by ' + timeslot.lastEditedBy);
+                        bodyTd.append(deletedDiv);
+                    }
 
                     //Create Booking outputTable
                     var createBookingDetails = $(document.createElement('table'));
@@ -615,6 +625,7 @@
                         self = $(this);
                         $('.booking').not(self).popover('hide');
                         $('.timeslotCell').not(self).popover('hide');
+                        $.pnotify_remove_all();
                         return false;
                     });
 
@@ -635,7 +646,7 @@
                     $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking', function(e) {
                         if (e.target === this) {
                             self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
-                            $('.timeslotCell').not(self).popover('hide');
+                            var timeslot = scheduleData.timeslots[self.attr('value')];
                             var refreshData = refreshScheduleData();
                             if (<%= activeRole.equals(Role.STUDENT) %>) {
                                 if (refreshData.bookingExists !== 0) {
@@ -647,6 +658,7 @@
                                     showNotification("WARNING", self, "You can only book for Term " + teamTerm);
                                     return false;
                                 }
+                                if (timeslot.rejectReason) showNotification("ERROR", self, timeslot.lastEditedBy + ": <br/>" + timeslot.rejectReason);
                             }
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                                 //Make a dropdown of all teams that have not booked yet if user is admin
@@ -662,6 +674,7 @@
                                 }
                             }
                             console.log(".unbookedTimeslot clicked.");
+                            self.tooltip('hide');
                             self.popover('show');
                             self.find('ul').remove(); //Remove all old tokenInputs
                             appendTokenInput(self); //Optional attendees
@@ -690,8 +703,11 @@
                         var returnData = createBooking(self, attendees);
                         //REFRESH STATE OF scheduleData
                         self.popover('destroy');
+                        self.tooltip('destroy');
                         self.removeClass('unbookedTimeslot');
                         self.addClass('bookedTimeslot');
+                        var $deletedDiv = self.children('.deletedBookingOnTimeslot');
+                        if ($deletedDiv) $deletedDiv.remove();
                         var bookingDiv = $(document.createElement('div'));
                         bookingDiv.addClass('booking pendingBooking');
                         bookingDiv.html(returnData.booking.team);
@@ -716,17 +732,24 @@
                         var timeslot = self.parents('.timeslotCell');
                         deleteBooking(timeslot);
                         showNotification("ERROR", timeslot, null);
-                        self.effect('clip', 'slow', function(){
-                            self.remove();
-                        });
                         timeslot.removeClass();
                         timeslot.addClass("timeslotCell unbookedTimeslot");
                         timeslot.popover('destroy');
                         delete scheduleData.timeslots[timeslot.attr('value')];
                         scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
+                            self.effect('clip', 'slow', function(){
+                                self.remove();
+                                var deletedDiv = $(document.createElement('div'));
+                                deletedDiv.addClass('deletedBookingOnTimeslot');
+                                makeTooltip(timeslot, "Removed by " + "<%= user.getFullName() %>");
+                                timeslot.append(deletedDiv);
+                            });
                             appendCreateBookingPopover(timeslot);
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+                            self.effect('clip', 'slow', function(){
+                                self.remove();
+                            });
                             appendPopovers();
                         }
                         return false;
@@ -1205,18 +1228,18 @@
                     var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
                     switch (action) {
                         case "SUCCESS":
-                            opts.title = "Booked";
-                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.title = "Booked"; else opts.title = "Note";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
                             opts.type = "success";
                             break;
                         case "ERROR":
-                            opts.title = "Deleted";
-                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.title = "Deleted"; else opts.title = "Rejected";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
                             opts.type = "error";
                             break;
                         case "INFO":
-                            opts.title = "Updated";
-                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.title = "Updated"; else opts.title = "Note";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
                             opts.type = "info";
                             break;
                         case "WARNING":
@@ -1267,7 +1290,10 @@
                     booking.find('.optionalAttendees').tokenInput(users, opts);
                 }
                 
-//                $(".booking").draggable({zIndex: 1035});
+//                $(".booking").draggable({
+//                    helper: "clone",
+//                    appendTo: "body",
+//                });
 //                $(".timeslotCell").droppable({
 //                        tolerance:"intersect",
 //                        drop: function(event, ui) {
@@ -1298,6 +1324,22 @@
 //                        return title + buttonClose.outerHTML();
 //                    },
                     content: content,
+                    placement: function(){
+                        if (container.parent().children().index(container) > 9) {
+                            return 'left';
+                        } else {
+                            return 'right';
+                        }
+                    }
+                });
+            }
+            
+            /* POPOVER */
+            function makeTooltip(container, title) {
+                container.tooltip({
+                    container: container,
+                    html: true,
+                    title: title,
                     placement: function(){
                         if (container.parent().children().index(container) > 9) {
                             return 'left';

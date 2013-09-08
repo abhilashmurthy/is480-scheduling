@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -95,10 +96,10 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat viewDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
             SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
-            
+
             HttpSession session = request.getSession();
             Term term = (Term) session.getAttribute("currentActiveTerm");
-            
+
             if (milestone != null) {
                 //Return schedule data by milestone
                 Milestone milestoneObject = MilestoneManager.findByNameAndTerm(em, milestone, term);
@@ -243,6 +244,20 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
 
                         map.put("available", available);
                         map.put("unavailable", unavailable);
+                        
+                        //If a previous booking was here
+                        Query bookingsQuery = em.createQuery("select b from Booking b where b.timeslot = :timeslotId and b.team = :teamId")
+                                                    .setParameter("timeslotId", t)
+                                                    .setParameter("teamId", team);
+                        List<Booking> allBookingsOnThisSlot = bookingsQuery.getResultList();
+                        for (Booking slotBooking : allBookingsOnThisSlot) {
+                            if (slotBooking.equals(t.getCurrentBooking())) continue;
+                            //If this is reached, an old booking for the same team was here
+                            map.put("bookingWasDeleted", true);
+                            map.put("lastEditedBy", slotBooking.getLastEditedBy());
+                            if (slotBooking.getRejectReason() != null) map.put("rejectReason", slotBooking.getRejectReason());
+                        }
+                        
                     }
 
                     //Miscellaneous Role specific information
@@ -255,6 +270,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     } else if (user.getRole() == Role.TA && t.getTA() != null) {
                         map.put("taId", t.getTA().getId());
                     }
+                    
                     mapList.add(map);
                 }
                 logger.info("mapList size: " + mapList.size());

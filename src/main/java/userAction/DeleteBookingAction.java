@@ -45,6 +45,9 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
         try {
             json.put("exception", false);
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            HttpSession session = request.getSession();
+            
+            User user = (User) session.getAttribute("user");
 
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
@@ -57,6 +60,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
                 Booking b = ts.getCurrentBooking();
 
                 b.setBookingStatus(BookingStatus.DELETED);
+                b.setLastEditedBy(user.getFullName());
 
                 //set the current booking to null
                 ts.setCurrentBooking(null);

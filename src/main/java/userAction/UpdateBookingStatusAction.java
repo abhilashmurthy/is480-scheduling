@@ -143,6 +143,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
 				}
+                                
+                                booking.setLastEditedBy(user.getFullName());
 			
 				//Updating the time slot 
 				EntityTransaction transaction = em.getTransaction();

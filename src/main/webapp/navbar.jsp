@@ -189,6 +189,7 @@
         
         //Hide all popovers on page click
         $("body").on('click', function(e) {
+            //Hide all popovers
             $('.popover.in').each(function(f){
                 var self = $(this);
                 //Don't detect datepicker and timepicker
@@ -196,6 +197,8 @@
                     self.parent().popover('hide');
                 }
             });
+            //Hide all notifications
+            $.pnotify_remove_all();
         });    
             
         
