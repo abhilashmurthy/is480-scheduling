@@ -61,6 +61,9 @@ public class RejectedBookingEmail extends EmailTemplate{
 		//Inserting approver name
 		map.put("[REJECTOR_NAME]", rejector.getFullName());
 		
+		//Inserting the reason for rejection
+		map.put("[REJECT_REASON]", b.getRejectReason());
+		
 		//Insert team name
 		map.put("[TEAM_NAME]", b.getTeam().getTeamName());
 		

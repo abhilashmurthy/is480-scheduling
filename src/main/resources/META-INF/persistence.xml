@@ -27,10 +27,10 @@
 		
 		<!-- Hibernate C3P0 Connection Pool Settings -->
 		<property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider" />
-		<property name="hibernate.c3p0.max_size" value="100" />
-		<property name="hibernate.c3p0.idle_test_period" value="3000" />
-		<property name="hibernate.c3p0.max_statements" value="50" />
-		<property name="hibernate.c3p0.timeout" value="300" />
+		<property name="hibernate.connection.release_mode" value="after_statement" />
+		<property name="hibernate.c3p0.max_size" value="151" />
+		<property name="hibernate.c3p0.idle_test_period" value="30" />
+		<property name="hibernate.c3p0.timeout" value="30" />
     </properties>
   </persistence-unit>
 </persistence>
