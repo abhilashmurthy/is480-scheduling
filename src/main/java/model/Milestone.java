@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -37,6 +38,7 @@ public class Milestone implements Serializable {
 	private ArrayList<String> requiredAttendees;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+        @JsonIgnore //Ignore recursive relationship to parent when parsing Json
 	private Term term;
         
 	public Milestone() {}
