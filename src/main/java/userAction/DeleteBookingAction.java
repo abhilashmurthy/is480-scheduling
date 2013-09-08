@@ -60,6 +60,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
                 Booking b = ts.getCurrentBooking();
 
                 b.setBookingStatus(BookingStatus.DELETED);
+                b.setRejectReason(null);
                 b.setLastEditedBy(user.getFullName());
 
                 //set the current booking to null

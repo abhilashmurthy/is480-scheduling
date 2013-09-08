@@ -252,7 +252,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         List<Booking> allBookingsOnThisSlot = bookingsQuery.getResultList();
                         for (Booking slotBooking : allBookingsOnThisSlot) {
                             if (slotBooking.equals(t.getCurrentBooking())) continue;
-                            //If this is reached, an old booking for the same team was here
+                            //If this is reached, an old booking for the same team was here, get latest old booking's details
                             map.put("bookingWasDeleted", true);
                             map.put("lastEditedBy", slotBooking.getLastEditedBy());
                             if (slotBooking.getRejectReason() != null) map.put("rejectReason", slotBooking.getRejectReason());
