@@ -13,6 +13,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>IS480 Scheduling</title>
+        <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+        <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
     </head>
     <body>
         <!-- Navigation -->
@@ -283,172 +285,157 @@
                             booking.addClass('pendingBooking');
                         }
                     }
+                    
+                    //Getting the content
+                    //Additional details
+                    var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
 
-                    //Popover
-                    booking.popover({
-                        container: booking, //This is important for the popover to overflow the schedule
-                        trigger: 'manual',
-                        html: 'true',
-                        content: function() {
-                            
-                            //Additional details
-                            var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
-                            
-                            //Output in the form of a table
-                            var outputTable = $(document.createElement('table'));
-                            outputTable.attr('id', 'viewTimeslotTable');
-                            var outputData = [
-                                ["Team", timeslot.team],
-                                ["Status", timeslot.status],
-                                ["Date", timeslot.startDate],
-                                ["Time", timeslot.time],
-                                ["Venue", timeslot.venue],
-                                ["Students", timeslot.students],
-                                ["Faculty", timeslot.faculties],
-                                ["Optional", optionalAttendees]
-                            ];
-                            
-                            //Add Delete and Update button if user is a student with a team
-                            if (timeslot.team === teamName) {
-                                var buttonDelete = $(document.createElement('button'));
-                                buttonDelete.attr('id', 'deleteBookingBtn');
-                                buttonDelete.addClass('popoverBtn btn btn-danger');
-                                var iconDelete = $(document.createElement('i'));
-                                iconDelete.addClass('icon-trash icon-white');
-                                buttonDelete.append(iconDelete);
-                                buttonDelete.append("Delete");
-                                
-                                var buttonUpdate = $(document.createElement('button'));
-                                buttonUpdate.attr('id', 'updateBookingBtn');
-                                buttonUpdate.addClass('popoverBtn btn btn-info');
-                                var iconUpdate = $(document.createElement('i'));
-                                iconUpdate.addClass('icon-edit icon-white');
-                                buttonUpdate.append(iconUpdate);
-                                buttonUpdate.append("Save");
-                                
-                                outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
-                            }
+                    //Output in the form of a table
+                    var bookingDetails = $(document.createElement('table'));
+                    bookingDetails.attr('id', 'viewTimeslotTable');
+                    var outputData = [
+                        ["Team", timeslot.team],
+                        ["Status", timeslot.status],
+                        ["Date", timeslot.startDate],
+                        ["Time", timeslot.time],
+                        ["Venue", timeslot.venue],
+                        ["Students", timeslot.students],
+                        ["Faculty", timeslot.faculties],
+                        ["Optional", optionalAttendees]
+                    ];
 
-                            //Make fields editable and add Update and Delete buttons if user is admin
-                            if (<%=activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                                //Replace startDate and startTime with editable fields
-                                for (var i = 0; i < outputData.length; i++) {
-                                    if (outputData[i][0] === "Venue") {
-                                        var input = $(document.createElement('input'));
-                                        input.attr('id', 'updateFormVenue');
-                                        input.attr('type', 'text');
-                                        input.attr('placeholder', outputData[i][1]);
-                                        input.addClass('updateFormVenue popoverInput');
-                                        input.val(outputData[i][1]).change();
-                                        outputData[i][1] = input;
-                                    }
-                                    if (outputData[i][0] === "Date") {
-                                        var input = $(document.createElement('input'));
-                                        input.attr('id', 'updateFormDate');
-                                        input.attr('type', 'text');
-                                        input.attr('placeholder', outputData[i][1]);
-                                        input.attr('title', 'Enter a new date (YYYY-MM-DD)');
-                                        input.addClass('updateFormDate popoverInput');
-                                        input.datepicker({
-                                            dateFormat: "yy-mm-dd",
-                                            beforeShowDay: $.datepicker.noWeekends
-                                        });
-                                        input.val(outputData[i][1]).change();
-                                        outputData[i][1] = input;
-                                    }
-                                    if (outputData[i][0] === "Time") {
-                                        var input = $(document.createElement('input'));
-                                        input.attr('id', 'updateFormStartTime');
-                                        input.attr('type', 'text');
-                                        input.attr('placeholder', outputData[i][1]);
-                                        input.attr('title', 'Enter a new start time (HH:MM)');
-                                        input.addClass('updateFormStartTime popoverInput');
-                                        input.timepicker({
-                                            minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
-                                            maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
-                                            step: 30,
-                                            forceRoundTime: true,
-                                            timeFormat: 'H:i'
-                                        });
-                                        input.val(outputData[i][1]).change();
-                                        outputData[i][1] = input;
-                                    }
-                                }
-                                //Add Update AND Delete button
-                                var buttonDelete = $(document.createElement('button'));
-                                buttonDelete.attr('id', 'deleteBookingBtn');
-                                buttonDelete.addClass('popoverBtn btn btn-danger');
-                                var iconDelete = $(document.createElement('i'));
-                                iconDelete.addClass('icon-trash icon-white');
-                                buttonDelete.append(iconDelete);
-                                buttonDelete.append("Delete");
-                                
-                                var buttonUpdate = $(document.createElement('button'));
-                                buttonUpdate.attr('id', 'updateBookingBtn');
-                                buttonUpdate.addClass('popoverBtn btn btn-info');
-                                var iconUpdate = $(document.createElement('i'));
-                                iconUpdate.addClass('icon-edit icon-white');
-                                buttonUpdate.append(iconUpdate);
-                                buttonUpdate.append("Save");
-                                
-                                outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
-                            }
+                    //Add Delete and Update button if user is a student with a team
+                    if (timeslot.team === teamName) {
+                        var buttonDelete = $(document.createElement('button'));
+                        buttonDelete.attr('id', 'deleteBookingBtn');
+                        buttonDelete.addClass('popoverBtn btn btn-danger');
+                        var iconDelete = $(document.createElement('i'));
+                        iconDelete.addClass('icon-trash icon-white');
+                        buttonDelete.append(iconDelete);
+                        buttonDelete.append("Delete");
 
-                            //Append all fields
-                            for (var i = 0; i < outputData.length; i++) {
-                                var outputTr = $(document.createElement('tr'));
-                                var outputTdKey = $(document.createElement('td')).html(outputData[i][0]);
-                                var outputTdValue = null;
-                                if (outputData[i][1] instanceof Array) {
-                                    var outputArray = outputData[i][1];
-                                    var outputArrayStr = "";
-                                    //If print students
-                                    if (outputData[i][0] === "Students") {
-                                        for (var j = 0; j < outputArray.length; j++) {
-                                            outputArrayStr += outputArray[j].name + "<br/>";
-                                        }
-                                    }
-                                    //If print faculty
-                                    if (outputData[i][0] === "Faculty") {
-                                        for (var j = 0; j < outputArray.length; j++) {
-                                            outputArrayStr += outputArray[j].name + " (" + outputArray[j].status.toLowerCase() + ")" + "<br/>";
-                                        }
-                                    }
-                                    outputTdValue = $(document.createElement('td')).html(outputArrayStr);
-                                } else {
-                                    outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
-                                }
-                                outputTr.append(outputTdKey);
-                                outputTr.append(outputTdValue);
-                                outputTable.append(outputTr);
+                        var buttonUpdate = $(document.createElement('button'));
+                        buttonUpdate.attr('id', 'updateBookingBtn');
+                        buttonUpdate.addClass('popoverBtn btn btn-info');
+                        var iconUpdate = $(document.createElement('i'));
+                        iconUpdate.addClass('icon-edit icon-white');
+                        buttonUpdate.append(iconUpdate);
+                        buttonUpdate.append("Save");
+
+                        outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
+                    }
+
+                    //Make fields editable and add Update and Delete buttons if user is admin
+                    if (<%=activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+                        //Replace startDate and startTime with editable fields
+                        for (var i = 0; i < outputData.length; i++) {
+                            if (outputData[i][0] === "Venue") {
+                                var input = $(document.createElement('input'));
+                                input.attr('id', 'updateFormVenue');
+                                input.attr('type', 'text');
+                                input.attr('placeholder', outputData[i][1]);
+                                input.addClass('updateFormVenue popoverInput');
+                                input.val(outputData[i][1]).change();
+                                outputData[i][1] = input;
                             }
-                            return outputTable;
-                        },
-                        placement: function() {
-                            if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                return 'left';
-                            } else {
-                                return 'right';
+                            if (outputData[i][0] === "Date") {
+                                var input = $(document.createElement('input'));
+                                input.attr('id', 'updateFormDate');
+                                input.attr('type', 'text');
+                                input.attr('placeholder', outputData[i][1]);
+                                input.attr('title', 'Enter a new date (YYYY-MM-DD)');
+                                input.addClass('updateFormDate popoverInput');
+                                input.datepicker({
+                                    dateFormat: "yy-mm-dd",
+                                    beforeShowDay: $.datepicker.noWeekends
+                                });
+                                input.val(outputData[i][1]).change();
+                                outputData[i][1] = input;
                             }
-                        },
-                        title: function() {
-                            var buttonClose = $(document.createElement('button'));
-                            buttonClose.attr('type', 'button');
-                            buttonClose.addClass('close');
-                            buttonClose.append("&times;"); //X sign
-                            if (timeslot.team === teamName) {
-                                return "<b>Your Booking</b>" + buttonClose.outerHTML();
-                            } else {
-                                return "<b>Team Booking</b>" + buttonClose.outerHTML();
+                            if (outputData[i][0] === "Time") {
+                                var input = $(document.createElement('input'));
+                                input.attr('id', 'updateFormStartTime');
+                                input.attr('type', 'text');
+                                input.attr('placeholder', outputData[i][1]);
+                                input.attr('title', 'Enter a new start time (HH:MM)');
+                                input.addClass('updateFormStartTime popoverInput');
+                                input.timepicker({
+                                    minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
+                                    maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
+                                    step: 30,
+                                    forceRoundTime: true,
+                                    timeFormat: 'H:i'
+                                });
+                                input.val(outputData[i][1]).change();
+                                outputData[i][1] = input;
                             }
                         }
-                    });
+                        //Add Update AND Delete button
+                        var buttonDelete = $(document.createElement('button'));
+                        buttonDelete.attr('id', 'deleteBookingBtn');
+                        buttonDelete.addClass('popoverBtn btn btn-danger');
+                        var iconDelete = $(document.createElement('i'));
+                        iconDelete.addClass('icon-trash icon-white');
+                        buttonDelete.append(iconDelete);
+                        buttonDelete.append("Delete");
+
+                        var buttonUpdate = $(document.createElement('button'));
+                        buttonUpdate.attr('id', 'updateBookingBtn');
+                        buttonUpdate.addClass('popoverBtn btn btn-info');
+                        var iconUpdate = $(document.createElement('i'));
+                        iconUpdate.addClass('icon-edit icon-white');
+                        buttonUpdate.append(iconUpdate);
+                        buttonUpdate.append("Save");
+
+                        outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
+                    }
+
+                    //Append all fields
+                    for (var i = 0; i < outputData.length; i++) {
+                        var outputTr = $(document.createElement('tr'));
+                        var outputTdKey = $(document.createElement('td')).html(outputData[i][0]);
+                        var outputTdValue = null;
+                        if (outputData[i][1] instanceof Array) {
+                            var outputArray = outputData[i][1];
+                            var outputArrayStr = "";
+                            //If print students
+                            if (outputData[i][0] === "Students") {
+                                for (var j = 0; j < outputArray.length; j++) {
+                                    outputArrayStr += outputArray[j].name + "<br/>";
+                                }
+                            }
+                            //If print faculty
+                            if (outputData[i][0] === "Faculty") {
+                                for (var j = 0; j < outputArray.length; j++) {
+                                    outputArrayStr += outputArray[j].name + " (" + outputArray[j].status.toLowerCase() + ")" + "<br/>";
+                                }
+                            }
+                            outputTdValue = $(document.createElement('td')).html(outputArrayStr);
+                        } else {
+                            outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
+                        }
+                        outputTr.append(outputTdKey);
+                        outputTr.append(outputTdValue);
+                        bookingDetails.append(outputTr);
+                    }
+
+                    //Popover
+                    makePopover(
+                        booking,
+                        title = function() {
+                            if (timeslot.team === teamName) {
+                                return "<b>Your Booking</b>";
+                            } else {
+                                return "<b>Team Booking</b>";
+                            }
+                        },
+                        bookingDetails
+                    );
                 }
                 
                 function appendCreateBookingPopover(bodyTd) {
                     if (bodyTd.hasClass('legendBox')) return;
                     //Initialize variables
-                    var popoverTitle = null;
                     var termId = activeAcademicYearStr + "," + activeSemesterStr;
                     var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
                     var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
@@ -459,8 +446,8 @@
                     var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
 
                     //Create Booking outputTable
-                    var outputTable = $(document.createElement('table'));
-                    outputTable.attr('id', 'createTimeslotTable');
+                    var createBookingDetails = $(document.createElement('table'));
+                    createBookingDetails.attr('id', 'createTimeslotTable');
                     
                     var outputData = [
                         ["Date", dateToView],
@@ -478,7 +465,6 @@
                         var timeslots = scheduleData.timeslots;
                         var unavailableTimeslotData = timeslots[bodyTd.attr('value')];
                         outputData.push(["Unavailable", unavailableTimeslotData.unavailable]);
-                        popoverTitle = "Unavailable Timeslot";
                         //TODO: Can create booking still? Add button here
                     } else {
                         var buttonCreate = $(document.createElement('button'));
@@ -489,7 +475,6 @@
                         buttonCreate.append(iconCreate);
                         buttonCreate.append("Book");
                         outputData.push(["", buttonCreate]);
-                        popoverTitle = "Available Timeslot";
                     }
                     //Print data
                     for (var i = 0; i < outputData.length; i++) {
@@ -505,36 +490,27 @@
                         var outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
                         outputTr.append(outputTdKey);
                         outputTr.append(outputTdValue);
-                        outputTable.append(outputTr);
+                        createBookingDetails.append(outputTr);
                     }
                     
-                    bodyTd.popover({
-                        container: bodyTd,
-                        html: 'true',
-                        trigger: 'manual',
-                        placement: function() {
-                            if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                return 'left';
+                    makePopover(
+                        bodyTd,
+                        title = function(){
+                            if (bodyTd.is('.unavailableTimeslot')) {
+                                return "Unavailable Timeslot";
                             } else {
-                                return 'right';
+                                return "Available Timeslot";
                             }
                         },
-                        content: outputTable,
-                        title: function() {
-                            var buttonClose = $(document.createElement('button'));
-                            buttonClose.attr('type', 'button');
-                            buttonClose.addClass('close');
-                            buttonClose.append("&times;"); //X sign
-                            return popoverTitle + buttonClose.outerHTML();
-                        }
-                    });
+                        createBookingDetails
+                    );
                 }
                 
                 function appendChangeAvailabilityPopover(bodyTd) {
                     if (bodyTd.hasClass('legendBox')) return;
                     //Create Booking outputTable
-                    var outputTable = $(document.createElement('table'));
-                    outputTable.attr('id', 'createTimeslotTable');
+                    var changeAvailabailityDetails = $(document.createElement('table'));
+                    changeAvailabailityDetails.attr('id', 'createTimeslotTable');
                     var outputData = [];
                     if (bodyTd.is('.unavailableTimeslot')) {
                         var buttonAvail = $(document.createElement('button'));
@@ -562,29 +538,14 @@
                         var outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
                         outputTr.append(outputTdKey);
                         outputTr.append(outputTdValue);
-                        outputTable.append(outputTr);
+                        changeAvailabailityDetails.append(outputTr);
                     }
-
-                    bodyTd.popover({
-                        container: bodyTd,
-                        html: 'true',
-                        trigger: 'manual',
-                        placement: function() {
-                            if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                return 'left';
-                            } else {
-                                return 'right';
-                            }
-                        },
-                        content: outputTable,
-                        title: function() {
-                            var buttonClose = $(document.createElement('button'));
-                            buttonClose.attr('type', 'button');
-                            buttonClose.addClass('close');
-                            buttonClose.append("&times;"); //X sign
-                            return "Change availability" + buttonClose.outerHTML();
-                        }
-                    });
+                    
+                    makePopover(
+                        bodyTd,
+                        "Change Availabaility",
+                        changeAvailabailityDetails
+                    );
                 }
                 
                 //Function to refresh booking exists
@@ -664,6 +625,7 @@
                         if ($(e.target).parents('.popover').length) return false;
 //                        console.log(".booking clicked: " + $(e.target).attr('class'));
                         self.popover('show');
+                        self.find('ul').remove();
                         appendTokenInput(self); //Optional attendees
                         return false;
                     });
@@ -1218,9 +1180,10 @@
                 }
                 
                 /*****************************
-                 NOTIFICATIONS
+                 PLUGINS AND COMPONENTS
                  ****************************/
-
+                
+                /* PINES NOTIFY */
                 function showNotification(action, bodyTd, notificationMessage) {
                     var opts = {
                         title: "Note",
@@ -1273,7 +1236,7 @@
                     $.pnotify(opts);
                 }
                 
-                //Token input
+                /* TOKEN INPUT */
                 function appendTokenInput(booking){
                     booking.find('.optionalAttendees').tokenInput('destroy');
                     var opts = {
@@ -1307,6 +1270,31 @@
 //                $(".booking").draggable({appendTo: "body", zIndex: 1035});
                 
             };
+            
+            /* POPOVER */
+            function makePopover(container, title, content) {
+                container.popover({
+                    container: container,
+                    trigger: 'manual',
+                    html: true,
+                    title: title,
+//                    title: function(){
+//                        var buttonClose = $(document.createElement('button'));
+//                        buttonClose.attr('type', 'button');
+//                        buttonClose.addClass('close');
+//                        buttonClose.append("&times;"); //X sign
+//                        return title + buttonClose.outerHTML();
+//                    },
+                    content: content,
+                    placement: function(){
+                        if (container.parent().children().index(container) > 9) {
+                            return 'left';
+                        } else {
+                            return 'right';
+                        }
+                    }
+                });
+            }
 
             addLoadEvent(viewScheduleLoad);
         </script>
