@@ -4,6 +4,8 @@
  */
 package systemAction;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Response;
@@ -29,10 +31,12 @@ import model.Team;
 import model.Term;
 import model.Timeslot;
 import model.User;
+import model.jsonadapters.MilestoneAdapter;
 import model.role.Faculty;
 import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.hibernate.Hibernate;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -87,15 +91,14 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
         try {
             em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
 
-            //Write lastSelectedMilstone session object
-            HttpSession session = request.getSession();
-//            session.setAttribute("lastSelectedMilestone", milestone.toUpperCase());
-
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat viewDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
             SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
+            
+            HttpSession session = request.getSession();
             Term term = (Term) session.getAttribute("currentActiveTerm");
+            
             if (milestone != null) {
                 //Return schedule data by milestone
                 Milestone milestoneObject = MilestoneManager.findByNameAndTerm(em, milestone, term);
@@ -259,16 +262,10 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             } else {
                 //Return only milestones for this term
                 List<Milestone> milestonesForTerm = MilestoneManager.findByTerm(em, term);
-                List<HashMap<String, Object>> milestonesToShow = new ArrayList<HashMap<String, Object>>();
-                int order = 0;
-                for (Milestone m : milestonesForTerm) {
-                    HashMap<String, Object> milestoneInfo = new HashMap<String, Object>();
-                    milestoneInfo.put("name", m.getName());
-                    milestoneInfo.put("id", m.getId());
-                    milestoneInfo.put("order", ++order);
-                    milestonesToShow.add(milestoneInfo);
-                }
-                json.put("milestones", milestonesToShow);
+                Gson gson = new GsonBuilder().registerTypeAdapter(Milestone.class, new MilestoneAdapter()).create();
+                String milestonesJson = gson.toJson(milestonesForTerm);
+                logger.debug("Got milestonesJson: " + milestonesJson);
+                json.put("milestones", new Gson().fromJson(milestonesJson, List.class));
             }
             json.put("success", true);
         } catch (Exception e) {
