@@ -31,10 +31,10 @@ import model.Team;
 import model.Term;
 import model.Timeslot;
 import model.User;
-import model.jsonadapters.MilestoneAdapter;
 import model.role.Faculty;
 import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Hibernate;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -262,10 +262,9 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             } else {
                 //Return only milestones for this term
                 List<Milestone> milestonesForTerm = MilestoneManager.findByTerm(em, term);
-                Gson gson = new GsonBuilder().registerTypeAdapter(Milestone.class, new MilestoneAdapter()).create();
-                String milestonesJson = gson.toJson(milestonesForTerm);
-                logger.debug("Got milestonesJson: " + milestonesJson);
-                json.put("milestones", new Gson().fromJson(milestonesJson, List.class));
+                ObjectMapper mapper = new ObjectMapper();
+                String milestonesJson = mapper.writeValueAsString(milestonesForTerm);
+                json.put("milestones", mapper.readValue(milestonesJson, List.class));
             }
             json.put("success", true);
         } catch (Exception e) {
