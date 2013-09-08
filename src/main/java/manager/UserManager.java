@@ -26,7 +26,7 @@ public class UserManager {
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
 
     public static void save(EntityManager em, User user) {
-        logger.info("Saving user: " + user.getFullName());
+        logger.trace("Saving user: " + user.getFullName());
         try {
             em.getTransaction().begin();
             em.persist(user);
@@ -47,7 +47,7 @@ public class UserManager {
      * @return List of User objects
      */
     public static ArrayList<User> findActiveRolesByUsername(EntityManager em, String username, Term activeTerm) {
-        logger.info("Finding active roles for: " + username);
+        logger.trace("Finding active roles for: " + username);
         ArrayList<User> users = new ArrayList<User>();
         try {
             em.getTransaction().begin();
@@ -73,7 +73,7 @@ public class UserManager {
      * @return Single User object satisfying all criteria
      */
     public static User findByRoleTermUsername(EntityManager em, Role role, Term term, String username) {
-        logger.info("Getting specific user object");
+        logger.trace("Getting specific user object");
         User user = null;
         try {
             Query q = em.createQuery("select o from User o where role = :role and term = :term and username = :username");
@@ -88,7 +88,7 @@ public class UserManager {
     }
 
     public static List<User> getAllUsers(EntityManager em) {
-        logger.info("Getting all users");
+        logger.trace("Getting all users");
         List<User> result = null;
         try {
             em.getTransaction().begin();
@@ -103,7 +103,7 @@ public class UserManager {
     }
 
     public static User getCourseCoordinator(EntityManager em) {
-        logger.info("Getting Course Coordinator");
+        logger.trace("Getting Course Coordinator");
         User user = null;
         try {
             em.getTransaction().begin();
@@ -119,7 +119,7 @@ public class UserManager {
     }
 
     public static <T extends User> T getUser(long id, Class<T> type) {
-        logger.info("Getting User: " + id + ", by class: " + type);
+        logger.trace("Getting User: " + id + ", by class: " + type);
         EntityManager em = null;
         T user = null;
         try {

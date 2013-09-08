@@ -28,7 +28,7 @@ public class TimeslotManager {
     private static Logger logger = LoggerFactory.getLogger(TimeslotManager.class);
 
     public static Timeslot findById(EntityManager em, long id) {
-        logger.info("Getting timeslot based on id.");
+        logger.trace("Getting timeslot based on id.");
         Timeslot timeslot = null;
         try {
             em.getTransaction().begin();
@@ -45,7 +45,7 @@ public class TimeslotManager {
     }
     
     public static List<Timeslot> findBySchedule(EntityManager em, Schedule schedule) {
-        logger.info("Getting timeslot based on Schedule ID: " + schedule);
+        logger.trace("Getting timeslot based on Schedule ID: " + schedule);
         List<Timeslot> timeslots;
         boolean justHere = false;
         try {
@@ -67,14 +67,14 @@ public class TimeslotManager {
     }
 
     public static boolean saveTimeslots(EntityManager em, Set<Timeslot> timeslots, EntityTransaction transaction) {
-        logger.info("Saving timeslots starting from: " + timeslots);
+        logger.trace("Saving timeslots starting from: " + timeslots);
         try {
             transaction = em.getTransaction();
             transaction.begin();
             for (Timeslot t : timeslots) {
                 em.merge(t);
             }
-            logger.debug("All timeslots have been saved");
+            logger.trace("All timeslots have been saved");
             transaction.commit();
             return true;
         } catch (PersistenceException ex) {
@@ -92,7 +92,7 @@ public class TimeslotManager {
     }
     
     public static boolean delete(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
-        logger.info("Deleting timeslot: " + timeslot);
+        logger.trace("Deleting timeslot: " + timeslot);
         boolean justHere = true;
         try {
             transaction = em.getTransaction();
@@ -101,7 +101,7 @@ public class TimeslotManager {
                 justHere = false;
             }
             em.remove(timeslot);
-            logger.debug("All timeslots have been saved");
+            logger.trace("All timeslots have been saved");
             if (justHere) transaction.commit();
             return true;
         } catch (PersistenceException ex) {
@@ -152,7 +152,7 @@ public class TimeslotManager {
     }
     
      public static List<Timeslot> getAllTimeslots(EntityManager em) {
-        logger.info("Getting all timeslots");
+        logger.trace("Getting all timeslots");
         List<Timeslot> result = null;
         try {
             em.getTransaction().begin();
@@ -167,7 +167,7 @@ public class TimeslotManager {
     }
      
      public static Timeslot getByTimestampAndSchedule(EntityManager em, Timestamp ts, Schedule s) {
-        logger.info("Getting Timeslot by Timestamp: " + ts + " and schedule: " + s);
+        logger.trace("Getting Timeslot by Timestamp: " + ts + " and schedule: " + s);
         Timeslot timeslot = null;
         try {
             em.getTransaction().begin();
@@ -178,7 +178,7 @@ public class TimeslotManager {
             em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
-            logger.debug(e.getMessage());
+            logger.trace(e.getMessage());
             em.getTransaction().rollback();
         }
         return timeslot;

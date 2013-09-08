@@ -25,7 +25,7 @@ public class MilestoneManager {
     private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
 
     public static boolean save(EntityManager em, Milestone milestone, EntityTransaction transaction) {
-        logger.info("Creating new milestone: " + milestone.getName());
+        logger.trace("Creating new milestone: " + milestone.getName());
         try {
             transaction = em.getTransaction();
             transaction.begin();
@@ -47,7 +47,7 @@ public class MilestoneManager {
     }
 
     public static Milestone findByNameAndTerm(EntityManager em, String name, Term term) {
-        logger.info("Getting milestone by name");
+        logger.trace("Getting milestone by name");
         Milestone result = null;
         try {
             em.getTransaction().begin();
@@ -64,7 +64,7 @@ public class MilestoneManager {
     }
     
     public static List<Milestone> findByTerm(EntityManager em, Term term) {
-        logger.info("Getting milestones by term: " + term);
+        logger.trace("Getting milestones by term: " + term);
         List<Milestone> result = null;
         try {
             em.getTransaction().begin();
