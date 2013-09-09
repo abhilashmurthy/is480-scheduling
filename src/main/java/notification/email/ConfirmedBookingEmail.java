@@ -47,7 +47,7 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 	public Set<String> generateCCAddressList() {
 		EntityManager em = null;
 		try {
-			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = MiscUtil.getEntityManagerInstance();
 			HashSet<String> emails = new HashSet<String>();
 
 			//Adding required attendees

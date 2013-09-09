@@ -36,7 +36,7 @@ public class GetMilestoneSettingsAction extends ActionSupport implements Servlet
     public String execute() {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 			HttpSession session = request.getSession();
 			
 			//Checking whether the active user is admin/coursee coordinator or not

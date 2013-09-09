@@ -62,7 +62,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
             Map parameters = request.getParameterMap();
             String[] optionalAttendeesArray = (String[]) parameters.get("attendees[]");

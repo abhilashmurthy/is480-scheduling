@@ -52,7 +52,7 @@ public class UserTestingDB {
 	 * WARNING! Please run this file only on a blank database!
 	 */
 	public static void main(String[] args) {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+		EntityManager em = Persistence.createEntityManagerFactory("scheduler").createEntityManager();
 		try {
 			logger.info("DB Initialization started");   
 			em.getTransaction().begin();

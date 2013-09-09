@@ -37,7 +37,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
     public String execute() throws Exception {
         EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             User user = (User) request.getSession().getAttribute("user");
             if (user.getRole() != Role.FACULTY) {
                 json.put("success", false);

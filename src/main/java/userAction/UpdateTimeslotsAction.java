@@ -50,7 +50,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 		EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 
             Map parameters = request.getParameterMap();
 

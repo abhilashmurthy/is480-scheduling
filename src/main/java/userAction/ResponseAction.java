@@ -39,8 +39,10 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 
     @Override
     public String execute() throws Exception {
+		//TODO EntityManager not being closed!
+		EntityManager em = null;
         try {
-			EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");

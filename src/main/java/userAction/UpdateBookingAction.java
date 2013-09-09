@@ -55,7 +55,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
         try {
             //Code here
             //convert the chosen ID into long and get the corresponding Timeslot object
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
 
             //Checking whether the user setting optional attendees is student, admin or cc

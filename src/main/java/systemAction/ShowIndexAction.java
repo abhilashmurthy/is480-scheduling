@@ -49,7 +49,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
     public String execute() throws Exception {
         EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
 

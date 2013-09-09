@@ -24,13 +24,15 @@
 		<property name="hibernate.hbm2ddl.auto" value="update"/>
 		<property name="hibernate.show_sql" value="false"/>
 		<property name="hibernate.format_sql" value="true"/>
+		<property name="hibernate.generate_statistics" value="true"/>
 		
 		<!-- Hibernate C3P0 Connection Pool Settings -->
-<!--		<property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider" />
-		<property name="hibernate.connection.release_mode" value="after_statement" />
+		<property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider" />
+		<property name="hibernate.connection.release_mode" value="after_transaction" />
 		<property name="hibernate.c3p0.max_size" value="151" />
+		<property name="hibernate.c3p0.acquire_increment" value="1" />
 		<property name="hibernate.c3p0.idle_test_period" value="30" />
-		<property name="hibernate.c3p0.timeout" value="30" />-->
+		<property name="hibernate.c3p0.timeout" value="30" />
     </properties>
   </persistence-unit>
 </persistence>

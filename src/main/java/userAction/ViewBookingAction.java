@@ -44,7 +44,7 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             //convert the chosen ID into long
             long chosenID = Long.parseLong(bookingId);
             Booking b = em.find(Booking.class, chosenID);

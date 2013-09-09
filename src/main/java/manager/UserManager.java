@@ -120,10 +120,10 @@ public class UserManager {
 
     public static <T extends User> T getUser(long id, Class<T> type) {
         logger.trace("Getting User: " + id + ", by class: " + type);
-        EntityManager em = null;
         T user = null;
+		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = MiscUtil.getEntityManagerInstance();
             em.getTransaction().begin();
             user = (T) em.find(type, id);
             em.getTransaction().commit();

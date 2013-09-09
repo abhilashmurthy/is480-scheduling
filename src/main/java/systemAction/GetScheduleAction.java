@@ -4,8 +4,6 @@
  */
 package systemAction;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Response;
@@ -90,7 +88,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
     public String execute() throws ServletException, IOException {
         EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

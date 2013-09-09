@@ -8,12 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import javax.persistence.EntityManager;
-import manager.ScheduleManager;
-import manager.TermManager;
-import model.Schedule;
-import model.Term;
-import org.hibernate.Session;
-import org.hibernate.ejb.HibernateEntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,19 +21,14 @@ public class MiscUtil {
 	private static Logger logger = LoggerFactory.getLogger(MiscUtil.class);
 	
 	/**
-	 * Name of the Persistence Unit used application-wide
+	 * EntityManagerFactory to be used to obtain EntityManager instances application-wide
 	 */
-	public static final String PERSISTENCE_UNIT = "scheduler";
+	public static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("scheduler");
 	
 	/**
 	 * Boolean variable to check if the system is currently running in development mode
 	 */
-	public static final boolean DEV_MODE;
-	
-	static {
-		DEV_MODE = Boolean.parseBoolean(getProperty("General", "DEV_MODE"));
-		logger.info("DEV_MODE: " + DEV_MODE);
-	}
+	public static final boolean DEV_MODE = Boolean.parseBoolean(getProperty("General", "DEV_MODE"));
 	
 	public static String getProperty(String fileName, String propertyName) {
 		try {
@@ -51,5 +42,9 @@ public class MiscUtil {
 		}
 		
 		return null;
+	}
+	
+	public static EntityManager getEntityManagerInstance() {
+		return emf.createEntityManager();
 	}
 }

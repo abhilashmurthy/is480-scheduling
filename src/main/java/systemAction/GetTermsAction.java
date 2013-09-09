@@ -36,7 +36,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
     public String execute() throws ServletException, IOException {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 
             //Getting all the term objects
             listTerms = TermManager.getAllTerms(em);

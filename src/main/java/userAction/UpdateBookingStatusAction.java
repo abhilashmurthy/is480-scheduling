@@ -48,7 +48,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = MiscUtil.getEntityManagerInstance();
 
 			JSONObject inputObject = (JSONObject) new JSONObject(request.getParameter("jsonData"));
 			long bookingId = Long.valueOf(inputObject.getString("bookingId"));

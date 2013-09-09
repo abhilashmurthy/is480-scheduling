@@ -51,7 +51,7 @@ public class UpdateScheduleAction_old extends ActionSupport implements ServletRe
 		EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             EntityTransaction transaction = null;
             
             Map parameters = request.getParameterMap();

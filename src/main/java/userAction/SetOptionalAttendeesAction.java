@@ -42,7 +42,7 @@ public class SetOptionalAttendeesAction extends ActionSupport implements Servlet
 		EntityManager em = null;
         try {
 			json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 			HttpSession session = request.getSession();
 			
 			//Checking whether the user setting optional attendees is student, admin or cc

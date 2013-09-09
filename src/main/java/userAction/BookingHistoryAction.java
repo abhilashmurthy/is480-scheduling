@@ -48,7 +48,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
             //Getting the active role of the user
             Role activeRole = (Role) session.getAttribute("activeRole");

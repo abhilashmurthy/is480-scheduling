@@ -45,7 +45,7 @@ public class TASignupAction extends ActionSupport implements ServletRequestAware
         try{
             
             HttpSession session = request.getSession();
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             
             //get current user object
             em.clear();
