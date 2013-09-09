@@ -43,33 +43,7 @@ public class NewBookingEmail extends EmailTemplate{
 	public HashMap<String, String> prepareBodyData() {
 		HashMap<String, String> map = new HashMap<String, String>();
 		
-		//Insert team name
-		map.put("[TEAM_NAME]", b.getTeam().getTeamName());
-		
-		//Insert milestone name
-		map.put("[MILESTONE]", b.getTimeslot().getSchedule().getMilestone().getName());
-		
-		//Insert start date
-		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
-		map.put("[DATE]", dateFormat.format(b.getTimeslot().getStartTime()));
-		
-		//Insert start and end time
-		SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-		map.put("[START_TIME]", timeFormat.format(b.getTimeslot().getStartTime()));
-		map.put("[END_TIME]", timeFormat.format(b.getTimeslot().getEndTime()));
-		
-		//Insert venue
-		map.put("[VENUE]", b.getTimeslot().getVenue());
-		
-		//Insert required attendees
-		Set<User> userList = b.getResponseList().keySet();
-		StringBuilder result = new StringBuilder();
-		
-		for(User u : userList) {
-			result.append("&nbsp;").append(u.getFullName());
-		}
-		
-		map.put("[REQUIRED_ATTENDEES]", result.toString());
+		map = generateStandardDetails(b, map);
 		
 		return map;
 	}
