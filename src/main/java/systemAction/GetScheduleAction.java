@@ -132,7 +132,6 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 }
 
                 ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
-                logger.info("Timeslots size: " + activeSchedule.getTimeslots().size());
                 for (Timeslot t : activeSchedule.getTimeslots()) {
 
                     HashMap<String, Object> map = new HashMap<String, Object>();
@@ -274,7 +273,6 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     
                     mapList.add(map);
                 }
-                logger.info("mapList size: " + mapList.size());
                 json.put("timeslots", mapList);
             } else {
                 //Return only milestones for this term
