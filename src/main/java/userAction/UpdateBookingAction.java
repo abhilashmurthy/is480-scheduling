@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -248,6 +249,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 }
                 
                 booking.setLastEditedBy(user.getFullName());
+                booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
                 
                 if (!em.getTransaction().isActive()) em.getTransaction().begin();
                 em.persist(booking);

@@ -448,10 +448,10 @@
                     var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
                     
                     //If booking was deleted, 
-                    if (timeslot.bookingWasDeleted) {
+                    if (timeslot.lastBookingWasDeleted) {
                         var deletedDiv = $(document.createElement('div'));
                         deletedDiv.addClass('deletedBookingOnTimeslot');
-                        makeTooltip(bodyTd, 'Removed by ' + timeslot.lastEditedBy);
+                        makeTooltip(bodyTd, 'Removed by ' + timeslot.lastBookingEditedBy);
                         bodyTd.append(deletedDiv);
                     }
 
@@ -658,7 +658,7 @@
                                     showNotification("WARNING", self, "You can only book for Term " + teamTerm);
                                     return false;
                                 }
-                                if (timeslot.rejectReason) showNotification("ERROR", self, timeslot.lastEditedBy + ": <br/>" + timeslot.rejectReason);
+                                if (timeslot.lastBookingRejectReason) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingRejectReason);
                             }
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                                 //Make a dropdown of all teams that have not booked yet if user is admin

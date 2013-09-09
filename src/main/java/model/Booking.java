@@ -55,6 +55,7 @@ public class Booking implements Serializable {
     private HashSet<String> optionalAttendees = new HashSet<String>();
     private String rejectReason;
     private String lastEditedBy;
+    private Timestamp lastEditedAt;
 
     public Timeslot getTimeslot() {
         return timeslot;
@@ -79,6 +80,22 @@ public class Booking implements Serializable {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+    
+    public Timestamp getLastEditedAt() {
+        return lastEditedAt;
+    }
+
+    public void setLastEditedAt(Timestamp lastEditedAt) {
+        this.lastEditedAt = lastEditedAt;
+    }
+    
+    public String getLastEditedBy() {
+        return lastEditedBy;
+    }
+
+    public void setLastEditedBy(String lastEditedBy) {
+        this.lastEditedBy = lastEditedBy;
+    }
 
     public HashMap<User, Response> getResponseList() {
         return responseList;
@@ -102,14 +119,6 @@ public class Booking implements Serializable {
 
     public void setRejectReason(String rejectReason) {
         this.rejectReason = rejectReason;
-    }
-    
-    public String getLastEditedBy() {
-        return lastEditedBy;
-    }
-
-    public void setLastEditedBy(String lastEditedBy) {
-        this.lastEditedBy = lastEditedBy;
     }
 
     public BookingStatus getBookingStatus() {
