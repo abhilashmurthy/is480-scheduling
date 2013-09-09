@@ -53,8 +53,8 @@
 							<th>Presentation</th>
 							<th>Date & Time</th>
 							<th>Venue</th>
+							<th>Response</th>
 							<th>Booking Status</th>
-							<th>Overall Booking Status</th>
 							<th>Reason to Reject</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
@@ -64,8 +64,8 @@
 							<th>Presentation</th>
 							<th>Date & Time</th>
 							<th>Venue</th>
-							<th>My Status</th>
-							<th>Overall Booking Status</th>
+							<th>My Response</th>
+							<th>Booking Status</th>
 							<th>Reason to Reject</th>
 						</tr>
 					<% } %>
