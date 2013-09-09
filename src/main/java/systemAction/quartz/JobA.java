@@ -15,7 +15,7 @@ import org.quartz.JobExecutionException;
 public class JobA implements Job {
     
     public void execute(JobExecutionContext jec) throws JobExecutionException {
-        System.out.println("\n\n\nJob A is runing\n\n\n");
+//        System.out.println("\n\n\nJob A is runing\n\n\n");
     }
     
 }
