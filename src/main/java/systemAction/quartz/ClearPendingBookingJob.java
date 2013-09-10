@@ -4,23 +4,21 @@
  */
 package systemAction.quartz;
 
-import static com.opensymphony.xwork2.Action.ERROR;
 import constant.BookingStatus;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import model.Booking;
+import model.CronLog;
 import model.Timeslot;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import userAction.TestAction;
 import util.MiscUtil;
 
 /**
@@ -33,7 +31,14 @@ public class ClearPendingBookingJob implements Job {
     private int noOfDaysToRespond;
     
     public void execute(JobExecutionContext jec) throws JobExecutionException {
-        logger.debug("Started ClearPendingBookingJob");
+		logger.info("Started Clear Pending Bookings job");
+		//Initializing run log to be stored in database
+		CronLog logItem = new CronLog();
+		logItem.setJobName("Clear Pending Bookings");
+		Calendar cal = Calendar.getInstance();
+		Timestamp now = new Timestamp(cal.getTimeInMillis());
+		logItem.setRunTime(now);
+		
         EntityManager em = null;
         noOfDaysToRespond = 1; //TODO: Remove hardcoding
         try {
@@ -44,8 +49,6 @@ public class ClearPendingBookingJob implements Job {
                                     .setParameter("pendingBookingStatus", BookingStatus.PENDING);
             try {
                 pendingBookings = (List<Booking>) queryBookings.getResultList();
-                Calendar cal = Calendar.getInstance();
-                Timestamp now = new Timestamp(cal.getTimeInMillis());
                 for (Booking pendingBooking : pendingBookings) {
                     //Do the time calculation
                     cal.clear();
@@ -68,28 +71,34 @@ public class ClearPendingBookingJob implements Job {
                         //TODO: Add email notification for this task
                     }
                 }
+				logItem.setMessage("Success: Pending bookings cleared.");
                 em.getTransaction().commit();
             } catch (NoResultException n) {
                 //Normal, no pending bookings found
+				logItem.setMessage("Success: No pending bookings to clear.");
                 logger.debug("There are no pending bookings now");
-            } finally {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
             }
-            if (em.isOpen()) {
-                em.close();
-            }
-            logger.debug("Finished ClearPendingBookingJob");
-        }
-            
         } catch (Exception e) {
+			logItem.setMessage("Error: " + e.getMessage());
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
                 }
             }
-        }
+        } finally {
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
+			
+			logger.info("Finished Clear Pending Bookings job");
+		}
     }
     
 }
