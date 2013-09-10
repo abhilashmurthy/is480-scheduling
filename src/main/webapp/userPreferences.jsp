@@ -1,0 +1,147 @@
+<%-- 
+    Document   : userPreferences
+    Created on : Sep 10, 2013, 2:06:49 PM
+    Author     : Prakhar
+--%>
+
+<%@page contentType="text/html" pageEncoding="windows-1252"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Manage Preferences</title>
+    </head>
+    <body>
+        <%@include file="navbar.jsp" %>
+		
+        <div class="container">
+			<h3>Manage Preferences</h3>
+			<br>
+			<table id="smsTable" class="table">
+				<tbody>
+					<tr align="center">
+						<td style="width:250px">Subscribe to SMS Notification</td>
+						<form>
+						<td style="width:50px"> 
+							<input type="radio" id="onPref" class="pref" name="pref" value="on">&nbsp; On 
+						</td>
+						<td>
+							<input type="radio" id="offPref" class="pref" name="pref" value="off" checked>&nbsp; Off 
+						</td>
+						</form>
+					</tr>
+					<tr id="setMobileNumber">
+						<td>SMS Notification will be sent to:</td>
+						
+						<td> 
+							<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
+						</td>
+						<td>
+							<input type="text" id="mobileNumber" name="mobileNumber" placeholder="e.g. 81256296" data-mask="99999999">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
+        </div>
+		
+		<%@include file="footer.jsp"%>
+		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.js"></script>
+		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//When the page is first loaded
+				if ($("#offPref").is(':checked')) {
+					$('#setMobileNumber').hide();
+				} else if ($("#onPref").is(':checked')) {
+					$('#setMobileNumber').show();
+				}
+				
+				//For hiding and showing table row
+				$("input:radio").change(function () {
+					if ($(this).val() === 'on') {
+						$('#setMobileNumber').show();
+					} else {
+						$('#setMobileNumber').hide();
+					}
+				});
+			});
+			
+			//For restricting mobile number to 8 digits
+//			$('#mobileNumber').inputmask();
+			
+			//Submit changes to backend
+			$('#submitFormBtn').click(function() {
+//				$(this).button('loading');
+				var mobNo = $('#mobileNumber').val();
+				//Checking whether mobile number is incorrect or not
+				if (mobNo === "") {
+					showNotification("ERROR", "Mobile Number is invalid!");
+					return false;
+				}
+				var mobJson = {};
+				mobJson['mobileNumber'] = mobNo;
+				
+				$.ajax({
+					type: 'POST',
+					async: false,
+					url: 'updateActiveTerms',
+					data: {jsonData: JSON.stringify(mobJson)}	
+				}).done(function(response) {
+					$("#submitFormBtn").button('reset');
+					console.log(response);
+					if (response.success) {
+						showNotification("SUCCESS", response.message);
+					} else {
+						showNotification("ERROR", response.message);
+					}
+				}).fail(function(response) {
+					$("#submitFormBtn").button('reset');
+					console.log(response);
+					showNotification("WARNING", "Oops. Something went wrong. Please try again!");
+				});
+			});
+
+			//Notification-------------
+			function showNotification(action, notificationMessage) {
+				var opts = {
+					title: "Note",
+					text: notificationMessage,
+					type: "warning",
+					icon: false,
+					sticker: false,
+					mouse_reset: false,
+					animation: "fade",
+					animate_speed: "fast",
+					before_open: function(pnotify) {
+						pnotify.css({
+						   top: "52px",
+						   left: ($(window).width() / 2) - (pnotify.width() / 2)
+						});
+					}
+				};
+				switch (action) {
+					case "SUCCESS":
+						opts.title = "Updated";
+						opts.type = "success";
+						break;
+					case "ERROR":
+						opts.title = "Error";
+						opts.type = "error";
+						break;
+					case "INFO":
+						opts.title = "Error";
+						opts.type = "info";
+						break;
+					case "WARNING":
+						$.pnotify_remove_all();
+						opts.title = "Note";
+						opts.type = "warning";
+						break;
+					default:
+						alert("Something went wrong");
+				}
+				$.pnotify(opts);
+			}
+		</script>
+    </body>
+</html>

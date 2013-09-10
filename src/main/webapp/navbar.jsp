@@ -102,7 +102,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
-                    <li class="disabled"><a tabindex="-1" href="#"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
+                    <li><a tabindex="-1" href="userPreferences.jsp"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
                     <li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
                 </ul>
             </div>
