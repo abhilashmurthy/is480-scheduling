@@ -24,6 +24,8 @@ public class CronLog implements Serializable {
 	
 	private Timestamp runTime;
 	
+	private boolean success = false;
+
 	private String jobName;
 
 	private String message;
@@ -40,6 +42,14 @@ public class CronLog implements Serializable {
 		return jobName;
 	}
 
+	public boolean isSuccess() {
+		return success;
+	}
+
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
+	
 	public void setJobName(String jobName) {
 		this.jobName = jobName;
 	}

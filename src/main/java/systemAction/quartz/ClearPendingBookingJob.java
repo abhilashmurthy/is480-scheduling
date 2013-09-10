@@ -73,12 +73,15 @@ public class ClearPendingBookingJob implements Job {
                 }
             }
             em.getTransaction().commit();
-			logItem.setMessage("Success: Pending bookings cleared.");
+			logItem.setSuccess(true);
+			logItem.setMessage("Pending bookings cleared.");
         } catch (NoResultException n) {
             //Normal, no pending bookings found
-			logItem.setMessage("Success: No pending bookings to clear.");
+			logItem.setSuccess(true);
+			logItem.setMessage("No pending bookings to clear.");
             logger.trace("There are no pending bookings now");
         } catch (Exception e) {
+			logItem.setSuccess(false);
 			logItem.setMessage("Error: " + e.getMessage());
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
