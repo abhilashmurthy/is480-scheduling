@@ -28,10 +28,10 @@ import util.MiscUtil;
  * @author ABHILASHM.2010
  */
 public class ClearPendingBookingJob implements Job {
-    
+
     private static Logger logger = LoggerFactory.getLogger(ClearPendingBookingJob.class);
     private int noOfDaysToRespond;
-    
+
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         logger.debug("Started ClearPendingBookingJob");
         EntityManager em = null;
@@ -41,47 +41,35 @@ public class ClearPendingBookingJob implements Job {
             em.getTransaction().begin();
             List<Booking> pendingBookings = null;
             Query queryBookings = em.createQuery("select p from Booking p where p.bookingStatus = :pendingBookingStatus")
-                                    .setParameter("pendingBookingStatus", BookingStatus.PENDING);
-            try {
-                pendingBookings = (List<Booking>) queryBookings.getResultList();
-                Calendar cal = Calendar.getInstance();
-                Timestamp now = new Timestamp(cal.getTimeInMillis());
-                for (Booking pendingBooking : pendingBookings) {
-                    //Do the time calculation
-                    cal.clear();
-                    cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
-                    cal.add(Calendar.DATE, noOfDaysToRespond);
+                    .setParameter("pendingBookingStatus", BookingStatus.PENDING);
+            pendingBookings = (List<Booking>) queryBookings.getResultList();
+            Calendar cal = Calendar.getInstance();
+            Timestamp now = new Timestamp(cal.getTimeInMillis());
+            for (Booking pendingBooking : pendingBookings) {
+                //Do the time calculation
+                cal.clear();
+                cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
+                cal.add(Calendar.DATE, noOfDaysToRespond);
 //                    cal.add(Calendar.MINUTE, noOfDaysToRespond); //For testing
-                    Timestamp dueDate = new Timestamp(cal.getTimeInMillis());
-                    //Delete booking is date is passed
-                    if (now.after(dueDate)) {
-                        logger.debug("Booking: " + pendingBooking + " passed due date. Deleting.");
-                        pendingBooking.setBookingStatus(BookingStatus.DELETED);
-                        pendingBooking.setLastEditedBy("IS480 Scheduling System");
-                        pendingBooking.setLastEditedAt(now);
-                        pendingBooking.setRejectReason("Faculty response overdue. Releasing timeslot.");
-                        Timeslot ts = pendingBooking.getTimeslot();
-                        ts.setCurrentBooking(null);
-                        em.persist(pendingBooking);
-                        em.persist(ts);
-                        
-                        //TODO: Add email notification for this task
-                    }
+                Timestamp dueDate = new Timestamp(cal.getTimeInMillis());
+                //Delete booking is date is passed
+                if (now.after(dueDate)) {
+                    logger.debug("Booking: " + pendingBooking + " passed due date. Deleting.");
+                    pendingBooking.setBookingStatus(BookingStatus.DELETED);
+                    pendingBooking.setLastEditedBy("IS480 Scheduling System");
+                    pendingBooking.setLastEditedAt(now);
+                    pendingBooking.setRejectReason("Faculty response overdue. Releasing timeslot.");
+                    Timeslot ts = pendingBooking.getTimeslot();
+                    ts.setCurrentBooking(null);
+                    em.persist(pendingBooking);
+                    em.persist(ts);
+                    //TODO: Add email notification for this task
                 }
-                em.getTransaction().commit();
-            } catch (NoResultException n) {
-                //Normal, no pending bookings found
-                logger.debug("There are no pending bookings now");
-            } finally {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
             }
-            if (em.isOpen()) {
-                em.close();
-            }
-            logger.debug("Finished ClearPendingBookingJob");
-        }
-            
+            em.getTransaction().commit();
+        } catch (NoResultException n) {
+            //Normal, no pending bookings found
+            logger.trace("There are no pending bookings now");
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -89,7 +77,14 @@ public class ClearPendingBookingJob implements Job {
                     logger.debug(s.toString());
                 }
             }
+        } finally {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (em.isOpen()) {
+                em.close();
+            }
         }
+        logger.debug("Finished ClearPendingBookingJob");
     }
-    
 }
