@@ -37,7 +37,7 @@ public class ClearPendingBookingJob implements Job {
         EntityManager em = null;
         noOfDaysToRespond = 1; //TODO: Remove hardcoding
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             em.getTransaction().begin();
             List<Booking> pendingBookings = null;
             Query queryBookings = em.createQuery("select p from Booking p where p.bookingStatus = :pendingBookingStatus")
