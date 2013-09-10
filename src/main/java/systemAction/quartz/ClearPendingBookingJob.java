@@ -48,7 +48,10 @@ public class ClearPendingBookingJob implements Job {
             Query queryBookings = em.createQuery("select p from Booking p where p.bookingStatus = :pendingBookingStatus")
                     .setParameter("pendingBookingStatus", BookingStatus.PENDING);
             pendingBookings = (List<Booking>) queryBookings.getResultList();
-            for (Booking pendingBooking : pendingBookings) {
+			
+			if (pendingBookings.isEmpty()) throw new  NoResultException();
+            
+			for (Booking pendingBooking : pendingBookings) {
                 //Do the time calculation
                 cal.clear();
                 cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
