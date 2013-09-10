@@ -72,11 +72,15 @@
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
 //				$(this).button('loading');
-				var mobNo = $('#mobileNumber').val();
-				//Checking whether mobile number is incorrect or not
-				if (mobNo === "") {
-					showNotification("ERROR", "Mobile Number is invalid!");
-					return false;
+				var mobNo = "";
+				//Checking if the element is visible on page currently or not
+				if($('#mobileNumber').is(':visible')) {
+					mobNo = $('#mobileNumber').val();
+					//Checking whether mobile number is incorrect or not
+					if (mobNo === "") {
+						showNotification("ERROR", "Mobile Number is invalid!");
+						return false;
+					}
 				}
 				var mobJson = {};
 				mobJson['mobileNumber'] = mobNo;
@@ -84,7 +88,7 @@
 				$.ajax({
 					type: 'POST',
 					async: false,
-					url: 'updateActiveTerms',
+					url: 'updateUserPreferences',
 					data: {jsonData: JSON.stringify(mobJson)}	
 				}).done(function(response) {
 					$("#submitFormBtn").button('reset');
@@ -111,7 +115,7 @@
 					sticker: false,
 					mouse_reset: false,
 					animation: "fade",
-					animate_speed: "fast",
+					animate_speed: "slow",
 					before_open: function(pnotify) {
 						pnotify.css({
 						   top: "52px",

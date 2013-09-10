@@ -203,6 +203,12 @@
 				  <param name="root">json</param>
 			</result>
         </action>
+		
+		<action name="updateUserPreferences" class="userAction.UpdateUserPreferencesAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
     </package>
 
 </struts>

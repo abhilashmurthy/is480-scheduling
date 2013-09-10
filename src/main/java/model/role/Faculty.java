@@ -28,8 +28,8 @@ public class Faculty extends User implements Serializable {
 	
 	protected Faculty() {}
 	
-	public Faculty(String username, String fullName, Term term) {
-		super(username, fullName, Role.FACULTY, term);
+	public Faculty(String username, String fullName, String mobileNumber, Term term) {
+		super(username, fullName, mobileNumber, Role.FACULTY, term);
 	}
 	
 	private static final long serialVersionUID = 1L;

@@ -33,9 +33,10 @@ public class User implements Serializable {
 	
 	protected User() {}
 	
-	public User(String username, String fullName, Role role, Term term) {
+	public User(String username, String fullName, String mobileNumber, Role role, Term term) {
 		this.username = username;
 		this.fullName = fullName;
+		this.mobileNumber = mobileNumber;
 		this.role = role;
 		if (term != null) this.term = term;
 	}
@@ -48,6 +49,8 @@ public class User implements Serializable {
 	private String username;
 	
 	private String fullName;
+	
+	private String mobileNumber;
 	
 	@ManyToOne(fetch = FetchType.EAGER) //Set to NULL for permanent roles
 	private Term term;
@@ -87,6 +90,14 @@ public class User implements Serializable {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	public String getMobileNumber() {
+		return mobileNumber;
+	}
+
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
 	}
 	
 //	public Set<Booking> getSubscribedBookings() {

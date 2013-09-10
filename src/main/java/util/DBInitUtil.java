@@ -247,133 +247,133 @@ public class DBInitUtil {
         /*
          * USER TABLE POPULATION
          */
-        User uAdmin = new User("fionalee", "Fiona LEE", Role.ADMINISTRATOR, null);
+        User uAdmin = new User("fionalee", "Fiona LEE", null, Role.ADMINISTRATOR, null);
 
-        User uCourseCoordinator = new User("benjamingan", "Benjamin GAN Kok Siew", Role.COURSE_COORDINATOR, null);
+        User uCourseCoordinator = new User("benjamingan", "Benjamin GAN Kok Siew", null, Role.COURSE_COORDINATOR, null);
 
-        TA ta1 = new TA("kjsebastian.2011", "SEBASTIAN Kiran Joy", term12013);
+        TA ta1 = new TA("kjsebastian.2011", "SEBASTIAN Kiran Joy", null, term12013);
 
-        Student u1 = new Student("suresh.s.2010", "Suresh SUBRAMANIAM", term12013);
+        Student u1 = new Student("suresh.s.2010", "Suresh SUBRAMANIAM", null, term12013);
 
-        Student u2 = new Student("abhilashm.2010", "Abhilash MURTHY", term12013);
+        Student u2 = new Student("abhilashm.2010", "Abhilash MURTHY", null, term12013);
 
-        Student u3 = new Student("tsgill.ps.2010", "Tarlochan Singh GILL S/O P S", term12013);
+        Student u3 = new Student("tsgill.ps.2010", "Tarlochan Singh GILL S/O P S", null, term12013);
 
-        Student u4 = new Student("prakhara.2010", "Prakhar AGARWAL", term12013);
+        Student u4 = new Student("prakhara.2010", "Prakhar AGARWAL", null, term12013);
 
-        Student u5 = new Student("xuling.dai.2010", "DAI Xuling", term12013);
+        Student u5 = new Student("xuling.dai.2010", "DAI Xuling", null, term12013);
 
-        Faculty u6 = new Faculty("rcdavis", "Richard C. DAVIS", term12013);
+        Faculty u6 = new Faculty("rcdavis", "Richard C. DAVIS", null, term12013);
 
-        Faculty u7 = new Faculty("yskim", "Youngsoo KIM", term12013);
+        Faculty u7 = new Faculty("yskim", "Youngsoo KIM", null, term12013);
 
-        Faculty u8 = new Faculty("laiteecheok", "CHEOK Lai-Tee", term12013);
+        Faculty u8 = new Faculty("laiteecheok", "CHEOK Lai-Tee", null, term12013);
 
-        Student u9 = new Student("henry.tang.2011", "Henry TANG Ji Rui", term12013);
+        Student u9 = new Student("henry.tang.2011", "Henry TANG Ji Rui", null, term12013);
 
-        Student u10 = new Student("ian.chan.2011", "Ian Clarence CHAN", term12013);
+        Student u10 = new Student("ian.chan.2011", "Ian Clarence CHAN", null, term12013);
 
-        Student u11 = new Student("jeremyzhong.2011", "Jeremy ZHONG Jiahao", term12013);
+        Student u11 = new Student("jeremyzhong.2011", "Jeremy ZHONG Jiahao", null, term12013);
 
-        Student u12 = new Student("xrlee.2011", "LEE Xiang Rui", term12013);
+        Student u12 = new Student("xrlee.2011", "LEE Xiang Rui", null, term12013);
 
-        Student u13 = new Student("vivian.lai.2011", "Vivian LAI Wan Yin", term12013);
+        Student u13 = new Student("vivian.lai.2011", "Vivian LAI Wan Yin", null, term12013);
 
-        Student u14 = new Student("alvin.soh.2011", "Alvin SOH Wei Sheng", term12013);
+        Student u14 = new Student("alvin.soh.2011", "Alvin SOH Wei Sheng", null, term12013);
 
-        Faculty u15 = new Faculty("benjamingan", "Benjamin GAN Kok Siew", term12013);
+        Faculty u15 = new Faculty("benjamingan", "Benjamin GAN Kok Siew", null, term12013);
 
-        Student u16 = new Student("mfaizal.s.2010", "Muhammad Faizal SUKIM", term12013);
+        Student u16 = new Student("mfaizal.s.2010", "Muhammad Faizal SUKIM", null, term12013);
 
-        Student u17 = new Student("huimin.hong.2011", "HONG Huimin", term12013);
+        Student u17 = new Student("huimin.hong.2011", "HONG Huimin", null, term12013);
 
-        Student u18 = new Student("shaorui.lei.2011", "LEI Shaorui", term12013);
+        Student u18 = new Student("shaorui.lei.2011", "LEI Shaorui", null, term12013);
 
-        Student u19 = new Student("zhuoran.li.2011", "LI Zhuoran", term12013);
+        Student u19 = new Student("zhuoran.li.2011", "LI Zhuoran", null, term12013);
 
-        Student u20 = new Student("jz.peng.2011", "PENG Jian Zhang", term12013);
+        Student u20 = new Student("jz.peng.2011", "PENG Jian Zhang", null, term12013);
 
-        Faculty u21 = new Faculty("cboesch", "Chris BOESCH", term12013);
+        Faculty u21 = new Faculty("cboesch", "Chris BOESCH", null, term12013);
 
-        Student u22 = new Student("yt.ning.2011", "NING Yuting", term12013);
+        Student u22 = new Student("yt.ning.2011", "NING Yuting", null, term12013);
 
-        Student u23 = new Student("duo.li.2011", "LI Duo", term12013);
+        Student u23 = new Student("duo.li.2011", "LI Duo", null, term12013);
 
-        Student u24 = new Student("haryono.2011", "HARYONO", term12013);
+        Student u24 = new Student("haryono.2011", "HARYONO", null, term12013);
 
-        Student u25 = new Student("yufu.2011", "FU Yu", term12013);
+        Student u25 = new Student("yufu.2011", "FU Yu", null, term12013);
 
-        Student u26 = new Student("canwang.2011", "WANG Can", term12013);
+        Student u26 = new Student("canwang.2011", "WANG Can", null, term12013);
 
-        Student u27 = new Student("fzsun.2011", "SUN Fangzhou", term12013);
+        Student u27 = new Student("fzsun.2011", "SUN Fangzhou", null, term12013);
 
-        Student u28 = new Student("lu.yang.2011", "YANG Lu", term12013);
+        Student u28 = new Student("lu.yang.2011", "YANG Lu", null, term12013);
 
-        Student u29 = new Student("wenxuan.he.2011", "HE Wenxuan", term12013);
+        Student u29 = new Student("wenxuan.he.2011", "HE Wenxuan", null, term12013);
 
-        Student u30 = new Student("jifei.zhang.2010", "ZHANG Jifei", term12013);
+        Student u30 = new Student("jifei.zhang.2010", "ZHANG Jifei", null, term12013);
 
-        Student u31 = new Student("tao.liang.2011", "LIANG Tao", term12013);
+        Student u31 = new Student("tao.liang.2011", "LIANG Tao", null, term12013);
 
-        Student u32 = new Student("miao.gao.2010", "GAO Miao", term12013);
+        Student u32 = new Student("miao.gao.2010", "GAO Miao", null, term12013);
 
-        Student u33 = new Student("joelbb.p.2010", "PEREIRA Joel Bernardo Bosco", term12013);
+        Student u33 = new Student("joelbb.p.2010", "PEREIRA Joel Bernardo Bosco", null, term12013);
 
-        Student u34 = new Student("bixia.ang.2010", "ANG Bi Xia", term12013);
+        Student u34 = new Student("bixia.ang.2010", "ANG Bi Xia", null, term12013);
 
-        Student u35 = new Student("yiying.tan.2010", "TAN Yi Ying", term12013);
+        Student u35 = new Student("yiying.tan.2010", "TAN Yi Ying", null, term12013);
 
-        Student u36 = new Student("suansen.yeo.2010", "YEO Suan Sen", term12013);
+        Student u36 = new Student("suansen.yeo.2010", "YEO Suan Sen", null, term12013);
 
-        Student u37 = new Student("iadarmawan.2010", "Indra Adam DARMAWAN", term12013);
+        Student u37 = new Student("iadarmawan.2010", "Indra Adam DARMAWAN", null, term12013);
 
-        Student u38 = new Student("lynetteseah.2010", "Lynette SEAH Pei Jie", term12013);
+        Student u38 = new Student("lynetteseah.2010", "Lynette SEAH Pei Jie", null, term12013);
 
-        Student u39 = new Student("jane.lee.2011", "Jane LEE Xue li", term12013);
+        Student u39 = new Student("jane.lee.2011", "Jane LEE Xue li", null, term12013);
 
-        Student u40 = new Student("shena.ong.2011", "Shena ONG Wei Ting", term12013);
+        Student u40 = new Student("shena.ong.2011", "Shena ONG Wei Ting", null, term12013);
 
-        Student u41 = new Student("edmund.gair.2010", "Edmund GAIR Jun Jie", term12013);
+        Student u41 = new Student("edmund.gair.2010", "Edmund GAIR Jun Jie", null, term12013);
 
-        Student u42 = new Student("kaicong.loh.2011", "LOH Kai Cong", term12013);
+        Student u42 = new Student("kaicong.loh.2011", "LOH Kai Cong", null, term12013);
 
-        Student u43 = new Student("yanjun.tan.2011", "TAN Yan Jun", term12013);
+        Student u43 = new Student("yanjun.tan.2011", "TAN Yan Jun", null, term12013);
 
-        Student u44 = new Student("weiyang.sim.2011", "SIM Wei Yang", term12013);
+        Student u44 = new Student("weiyang.sim.2011", "SIM Wei Yang", null, term12013);
 
-        Student u45 = new Student("sy.chia.2011", "CHIA Sheng Yang", term12013);
+        Student u45 = new Student("sy.chia.2011", "CHIA Sheng Yang", null, term12013);
 
-        Student u46 = new Student("junkiat.koh.2011", "KOH Jun Kiat", term12013);
+        Student u46 = new Student("junkiat.koh.2011", "KOH Jun Kiat", null, term12013);
 
-        Student u47 = new Student("billy.lam.2011", "Billy LAM Wai Loon", term12013);
+        Student u47 = new Student("billy.lam.2011", "Billy LAM Wai Loon", null, term12013);
 
-        Student u48 = new Student("rosannechoo.2011", "Rosanne CHOO Sweet Cin", term12013);
+        Student u48 = new Student("rosannechoo.2011", "Rosanne CHOO Sweet Cin", null, term12013);
 
-        Student u49 = new Student("wjwee.2011", "WEE Wei Jian", term12013);
+        Student u49 = new Student("wjwee.2011", "WEE Wei Jian", null, term12013);
 
-        Student u50 = new Student("yh.koon.2010", "Geraldine KOON Yuhua", term12013);
+        Student u50 = new Student("yh.koon.2010", "Geraldine KOON Yuhua", null, term12013);
 
-        Student u51 = new Student("juntao.zhu.2010", "ZHU Juntao", term12013);
+        Student u51 = new Student("juntao.zhu.2010", "ZHU Juntao", null, term12013);
 
-        Student u52 = new Student("yg.tan.2010", "TAN Yao Guang", term12013);
+        Student u52 = new Student("yg.tan.2010", "TAN Yao Guang", null, term12013);
 
-        Student u53 = new Student("james.lim.2010", "James LIM Xing Yan", term12013);
+        Student u53 = new Student("james.lim.2010", "James LIM Xing Yan", null, term12013);
 
-        Student u54 = new Student("kevin.ng.2010", "Kevin NG Ying Yi", term12013);
+        Student u54 = new Student("kevin.ng.2010", "Kevin NG Ying Yi", null, term12013);
 
-        Student u55 = new Student("jonathan.ho.2010", "Jonathan HO Jian Wei", term12013);
+        Student u55 = new Student("jonathan.ho.2010", "Jonathan HO Jian Wei", null, term12013);
 
-        Student u56 = new Student("jolie.lee.2010", "Jolie LEE Jia Ling", term12013);
+        Student u56 = new Student("jolie.lee.2010", "Jolie LEE Jia Ling", null, term12013);
 
-        Student u57 = new Student("radeyap.2010", "Radeya PARVEEN", term12013);
+        Student u57 = new Student("radeyap.2010", "Radeya PARVEEN", null, term12013);
 
-        Student u58 = new Student("rosalind.ng.2010", "Rosalind NG Hsiu Zhen", term12013);
+        Student u58 = new Student("rosalind.ng.2010", "Rosalind NG Hsiu Zhen", null, term12013);
 
-        Student u59 = new Student("sitiz.k.2010", "Siti Zulaiha BTE KAMARUDIN", term12013);
+        Student u59 = new Student("sitiz.k.2010", "Siti Zulaiha BTE KAMARUDIN", null, term12013);
 
-        Student u60 = new Student("lionel.koh.2010", "Lionel KOH Wee Heng", term12013);
+        Student u60 = new Student("lionel.koh.2010", "Lionel KOH Wee Heng", null, term12013);
 
-        Student u61 = new Student("xinyi.song.2010", "SONG Xinyi", term12013);
+        Student u61 = new Student("xinyi.song.2010", "SONG Xinyi", null, term12013);
 
         // Persistence
         em.persist(uAdmin);

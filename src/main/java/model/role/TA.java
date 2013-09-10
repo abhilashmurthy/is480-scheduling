@@ -27,8 +27,8 @@ public class TA extends User implements Serializable {
 		
 	}
 	
-	public TA(String username, String fullName, Term term) {
-		super(username, fullName, Role.TA, term);
+	public TA(String username, String fullName, String mobileNumber, Term term) {
+		super(username, fullName, mobileNumber, Role.TA, term);
 	}
 	
 	@OneToMany(mappedBy = "TA")

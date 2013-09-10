@@ -34,8 +34,12 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
         try {
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
+			//Getting user object from session
 			HttpSession session = request.getSession();
-			User user = (User) session.getAttribute("user");
+			User userFromSession = (User) session.getAttribute("user");
+			
+			//Getting user object from db
+			User userToUpdate = em.find(User.class, userFromSession.getId());
 			
             JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
             String number = inputData.getString("mobileNumber");
@@ -49,20 +53,23 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
 				}
 				//Storing the users mobile number
 				em.getTransaction().begin();
-				user.setMobileNumber(number);
-				em.persist(user);
+				userToUpdate.setMobileNumber(number);
+				em.persist(userToUpdate);
 				em.getTransaction().commit();
 			} else {
 				//Deleting user's mobile number
 				em.getTransaction().begin();
-				user.setMobileNumber(null);
-				em.persist(user);
+				userToUpdate.setMobileNumber(null);
+				em.persist(userToUpdate);
 				em.getTransaction().commit();
 			}
 			
+			//Setting the updated user object in the session
+			User user = em.find(User.class, userToUpdate);
+			session.setAttribute("user", user);
+			
 			json.put("success", true);
 			json.put("message", "Your settings have been updated!");
-			return SUCCESS;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -80,7 +87,7 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
                 em.close();
             }
         }
-        return SUCCESS;
+		return SUCCESS;
     }
 
     public void setServletRequest(HttpServletRequest hsr) {
