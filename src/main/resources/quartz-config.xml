@@ -7,19 +7,21 @@
     version="1.8">
     <schedule>
         <job>
-            <name>JobA</name>
-            <group>GroupDummy</group>
-            <description>This is Job A</description>
-            <job-class>systemAction.quartz.JobA</job-class>
+            <name>ClearPendingBookingJob</name>
+            <group>BookingJobs</group>
+            <description>This will clear all pending bookings which have passed the time limit</description>
+            <job-class>systemAction.quartz.ClearPendingBookingJob</job-class>
         </job>
  
         <trigger>
             <cron>
-                <name>dummyTriggerNameA</name>
-                <job-name>JobA</job-name>
-                <job-group>GroupDummy</job-group>
-                <!-- It will run every 5 seconds -->
-                <cron-expression>0/5 * * * * ?</cron-expression>
+                <name>TriggerAt3AM</name>
+                <job-name>ClearPendingBookingJob</job-name>
+                <job-group>BookingJobs</job-group>
+                <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
+                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
+                <!-- Testing: It will run every minute -->
+                <cron-expression>0 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>

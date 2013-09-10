@@ -8,6 +8,8 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
 //import constant.Status;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,6 +62,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
                 Booking b = ts.getCurrentBooking();
                 b.setBookingStatus(BookingStatus.DELETED);
                 b.setLastEditedBy(user.getFullName());
+                b.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 
                 //set the current booking to null
                 ts.setCurrentBooking(null);

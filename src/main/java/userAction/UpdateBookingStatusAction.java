@@ -10,7 +10,9 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -145,6 +147,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				}
                                 
                                 booking.setLastEditedBy(user.getFullName());
+                                booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			
 				//Updating the time slot 
 				EntityTransaction transaction = em.getTransaction();

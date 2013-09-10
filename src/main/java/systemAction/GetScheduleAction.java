@@ -6,9 +6,11 @@ package systemAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.servlet.ServletException;
@@ -242,18 +245,22 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         map.put("available", available);
                         map.put("unavailable", unavailable);
                         
-                        //If a previous booking was here
-                        Query bookingsQuery = em.createQuery("select b from Booking b where b.timeslot = :timeslotId and b.team = :teamId")
+                        //Get latest previous booking for the current schedule
+                        Query bookingsQuery = em.createQuery("select b from Booking b where b.timeslot = :timeslotId and b.team = :teamId and b.lastEditedAt = "
+                                                    + "(select MAX(c.lastEditedAt) from Booking c where c.team = :teamId and c.bookingStatus = :deletedBookingStatus and c.timeslot.schedule = :scheduleId)")
                                                     .setParameter("timeslotId", t)
-                                                    .setParameter("teamId", team);
-                        List<Booking> allBookingsOnThisSlot = bookingsQuery.getResultList();
-                        for (Booking slotBooking : allBookingsOnThisSlot) {
-                            if (slotBooking.equals(t.getCurrentBooking())) continue;
-                            //If this is reached, an old booking for the same team was here, get latest old booking's details
-                            map.put("bookingWasDeleted", true);
-                            map.put("lastEditedBy", slotBooking.getLastEditedBy());
-                            if (map.get("rejectReason") != null) map.remove("rejectReason");
-                            if (slotBooking.getRejectReason() != null) map.put("rejectReason", slotBooking.getRejectReason());
+                                                    .setParameter("teamId", team)
+                                                    .setParameter("deletedBookingStatus", BookingStatus.DELETED)
+                                                    .setParameter("scheduleId", t.getSchedule())
+                                                    .setMaxResults(1);
+                        try {
+                            Booking lastBooking = (Booking) bookingsQuery.getSingleResult();
+                            //Add only the single last booking
+                            map.put("lastBookingWasDeleted", true);
+                            map.put("lastBookingEditedBy", lastBooking.getLastEditedBy());
+                            map.put("lastBookingRejectReason", lastBooking.getRejectReason());
+                        } catch (NoResultException n) {
+                            //This is normal, there was no old booking found
                         }
                         
                     }
@@ -281,7 +288,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             }
             json.put("success", true);
         } catch (Exception e) {
-            logger.error("Exception caught: " + e.getMessage());
+            logger.error("Exception caught: " + e.getClass().getName() + " " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());

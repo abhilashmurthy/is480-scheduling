@@ -147,6 +147,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 booking.setRequiredAttendees(reqAttendees);
                 booking.setOptionalAttendees(optionalAttendees);
                 booking.setLastEditedBy(user.getFullName());
+                booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
                 NewBookingEmail newEmail = new NewBookingEmail(booking);
                 RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
                 newEmail.sendEmail();
