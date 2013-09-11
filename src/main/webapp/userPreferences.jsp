@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="windows-1252"%>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -49,22 +50,32 @@
 		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.min.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
-				//When the page is first loaded
-				if ($("#offPref").is(':checked')) {
+				var mobileNo = '<s:property value="mobileNumber"/>';
+				if (mobileNo === null || mobileNo === "") {
 					$('#setMobileNumber').hide();
-				} else if ($("#onPref").is(':checked')) {
+				} else {
 					$('#setMobileNumber').show();
+					$("#mobileNumber").attr("placeholder", mobileNo);
+					$("#onPref").attr("checked", 'checked');
+//					document.getElementById('mobileNumber').Value = mobileNo;
 				}
-				
-				//For hiding and showing table row
-				$("input:radio").change(function () {
-					if ($(this).val() === 'on') {
-						$('#setMobileNumber').show();
-					} else {
-						$('#setMobileNumber').hide();
-					}
-				});
+				//When the page is first loaded
+//				if ($("#offPref").is(':checked')) {
+//					$('#setMobileNumber').hide();
+//				} else if ($("#onPref").is(':checked')) {
+//					$('#setMobileNumber').show();
+//				}
 			});
+			
+			//For hiding and showing table row
+			$("input:radio").change(function () {
+				if ($(this).val() === 'on') {
+					$('#setMobileNumber').show();
+				} else {
+					$('#setMobileNumber').hide();
+				}
+			});
+			
 			
 			//For restricting mobile number to 8 digits
 //			$('#mobileNumber').inputmask();

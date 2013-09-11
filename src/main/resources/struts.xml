@@ -89,6 +89,10 @@
             <result name="success">/availability.jsp</result>
         </action>
 		
+		<action name="getUserPreferences" class="systemAction.GetUserPreferencesAction" method="execute">
+            <result name="success">/userPreferences.jsp</result>
+        </action>
+		
 		<action name="taAvailability" method="execute">
 			<result>/tasignup.jsp</result>
 		</action>
