@@ -32,12 +32,13 @@
 					</tr>
 					<tr id="setMobileNumber">
 						<td>SMS Notification will be sent to:</td>
-						
-						<td> 
+						<td style="width:70px"> 
+							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px"/>
 							<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
 						</td>
 						<td>
-							<input type="text" id="mobileNumber" name="mobileNumber" placeholder="e.g. 81256296" data-mask="99999999">
+							<input type="text" id="mobileNumber" name="mobileNumber" placeholder="e.g. 81256296" 
+								   style="width:110px" data-mask="99999999">
 						</td>
 					</tr>
 				</tbody>
@@ -82,7 +83,7 @@
 			
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
-//				$(this).button('loading');
+				$(this).button('loading');
 				var mobNo = "";
 				//Checking if the element is visible on page currently or not
 				if($('#mobileNumber').is(':visible')) {
@@ -90,6 +91,7 @@
 					//Checking whether mobile number is incorrect or not
 					if (mobNo === "") {
 						showNotification("ERROR", "Mobile Number is invalid!");
+						$("#submitFormBtn").button('reset');
 						return false;
 					}
 				}
