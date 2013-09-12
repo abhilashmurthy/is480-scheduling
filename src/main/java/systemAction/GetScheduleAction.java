@@ -201,13 +201,6 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         map.put("faculties", faculties);
                         map.put("optionals", optionals);
 
-                        //TODO: Things this code cannot get as of now (can only do this when database has values)
-                        TA ta = t.getTA();
-                        if(ta!=null){
-                            map.put("TA", ta.getFullName());
-                        }else{
-                            map.put("TA", "");
-                        }
                         String teamWiki = "-";
                         map.put("teamWiki", teamWiki);
                         if (user.getRole() == Role.FACULTY) {
@@ -286,7 +279,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         }
                         map.put("available", available);
                     } else if (user.getRole() == Role.TA && t.getTA() != null) {
-                        map.put("TA", t.getTA().getFullName());
+                        map.put("taId", t.getTA().getId());
                     }
                     
                     mapList.add(map);
