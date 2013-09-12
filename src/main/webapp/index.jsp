@@ -78,7 +78,11 @@
                     <td style="width:15px"></td>
                     <td class="legendBox deletedBookingOnTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Removed</td> 
                     <td style="width:15px"></td>
+					<% if (activeRole.equals(Role.FACULTY)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
+					<% } else if (activeRole.equals(Role.TA)) { %>
+					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Chosen By You</td>
+					<% } %>
                 </tr>
             </table>
 
@@ -147,6 +151,9 @@
                 var teams = JSON.parse('<%= session.getAttribute("allTeams")%>'); //All teams JSON
                 var teamDropDownSelect = null;
                 var createBookingOutputForAdmin = null;
+				
+				//TA specific variables
+				var loggedInTa = <%= user.getId() %>;
                 
                 //Booking specific variables
                 var self = null;
@@ -1158,6 +1165,7 @@
                                 var id = timeslot.id;
                                 var team = timeslot.team;
                                 var isAvailable = timeslot.available;
+								var taId = timeslot.taId;
                                 bodyTd.attr('id', 'timeslot_' + id);
                                 bodyTd.attr('value', datetimeString);
 
@@ -1174,6 +1182,16 @@
                                         bodyTd.addClass('unbookedTimeslot');
                                     }
                                 }
+								
+								//TA specific class allocation
+								if (<%= activeRole.equals(Role.TA) %> && taId !== undefined ) {
+									if (loggedInTa === taId) {
+										bodyTd.addClass('taChosenTimeslot');
+									} else {
+										bodyTd.addClass('otherTATimeslot');
+									}
+								}
+								
                                 var temp = null;
                                 bodyTd.attr('align', 'center');
                                 var duration = scheduleData.duration;
