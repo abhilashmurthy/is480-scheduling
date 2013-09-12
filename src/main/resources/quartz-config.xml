@@ -47,5 +47,25 @@
         </trigger>
     </schedule>
     
-    
+    <schedule>
+        <job>
+            <name>SMSReminderJob</name>
+            <group>BookingJob</group>
+            <description>This will send SMS reminders 60 mins before the presentation</description>
+            <job-class>systemAction.quartz.SMSReminderJob</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>TriggerEveryMinute</name>
+                <job-name>SMSReminderJob</job-name>
+                <job-group>BookingJob</job-group>
+                <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
+                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
+                <!-- Testing: It will run every minute -->
+                <cron-expression>0 * * * * MON-SAT</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+
 </job-scheduling-data>
