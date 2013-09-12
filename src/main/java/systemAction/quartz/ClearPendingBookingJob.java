@@ -31,7 +31,6 @@ public class ClearPendingBookingJob implements Job {
     private int noOfDaysToRespond;
 
     public void execute(JobExecutionContext jec) throws JobExecutionException {
-        logger.debug("Started Clear Pending Bookings job");
 		//Initializing run log to be stored in database
 		CronLog logItem = new CronLog();
 		logItem.setJobName("Clear Pending Bookings");
@@ -100,6 +99,5 @@ public class ClearPendingBookingJob implements Job {
 				if (em.isOpen()) em.close();
 			}
         }
-        logger.debug("Finished ClearPendingBookingJob");
     }
 }
