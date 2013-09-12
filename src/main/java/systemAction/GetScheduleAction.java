@@ -35,6 +35,7 @@ import model.Timeslot;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
+import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Hibernate;
@@ -201,14 +202,26 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         map.put("optionals", optionals);
 
                         //TODO: Things this code cannot get as of now (can only do this when database has values)
-                        String TA = "-";
-                        map.put("TA", TA);
+                        TA ta = t.getTA();
+                        if(ta!=null){
+                            map.put("TA", ta.getFullName());
+                        }else{
+                            map.put("TA", "");
+                        }
                         String teamWiki = "-";
                         map.put("teamWiki", teamWiki);
                         if (user.getRole() == Role.FACULTY) {
                             map.put("isMyTeam", isMyTeam);
                         }
                     }
+                    
+                    TA ta = t.getTA();
+                    if(ta!=null){
+                        map.put("TA", ta.getFullName());
+                    }else{
+                        map.put("TA", "-");
+                    }
+                    
 
                     if (user.getRole() == Role.STUDENT) {
                         Team team = student.getTeam();
@@ -273,7 +286,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         }
                         map.put("available", available);
                     } else if (user.getRole() == Role.TA && t.getTA() != null) {
-                        map.put("taId", t.getTA().getId());
+                        map.put("TA", t.getTA().getFullName());
                     }
                     
                     mapList.add(map);

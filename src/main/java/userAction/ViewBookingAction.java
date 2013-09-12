@@ -23,6 +23,7 @@ import model.Booking;
 import model.Team;
 import model.User;
 import model.role.Student;
+import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +113,12 @@ public class ViewBookingAction extends ActionSupport implements ServletRequestAw
                     json.put("venue", venue);
 
                     //TODO Things this code cannot get as of now (can only do this when database has values)
-                    String TA = "-";
-                    json.put("TA", TA);
+                    TA ta = b.getTimeslot().getTA();
+                    if(ta!=null){
+                        json.put("TA", ta.getFullName());
+                    }else{
+                        json.put("TA", "-");
+                    }
                     String teamWiki = "-";
                     json.put("teamWiki", teamWiki);
 

@@ -303,6 +303,7 @@
                         ["Venue", timeslot.venue],
                         ["Students", timeslot.students],
                         ["Faculty", timeslot.faculties],
+                        ["TA", timeslot.TA],
                         ["Optional", optionalAttendees]
                     ];
 
@@ -458,12 +459,13 @@
                     //Create Booking outputTable
                     var createBookingDetails = $(document.createElement('table'));
                     createBookingDetails.attr('id', 'createTimeslotTable');
-                    
+                   
                     var outputData = [
                         ["Date", dateToView],
                         ["Time", startTimeToView + " - " + endTimeToView],
                         ["Milestone", milestoneStr],
                         ["Venue", timeslot.venue],
+                        ["TA", timeslot.TA],
                         ["Optional", optionalAttendees]
                     ];
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
