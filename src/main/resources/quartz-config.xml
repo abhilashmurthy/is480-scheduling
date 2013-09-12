@@ -25,4 +25,27 @@
             </cron>
         </trigger>
     </schedule>
+    
+    <schedule>
+        <job>
+            <name>RemindPendingBookingJob</name>
+            <group>BookingJob</group>
+            <description>This will send booking reminders (action needed) depending on the number of days</description>
+            <job-class>systemAction.quartz.RemindPendingBookingJob</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>TriggerAt3am</name>
+                <job-name>RemindPendingBookingJob</job-name>
+                <job-group>BookingJob</job-group>
+                <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
+                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
+                <!-- Testing: It will run every minute -->
+                <cron-expression>0 0 3 ? * MON-SUN</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+    
+    
 </job-scheduling-data>
