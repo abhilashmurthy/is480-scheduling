@@ -76,7 +76,7 @@
                     <td style="width:15px"></td>
                     <td class="legendBox approvedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
                     <td style="width:15px"></td>
-                    <td class="legendBox deletedBookingOnTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Removed</td> 
+                    <td class="legendBox rejectedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
                     <td style="width:15px"></td>
 					<% if (activeRole.equals(Role.FACULTY)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
@@ -456,10 +456,16 @@
                     var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
                     
                     //If booking was deleted, 
-                    if (timeslot.lastBookingWasDeleted) {
+                    if (timeslot.lastBookingWasRemoved) {
                         var deletedDiv = $(document.createElement('div'));
-                        deletedDiv.addClass('deletedBookingOnTimeslot');
-                        makeTooltip(bodyTd, 'Removed by ' + timeslot.lastBookingEditedBy);
+                        if (timeslot.lastBookingRejectReason) {
+                            deletedDiv.addClass('rejectedBooking');
+                            makeTooltip(bodyTd, 'Removed by ' + timeslot.lastBookingEditedBy);
+                        } else {
+                            deletedDiv.addClass('deletedBookingOnTimeslot');
+                            deletedDiv.addClass('icon-info-sign icon-red');
+                            makeTooltip(deletedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
+                        }
                         bodyTd.append(deletedDiv);
                     }
 
@@ -715,7 +721,7 @@
                         self.tooltip('destroy');
                         self.removeClass('unbookedTimeslot');
                         self.addClass('bookedTimeslot');
-                        var $deletedDiv = self.children('.deletedBookingOnTimeslot');
+                        var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
                         if ($deletedDiv) $deletedDiv.remove();
                         var bookingDiv = $(document.createElement('div'));
                         bookingDiv.addClass('booking pendingBooking');
@@ -751,7 +757,8 @@
                                 self.remove();
                                 var deletedDiv = $(document.createElement('div'));
                                 deletedDiv.addClass('deletedBookingOnTimeslot');
-                                makeTooltip(timeslot, "Removed by " + "<%= user.getFullName() %>");
+                                deletedDiv.addClass('icon-info-sign');
+                                makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
                                 timeslot.append(deletedDiv);
                             });
                             appendCreateBookingPopover(timeslot);

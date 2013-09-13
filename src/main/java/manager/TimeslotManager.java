@@ -47,11 +47,10 @@ public class TimeslotManager {
     public static List<Timeslot> findBySchedule(EntityManager em, Schedule schedule) {
         logger.trace("Getting timeslot based on Schedule ID: " + schedule);
         List<Timeslot> timeslots;
-        boolean justHere = false;
+        boolean justHere = true;
         try {
-            if (!em.getTransaction().isActive()) {
-                em.getTransaction().begin();
-                justHere = true;
+            if (em.getTransaction().isActive()) {
+                justHere = false;
             }
             Query q = em.createQuery("select t from Timeslot t where t.schedule = :schedule")
                     .setParameter("schedule", schedule);
