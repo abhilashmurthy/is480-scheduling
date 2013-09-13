@@ -20,7 +20,8 @@
 %>
 <html>
     <head>
-        <title>Faculty Availability</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Your Availability</title>
         <style type="text/css">
             .timeslotsTable tr:first-child {
                 font-size: 16px !important;

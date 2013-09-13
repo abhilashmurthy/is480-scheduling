@@ -51,6 +51,8 @@ public class TimeslotManager {
         try {
             if (em.getTransaction().isActive()) {
                 justHere = false;
+            } else {
+                em.getTransaction().begin();
             }
             Query q = em.createQuery("select t from Timeslot t where t.schedule = :schedule")
                     .setParameter("schedule", schedule);

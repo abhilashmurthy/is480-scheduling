@@ -11,10 +11,8 @@
 %>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>IS480 Scheduling</title>
-        <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-        <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System</title>
     </head>
     <body>
         <!-- Navigation -->
@@ -81,11 +79,10 @@
 					<% if (activeRole.equals(Role.FACULTY)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
 					<% } else if (activeRole.equals(Role.TA)) { %>
-					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Chosen By You</td>
+					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Your video signup</td>
 					<% } %>
                 </tr>
             </table>
-
         </div>
 
         <!-- Main schedule navigation -->
@@ -1380,6 +1377,5 @@
             addLoadEvent(viewScheduleLoad);
         </script>
         <br/>
-        <%--<%@include file="navbar_footer.jsp" %>--%>
     </body>
 </html>

@@ -13,8 +13,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-        <title>Milestone Configuration</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Milestones </title>
 
         <%@include file="footer.jsp"%>
     </head>

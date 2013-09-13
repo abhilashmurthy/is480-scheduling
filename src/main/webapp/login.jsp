@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
+        <%@include file="header.jsp" %>
         <title>IS480 Scheduling System | Login</title>
 
         <!-- Le imports -->

@@ -14,8 +14,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Approve Booking</title>
-		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Approve</title>
+        <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
     </head>
     <body>
         <%@include file="navbar.jsp" %>

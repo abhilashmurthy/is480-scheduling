@@ -13,8 +13,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-        <title>Booking History</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Booking History</title>
 		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
     </head>
     <body>
