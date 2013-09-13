@@ -26,7 +26,7 @@
 							<input type="radio" id="onPref" class="pref" name="pref" value="on">&nbsp; On 
 						</td>
 						<td>
-							<input type="radio" id="offPref" class="pref" name="pref" value="off" checked>&nbsp; Off 
+							<input type="radio" id="offPref" class="pref" name="pref" value="off">&nbsp; Off 
 						</td>
 						</form>
 					</tr>
@@ -54,10 +54,14 @@
 				var mobileNo = '<s:property value="mobileNumber"/>';
 				if (mobileNo === null || mobileNo === "") {
 					$('#setMobileNumber').hide();
+					$("#offPref" ).prop("checked", true);
+//					$("#offPref").attr('checked', 'checked');
 				} else {
 					$('#setMobileNumber').show();
 					$("#mobileNumber").attr("placeholder", mobileNo);
-					$("#onPref").attr("checked", 'checked');
+					$("#onPref" ).prop("checked", true);
+					$("#offPref" ).prop("checked", false);
+//					$("#offPref").checked = false;
 //					document.getElementById('mobileNumber').Value = mobileNo;
 				}
 				//When the page is first loaded
