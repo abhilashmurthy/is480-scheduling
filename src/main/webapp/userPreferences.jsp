@@ -9,7 +9,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Manage Preferences</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Preferences </title>
     </head>
     <body>
         <%@include file="navbar.jsp" %>

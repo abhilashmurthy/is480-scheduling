@@ -20,7 +20,8 @@
 %>
 <html>
     <head>
-        <title>TA Availability</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | TA Video Signup </title>
         <style type="text/css">
             .timeslotsTable tr:first-child {
                 font-size: 16px !important;
@@ -116,14 +117,13 @@
                                 <table class='availabilityLegend'>
                                     <tr>
                                         <!-- <td style="width:50px"><b>Legend:</b></td>-->
-                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Presentation Slot</td> 
-                                        <!--<td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Unavailable</td>--> 
+                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td> 
                                     </tr>
                                     <tr>
-                                        <td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Chosen By You</td> 
+                                        <td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td> 
                                     </tr>
                                     <tr>
-                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Taken By Others</td> 
+                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td> 
                                     </tr>
                                 </table>
                             </td>

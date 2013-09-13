@@ -187,13 +187,17 @@ public class ScheduleManager {
     public static Schedule findById(EntityManager em, long id) {
         logger.trace("Getting schedule by id: " + id);
         Schedule schedule = null;
-        EntityTransaction transaction = em.getTransaction();
+        boolean justHere = true;
         try {
-            if (!transaction.isActive()) transaction.begin();
+            if (em.getTransaction().isActive()) {
+                justHere = false;
+            } else {
+                em.getTransaction().begin();
+            }
             Query q = em.createQuery("select o from Schedule o where o.id = :id", Schedule.class)
                     .setParameter("id", id);
             schedule = (Schedule) q.getSingleResult();
-            transaction.commit();
+            if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
             e.printStackTrace();

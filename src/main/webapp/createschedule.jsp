@@ -16,7 +16,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Create Term</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Create Schedule</title>
         <style type="text/css">
             table {
                 table-layout: fixed;

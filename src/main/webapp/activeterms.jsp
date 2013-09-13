@@ -3,7 +3,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Manage Active Terms</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Terms </title>
 		<style type="text/css">
 			#termTable {
 				width: auto;

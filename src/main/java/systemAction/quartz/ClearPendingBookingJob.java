@@ -60,7 +60,7 @@ public class ClearPendingBookingJob implements Job {
                 //Delete booking is date is passed
                 if (now.after(dueDate)) {
                     logger.debug("Booking: " + pendingBooking + " passed due date. Deleting.");
-                    pendingBooking.setBookingStatus(BookingStatus.DELETED);
+                    pendingBooking.setBookingStatus(BookingStatus.REJECTED);
                     pendingBooking.setLastEditedBy("IS480 Scheduling System");
                     pendingBooking.setLastEditedAt(now);
                     pendingBooking.setRejectReason("Faculty response overdue. Releasing timeslot.");
