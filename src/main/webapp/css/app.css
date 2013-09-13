@@ -78,6 +78,20 @@ input, button, select, textarea {
 	margin:15px
 }
 
+.periodView {
+    display: inline;
+    float: right;
+    clear: both;
+}
+
+.weekNum {
+    display: inline;
+    padding-right: 10px;
+}
+
+#milestoneTabContent {
+}
+
 .scheduleTable {
     /*margin: auto;*/
     display: table;
@@ -95,7 +109,7 @@ input, button, select, textarea {
     border: 1px solid #dddddd;
     background-color: #AEC7C9 !important; 
     padding: 5px;
-    width: 100px;
+    width: 110px;
     height: 20px;
 }
 
@@ -264,10 +278,13 @@ input, button, select, textarea {
     border: 2px solid #722A29 !important;
 }
 
-.legend {  
+.legend {
+    display: block;
+    padding-top: 10px;
     font-size: 13px;
     float: right;
     margin-top: 5px;
+    clear: both;
 }
 
 .legendBox {

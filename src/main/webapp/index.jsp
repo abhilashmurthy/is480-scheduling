@@ -63,6 +63,17 @@
                 </div>
             </s:if>
             <% }%>
+            
+            <div class="periodView">
+                <div class="btn-group">
+                  <button class="btn" id="previousWeek"><span class="icon-chevron-left"/></span></button>
+                  <button class="btn" id="weekView">Week View</button>
+                  <button class="btn" id="nextWeek"><span class="icon-chevron-right"/></span></button>
+                </div>
+                <div class="btn-group">
+                  <button class="btn" id="fullView">Full View</button>
+                </div>
+            </div>
 
             <!-- To display legend for the calendar -->
             <table class="legend">
@@ -135,11 +146,12 @@
                     DECLARE COMMON VARIABLES
                 ******************************/
                
-                //Default milestoneStr is ACCEPTANCE
-                var milestoneStr = "ACCEPTANCE";
-                var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
-                var activeSemesterStr = "<%= activeTerm.getSemester()%>";
+                //Default milestone is ACCEPTANCE
+                var milestone = "ACCEPTANCE";
+                var year = "<%= activeTerm.getAcademicYear()%>";
+                var semester = "<%= activeTerm.getSemester()%>";
                 var scheduleData = null; //This state shall be stored here
+                var weekView = null;
                 
                 //Student-specific variables
                 var teamName = "<%= team != null ? team.getTeamName() : null%>"; //Student's active team name
@@ -149,8 +161,8 @@
                 var teamDropDownSelect = null;
                 var createBookingOutputForAdmin = null;
 				
-				//TA specific variables
-				var loggedInTa = <%= user.getId() %>;
+                //TA specific variables
+                var loggedInTa = <%= user.getId() %>;
                 
                 //Booking specific variables
                 var self = null;
@@ -160,19 +172,18 @@
 
                 function loadDefault() {
                     //Default schedule to see upon opening index page
-                    $("#milestoneTab a#" + milestoneStr.toLowerCase()).tab('show');
-                    populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                    $("#milestoneTab a#" + milestone.toLowerCase()).tab('show');
+                    populateSchedule(milestone, year, semester);
                 }
 
                 //Function to change schedule based on selected milestone tab
                 $('#milestoneTab a').on('click', function(e) {
                     $("#milestoneTab").removeClass('active in');
                     $(this).tab('show');
-                    clearSchedules();
-                    milestoneStr = $(this).attr('id').toUpperCase();
-                    activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
-                    activeSemesterStr = "<%= activeTerm.getSemester()%>";
-                    populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                    milestone = $(this).attr('id').toUpperCase();
+                    year = "<%= activeTerm.getAcademicYear()%>";
+                    semester = "<%= activeTerm.getSemester()%>";
+                    populateSchedule(milestone, year, semester);
                     return false;
                 });
 
@@ -208,6 +219,7 @@
                 //View Schedule stuff
                 //Function to populate schedule data based on ACTIVE TERM
                 function populateSchedule(milestone, year, semester) {
+                    clearSchedules(); //Clear all schedules first
                     //Hide schedule tab and show progress bar
                     $("#milestoneTabContent").hide();
                     $("#scheduleProgressBar").show();
@@ -443,7 +455,7 @@
                 function appendCreateBookingPopover(bodyTd) {
                     if (bodyTd.hasClass('legendBox')) return;
                     //Initialize variables
-                    var termId = activeAcademicYearStr + "," + activeSemesterStr;
+                    var termId = year + "," + semester;
                     var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
                     var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
                     var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addMinutes(scheduleData.duration).toString('HH:mm');
@@ -473,7 +485,7 @@
                     var outputData = [
                         ["Date", dateToView],
                         ["Time", startTimeToView + " - " + endTimeToView],
-                        ["Milestone", milestoneStr],
+                        ["Milestone", milestone],
                         ["Venue", timeslot.venue],
                         ["TA", timeslot.TA],
                         ["Optional", optionalAttendees]
@@ -589,7 +601,7 @@
                                 }
                             }
                         }
-//                        console.log("Does booking exist? " + milestoneStr + " " + teamName + " " + bookingExists);
+//                        console.log("Does booking exist? " + milestone + " " + teamName + " " + bookingExists);
                         toReturn = {bookingExists:bookingExists, existingTimeslot: existingTimeslot};
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
                         teamsPendingBooking = new Array();
@@ -926,6 +938,42 @@
                         }
                         return false;
                     });
+                    
+                    //Week view functions
+                    $("#weekView").off('click');
+                    $("#weekView").on('click', function(){
+                        weekView = 0;
+                        $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                        populateSchedule(milestone, year, semester);
+                        return false;
+                    });
+                    $("#nextWeek").off('click');
+                    $("#nextWeek").on('click', function(){
+                        ++weekView;
+                        populateSchedule(milestone, year, semester);
+                        $(".weekNum").remove();
+                        $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                        return false;
+                    });
+                    $("#previousWeek").off('click');
+                    $("#previousWeek").on('click', function(){
+                        if (weekView <= 0) {
+                            return false;
+                        } else {
+                            --weekView;
+                            $(".weekNum").remove();
+                            $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                            populateSchedule(milestone, year, semester);
+                        }
+                        return false;
+                    });
+                    $("#fullView").off('click');
+                    $("#fullView").on('click', function(){
+                        weekView = null;
+                        $(".weekNum").remove();
+                        populateSchedule(milestone, year, semester);
+                        return false;
+                    });
                 }
                 
                 /***************************
@@ -1089,7 +1137,7 @@
 
                 //Function to make schedule based on GetScheduleAction response
                 function makeSchedule() {
-                    var tableClass = "scheduleTable";
+                    var tableClass = "scheduleTable:first";
                     var timeslots = scheduleData.timeslots;
                     
                     //TODO: Get from server/admin console/whatevs
@@ -1104,19 +1152,8 @@
                         timesArray.push(timeVal.toString("HH:mm:ss"));
                     }
                     
-                    var datesArray = getDateArrayBetween(Date.parse(scheduleData.startDate), Date.parse(scheduleData.endDate)); //Gets whole range of dates
-//                    var datesArray = datesHashArray; //Gets only specific dates
-
-                    //Get dates between minDate and maxDate
-                    function getDateArrayBetween(startDate, stopDate) {
-                        var dateArray = new Array();
-                        var currentDate = startDate;
-                        while (currentDate <= stopDate) {
-                            dateArray.push(currentDate);
-                            currentDate = new Date(currentDate).addDays(1);
-                        }
-                        return dateArray;
-                    }
+                    var datesArray = getDateArrayBetween(scheduleData.startDate, scheduleData.endDate, weekView); //Gets full schedule
+//                    var datesArray = datesHashArray; //Gets only timeslot dates
 
                     //Append header names
                     var headerDom = $(document.createElement('thead'));
@@ -1127,6 +1164,8 @@
                     for (i = 0; i < datesArray.length; i++) {
                         var headerVal = new Date(datesArray[i]).toString('dd MMM') + "<br/>" + new Date(datesArray[i]).toString('ddd');
                         headerTd = $(document.createElement('td'));
+                        headerTd.addClass('dateCol');
+                        headerTd.attr('id', 'col_' + (i + 1));
                         headerTd.html(headerVal);
                         headerTr.append(headerTd);
                     }
@@ -1224,6 +1263,23 @@
                         }
                     }
                     return 0;
+                }
+                
+                //Get dates between startDate and stopDate
+                function getDateArrayBetween(startDate, stopDate, weekNum) {
+                    var dateArray = new Array();
+                    startDate = Date.parse(startDate);
+                    stopDate = Date.parse(stopDate);
+                    if (weekNum !== null) {
+                        startDate.addWeeks(weekNum);
+                        stopDate = startDate.clone().addWeeks(1).addDays(-1);
+                    }
+                    var currentDate = startDate;
+                    while (currentDate <= stopDate) {
+                        dateArray.push(currentDate);
+                        currentDate = new Date(currentDate).addDays(1);
+                    }
+                    return dateArray;
                 }
                 
                 /*****************************
