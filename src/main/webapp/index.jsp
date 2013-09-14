@@ -943,16 +943,19 @@
                     $("#weekView").off('click');
                     $("#weekView").on('click', function(){
                         weekView = 0;
+                        $(".weekNum").remove();
                         $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
                         populateSchedule(milestone, year, semester);
                         return false;
                     });
                     $("#nextWeek").off('click');
                     $("#nextWeek").on('click', function(){
-                        ++weekView;
-                        populateSchedule(milestone, year, semester);
-                        $(".weekNum").remove();
-                        $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                        if (weekView + 1 < 10) {
+                            ++weekView;
+                            $(".weekNum").remove();
+                            $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                            populateSchedule(milestone, year, semester);
+                        }
                         return false;
                     });
                     $("#previousWeek").off('click');
