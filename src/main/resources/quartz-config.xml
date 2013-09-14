@@ -48,13 +48,6 @@
     </schedule>
     
     <schedule>
-        <job>
-            <name>SMSReminderJob</name>
-            <group>BookingJob</group>
-            <description>This will send SMS reminders 60 mins before the presentation</description>
-            <job-class>systemAction.quartz.SMSReminderJob</job-class>
-        </job>
- 
         <trigger>
             <cron>
                 <name>TriggerEveryMinute</name>
