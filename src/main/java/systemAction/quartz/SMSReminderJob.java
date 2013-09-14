@@ -50,6 +50,8 @@ public class SMSReminderJob implements Job {
 			
 			//Block SMSs if system is in Dev Mode
 			if (MiscUtil.DEV_MODE) {
+				logItem.setSuccess(true);
+				logItem.setMessage("Job triggered with Booking ID: " + booking.getId() + ". SMS not sent.");
 				return;
 			}
 

@@ -308,6 +308,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
 		scheduledTime.setTime(presentationStartTime);
 		scheduledTime.add(Calendar.DAY_OF_MONTH, -1); //Subtracting a day from the presentation start time
+//		scheduledTime.add(Calendar.SECOND, 10); //For testing
 		
 		Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(),"SMS Reminders")
 				.startAt(scheduledTime.getTime()).build();
