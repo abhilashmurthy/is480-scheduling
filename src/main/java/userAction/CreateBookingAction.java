@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
@@ -30,11 +29,20 @@ import model.Team;
 import model.Timeslot;
 import model.User;
 import model.role.Student;
+import model.role.TA;
 import notification.email.NewBookingEmail;
 import notification.email.RespondToBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.ee.servlet.QuartzInitializerListener;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import systemAction.quartz.SMSReminderJob;
 import util.MiscUtil;
 
 /**
@@ -110,8 +118,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
                 //Assign information to booking
                 booking.setTimeslot(timeslot); 
-                booking.setTeam(team); 
-                booking.setCreatedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+                booking.setTeam(team);
+				Timestamp currentTime = new Timestamp(Calendar.getInstance().getTimeInMillis());
+                booking.setCreatedAt(currentTime);
                 
                 //Add team members to attendees
                 HashSet<User> reqAttendees = new HashSet<User>();
@@ -197,7 +206,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 }
                 map.put("optionals", optionals);
                
-                String TA = "-";
+				TA ta = timeslot.getTA();
+                String TA = (ta != null) ? ta.getFullName() : "-";
                 map.put("TA", TA);
                 String teamWiki = "-";
                 map.put("teamWiki", teamWiki);
@@ -205,6 +215,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 json.put("booking", map);
 
                 em.getTransaction().commit();
+				
+				//Schedule job for SMS reminders
+				scheduleSMSReminder(booking);
             } catch (Exception e) {
                 //Rolling back write operations
                 logger.error("Exception caught: " + e.getMessage());
@@ -279,6 +292,29 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         return true;
     }
 
+	//Method to schedule a job to send an SMS reminder 24 hrs before the presentation
+	private void scheduleSMSReminder(Booking b) throws Exception {
+		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
+				.getServletContext()
+				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
+		Scheduler scheduler = factory.getScheduler();
+		
+		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
+				.usingJobData("bookingId", b.getId())
+				.withIdentity(b.getId().toString(),"SMS Reminders").build();
+		
+		//Calculating the time to trigger the job
+		Calendar scheduledTime = Calendar.getInstance();
+		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
+		scheduledTime.setTime(presentationStartTime);
+		scheduledTime.add(Calendar.DAY_OF_MONTH, -1); //Subtracting a day from the presentation start time
+		
+		Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(),"SMS Reminders")
+				.startAt(scheduledTime.getTime()).build();
+		
+		scheduler.scheduleJob(jd, tr);
+	}
+	
     public Long getTeamId() {
         return teamId;
     }
