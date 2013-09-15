@@ -260,7 +260,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         if (team == null) {
             logger.error("Team information not found or unauthorized user role");
             json.put("success", false);
-            json.put("message", "Team not identified or you do not have required"
+            json.put("message", "Team unidentified or you may not have the required"
                     + " permissions to make a booking.");
             return false;
         }
@@ -272,6 +272,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("message", "Timeslot not found. Please check the ID provided!");
             return false;
         }
+		
+		//Check if the timeslot has already passed
+		Calendar now = Calendar.getInstance();
+		if (timeslot.getStartTime().before(now.getTime())) {
+			json.put("success", false);
+            json.put("message", "You cannot book a timeslot that has already passed!");
+            return false;
+		}
 
         //Check if the timeslot is free
         if (timeslot.getCurrentBooking() != null) { //Slot is full
