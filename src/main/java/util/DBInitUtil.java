@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.logging.Level;
@@ -148,24 +149,31 @@ public class DBInitUtil {
         /*
          * SCHEDULE TABLE POPULATION
          */
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_MONTH, 7); //Adding a week
         Schedule acceptance12013 = new Schedule();
         acceptance12013.setMilestone(acceptance);
-        acceptance12013.setStartDate(new Timestamp(2013 - 1900, 7, 7, 0, 0, 0, 0));
-        acceptance12013.setEndDate(new Timestamp(2013 - 1900, 7, 20, 0, 0, 0, 0));
+		acceptance12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
+		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
+        acceptance12013.setEndDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
         acceptance12013.setDayStartTime(9);
         acceptance12013.setDayEndTime(19);
 
         Schedule midterm12013 = new Schedule();
         midterm12013.setMilestone(midterm);
-        midterm12013.setStartDate(new Timestamp(2013 - 1900, 9, 19, 0, 0, 0, 0));
-        midterm12013.setEndDate(new Timestamp(2013 - 1900, 9, 30, 0, 0, 0, 0));
+		cal.add(Calendar.MONTH, 1); //Midterm is after another month
+		midterm12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
+		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
+        midterm12013.setEndDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
         midterm12013.setDayStartTime(9);
         midterm12013.setDayEndTime(19);
 
         Schedule final12013 = new Schedule();
         final12013.setMilestone(finalMilestone);
-        final12013.setStartDate(new Timestamp(2013 - 1900, 11, 1, 0, 0, 0, 0));
-        final12013.setEndDate(new Timestamp(2013 - 1900, 11, 15, 0, 0, 0, 0));
+		cal.add(Calendar.MONTH, 1); //Final is after another month
+		final12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
+		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
+        final12013.setEndDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
         final12013.setDayStartTime(9);
         final12013.setDayEndTime(19);
 
@@ -179,26 +187,37 @@ public class DBInitUtil {
          * TIMESLOT TABLE POPULATION
          */
         //Acceptance
-        for (int a = 7; a <= 20; a++) {
+		Calendar accStart = Calendar.getInstance(); Calendar accEnd = Calendar.getInstance();
+		accStart.setTime(acceptance12013.getStartDate());
+		accEnd.setTime(acceptance12013.getEndDate());
+        while (accEnd.after(accStart) || accEnd.compareTo(accStart) == 0) {
             // Skipping weekends
-            if (a == 10 || a == 11 || a == 17 || a == 18) {
+            if (accStart.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+					|| accStart.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+				accStart.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
             }
 
             for (int b = 9; b <= 18; b++) {
                 Timeslot t = new Timeslot();
-                t.setStartTime(new Timestamp(2013 - 1900, 7, a, b, 0, 0, 0));
-                t.setEndTime(new Timestamp(2013 - 1900, 7, a, b + 1, 0, 0, 0));
+                t.setStartTime(new Timestamp(accStart.get(Calendar.YEAR) - 1900, accStart.get(Calendar.MONTH), accStart.get(Calendar.DAY_OF_MONTH), b, 0, 0, 0));
+                t.setEndTime(new Timestamp(accStart.get(Calendar.YEAR) - 1900, accStart.get(Calendar.MONTH), accStart.get(Calendar.DAY_OF_MONTH), b + 1, 0, 0, 0));
                 t.setVenue("SIS Seminar Room 2-1");
                 t.setSchedule(acceptance12013);
                 em.persist(t);
             }
+			accStart.add(Calendar.DAY_OF_MONTH, 1); //Loop increment. 1 day
         }
 
         //Midterm
-        for (int a = 19; a <= 30; a++) {
+		Calendar midStart = Calendar.getInstance(); Calendar midEnd = Calendar.getInstance();
+		midStart.setTime(midterm12013.getStartDate());
+		midEnd.setTime(midterm12013.getEndDate());
+        while (midEnd.after(midStart) || midEnd.compareTo(midStart) == 0) {
             // Skipping weekends
-            if (a == 19 || a == 20 || a == 26 || a == 27) {
+            if (midStart.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+					|| midStart.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+				midStart.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
             }
 
@@ -206,11 +225,11 @@ public class DBInitUtil {
             for (int b = 9; (b + 2) <= 18; b++) {
                 Timeslot t = new Timeslot();
                 if (change) {
-                    t.setStartTime(new Timestamp(2013 - 1900, 9, a, b, 0, 0, 0));
-                    t.setEndTime(new Timestamp(2013 - 1900, 9, a, b + 1, 30, 0, 0));
+                    t.setStartTime(new Timestamp(midStart.get(Calendar.YEAR) - 1900, midStart.get(Calendar.MONTH), midStart.get(Calendar.DAY_OF_MONTH), b, 0, 0, 0));
+                    t.setEndTime(new Timestamp(midStart.get(Calendar.YEAR) - 1900, midStart.get(Calendar.MONTH), midStart.get(Calendar.DAY_OF_MONTH), b + 1, 30, 0, 0));
                 } else {
-                    t.setStartTime(new Timestamp(2013 - 1900, 9, a, b, 30, 0, 0));
-                    t.setEndTime(new Timestamp(2013 - 1900, 9, a, b + 2, 00, 0, 0));
+                    t.setStartTime(new Timestamp(midStart.get(Calendar.YEAR) - 1900, midStart.get(Calendar.MONTH), midStart.get(Calendar.DAY_OF_MONTH), b, 30, 0, 0));
+                    t.setEndTime(new Timestamp(midStart.get(Calendar.YEAR) - 1900, midStart.get(Calendar.MONTH), midStart.get(Calendar.DAY_OF_MONTH), b + 2, 00, 0, 0));
                     b++;
                 }
                 t.setVenue("SIS Seminar Room 2-1");
@@ -218,12 +237,18 @@ public class DBInitUtil {
                 em.persist(t);
                 change = !change;
             }
+			midStart.add(Calendar.DAY_OF_MONTH, 1); //Loop increment. 1 day
         }
 
         //Final
-        for (int a = 1; a <= 15; a++) {
+        Calendar finStart = Calendar.getInstance(); Calendar finEnd = Calendar.getInstance();
+		finStart.setTime(final12013.getStartDate());
+		finEnd.setTime(final12013.getEndDate());
+        while (finEnd.after(finStart) || finEnd.compareTo(finStart) == 0) {
             // Skipping weekends
-            if (a == 1 || a == 7 || a == 8 || a == 14 || a == 15) {
+            if (finStart.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+					|| finStart.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+				finStart.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
             }
 
@@ -231,11 +256,11 @@ public class DBInitUtil {
             for (int b = 9; (b + 2) <= 18; b++) {
                 Timeslot t = new Timeslot();
                 if (change) {
-                    t.setStartTime(new Timestamp(2013 - 1900, 11, a, b, 0, 0, 0));
-                    t.setEndTime(new Timestamp(2013 - 1900, 11, a, b + 1, 30, 0, 0));
+                    t.setStartTime(new Timestamp(finStart.get(Calendar.YEAR) - 1900, finStart.get(Calendar.MONTH), finStart.get(Calendar.DAY_OF_MONTH), b, 0, 0, 0));
+                    t.setEndTime(new Timestamp(finStart.get(Calendar.YEAR) - 1900, finStart.get(Calendar.MONTH), finStart.get(Calendar.DAY_OF_MONTH), b + 1, 30, 0, 0));
                 } else {
-                    t.setStartTime(new Timestamp(2013 - 1900, 11, a, b, 30, 0, 0));
-                    t.setEndTime(new Timestamp(2013 - 1900, 11, a, b + 2, 00, 0, 0));
+                    t.setStartTime(new Timestamp(finStart.get(Calendar.YEAR) - 1900, finStart.get(Calendar.MONTH), finStart.get(Calendar.DAY_OF_MONTH), b, 30, 0, 0));
+                    t.setEndTime(new Timestamp(finStart.get(Calendar.YEAR) - 1900, finStart.get(Calendar.MONTH), finStart.get(Calendar.DAY_OF_MONTH), b + 2, 00, 0, 0));
                     b++;
                 }
                 t.setVenue("SIS Seminar Room 2-1");
@@ -243,7 +268,9 @@ public class DBInitUtil {
                 em.persist(t);
                 change = !change;
             }
+			finStart.add(Calendar.DAY_OF_MONTH, 1); //Loop increment. 1 day
         }
+		
         /*
          * USER TABLE POPULATION
          */
