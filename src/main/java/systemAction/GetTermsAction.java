@@ -51,7 +51,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
                     //e.g. 2013-2014
                     String academicYear = Integer.toString(year) + "-" + Integer.toString(year + 1);
                     //e.g. Term 1
-                    String termName = academicYear + semester;
+                    String termName = academicYear + " " + semester;
                     map.put("termName", termName);
                     map.put("termId", Long.toString(termId));
 
