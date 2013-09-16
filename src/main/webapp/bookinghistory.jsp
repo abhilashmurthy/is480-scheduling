@@ -150,7 +150,9 @@
 				</table>
 				<br/><br/>
 		</s:if><s:else>
-			<h4>No bookings have been made!</h4>
+			<div style="clear: both;">
+				<h4>No bookings have been made!</h4>
+			</div>
 		</s:else>
 		</div>
 		</div>
