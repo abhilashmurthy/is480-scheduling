@@ -32,7 +32,7 @@
 				</p>
 			</div>
 			<div class="well well-large">
-				If the above link does not work, please email your issue to <a>dai.xuling.2010@sis.smu.edu.sg</a>
+				If the above link does not work, please email your issue to <a>xuling.dai.2010@sis.smu.edu.sg</a>
 			</div>
         </div>
 		
