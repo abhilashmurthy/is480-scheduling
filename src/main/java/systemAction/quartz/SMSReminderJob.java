@@ -98,11 +98,11 @@ public class SMSReminderJob implements Job {
                         .append("tel=")
                         .append(phoneNums.toString().substring(0, phoneNums.length() - 1))
                         .append("&username=")
-                        .append(MiscUtil.getProperty("General", "SMS_USERNAME").replaceAll("\"", ""))
+                        .append(MiscUtil.getProperty("General", "SMS_USERNAME"))
                         .append("&msg=")
                         .append(msg.toString().replaceAll("\\s+", "+"))
                         .append("&password=")
-                        .append(MiscUtil.getProperty("General", "SMS_PASSWORD").replaceAll("\"", ""));
+                        .append(MiscUtil.getProperty("General", "SMS_PASSWORD"));
 
                 logger.debug("Sending to URL: " + url.toString());
 
