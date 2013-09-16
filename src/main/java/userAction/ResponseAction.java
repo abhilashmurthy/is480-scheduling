@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import model.Booking;
 import model.Team;
 import model.User;
@@ -80,15 +79,17 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 						//Getting all the timeslot and booking details
 						HashMap<String, String> map = new HashMap<String, String>();
 						//SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
-						SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd yyyy, EEE");
-						SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
+						SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd, EEE");
+						SimpleDateFormat sdfForStartTime = new SimpleDateFormat("HH:mm");
+						SimpleDateFormat sdfForEndTime = new SimpleDateFormat("HH:mm aa");
+						
 						String venue = timeslot.getVenue();
 						Long bookingId = b.getId();
 						Team team = b.getTeam();
 						String teamName = team.getTeamName();
 						String milestoneName = timeslot.getSchedule().getMilestone().getName();
-						String time = sdfForTime.format(timeslot.getStartTime()) + " - " + 
-								sdfForTime.format(timeslot.getEndTime());
+						String time = sdfForStartTime.format(timeslot.getStartTime()) + " - " + 
+								sdfForEndTime.format(timeslot.getEndTime());
 						String date = sdfForDate.format(timeslot.getStartTime());
 						String myStatus = b.getResponseList().get(faculty).toString();
 						

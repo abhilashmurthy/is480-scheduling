@@ -47,7 +47,7 @@
 			<s:if test="%{data != null && data.size() > 0}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
 				<!--<form id="myform" action="updateBookingStatus" method="post">-->
-					<table id="approveRejectTable" class="table table-hover">
+					<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
@@ -55,8 +55,7 @@
 								<th>Team Name</th>
 								<th>Presentation</th>
 								<th>My Role</th>
-								<th>Date</th>
-								<th>Time</th>
+								<th>Date & Time</th>
 								<th>Venue</th>
 								<th>My Status</th>
 								<th></th>
@@ -80,8 +79,7 @@
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestone"/></td>
 									<td><s:property value="userRole"/></td>
-									<td><s:property value="date"/></td>
-									<td><s:property value="time"/></td>
+									<td><s:property value="date"/> <s:property value="time"/></td>
 									<td><s:property value="venue"/></td>
 									<td>
 										<s:property value="myStatus"/><br/><br/>
@@ -225,6 +223,7 @@
 					submitBookingData(bookingArray);
 				}
 			});
+			$("#rejectionText").focus();
 		} //end of reject
 		
 		//Deleting the data in the modal once it is hidden
