@@ -101,7 +101,7 @@
 							</tbody>
 						</table>
 						<br/><br/>
-					
+				<!--<input type="hidden" id="bookingIdValue" />-->
 				<!-- Modal -->
 				<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-header">
@@ -197,17 +197,18 @@
 		
 		function rejectBooking(e) {
 			//Disabling all buttons on page to avoid multiple clicking
-//			$('button[type=button]').attr('disabled', true);
-//			$("#rejectionModal").modal('show');
 			$('#rejectionModal').modal({
 				keyboard: true
 			});
 			
+			$('#rejectionModal').on('shown', function () {
+				$('#rejectionText').focus();
+			});
+
 			var bookingId =  $(e).val();
-			console.log(bookingId);
+//			$('#bookingIdValue').val(bookingId);
 			var id = $(e).attr("id");
-			console.log(id);
-			
+		
 			$('#rejectionTextSubmit').click(function(){
 				if ($('#rejectionText').val() === "") {
 				  //$('#rejectionText').next('.help-inline').show();
@@ -215,17 +216,17 @@
 				  return false;
 				} else {
 					var bookingArray = {};
+//					bookingArray['bookingId'] = $('#bookingIdValue').val();
 					bookingArray['bookingId'] = bookingId;
 					bookingArray['status'] = "reject";
 					bookingArray['rejectReason'] = $('#rejectionText').val();
 					//return true;
-//					alert(JSON.stringify(bookingArray));	
+	//					alert(JSON.stringify(bookingArray));	
 					submitBookingData(bookingArray);
 				}
 			});
-			$("#rejectionText").focus();
-		} //end of reject
-		
+		}  //end of reject
+		 
 		//Deleting the data in the modal once it is hidden
 		$('#rejectionModal').on('hidden', function() {
 //			console.log("hidden");
@@ -256,17 +257,6 @@
 				"bSortClasses": false
 			})
 		});
-		
-		//Display Message
-//		function displayMessage(id, msg, fade) {
-//			//Dislay result
-//			var e = $("#" + id);
-//			$(e).fadeTo(3000, 0);
-//			$(e).css('color', 'darkgreen').html(msg);
-//			if (fade) {
-//				$(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
-//			}
-//		}
 		
 		//Notification-------------
 		function showNotification(action, notificationMessage) {
