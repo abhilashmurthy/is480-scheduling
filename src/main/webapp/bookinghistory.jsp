@@ -20,23 +20,32 @@
     <body>
 		<%@include file="navbar.jsp" %>
 		<div class="container">
-		<h3>Booking History</h3>
-		
-		<!-- SECTION: Booking History -->
-		<s:if test="%{data != null && data.size() > 0}"> 
-			<!-- To hide/show columns -->
-<!--			<table class="table" style="font-size: 13px;">
-				<tr>
-					<td>Show/Hide Columns: </td>
-					<td>Team &nbsp;<input type="checkbox" id="teamHide"/></td>
-					<td>Presentation &nbsp;<input type="checkbox" id="presentationHide"/></td>
-					<td>Date & Time &nbsp;<input type="checkbox" id="dateHide"/></td>
-					<td>Venue &nbsp;<input type="checkbox" id="venueHide"/></td>
-					<td>Booking Status &nbsp;<input type="checkbox" id="bookingStatusHide"/></td>
-					<td>Overall Booking Status &nbsp;<input type="checkbox" id="overallBookingStatusHide"/></td>
-					<td>Reason to Reject &nbsp;<input type="checkbox" id="rejectReasonHide"/></td>
-				</tr>
-			</table>-->
+		<h3 style="float: left; margin-right: 50px;">Booking History</h3> 
+		<s:if test="%{data != null && data.size() > 0}">
+			<div style="float:right">
+				<input type="hidden" id="dropdownValues"/>
+				Hide/Show Columns:&nbsp;
+				<select id="hideColumns" size="4" multiple="multiple" style="font-size:13px; width:200px" onchange="onChangeInDropdown();">
+					<% if (activeRole.equals(Role.STUDENT)){ %>
+						<option value="1">My Team</option>
+					<% } else { %>
+						<option value="1">Team</option>
+					<% } %>
+					<option value="2">Presentation</option>
+					<option value="3">Date & Time</option>
+					<option value="4">Venue</option>
+					<% if (activeRole.equals(Role.FACULTY)) { %>
+						<option value="5">My Response</option>
+					<% } else { %>
+						<option value="5">Response</option>
+					<% } %>
+					<option value="6">Booking Status</option>
+					<option value="7">Reason for Rejection</option>
+				</select>
+			</div>
+			
+			<div style="clear: both;">
+			<br/>
 			<table id="bookingHistoryTable" class="table table-hover zebra-striped" style="font-size: 13px;">
 				<thead>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
@@ -55,7 +64,7 @@
 							<th>Venue</th>
 							<th>Response</th>
 							<th>Booking Status</th>
-							<th>Reason to Reject</th>
+							<th>Reason for Rejection</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<tr>
@@ -66,7 +75,7 @@
 							<th>Venue</th>
 							<th>My Response</th>
 							<th>Booking Status</th>
-							<th>Reason to Reject</th>
+							<th>Reason for Rejection</th>
 						</tr>
 					<% } %>
 				</thead>
@@ -102,7 +111,7 @@
 								</td>
 								<td><s:property value="overallBookingStatus"/></td>
 								<%--<s:if test="%{rejectReason != null)}">--%> 
-									<td><s:property value="rejectReason"/></td>
+								<td><s:property value="rejectReason"/></td>
 								<%--</s:if><s:else>--%>
 									<!--<td>-</td>-->
 								<%--</s:else>--%>
@@ -144,6 +153,7 @@
 			<h4>No bookings have been made!</h4>
 		</s:else>
 		</div>
+		</div>
 		
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
@@ -151,6 +161,29 @@
 			
 		//For data tables
 		$(document).ready(function(){
+			//To select all values in multiple select dropdown by default
+			$('#hideColumns option').attr('selected', 'selected');
+			var values = $("#hideColumns").val();
+			$('#dropdownValues').val(values);
+			$('#hideColumns option').removeAttr('selected');
+			
+			$('#hideColumns').change(function(){
+				var n = $('#dropdownValues').val();
+				var allValues = n.split(","); 
+				//First show all columns then hide whichever column has been chosen
+				for (var j=0; j<allValues.length; j++) {
+					$('td:nth-child('+ allValues[j] +'),th:nth-child('+ allValues[j] +')').show();
+				}
+				//Hiding the columns which have been selected
+				var selectedValues = $("#hideColumns").val();
+				//Only if a column has been selected
+				if (selectedValues.length > 0) {
+					for (var i=0; i<selectedValues.length; i++) {
+						$('td:nth-child('+ selectedValues[i] +'),th:nth-child('+ selectedValues[i] +')').hide();
+					}
+				}
+			}); //end of function
+		
 			$('#bookingHistoryTable').dataTable({
 				"aLengthMenu": [
 					[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
@@ -163,21 +196,19 @@
 //				"bAutoWidth": false,
 //				"asStripClasses": null,
 				"bSortClasses": false
-			})
+			});
 		});
 		
-		 $(document).ready(function() {
-           $("#teamHide").click(function() {
-//                $('td:nth-child(2)').hide();
-                // if your table has header(th), use this
-				var thisCheck = $(this);
-				if (thisCheck.is (':checked')) {
-					$('td:nth-child(1),th:nth-child(1)').hide();
-				} else {
-					$('td:nth-child(1),th:nth-child(1)').show();
-				}
-            });
-        });
+//		$("#teamHide").click(function() {
+////                $('td:nth-child(2)').hide();
+//			 // if your table has header(th), use this
+//			 var thisCheck = $(this);
+//			 if (thisCheck.is (':checked')) {
+//				 $('td:nth-child(1),th:nth-child(1)').hide();
+//			 } else {
+//				 $('td:nth-child(1),th:nth-child(1)').show();
+//			 }
+//		 });
 		</script>
     </body>
 </html>
