@@ -58,7 +58,7 @@ public class FacultyReminderEmail extends EmailTemplate{
 		dueDate.add(Calendar.MINUTE, -1);
 		
 		//Inserting the due date for response
-		map.put("[DUE_DATE]", sdf.format(dueDate));
+		map.put("[DUE_DATE]", sdf.format(dueDate.getTime()));
 		
 		return map;
 	}
