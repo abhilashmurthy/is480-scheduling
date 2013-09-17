@@ -330,16 +330,15 @@
                     }
                 }
                 
-                function getScheduleData(milestoneString, academicYearString, semesterString) {
+                function getScheduleData(milestone, year, semester) {
                     var toReturn = null;
                     var data = {
-                        year: academicYearString,
-                        semester: semesterString
+                        year: year,
+                        semester: semester
                     };
-                    if (milestoneString) {
-                        data["milestone"] = milestoneString;
+                    if (milestone) {
+                        data["milestone"] = milestone;
                     }
-                    console.log("Submitting data: " + JSON.stringify(data));
                     //Get schedule action
                     $.ajax({
                         type: 'GET',

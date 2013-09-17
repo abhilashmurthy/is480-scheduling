@@ -99,30 +99,10 @@
         <!-- Main schedule navigation -->
         <div class="scheduleContainer container page">
             <ul id="milestoneTab" class="nav nav-tabs">
-                <!-- TODO: populate dynamic milestones -->
-                <li class="active">
-                    <a id="acceptance" href="#acceptance" data-toggle="tab">Acceptance</a>
-                </li>
-                <li class>
-                    <a id="midterm" href="#midterm" data-toggle="tab">Midterm</a>
-                </li>
-                <li class>
-                    <a id="final" href="#final" data-toggle="tab">Final</a>
-                </li>
+                <!-- milestone tabs populated dynamically -->
             </ul>
             <div id="milestoneTabContent" class="tab-content" hidden="">
-                <div class="tab-pane fade active in" id="acceptanceContent">
-                    <table id="acceptanceScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
-                    </table>
-                </div>
-                <div class="tab-pane fade" id="midtermContent" hidden>
-                    <table id="midtermScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
-                    </table>
-                </div>
-                <div class="tab-pane fade" id="finalContent" hidden>
-                    <table id="finalScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
-                    </table>
-                </div>
+                <!-- milestone tables populated dynamically -->
             </div>
             <div id="scheduleProgressBar" class="progress progress-striped active">
                 <div class="bar" style="width: 100%;"></div>
@@ -167,8 +147,42 @@
                 //Booking specific variables
                 var self = null;
                 var users = JSON.parse('<%= session.getAttribute("allUsers") %>'); //All users JSON
-
+                
+                populateMilestones();
                 loadDefault();
+                
+                //Build the base of the page (Milestone tabs and tables)
+                function populateMilestones() {
+                    var milestones = getScheduleData(null, year, semester).milestones;
+                    for (var i = 0; i < milestones.length; i++) {
+                        var milestone = milestones[i];
+                        
+                        //Add the milestone tab
+                        var $milestoneTab = $(document.createElement('li'));
+                        if (i === 0) $milestoneTab.addClass('active');
+                        var $milestoneTabLink = 
+                                $(document.createElement('a'))
+                                .attr('id', milestone.name.toLowerCase())
+                                .attr('href', '#' + milestone.name.toLowerCase())
+                                .attr('data-toggle', 'tab')
+                                .html(milestone.name);
+                        $milestoneTabLink.appendTo($milestoneTab);
+                        $milestoneTab.appendTo($('ul#milestoneTab'));
+                        
+                        //Add the milestone table
+                        var $milestoneDiv = 
+                                $(document.createElement('div'))
+                                .addClass('tab-pane fade')
+                                .attr('id', milestone.name.toLowerCase() + "Content");
+                        if (i === 0) $milestoneDiv.addClass('active in');
+                        var $milestoneTable = 
+                                $(document.createElement('table'))
+                                .attr('id', milestone.name.toLowerCase() + "ScheduleTable")
+                                .addClass('scheduleTable table-condensed table-hover table-bordered');
+                        $milestoneTable.appendTo($milestoneDiv);
+                        $milestoneDiv.appendTo($('div#milestoneTabContent'));
+                    }
+                }
 
                 function loadDefault() {
                     //Default schedule to see upon opening index page
@@ -196,22 +210,29 @@
                 function getScheduleData(milestone, year, semester) {
                     var toReturn = null;
                     var data = {
-                        milestone: milestone,
                         year: year,
                         semester: semester
                     };
-                    //View Schedule AJAX
+                    if (milestone) {
+                        data["milestone"] = milestone;
+                    }
+                    //Get schedule action
                     $.ajax({
                         type: 'GET',
                         data: data,
-                        url: 'getSchedule',
                         async: false,
+                        url: 'getSchedule',
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
-                        toReturn = response;
+                        if (response.success) {
+                            toReturn = response;
+                        } else {
+                            var eid = btoa(response.message);
+                            window.location = "error.jsp?eid=" + eid;
+                        }
                     }).fail(function(error) {
-                        alert("There was an error in retrieving schedule");
+                        toReturn = "AJAX fail";
                     });
                     return toReturn;
                 }
@@ -1374,10 +1395,10 @@
                 }
                 
 //                $(".booking").draggable({
-//                    helper: "clone",
-//                    appendTo: "body",
+////                    helper: "clone",
+//                    appendTo: "body"
 //                });
-//                $(".timeslotCell").droppable({
+//                $(".unbookedTimeslot").droppable({
 //                        tolerance:"intersect",
 //                        drop: function(event, ui) {
 //                            var drop_p = $(this).offset();
@@ -1389,7 +1410,7 @@
 //                                left: '+=' + left_end
 //                            });
 //                        }
-//                    });
+//                });
             };
             
             /* POPOVER */
@@ -1408,7 +1429,7 @@
 //                    },
                     content: content,
                     placement: function(){
-                        if (container.parent().children().index(container) > 9) {
+                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 9) {
                             return 'left';
                         } else {
                             return 'right';
@@ -1424,7 +1445,7 @@
                     html: true,
                     title: title,
                     placement: function(){
-                        if (container.parent().children().index(container) > 9) {
+                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 9) {
                             return 'left';
                         } else {
                             return 'right';
