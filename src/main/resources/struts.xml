@@ -85,9 +85,21 @@
             <result name="success">/activeterms.jsp</result>
         </action>
 		
+		<action name="uploadFile" class="systemAction.GetTermsAction" method="execute">
+            <result name="success">/uploadfile.jsp</result>
+        </action>
+		
 		<action name="yourAvailability" class="systemAction.LoadAvailabilityAction" method="execute">
             <result name="success">/availability.jsp</result>
         </action>
+		
+		<action name="getUserPreferences" class="systemAction.GetUserPreferencesAction" method="execute">
+            <result name="success">/userpreferences.jsp</result>
+        </action>
+		
+		<action name="taAvailability" method="execute">
+			<result>/tasignup.jsp</result>
+		</action>
 				
     </package>
 
@@ -153,11 +165,6 @@
                 <param name="root">json</param>
             </result>
         </action>
-        <action name="viewBookingJson" class="userAction.ViewBookingAction" method="execute">
-            <result type="json">
-                <param name="root">json</param>
-            </result>
-        </action>
           <action name="deleteBookingJson" class="userAction.DeleteBookingAction" method="execute">
             <result type="json">
                 <param name="root">json</param>
@@ -193,6 +200,25 @@
 				  <param name="root">json</param>
 			</result>
         </action>
+		
+		<action name="taSignupJson" class="userAction.TASignupAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
+		<action name="updateUserPreferences" class="userAction.UpdateUserPreferencesAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
+		<action name="uploadFileToBackend" class="userAction.UploadFileAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
     </package>
 
 </struts>

@@ -38,7 +38,7 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
         EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 
             //Getting input data
             JSONObject inputData = new JSONObject(request.getParameter("jsonData"));

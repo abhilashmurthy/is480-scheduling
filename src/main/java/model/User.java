@@ -33,9 +33,10 @@ public class User implements Serializable {
 	
 	protected User() {}
 	
-	public User(String username, String fullName, Role role, Term term) {
+	public User(String username, String fullName, String mobileNumber, Role role, Term term) {
 		this.username = username;
 		this.fullName = fullName;
+		this.mobileNumber = mobileNumber;
 		this.role = role;
 		if (term != null) this.term = term;
 	}
@@ -49,13 +50,15 @@ public class User implements Serializable {
 	
 	private String fullName;
 	
+	private String mobileNumber;
+	
 	@ManyToOne(fetch = FetchType.EAGER) //Set to NULL for permanent roles
 	private Term term;
 	
 	private Role role;
 	
-	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Booking> subscribedBookings = new HashSet<Booking>();
+//	@ManyToMany(mappedBy = "optionalAttendees", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//	private Set<Booking> subscribedBookings = new HashSet<Booking>();
 	
 	public String getUsername() {
 		return username;
@@ -88,14 +91,22 @@ public class User implements Serializable {
 	public void setRole(Role role) {
 		this.role = role;
 	}
-	
-	public Set<Booking> getSubscribedBookings() {
-		return subscribedBookings;
+
+	public String getMobileNumber() {
+		return mobileNumber;
 	}
 
-	public void setSubscribedBookings(Set<Booking> subscribedBookings) {
-		this.subscribedBookings = subscribedBookings;
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
 	}
+	
+//	public Set<Booking> getSubscribedBookings() {
+//		return subscribedBookings;
+//	}
+//
+//	public void setSubscribedBookings(Set<Booking> subscribedBookings) {
+//		this.subscribedBookings = subscribedBookings;
+//	}
 	
 	public Long getId() {
 		return id;

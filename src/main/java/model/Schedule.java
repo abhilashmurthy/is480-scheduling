@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -25,6 +26,8 @@ import org.hibernate.annotations.Cascade;
  * @author suresh
  */
 @Entity
+@Table(uniqueConstraints = {
+		@UniqueConstraint(name = "Schedule_unique_constraint", columnNames = {"milestone_id"})})
 public class Schedule implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id

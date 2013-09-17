@@ -12,7 +12,9 @@ import constant.Response;
 import constant.Role;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
@@ -47,7 +49,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
     public String execute() throws Exception {
         EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
 
@@ -106,6 +108,11 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
             if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) {
                 addTeamsJson(em, session);
             }
+            
+            //Add users into session if user is admin/course coordinator/student
+            if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR || activeRole == Role.STUDENT) {
+                addUsersJson(em, session);
+            }
 
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
@@ -151,6 +158,32 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                 teamJsonList.add(teamMap);
             }
             session.setAttribute("allTeams", new Gson().toJson(teamJsonList));
+        }
+    }
+    
+    public void addUsersJson(EntityManager em, HttpSession session) {
+        //Get all users
+        Term term = (Term) session.getAttribute("currentActiveTerm");
+        List<User> userList = null;
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            Query q = em.createQuery("select u from User u");
+            userList = q.getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+        }
+        if (userList != null) {
+            ArrayList<HashMap<String, Object>> userJsonList = new ArrayList<HashMap<String, Object>>();
+            for (User u : userList) {
+                HashMap<String, Object> userMap = new HashMap<String, Object>();
+                userMap.put("id", u.getUsername() + "@smu.edu.sg");
+                userMap.put("name", u.getFullName());
+                userJsonList.add(userMap);
+            }
+            HashSet<HashMap<String, Object>> uniqueUsers = new HashSet<HashMap<String, Object>>(userJsonList);
+            session.setAttribute("allUsers", new Gson().toJson(uniqueUsers.toArray()));
         }
     }
 

@@ -4,6 +4,7 @@
     Author     : ABHILASHM.2010
 --%>
 
+<%@page import="manager.UserManager"%>
 <%@page import="model.role.Student"%>
 <%@page import="constant.Role"%>
 <%@page import="java.util.ArrayList"%>
@@ -67,11 +68,13 @@
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Manage Terms</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">Upload File</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<!--<li class="dropdown">   
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
@@ -81,6 +84,7 @@
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
 						<li id="bookingHistory"><a href="yourAvailability" class="navbar-title"><b>Your Availability</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.STUDENT)) { %>
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
@@ -88,9 +92,11 @@
 							<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.TA)) { %>	
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>Booking History</b></a></li>
-						<!--Nothing for now!-->
+						<li id="bookingHistory"><a href="taAvailability" class="navbar-title"><b>TA Video Signup</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } %>
                 </ul>
             </div>
@@ -101,7 +107,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
-                    <li class="disabled"><a tabindex="-1" href="#"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
+                    <li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
                     <li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
                 </ul>
             </div>
@@ -114,7 +120,7 @@
     <!--<p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>-->
 	
 	 <% if (activeRole.equals(Role.STUDENT)) { 
-			Student student = (Student) session.getAttribute("user");
+			Student student = UserManager.getUser(user.getId(), Student.class);
 	 %>
 		<p><strong>Team</strong><br/><% out.print(student.getTeam().getTeamName());%></p>
 	 <% } %>
@@ -187,11 +193,19 @@
         });
         
         //Hide all popovers on page click
-        $("body").on('click', function(){
-            if ($('.popover').hasClass("in")) {
-                $('.popover').parent().popover('hide');
-            }
-        });
+        $("body").on('click', function(e) {
+            //Hide all popovers
+            $('.popover.in').each(function(f){
+                var self = $(this);
+                //Don't detect datepicker and timepicker
+                if (!$(e.target).closest("div#ui-datepicker-div").length && !$(e.target).closest(".ui-timepicker-wrapper").length) {
+                    self.parent().popover('hide');
+                }
+            });
+            //Hide all notifications
+            $.pnotify_remove_all();
+        });    
+            
         
         //Disable Pines Notify Settings
         $.pnotify.defaults.history = false;

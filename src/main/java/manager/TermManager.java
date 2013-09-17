@@ -23,7 +23,7 @@ public class TermManager {
     private static Logger logger = LoggerFactory.getLogger(TermManager.class);
     
     public static boolean update(EntityManager em, Term term, EntityTransaction transaction) {
-        logger.info("Updating term: " + term);
+        logger.trace("Updating term: " + term);
         try {
             transaction = em.getTransaction();
             transaction.begin();
@@ -47,7 +47,7 @@ public class TermManager {
     }
 
     public static List<Term> getAllTerms(EntityManager em) {
-        logger.info("Getting all term objects");
+        logger.trace("Getting all term objects");
         List<Term> sourceList = null;
         EntityTransaction transaction = em.getTransaction();
         try {
@@ -63,7 +63,7 @@ public class TermManager {
     }
 
     public static Term findByYearAndSemester(EntityManager em, int year, String semester) {
-        logger.info("Getting term by year and semester");
+        logger.trace("Getting term by year and semester");
         Term result = null;
         try {
             Query q = em.createNativeQuery("select * from Term where academicYear = :year "
@@ -82,7 +82,7 @@ public class TermManager {
     }
 	
 	public static Term findTermById (EntityManager em, long id) {
-		logger.info("Getting term by id");
+		logger.trace("Getting term by id");
 		Term term = null;
 		try {
 			Query q = em.createQuery("SELECT t FROM Term t WHERE t.id = :id", Term.class);

@@ -48,7 +48,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
             //Getting the active role of the user
             Role activeRole = (Role) session.getAttribute("activeRole");
@@ -101,8 +101,9 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				for (Booking b: bookings) {
 					Timeslot timeslot = b.getTimeslot();
 					HashMap<String, Object> map = new HashMap<String, Object>();
-					SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd yyyy, EEE");
-					SimpleDateFormat sdfForTime = new SimpleDateFormat("HH:mm aa");
+					SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd, EEE");
+					SimpleDateFormat sdfForStartTime = new SimpleDateFormat("HH:mm");
+					SimpleDateFormat sdfForEndTime = new SimpleDateFormat("HH:mm aa");
 
 					String venue = timeslot.getVenue();
 					String teamName = b.getTeam().getTeamName();
@@ -113,8 +114,8 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 						milestoneName = schedule.getMilestone().getName();
 					}
 					String date = sdfForDate.format(timeslot.getStartTime());
-					String time = sdfForTime.format(timeslot.getStartTime()) + " - " + 
-							sdfForTime.format(timeslot.getEndTime());
+					String time = sdfForStartTime.format(timeslot.getStartTime()) + "-" + 
+							sdfForEndTime.format(timeslot.getEndTime());
 
 					//Only for supervisors/reviewers (or Faculty)
 					if (activeRole.equals(Role.FACULTY)) {
@@ -142,12 +143,16 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 						}
 						map.put("individualBookingStatus", individualStatusList);
 					}
+					
+					//Getting the reason for rejection if booking has been rejected
+					String rejectReason = b.getRejectReason();
 
 					map.put("teamName", teamName);
 					map.put("milestone", milestoneName);
 					map.put("date", date);
 					map.put("time", time);
 					map.put("venue", venue);
+					map.put("rejectReason", rejectReason);
 
 					data.add(map);
 				}

@@ -7,9 +7,7 @@ package manager;
 import constant.BookingStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
@@ -55,7 +53,7 @@ public class BookingManager {
 	}
 	
 	public static boolean updateBookings(EntityManager em, List<Booking> bookingsToUpdate, EntityTransaction transaction) {
-        logger.info("Updating bookings");
+        logger.trace("Updating bookings");
         try {
             transaction.begin();
             for (Booking booking : bookingsToUpdate) {

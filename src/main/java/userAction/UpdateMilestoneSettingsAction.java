@@ -40,7 +40,7 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 		EntityManager em = null;
         try {
 			json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 			HttpSession session = request.getSession();
 			
 			//Checking whether the active user is admin/course coordinator or not

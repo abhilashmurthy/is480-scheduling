@@ -6,9 +6,13 @@ package notification.email;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
+import model.Booking;
+import model.User;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +67,49 @@ public abstract class EmailTemplate {
 			body = body.replace(e.getKey(), e.getValue());
 		}
 		return body;
+	}
+	
+	/**
+	 * Injects standard booking information. Covers the following tags:
+	 * [TEAM_NAME], [MILESTONE], [DATE], [START_TIME], [END_TIME]
+	 * [VENUE], [REQUIRED_ATTENDEES]
+	 * @param b
+	 * @param map
+	 * @return 
+	 */
+	public HashMap<String, String> generateStandardDetails(Booking b, HashMap<String, String> map) {
+		//Insert team name
+		map.put("[TEAM_NAME]", b.getTeam().getTeamName());
+		
+		//Insert milestone name
+		map.put("[MILESTONE]", b.getTimeslot().getSchedule().getMilestone().getName());
+		
+		//Insert start date
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
+		map.put("[DATE]", dateFormat.format(b.getTimeslot().getStartTime()));
+		
+		//Insert start and end time
+		SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+		map.put("[START_TIME]", timeFormat.format(b.getTimeslot().getStartTime()));
+		map.put("[END_TIME]", timeFormat.format(b.getTimeslot().getEndTime()));
+		
+		//Insert venue
+		map.put("[VENUE]", b.getTimeslot().getVenue());
+		
+		//Insert required attendees
+		Set<User> userList = b.getResponseList().keySet();
+		Iterator<User> iter = userList.iterator();
+		StringBuilder result = new StringBuilder();
+		
+		while (iter.hasNext()) {
+			result.append(iter.next().getFullName());
+			if (iter.hasNext()) {
+				result.append(",&nbsp;");
+			}
+		}
+		map.put("[REQUIRED_ATTENDEES]", result.toString());
+		
+		return map;
 	}
 	
 	public abstract String generateEmailSubject();

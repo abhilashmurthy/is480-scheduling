@@ -41,7 +41,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
     public String execute() throws Exception {
         EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 
             //Getting input data
             JSONObject scheduleData = new JSONObject(request.getParameter("jsonData"));

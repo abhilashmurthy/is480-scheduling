@@ -32,7 +32,7 @@ public class LoadAvailabilityAction extends ActionSupport implements ServletRequ
 	public String execute() throws Exception {
 		EntityManager em = null;
 		try {
-			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = MiscUtil.getEntityManagerInstance();
 			
 			//Checking whether the active user is a faculty member
 			User user = (User) request.getSession().getAttribute("user");

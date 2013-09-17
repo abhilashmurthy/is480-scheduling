@@ -8,6 +8,8 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
 //import constant.Status;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +46,10 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 		EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
+            HttpSession session = request.getSession();
+            
+            User user = (User) session.getAttribute("user");
 
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
@@ -55,8 +60,9 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 				
                 //set the current booking's status to deleted
                 Booking b = ts.getCurrentBooking();
-
                 b.setBookingStatus(BookingStatus.DELETED);
+                b.setLastEditedBy(user.getFullName());
+                b.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 
                 //set the current booking to null
                 ts.setCurrentBooking(null);

@@ -10,7 +10,9 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -48,14 +50,14 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = MiscUtil.getEntityManagerInstance();
 
 			JSONObject inputObject = (JSONObject) new JSONObject(request.getParameter("jsonData"));
 			long bookingId = Long.valueOf(inputObject.getString("bookingId"));
 			//Status containing either approve or reject
 			String status = inputObject.getString("status");
 
-			String rejectReason = "";
+			String rejectReason = null;
 			Response response = null;
 			if (status.equalsIgnoreCase("approve")) {
 				response = Response.APPROVED;
@@ -106,6 +108,11 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					logger.error("Faculty not found in responseList for required attendees");
 					return ERROR;
 				}
+				
+				//Storing the reason for rejection
+				if (response == Response.REJECTED && rejectReason != null) {
+					booking.setRejectReason(rejectReason);
+				}
 
 				//Computing the overall status of the booking based on the new response
 				int total = 0;
@@ -138,6 +145,9 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
 				}
+                                
+                                booking.setLastEditedBy(user.getFullName());
+                                booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			
 				//Updating the time slot 
 				EntityTransaction transaction = em.getTransaction();

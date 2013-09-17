@@ -14,8 +14,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Approve Booking</title>
-		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Approve</title>
+        <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
     </head>
     <body>
         <%@include file="navbar.jsp" %>
@@ -46,7 +47,7 @@
 			<s:if test="%{data != null && data.size() > 0}"> 
 				<%--<s:if test="%{teamName != null}"> --%>
 				<!--<form id="myform" action="updateBookingStatus" method="post">-->
-					<table id="approveRejectTable" class="table table-hover">
+					<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
 						<thead>
 							<tr>
 								<%--<th>Team Id</th>--%>
@@ -54,8 +55,7 @@
 								<th>Team Name</th>
 								<th>Presentation</th>
 								<th>My Role</th>
-								<th>Date</th>
-								<th>Time</th>
+								<th>Date & Time</th>
 								<th>Venue</th>
 								<th>My Status</th>
 								<th></th>
@@ -79,20 +79,19 @@
 									<td><s:property value="teamName"/></td>
 									<td><s:property value="milestone"/></td>
 									<td><s:property value="userRole"/></td>
-									<td><s:property value="date"/></td>
-									<td><s:property value="time"/></td>
+									<td><s:property value="date"/> <s:property value="time"/></td>
 									<td><s:property value="venue"/></td>
 									<td>
 										<s:property value="myStatus"/><br/><br/>
 									</td>
 									<td>
 										<button type="button" class="btn btn-success" id="approve" value="<s:property value="bookingId"/>" 
-												name="approve" onClick="approveRejectBooking(this);">
+												name="approve" onClick="approveBooking(this);">
 											Approve
 										</button>
 										<span class="button-divider">
 										<button type="button" class="btn btn-danger" id="reject" value="<s:property value="bookingId"/>" 
-												name="reject" onClick="approveRejectBooking(this);">
+												name="reject" onClick="rejectBooking(this);">
 											Reject
 										</button>
 										</span>
@@ -102,7 +101,7 @@
 							</tbody>
 						</table>
 						<br/><br/>
-					
+				<!--<input type="hidden" id="bookingIdValue" />-->
 				<!-- Modal -->
 				<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-header">
@@ -110,18 +109,30 @@
 						<h3 id="myModalLabel">Information Required</h3>
 					</div>
 					<div class="modal-body">
+						<form id="rejectForm">
 						<table>
 							<tr>
-								<td width="150px">Reason for Rejection</td>
+								<td width="150px">
+									Reason for Rejecting <br/>
+									<i style="font-size: 13px;">(55 characters max.)</i>
+								</td>
 								<!--<th>Add Proxy</th>-->
-								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:300px; height:75px;" 
-											  placeholder="Unexpected Meeting..." maxlength="100"></textarea>
+								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
+											  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
+								</td>
 							</tr>
 						</table>
+						</form>
 					</div>
 					<div class="modal-footer">
 						<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-						<button class="btn btn-primary">Save</button>
+						<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
 					</div>
 				</div>
 			</s:if><s:else>
@@ -137,7 +148,10 @@
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<script type="text/javascript">
 
-		function approveRejectBooking(e) {
+		function approveBooking(e) {
+			//Disabling all buttons on page to avoid multiple clicking
+			$('button[type=button]').attr('disabled', true);
+			
 			var bookingId =  $(e).val();
 			console.log(bookingId);
 			var id = $(e).attr("id");
@@ -147,17 +161,13 @@
 			if (id === 'approve') {
 				bookingArray['bookingId'] = bookingId;
 				bookingArray['status'] = "approve";
-			} else if (id === 'reject') {
-				bookingArray['bookingId'] = bookingId;
-				bookingArray['status'] = "reject";
-//				$('#rejectionModal').modal({
-//					keyboard: true
-//				});
-				bookingArray['rejectReason'] = "Got a meeting!";
-			}
-			
+			} 			
+			submitBookingData(bookingArray);
+		}
+		
+		//AJAX call
+		function submitBookingData(bookingArray) {
 //			alert(JSON.stringify(bookingArray));
-			
 			$.ajax({
 				type: 'POST',
 				async: false,
@@ -166,34 +176,69 @@
 				}).done(function(response) {
 				   if (!response.exception) {
 					   if (response.success) {
-						   displayMessage("approveRejectMessage", response.message, false);
+						   showNotification("SUCCESS", response.message);
 					   } else {
-						   displayMessage("approveRejectMessage", response.message, true);
+						   showNotification("ERROR", response.message);
 					   }
 //					   window.location.reload(true);
 					   timedRefresh(2000);
+//					   $('button[type=button]').attr('disabled', false);
 				   } else {
 					   var eid = btoa(response.message);
 					   window.location = "error.jsp?eid=" + eid;
 				   }
 				}).fail(function(error) {
+				   $('button[type=button]').attr('disabled', false);
 				   console.log("Updating Booking Status AJAX FAIL");
-				   displayMessage("approveRejectMessage", "Oops.. something went wrong", true);
+				   showNotification("WARNING", "Oops.. something went wrong");
 				});
 				return false;
 		}
 		
+		function rejectBooking(e) {
+			//Disabling all buttons on page to avoid multiple clicking
+			$('#rejectionModal').modal({
+				keyboard: true
+			});
+			
+			$('#rejectionModal').on('shown', function () {
+				$('#rejectionText').focus();
+			});
+
+			var bookingId =  $(e).val();
+//			$('#bookingIdValue').val(bookingId);
+			var id = $(e).attr("id");
+		
+			$('#rejectionTextSubmit').click(function(){
+				if ($('#rejectionText').val() === "") {
+				  //$('#rejectionText').next('.help-inline').show();
+				  $('#errorMsg').show();
+				  return false;
+				} else {
+					var bookingArray = {};
+//					bookingArray['bookingId'] = $('#bookingIdValue').val();
+					bookingArray['bookingId'] = bookingId;
+					bookingArray['status'] = "reject";
+					bookingArray['rejectReason'] = $('#rejectionText').val();
+					//return true;
+	//					alert(JSON.stringify(bookingArray));	
+					submitBookingData(bookingArray);
+				}
+			});
+		}  //end of reject
+		 
+		//Deleting the data in the modal once it is hidden
+		$('#rejectionModal').on('hidden', function() {
+//			console.log("hidden");
+//			$(this).removeData('#rejectionText');
+//			$("#rejectionText").val(null);
+//			$("#errorMsg").hide();
+			location.reload(true);
+		});
+		
 		function timedRefresh(timeoutPeriod) {
 			setTimeout("location.reload(true);", timeoutPeriod);
 		}
-//		function validateProxyReason() {
-//			$('#rejectionModal').modal({
-//				keyboard: true
-//			});
-//			return false;
-//			var rejectionReason = document.getElementById("rejectiontText");
-//			alert(rejectionReason);
-//		}
 			
 		//For data tables
 		$(document).ready(function(){
@@ -213,17 +258,47 @@
 			})
 		});
 		
-		//Display Message
-		function displayMessage(id, msg, fade) {
-			//Dislay result
-			var e = $("#" + id);
-			$(e).fadeTo(3000, 0);
-			$(e).css('color', 'darkgreen').html(msg);
-			if (fade) {
-				$(e).css('color', 'darkred').html(msg).fadeTo(5000, 0);
+		//Notification-------------
+		function showNotification(action, notificationMessage) {
+			var opts = {
+				title: "Note",
+				text: notificationMessage,
+				type: "warning",
+				icon: false,
+				sticker: false,
+				mouse_reset: false,
+				animation: "fade",
+				animate_speed: "fast",
+				before_open: function(pnotify) {
+					pnotify.css({
+					   top: "52px",
+					   left: ($(window).width() / 2) - (pnotify.width() / 2)
+					});
+				}
+			};
+			switch (action) {
+				case "SUCCESS":
+					opts.title = "Updated";
+					opts.type = "success";
+					break;
+				case "ERROR":
+					opts.title = "Error";
+					opts.type = "error";
+					break;
+				case "INFO":
+					opts.title = "Error";
+					opts.type = "info";
+					break;
+				case "WARNING":
+					$.pnotify_remove_all();
+					opts.title = "Note";
+					opts.type = "warning";
+					break;
+				default:
+					alert("Something went wrong");
 			}
+			$.pnotify(opts);
 		}
-		
 		//To check/uncheck all boxes
 //		function toggle(oInput) {
 //			var aInputs = document.getElementsByTagName('input');

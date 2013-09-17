@@ -13,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import model.role.TA;
 
 /**
  *
@@ -20,6 +23,8 @@ import javax.persistence.OneToOne;
  */
 
 @Entity
+@Table(uniqueConstraints = {
+		@UniqueConstraint(name = "Timeslot_unique_constraint", columnNames = {"schedule_id", "startTime"})})
 public class Timeslot implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -36,6 +41,9 @@ public class Timeslot implements Serializable {
 	
 	@OneToOne(fetch = FetchType.LAZY) //Stores the current active booking for the timeslot. If null, then the timeslot is available
 	private Booking currentBooking;
+	
+	@ManyToOne
+	private TA TA;
 
 	public Timestamp getStartTime() {
 		return startTime;
@@ -83,6 +91,14 @@ public class Timeslot implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public TA getTA() {
+		return TA;
+	}
+
+	public void setTA(TA TA) {
+		this.TA = TA;
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
 
             //Getting input data
             JSONObject inputData = new JSONObject(request.getParameter("jsonData"));

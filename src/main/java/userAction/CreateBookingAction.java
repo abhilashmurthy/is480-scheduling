@@ -11,14 +11,15 @@ import constant.Role;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
@@ -28,11 +29,20 @@ import model.Team;
 import model.Timeslot;
 import model.User;
 import model.role.Student;
+import model.role.TA;
 import notification.email.NewBookingEmail;
 import notification.email.RespondToBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.ee.servlet.QuartzInitializerListener;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import systemAction.quartz.SMSReminderJob;
 import util.MiscUtil;
 
 /**
@@ -60,8 +70,11 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
+            Map parameters = request.getParameterMap();
+            String[] optionalAttendeesArray = (String[]) parameters.get("attendees[]");
+            if (optionalAttendeesArray != null) logger.debug("Optional 1: " + optionalAttendeesArray[0]);
 
             User user = (User) session.getAttribute("user");
             Role activeRole = (Role) session.getAttribute("activeRole");
@@ -105,8 +118,9 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
                 //Assign information to booking
                 booking.setTimeslot(timeslot); 
-                booking.setTeam(team); 
-                booking.setCreatedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+                booking.setTeam(team);
+				Timestamp currentTime = new Timestamp(Calendar.getInstance().getTimeInMillis());
+                booking.setCreatedAt(currentTime);
                 
                 //Add team members to attendees
                 HashSet<User> reqAttendees = new HashSet<User>();
@@ -133,9 +147,16 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                     logger.error("FATAL ERROR: Code not to be reached!");
                     throw new Exception();
                 }
+                
+                //Add optional attendees
+                HashSet<String> optionalAttendees = new HashSet<String>();
+                if (optionalAttendeesArray != null) optionalAttendees = new HashSet<String>(Arrays.asList(optionalAttendeesArray));
 
                 booking.setResponseList(responseList);
                 booking.setRequiredAttendees(reqAttendees);
+                booking.setOptionalAttendees(optionalAttendees);
+                booking.setLastEditedBy(user.getFullName());
+                booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
                 NewBookingEmail newEmail = new NewBookingEmail(booking);
                 RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
                 newEmail.sendEmail();
@@ -173,8 +194,20 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                     facultyMap.put("status", statusList.get(facultyUser).toString());
                     faculties.add(facultyMap);
                 }
-                map.put("faculties", faculties);
-                String TA = "-";
+                 map.put("faculties", faculties);
+                
+                //Adding all optionals
+                List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>();
+                for (String optional : optionalAttendees) {
+                    HashMap<String, String> optionalMap = new HashMap<String, String>();
+                    optionalMap.put("id", optional);
+                    optionalMap.put("name", optional);
+                    optionals.add(optionalMap);
+                }
+                map.put("optionals", optionals);
+               
+				TA ta = timeslot.getTA();
+                String TA = (ta != null) ? ta.getFullName() : "-";
                 map.put("TA", TA);
                 String teamWiki = "-";
                 map.put("teamWiki", teamWiki);
@@ -182,10 +215,18 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 json.put("booking", map);
 
                 em.getTransaction().commit();
+				
+				//Schedule job for SMS reminders
+				scheduleSMSReminder(booking);
             } catch (Exception e) {
                 //Rolling back write operations
+                logger.error("Exception caught: " + e.getMessage());
+                if (MiscUtil.DEV_MODE) {
+                    for (StackTraceElement s : e.getStackTrace()) {
+                        logger.debug(s.toString());
+                    }
+                }
                 em.getTransaction().rollback();
-                logger.error("FATAL ERROR: Database Write Error. Code not to be reached!");
                 json.put("success", false);
                 json.put("message", "Oops. Something went wrong on our end. Please try again!");
                 return SUCCESS;
@@ -219,7 +260,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         if (team == null) {
             logger.error("Team information not found or unauthorized user role");
             json.put("success", false);
-            json.put("message", "Team not identified or you do not have required"
+            json.put("message", "Team unidentified or you may not have the required"
                     + " permissions to make a booking.");
             return false;
         }
@@ -231,6 +272,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("message", "Timeslot not found. Please check the ID provided!");
             return false;
         }
+		
+		//Check if the timeslot has already passed
+		Calendar now = Calendar.getInstance();
+		if (timeslot.getStartTime().before(now.getTime())) {
+			json.put("success", false);
+            json.put("message", "You cannot book a timeslot that has already passed!");
+            return false;
+		}
 
         //Check if the timeslot is free
         if (timeslot.getCurrentBooking() != null) { //Slot is full
@@ -251,6 +300,30 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         return true;
     }
 
+	//Method to schedule a job to send an SMS reminder 24 hrs before the presentation
+	private void scheduleSMSReminder(Booking b) throws Exception {
+		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
+				.getServletContext()
+				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
+		Scheduler scheduler = factory.getScheduler();
+		
+		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
+				.usingJobData("bookingId", b.getId())
+				.withIdentity(b.getId().toString(),"SMS Reminders").build();
+		
+		//Calculating the time to trigger the job
+		Calendar scheduledTime = Calendar.getInstance();
+		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
+		scheduledTime.setTime(presentationStartTime);
+		scheduledTime.add(Calendar.DAY_OF_MONTH, -1); //Subtracting a day from the presentation start time
+//		scheduledTime.add(Calendar.SECOND, 10); //For testing
+		
+		Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(),"SMS Reminders")
+				.startAt(scheduledTime.getTime()).build();
+		
+		scheduler.scheduleJob(jd, tr);
+	}
+	
     public Long getTeamId() {
         return teamId;
     }

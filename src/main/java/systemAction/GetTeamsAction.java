@@ -73,7 +73,7 @@ public class GetTeamsAction extends ActionSupport implements ServletRequestAware
     public String execute() throws ServletException, IOException {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             
             //Get term
             Term term = TermManager.findByYearAndSemester(em, Integer.parseInt(academicYearString), semesterString);

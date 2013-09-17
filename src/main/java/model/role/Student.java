@@ -28,8 +28,8 @@ public class Student extends User implements Serializable {
 	
 	protected Student() {}
 	
-	public Student(String username, String fullName, Term term) {
-		super(username, fullName, Role.STUDENT, term);
+	public Student(String username, String fullName, String mobileNumber, Term term) {
+		super(username, fullName, mobileNumber, Role.STUDENT, term);
 	}
 	
 	private static final long serialVersionUID = 1L;
@@ -59,6 +59,11 @@ public class Student extends User implements Serializable {
 
 	public void setRequiredBookings(Set<Booking> requiredBookings) {
 		this.requiredBookings = requiredBookings;
+	}
+
+	@Override
+	public void setRole(Role role) {
+		super.setRole(Role.STUDENT);
 	}
 	
 	@Override

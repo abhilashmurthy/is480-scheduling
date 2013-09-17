@@ -45,55 +45,32 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		EntityManager em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-		HashSet<String> emails = new HashSet<String>();
-		
-		//Adding required attendees
-		for (User u : b.getResponseList().keySet()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+		EntityManager em = null;
+		try {
+			em = MiscUtil.getEntityManagerInstance();
+			HashSet<String> emails = new HashSet<String>();
+
+			//Adding required attendees
+			for (User u : b.getResponseList().keySet()) {
+				emails.add(u.getUsername() + "@smu.edu.sg");
+			}
+			//Adding the course coordinator
+			emails.add(UserManager.getCourseCoordinator(em).getUsername() + "@smu.edu.sg");
+
+			//Adding the optional attendees
+			for (String s : b.getOptionalAttendees()) {
+				emails.add(s);
+			}
+			return emails;
+		} finally {
+			if (em != null && em.isOpen()) em.close();
 		}
-		//Adding the course coordinator
-		emails.add(UserManager.getCourseCoordinator(em).getUsername() + "@smu.edu.sg");
-		
-		return emails;
 	}
 
 	@Override
 	public HashMap<String, String> prepareBodyData() {
 		HashMap<String, String> map = new HashMap<String, String>();
-		
-		//Insert team name
-		map.put("[TEAM_NAME]", b.getTeam().getTeamName());
-		
-		//Insert milestone name
-		map.put("[MILESTONE]", b.getTimeslot().getSchedule().getMilestone().getName());
-		
-		//Insert start date
-		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy");
-		map.put("[DATE]", dateFormat.format(b.getTimeslot().getStartTime()));
-		
-		//Insert start and end time
-		SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-		map.put("[START_TIME]", timeFormat.format(b.getTimeslot().getStartTime()));
-		map.put("[END_TIME]", timeFormat.format(b.getTimeslot().getEndTime()));
-		
-		//Insert venue
-		map.put("[VENUE]", b.getTimeslot().getVenue());
-		
-		//Insert required attendees
-		Set<User> userList = b.getResponseList().keySet();
-		Iterator<User> iter = userList.iterator();
-		StringBuilder result = new StringBuilder();
-		
-		while (iter.hasNext()) {
-			result.append("&nbsp;").append(iter.next().getFullName());
-			if (iter.hasNext()) {
-				result.append("<br />");
-			}
-		}
-		map.put("[CONFIRMED_ATTENDEES]", result.toString());
-		
-		return map;
+		return generateStandardDetails(b, map);
 	}
 	
 }

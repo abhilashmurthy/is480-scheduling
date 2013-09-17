@@ -29,7 +29,7 @@ public class ScheduleManager {
     private static Logger logger = LoggerFactory.getLogger(ScheduleManager.class);
 
     public static Schedule findByMilestone(EntityManager em, Milestone milestone) {
-        logger.info("Getting schedule by milestone");
+        logger.trace("Getting schedule by milestone");
         Schedule result = null;
         try {
             em.getTransaction().begin();
@@ -45,7 +45,7 @@ public class ScheduleManager {
     }
 
     public static Schedule findActiveByTerm(EntityManager em, Term term) {
-        logger.info("Getting active schedule by term");
+        logger.trace("Getting active schedule by term");
         Schedule result = null;
         try {
             em.getTransaction().begin();
@@ -66,7 +66,7 @@ public class ScheduleManager {
     }
 
     public static List<Schedule> findByTerm(EntityManager em, Term term) {
-        logger.info("Getting schedules by term");
+        logger.trace("Getting schedules by term");
         List<Schedule> result = null;
         try {
             em.getTransaction().begin();
@@ -82,7 +82,7 @@ public class ScheduleManager {
     }
 
     public static boolean save(EntityManager em, List<Schedule> scheduleList, EntityTransaction transaction) {
-        logger.info("Creating new schedule");
+        logger.trace("Creating new schedule");
         try {
             transaction = em.getTransaction();
             transaction.begin();
@@ -106,7 +106,7 @@ public class ScheduleManager {
     }
     
     public static boolean save(EntityManager em, Schedule schedule, EntityTransaction transaction) {
-        logger.info("Creating new schedule: " + schedule);
+        logger.trace("Creating new schedule: " + schedule);
         try {
             transaction = em.getTransaction();
             transaction.begin();
@@ -128,7 +128,7 @@ public class ScheduleManager {
     }
     
     public static boolean update(EntityManager em, Schedule schedule, EntityTransaction transaction) {
-        logger.info("Updated schedule: " + schedule);
+        logger.trace("Updated schedule: " + schedule);
         try {
             transaction = em.getTransaction();
             transaction.begin();
@@ -150,7 +150,7 @@ public class ScheduleManager {
     }
 
     public static List<Schedule> getAllSchedules(EntityManager em) {
-        logger.info("Getting all schedule objects");
+        logger.trace("Getting all schedule objects");
         List<Schedule> sourceList = null;
         EntityTransaction transaction = em.getTransaction();
         try {
@@ -167,7 +167,7 @@ public class ScheduleManager {
     }
     
     public static Schedule findByWindow(EntityManager em, Timestamp startDate, Timestamp endDate) {
-        logger.info("Getting schedule by window: start[" + startDate + "], end[" + endDate + "]");
+        logger.trace("Getting schedule by window: start[" + startDate + "], end[" + endDate + "]");
         Schedule schedule = null;
         EntityTransaction transaction = em.getTransaction();
         try {
@@ -185,15 +185,19 @@ public class ScheduleManager {
     }
     
     public static Schedule findById(EntityManager em, long id) {
-        logger.info("Getting schedule by id: " + id);
+        logger.trace("Getting schedule by id: " + id);
         Schedule schedule = null;
-        EntityTransaction transaction = em.getTransaction();
+        boolean justHere = true;
         try {
-            transaction.begin();
+            if (em.getTransaction().isActive()) {
+                justHere = false;
+            } else {
+                em.getTransaction().begin();
+            }
             Query q = em.createQuery("select o from Schedule o where o.id = :id", Schedule.class)
                     .setParameter("id", id);
             schedule = (Schedule) q.getSingleResult();
-            transaction.commit();
+            if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
             e.printStackTrace();

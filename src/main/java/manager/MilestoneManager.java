@@ -4,6 +4,7 @@
  */
 package manager;
 
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
@@ -20,10 +21,11 @@ import util.MiscUtil;
  * @author suresh
  */
 public class MilestoneManager {
-	private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
-        
+
+    private static Logger logger = LoggerFactory.getLogger(MilestoneManager.class);
+
     public static boolean save(EntityManager em, Milestone milestone, EntityTransaction transaction) {
-        logger.info("Creating new milestone: " + milestone.getName());
+        logger.trace("Creating new milestone: " + milestone.getName());
         try {
             transaction = em.getTransaction();
             transaction.begin();
@@ -43,21 +45,37 @@ public class MilestoneManager {
         }
         return false;
     }
-	
-	public static Milestone findByNameAndTerm (EntityManager em, String name, Term term) {
-		logger.info("Getting milestone by name");
-		Milestone result = null;
-		try {
-			em.getTransaction().begin();
-			Query q = em.createNativeQuery("select * from Milestone where name = :name and term_id = :term", Milestone.class)
-                            .setParameter("name", name)
-                            .setParameter("term", term);
-			result = (Milestone) q.getSingleResult();
-			em.getTransaction().commit();	
-		} catch (Exception e) {
-			e.printStackTrace();
-			em.getTransaction().rollback();
-		}
-		return result;
-	}
+
+    public static Milestone findByNameAndTerm(EntityManager em, String name, Term term) {
+        logger.trace("Getting milestone by name");
+        Milestone result = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createNativeQuery("select * from Milestone where name = :name and term_id = :term", Milestone.class)
+                    .setParameter("name", name)
+                    .setParameter("term", term);
+            result = (Milestone) q.getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        }
+        return result;
+    }
+    
+    public static List<Milestone> findByTerm(EntityManager em, Term term) {
+        logger.trace("Getting milestones by term: " + term);
+        List<Milestone> result = null;
+        try {
+            em.getTransaction().begin();
+            Query q = em.createNativeQuery("select * from Milestone where term_id = :term", Milestone.class)
+                    .setParameter("term", term);
+            result = (List<Milestone>) q.getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        }
+        return result;
+    }
 }

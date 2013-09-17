@@ -41,7 +41,7 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
     public String execute() throws ServletException, IOException {
 		EntityManager em = null;
         try {
-			em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+			em = MiscUtil.getEntityManagerInstance();
 			HttpSession session = request.getSession();
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			

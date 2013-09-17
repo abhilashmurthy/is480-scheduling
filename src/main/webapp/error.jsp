@@ -5,9 +5,8 @@
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
+        <%@include file="header.jsp" %>
         <title>IS480 Scheduling System | Error</title>
-
         <% 
             String eid = request.getParameter("eid");
             if (eid != null) {

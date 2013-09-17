@@ -9,7 +9,12 @@
 body {
     padding-top: 50px; /* 1px to make the container go all the way to the bottom of the topbar */
     padding-left: 10px;
+    font-family: 'Droid Sans', sans-serif !important;
     /*font: 0.7em/1.5em "Trebuchet MS",Verdana,sans-serif !important;*/
+}
+input, button, select, textarea {
+    font-family: 'Droid Sans', sans-serif !important;
+    margin-bottom: 0 !important;
 }
 
 .navbar .container {
@@ -73,6 +78,20 @@ body {
 	margin:15px
 }
 
+.periodView {
+    display: inline;
+    float: right;
+    clear: both;
+}
+
+.weekNum {
+    display: inline;
+    padding-right: 10px;
+}
+
+#milestoneTabContent {
+}
+
 .scheduleTable {
     /*margin: auto;*/
     display: table;
@@ -90,7 +109,7 @@ body {
     border: 1px solid #dddddd;
     background-color: #AEC7C9 !important; 
     padding: 5px;
-    width: 100px;
+    width: 110px;
     height: 20px;
 }
 
@@ -100,12 +119,44 @@ body {
 
 .popover {
 /*    width: 100%;*/
+    max-width: 400px !important;
     font-weight: normal;
     z-index: 1031 !important;
 }
 
-#updateFormDate, #updateFormStartTime {
-    width: 150px;
+.token-input-list {
+    display: none;
+}
+
+.token-input-token-facebook, .token-input-list, .token-input-list-facebook, .token-input-dropdown-facebook, #token-input-, #createTeamSelect {
+    max-width: 200px !important;
+    z-index: 1032 !important;
+    
+    /* Bootstrap stuff */
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+    display: inline-block;
+    height: 30px;
+    padding: 4px 6px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #555555;
+    vertical-align: middle;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.popoverInput {
+    width: 200px;
 }
 
 .bookedTimeslot:hover, .unbookedTimeslot:hover {
@@ -172,13 +223,38 @@ body {
     font-weight: bold;
 }
 
-.booking {
+.deletedBookingOnTimeslot {
+    margin-top: -20px !important;
+    float: right;
+}
+
+.rejectedBooking {
+    opacity: 0.3;
+    border-radius: 5px;
+    background-color: #F75D59 !important;
+    background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGUlEQVQY02P8//8/AzGAkSYKrQbO6sHuRgB90h5hFaCnewAAAABJRU5ErkJggg==);
+    pointer-events: none;
+    border: 2px solid #415641 !important;
+}
+
+.taChosenTimeslot {
+	background-color: #AEC7C9;
+	background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,.5) 50%);
+	background-size: 15px 15px;
+}
+
+.booking, .rejectedBooking {
     margin: auto;
-    width: 100%;
-    height: 100%;
+    width: 100px;
+    height: 40px;
     line-height: 20px;
     text-align: center;
     vertical-align: middle;
+    z-index: 10;
+}
+
+.tooltip {
+    z-index: 9;
 }
 
 .pendingBooking {
@@ -202,12 +278,22 @@ body {
     border: 2px solid #722A29 !important;
 }
 
-.legend {  
+.legend {
+    display: block;
+    padding-top: 10px;
     font-size: 13px;
-    /*float: right;*/
-	position: absolute;
-	left:66%;
-	top:17.5%;
+    float: right;
+    margin-top: 5px;
+    clear: both;
+}
+
+.legendBox {
+    height: 20px;
+    max-height: 20px;
+}
+
+.scheduleContainer {
+    margin-top: -30px;
 }
 
 .pendingBookings {
@@ -220,9 +306,11 @@ body {
 
 
 .activeTerms {
-	position: absolute;
+    float: right;
+    margin-top: -45px;
+/*	position: absolute;
 	left:71%;
-	top:10%;
+	top:10%;*/
 }
 
 
@@ -257,10 +345,6 @@ body {
     text-shadow: 0px 1px 0px rgb(255, 255, 255);
     background-color: rgb(245, 245, 245);
     border-top: 1px solid #D1D0CE;
-}
-
-#createTeamSelect {
-    width: 150px;
 }
 
 #scheduleProgressBar {

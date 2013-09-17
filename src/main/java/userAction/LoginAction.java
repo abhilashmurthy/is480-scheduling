@@ -76,7 +76,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             logger.info("Reached LoginAction");
 			
 			if (request.getParameter("bypass") != null) { //BYPASS SSO LOGIN

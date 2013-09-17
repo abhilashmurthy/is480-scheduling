@@ -24,6 +24,7 @@ import model.Term;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
+import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
+            em = MiscUtil.getEntityManagerInstance();
             //Getting the session object
             HttpSession session = request.getSession();
             //Getting all the user objects
@@ -62,6 +63,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
                 long facultyId = 0;
                 long administratorId = 0;
                 long courseCoordinatorId = 0;
+                long taId = 0;
 
                 for (User user : userRoles) {
                     if (user.getRole().equals(Role.FACULTY)) {
@@ -73,7 +75,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
                     } else if (user.getRole().equals(Role.COURSE_COORDINATOR)) {
                         isCourseCoordinator = true;
                         courseCoordinatorId = user.getId();
-                    }
+                    } 
                 }
 
                 //Setting default role during first login for users with multiple roles
@@ -126,7 +128,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
                             return ERROR;
                         }
                     }
-                } else {
+                }else {
                     //send error message
                     request.setAttribute("error", "Error with SetRoles: Escalate to developers!");
                     return ERROR;
@@ -148,8 +150,8 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
                 Student student = em.find(Student.class, userRoles.get(0).getId());
                 session.setAttribute("user", student);
             } else if (userRoles.get(0).getRole().equals(Role.TA)) {
-                //TA ta = em.find(TA.class, userRoles.get(0).getId());
-                //session.setAttribute("user", ta);
+                TA ta = em.find(TA.class, userRoles.get(0).getId());
+                session.setAttribute("user", ta);
             }
             return SUCCESS;
 

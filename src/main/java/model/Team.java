@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import model.role.Faculty;
 import model.role.Student;
 import org.hibernate.annotations.Cascade;
@@ -24,6 +26,8 @@ import org.hibernate.annotations.Cascade;
  * @author suresh
  */
 @Entity
+@Table(uniqueConstraints = {
+		@UniqueConstraint(name = "Team_unique_constraint", columnNames = {"teamName", "term_id"})})
 public class Team implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id

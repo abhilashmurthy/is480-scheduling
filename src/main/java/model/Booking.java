@@ -30,145 +30,143 @@ import javax.persistence.OneToOne;
  */
 @Entity
 public class Booking implements Serializable {
-	private static final long serialVersionUID = 1L;
-	@Id
+
+    private static final long serialVersionUID = 1L;
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-	
-	@OneToOne(fetch = FetchType.EAGER)
-	private Timeslot timeslot;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Team team;
-	
-	private Timestamp createdAt;
+    private Long id;
+    @OneToOne(fetch = FetchType.EAGER)
+    private Timeslot timeslot;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Team team;
+    private Timestamp createdAt;
+    //Store the overall status of the booking. Set to PENDING by default
+    private BookingStatus bookingStatus = BookingStatus.PENDING;
+    @Column(length = 19000000) //Track the responses of the required attendees
+    private HashMap<User, Response> responseList = new HashMap<User, Response>();
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "Booking_Required_Attendees",
+            joinColumns =
+            @JoinColumn(name = "booking_id"),
+            inverseJoinColumns =
+            @JoinColumn(name = "user_id"))
+    private Set<User> requiredAttendees = new HashSet<User>();
+    @Column(length = 19000000)
+    private HashSet<String> optionalAttendees = new HashSet<String>();
+    private String rejectReason;
+    private String lastEditedBy;
+    private Timestamp lastEditedAt;
 
-	//Store the overall status of the booking. Set to PENDING by default
-	private BookingStatus bookingStatus = BookingStatus.PENDING;
-	
-	@Column(length=19000000) //Track the responses of the required attendees
-	private HashMap<User, Response> responseList = new HashMap<User, Response>();
-	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name="Booking_Required_Attendees",
-            joinColumns=@JoinColumn(name="booking_id"),
-            inverseJoinColumns=@JoinColumn(name="user_id"))
-	private Set<User> requiredAttendees = new HashSet<User>();
-	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name="Booking_Optional_Attendees",
-            joinColumns=@JoinColumn(name="booking_id"),
-            inverseJoinColumns=@JoinColumn(name="user_id"))
-	private Set<User> optionalAttendees = new HashSet<User>();
-	
-	@Column(length=19000000)
-	private HashSet<String> externalAttendees = new HashSet<String>();
-	
-	private String rejectReason;
-	
-	public Timeslot getTimeslot() {
-		return timeslot;
-	}
+    public Timeslot getTimeslot() {
+        return timeslot;
+    }
 
-	public void setTimeslot(Timeslot timeslot) {
-		this.timeslot = timeslot;
-	}
+    public void setTimeslot(Timeslot timeslot) {
+        this.timeslot = timeslot;
+    }
 
-	public Team getTeam() {
-		return team;
-	}
+    public Team getTeam() {
+        return team;
+    }
 
-	public void setTeam(Team team) {
-		this.team = team;
-	}
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 
-	public Timestamp getCreatedAt() {
-		return createdAt;
-	}
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
 
-	public void setCreatedAt(Timestamp createdAt) {
-		this.createdAt = createdAt;
-	}
-	
-	public HashMap<User, Response> getResponseList() {
-		return responseList;
-	}
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public Timestamp getLastEditedAt() {
+        return lastEditedAt;
+    }
 
-	public void setResponseList(HashMap<User, Response> responseList) {
-		this.responseList = responseList;
-	}
+    public void setLastEditedAt(Timestamp lastEditedAt) {
+        this.lastEditedAt = lastEditedAt;
+    }
+    
+    public String getLastEditedBy() {
+        return lastEditedBy;
+    }
 
-	public Set<User> getRequiredAttendees() {
-		return requiredAttendees;
-	}
+    public void setLastEditedBy(String lastEditedBy) {
+        this.lastEditedBy = lastEditedBy;
+    }
 
-	public void setRequiredAttendees(Set<User> attendees) {
-		this.requiredAttendees = attendees;
-	}
+    public HashMap<User, Response> getResponseList() {
+        return responseList;
+    }
 
-	public Set<User> getOptionalAttendees() {
-		return optionalAttendees;
-	}
+    public void setResponseList(HashMap<User, Response> responseList) {
+        this.responseList = responseList;
+    }
 
-	public void setOptionalAttendees(Set<User> optionalAttendees) {
-		this.optionalAttendees = optionalAttendees;
-	}
+    public Set<User> getRequiredAttendees() {
+        return requiredAttendees;
+    }
 
-	public String getRejectReason() {
-		return rejectReason;
-	}
+    public void setRequiredAttendees(Set<User> attendees) {
+        this.requiredAttendees = attendees;
+    }
 
-	public void setRejectReason(String rejectReason) {
-		this.rejectReason = rejectReason;
-	}
+    public String getRejectReason() {
+        return rejectReason;
+    }
 
-	public BookingStatus getBookingStatus() {
-		return bookingStatus;
-	}
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
 
-	public void setBookingStatus(BookingStatus bookingStatus) {
-		this.bookingStatus = bookingStatus;
-	}
+    public BookingStatus getBookingStatus() {
+        return bookingStatus;
+    }
 
-	public HashSet<String> getExternalAttendees() {
-		return externalAttendees;
-	}
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
 
-	public void setExternalAttendees(HashSet<String> externalAttendees) {
-		this.externalAttendees = externalAttendees;
-	}
+    public HashSet<String> getOptionalAttendees() {
+        return optionalAttendees;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public void setOptionalAttendees(HashSet<String> optionalAttendees) {
+        this.optionalAttendees = optionalAttendees;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
-		if (!(object instanceof Booking)) {
-			return false;
-		}
-		Booking other = (Booking) object;
-		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
-	@Override
-	public String toString() {
-		return "model.Booking[ id=" + id + " ]";
-	}
-	
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Booking)) {
+            return false;
+        }
+        Booking other = (Booking) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "model.Booking[ id=" + id + " ]";
+    }
 }

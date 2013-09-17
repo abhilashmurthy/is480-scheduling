@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import manager.MilestoneManager;
 import manager.TermManager;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.json.JSONObject;
 import util.MiscUtil;
 
 /**
@@ -29,27 +30,6 @@ public class UpdateTermAction extends ActionSupport implements ServletRequestAwa
 
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(UpdateTermAction.class);
-    private int year;
-    private String semester;
-    private int activeYear;
-
-    public int getActiveYear() {
-        return activeYear;
-    }
-
-    public void setActiveYear(int activeYear) {
-        this.activeYear = activeYear;
-    }
-
-    public String getActiveSemester() {
-        return activeSemester;
-    }
-
-    public void setActiveSemester(String activeSemester) {
-        this.activeSemester = activeSemester;
-    }
-    private String activeSemester;
-    private boolean canAdd;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     public HashMap<String, Object> getJson() {
@@ -60,60 +40,47 @@ public class UpdateTermAction extends ActionSupport implements ServletRequestAwa
         this.json = json;
     }
 
-    public boolean isHasBeenAdded() {
-        return canAdd;
-    }
-
-    public void setHasBeenAdded(boolean canAdd) {
-        this.canAdd = canAdd;
-    }
-
     @Override
     public String execute() throws Exception {
-		EntityManager em = null;
+        EntityManager em = null;
         try {
             json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-            
-            json.put("year", year);
-            json.put("semester", semester);
+            em = MiscUtil.getEntityManagerInstance();
+
+            JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+            int year = inputData.getInt("year");
+            String semester = inputData.getString("semester");
+            Term currentTerm = (Term) request.getSession().getAttribute("currentActiveTerm");
+            int activeYear = currentTerm.getAcademicYear();
+            String activeSemester = currentTerm.getSemester();
 
             //To check if this term already exists
             logger.info("Active year: " + activeYear + ", Active semester: " + activeSemester);
-            Term existingTerm = TermManager.findByYearAndSemester(em, activeYear, activeSemester);
-            if (existingTerm != null) {                
-                //Check if there is a change
-                if (year == activeYear && semester.equals(activeSemester)) {
-                    json.put("success", false);
-                    json.put("message", "No change was made");
-                    return SUCCESS;
-                }
-                
-                Term newTerm = TermManager.findByYearAndSemester(em, year, semester);
-                if (newTerm != null) {
-                    json.put("success", false);
-                    json.put("message", "Term already exists...");
-                    return SUCCESS;
-                }
-                
-                 //Update Term in DB
-                EntityTransaction transaction = null;
-                existingTerm.setAcademicYear(year);
-                existingTerm.setSemester(semester);
-                TermManager.update(em, existingTerm, transaction);
-                
-                //Update Term in session
-                HttpSession session = request.getSession();
-                session.setAttribute("currentActiveTerm", existingTerm);
-                
-                json.put("success", true);
-                json.put("message", "Updated Term");
-                json.put("canAdd", true);
-            } else {
-                logger.error("Existing term doesn't exists!");
-                json.put("message", "Term doesn't exist");
+            //Check if there is a change
+            if (year == activeYear && semester.equals(activeSemester)) {
                 json.put("success", false);
+                json.put("message", "No change was made..");
+                return SUCCESS;
             }
+
+            Term newTerm = TermManager.findByYearAndSemester(em, year, semester);
+            if (newTerm != null) {
+                json.put("success", false);
+                json.put("message", "Term already exists..");
+                return SUCCESS;
+            }
+
+            //Update Term in DB
+            EntityTransaction transaction = null;
+            currentTerm = new Term(year, semester);
+            TermManager.update(em, currentTerm, transaction);
+
+            //Update Term in session
+            HttpSession session = request.getSession();
+            session.setAttribute("currentActiveTerm", currentTerm);
+
+            json.put("success", true);
+            json.put("message", "Updated Term");
             return SUCCESS;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
@@ -123,28 +90,16 @@ public class UpdateTermAction extends ActionSupport implements ServletRequestAwa
                 }
             }
             json.put("exception", true);
-            json.put("message", "Error with CheckTerm: Escalate to developers!");
+            json.put("message", "Error with UpdateTerm: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
-		}
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
         return SUCCESS;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public String getSemester() {
-        return semester;
-    }
-
-    public void setSemester(String semester) {
-        this.semester = semester;
     }
 
     public void setServletRequest(HttpServletRequest hsr) {

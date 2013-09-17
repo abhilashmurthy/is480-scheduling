@@ -11,32 +11,203 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
+import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.TimeslotManager;
+import model.Booking;
+import model.Milestone;
 import model.Schedule;
 import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
 
 /**
  *
- * @author User
+ * @author Prakhar
  */
 public class UpdateScheduleAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
-    private static Logger logger = LoggerFactory.getLogger(UpdateScheduleAction.class);
+    static final Logger logger = LoggerFactory.getLogger(UpdateScheduleAction.class);
     private HashMap<String, Object> json = new HashMap<String, Object>();
+
+    @Override
+    public String execute() throws Exception {
+        EntityManager em = null;
+        try {
+            json.put("exception", false);
+            em = MiscUtil.getEntityManagerInstance();
+
+            //Getting input data
+            JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+            JSONArray milestones = inputData.getJSONArray("milestones[]");
+
+            //Creating schedule objects for all milestones
+            em.getTransaction().begin();
+            ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
+            for (int i = 0; i < milestones.length(); i++) {
+                HashMap<String, Object> scheduleJson = new HashMap<String, Object>();
+                JSONObject obj = milestones.getJSONObject(i);
+                long milestoneId = obj.getLong("id");
+                Milestone m = em.find(Milestone.class, milestoneId);
+                if (m == null) {
+                    json.put("success", false);
+                    json.put("message", "Milestone with ID: " + milestoneId + " not found");
+                    return SUCCESS;
+                }
+                scheduleJson.put("milestoneName", m.getName());
+                scheduleJson.put("duration", m.getSlotDuration());
+                scheduleJson.put("dayStartTime", obj.getInt("dayStartTime"));
+                scheduleJson.put("dayEndTime", obj.getInt("dayEndTime"));
+                
+                /************************
+                  SCHEDULE MANAGEMENT 
+                ************************/
+                
+                JSONArray milestoneDates = obj.getJSONArray("dates[]");
+                ArrayList<String> dates = new ArrayList<String>();
+                for (int j = 0; j < milestoneDates.length(); j++) {
+                    dates.add(milestoneDates.getString(j));
+                }
+                scheduleJson.put("dates", dates);
+                Timestamp startTimestamp = Timestamp.valueOf(milestoneDates.getString(0) + " 00:00:00");
+                Timestamp endTimestamp = Timestamp.valueOf(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
+                int dayStartTime = obj.getInt("dayStartTime");
+                int dayEndTime = obj.getInt("dayEndTime");
+
+                long scheduleId = obj.getLong("scheduleId");
+                Schedule s = em.find(Schedule.class, scheduleId);
+                s.setStartDate(startTimestamp);
+                s.setEndDate(endTimestamp);
+                s.setDayStartTime(dayStartTime);
+                s.setDayEndTime(dayEndTime);
+                em.merge(s);
+
+                
+                /************************
+                  TIMESLOT MANAGEMENT 
+                ************************/
+                Calendar cal = Calendar.getInstance();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                List<Timeslot> oldTimeslots = TimeslotManager.findBySchedule(em, s);
+
+                //Delete unwanted acceptance timeslots
+                Map<Timestamp, Timestamp> keepTimestamps = new HashMap<Timestamp, Timestamp>();
+                keepTimestamps:
+                for (Timeslot t : oldTimeslots) {
+                    Timestamp startTimeslotTimestamp = t.getStartTime();
+                    Timestamp endTimeslotTimestamp = t.getEndTime();
+                    if (t.getCurrentBooking() != null) {
+                        keepTimestamps.put(startTimeslotTimestamp, endTimeslotTimestamp);
+                        continue keepTimestamps;
+                    }
+                    logger.debug("Got timeslot: " + t.getId() + ", " + t.getStartTime());
+                    //Filters out dates without timeslots
+                    for (int j = 0; j < milestoneDates.length(); j++) {
+                        String newDate = milestoneDates.getString(j);
+                        cal.clear();
+                        cal.set(Calendar.HOUR_OF_DAY, dayStartTime);
+                        Timestamp currentDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
+                        cal.set(Calendar.HOUR_OF_DAY, dayEndTime);
+                        Timestamp endDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
+                        while (currentDayTimestamp.before(endDayTimestamp)) {
+                            cal.clear();
+                            cal.setTimeInMillis(currentDayTimestamp.getTime());
+                            cal.add(Calendar.MINUTE, m.getSlotDuration());
+                            Timestamp nextTimeslotTimestamp = new Timestamp(cal.getTimeInMillis());
+                            if ((startTimeslotTimestamp.equals(currentDayTimestamp) && endTimeslotTimestamp.equals(nextTimeslotTimestamp)) && (endTimeslotTimestamp.before(endDayTimestamp) || endTimeslotTimestamp.equals(endDayTimestamp))) {
+                                keepTimestamps.put(startTimeslotTimestamp, endTimeslotTimestamp);
+                                continue keepTimestamps;
+                            }
+                            currentDayTimestamp = nextTimeslotTimestamp;
+                        }
+                    }
+                    //If this is reached, the timeslot doesn't exist. remove it completely.
+                    logger.debug("Removing timeslot: " + t.getId() + ", " + t.getStartTime());
+                    if (!TimeslotManager.delete(em, t, em.getTransaction())) { //Remove from database
+                        throw new Exception("Unable to delete: " + t);
+                    }
+                }
+
+                //Add new Timeslots -- WAIT SHOULD WE ADD NEW TIMESLOTS FOR ALL NEW DATES SELECTED??
+                logger.debug("Adding timeslots now");
+                logger.debug("These are the new dates: " + milestoneDates.toString());
+                for (int j = 0; j < milestoneDates.length(); j++) {
+                    //Add new Dates
+                    String newDate = milestoneDates.getString(j);
+                    cal.clear();
+                    cal.set(Calendar.HOUR_OF_DAY, dayStartTime);
+                    Timestamp currentDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
+                    cal.set(Calendar.HOUR_OF_DAY, dayEndTime);
+                    Timestamp endDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
+                    logger.debug("Day start: " + currentDayTimestamp + ", Day end: " + endDayTimestamp);
+                    newTimestamps: 
+                    while (currentDayTimestamp.before(endDayTimestamp)) {
+                        Timestamp endTimeslotTimestamp = keepTimestamps.get(currentDayTimestamp);
+                        for (Timestamp keepTimestamp : keepTimestamps.keySet()) {
+                            if (keepTimestamp.equals(currentDayTimestamp)) {
+                                logger.debug("Keeping: " + currentDayTimestamp);
+                                currentDayTimestamp = endTimeslotTimestamp; //Continue while loop
+                                continue newTimestamps;
+                            }
+                        }
+                        //This must be a new timeslot -- Add it
+                        cal.clear();
+                        cal.setTimeInMillis(currentDayTimestamp.getTime());
+                        cal.add(Calendar.MINUTE, m.getSlotDuration());
+                        endTimeslotTimestamp = new Timestamp(cal.getTimeInMillis());
+                        if (endTimeslotTimestamp.before(endDayTimestamp) || endTimeslotTimestamp.equals(endDayTimestamp)) { //Add only fitting timeslots
+                            Timeslot newT = new Timeslot();
+                            newT.setStartTime(currentDayTimestamp);
+                            newT.setEndTime(endTimeslotTimestamp);
+                            logger.debug("Persiting start: " + currentDayTimestamp + ", end: " + endTimeslotTimestamp);
+                            newT.setVenue("Not set yet");
+                            newT.setSchedule(s);
+                            logger.debug("Adding timeslot: " + currentDayTimestamp);
+                            em.persist(newT);
+                        }
+                        currentDayTimestamp = endTimeslotTimestamp; //Continue while loop
+                    }
+                }
+                logger.debug("Finished adding");
+
+                scheduleJson.put("scheduleId", scheduleId);
+                scheduleList.add(scheduleJson);
+            }
+            em.getTransaction().commit();
+            json.put("schedules", scheduleList);
+            json.put("success", true);
+        } catch (Exception e) {
+            logger.error("Exception caught: " + e.getClass().getName() + " " + e.getMessage());
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            json.put("success", false);
+            json.put("message", "Error with UpdateSchedule: Escalate to developers!");
+        } finally {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+        return SUCCESS;
+    }
 
     public HashMap<String, Object> getJson() {
         return json;
@@ -46,276 +217,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
         this.json = json;
     }
 
-    @Override
-    public String execute() throws Exception {
-		EntityManager em = null;
-        try {
-            json.put("exception", false);
-            em = Persistence.createEntityManagerFactory(MiscUtil.PERSISTENCE_UNIT).createEntityManager();
-            EntityTransaction transaction = null;
-            
-            Map parameters = request.getParameterMap();
-            for (Object key : parameters.keySet()) {
-                logger.info("Received key: " + key + ", value: " + ((String[]) parameters.get(key))[0]);
-            }
-
-            int year = Integer.parseInt(((String[]) parameters.get("year"))[0]);
-            String semester = ((String[]) parameters.get("semester"))[0];
-            int acceptanceId = Integer.parseInt(((String[]) parameters.get("acceptanceId"))[0]);
-            int midtermId = Integer.parseInt(((String[]) parameters.get("midtermId"))[0]);
-            int finalId = Integer.parseInt(((String[]) parameters.get("finalId"))[0]);
-            List<String> acceptanceDates = new ArrayList<String>(Arrays.asList(((String[]) parameters.get("acceptanceDates[]"))));
-            List<String> midtermDates = new ArrayList<String>(Arrays.asList(((String[]) parameters.get("midtermDates[]"))));
-            List<String> finalDates = new ArrayList<String>(Arrays.asList(((String[]) parameters.get("finalDates[]"))));
-            
-            Collections.sort(acceptanceDates);
-            Collections.sort(midtermDates);
-            Collections.sort(finalDates);
-            
-            for (String s : acceptanceDates) {
-                logger.debug("AccDates: " + s);
-            }
-            
-            logger.debug("Initialized variables");
-            
-            Schedule acceptanceSchedule = ScheduleManager.findById(em, acceptanceId);
-            Schedule midtermSchedule = ScheduleManager.findById(em, midtermId);
-            Schedule finalSchedule = ScheduleManager.findById(em, finalId);
-            
-            logger.debug("Retreieved midtermSchedule: " + midtermSchedule.getId());
-            
-            //Getting and setting timestamps
-            Timestamp acceptanceStartTimeStamp = Timestamp.valueOf(acceptanceDates.get(0) + " 00:00:00");
-            Timestamp acceptanceEndTimeStamp = Timestamp.valueOf(acceptanceDates.get(acceptanceDates.size() - 1) + " 00:00:00");
-            Timestamp midtermStartTimeStamp = Timestamp.valueOf(midtermDates.get(0) + " 00:00:00");
-            Timestamp midtermEndTimeStamp = Timestamp.valueOf(midtermDates.get(midtermDates.size() - 1) + " 00:00:00");
-            Timestamp finalStartTimeStamp = Timestamp.valueOf(finalDates.get(0) + " 00:00:00");
-            Timestamp finalEndTimeStamp = Timestamp.valueOf(finalDates.get(finalDates.size() - 1) + " 00:00:00");
-            
-            logger.debug("Got timestamps");
-            
-            acceptanceSchedule.setStartDate(acceptanceStartTimeStamp);
-            acceptanceSchedule.setEndDate(acceptanceEndTimeStamp);
-            midtermSchedule.setStartDate(midtermStartTimeStamp);
-            midtermSchedule.setEndDate(midtermEndTimeStamp);
-            finalSchedule.setStartDate(finalStartTimeStamp);
-            finalSchedule.setEndDate(finalEndTimeStamp);
-            
-            logger.debug("Updated timestamps");
-            
-            ScheduleManager.update(em, acceptanceSchedule, transaction);
-            ScheduleManager.update(em, midtermSchedule, transaction);
-            ScheduleManager.update(em, finalSchedule, transaction);
-            
-            logger.debug("Stored in database");
-            
-            //Get timeslots based on schedules
-            List<Timeslot> acceptanceTimeslots = TimeslotManager.findBySchedule(em, acceptanceSchedule);
-            List<Timeslot> midtermTimeslots = TimeslotManager.findBySchedule(em, midtermSchedule);
-            List<Timeslot> finalTimeslots = TimeslotManager.findBySchedule(em, finalSchedule);
-            
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            
-            List<String> oldDates = new ArrayList<String>();
-            
-            /*
-              ACCEPTANCE TIMESLOT UPDATING
-             */
-            
-            //Delete unwanted acceptance timeslots
-            oldAcceptanceDates:
-            for (Timeslot t : acceptanceTimeslots) {
-                logger.debug("Got acceptance timeslot: " + t.getId() + ", " + t.getStartTime());
-                Timestamp startTime = t.getStartTime();
-                cal.setTimeInMillis(startTime.getTime());
-                String startDate = sdf.format(cal.getTime());
-                
-                //Filters out dates without timeslots
-                for (int i = 0; i < acceptanceDates.size(); i++) {
-                    String acceptanceDate = acceptanceDates.get(i);
-                    if (acceptanceDate.equals(startDate)) {
-                        oldDates.add(acceptanceDate);
-                        continue oldAcceptanceDates;
-                    }
-                }
-                
-                //If this is reached, the timeslot date doesn't exist. Therefore, remove it completely.
-                if (!TimeslotManager.delete(em, t, transaction)) {
-                    throw new Exception("Unable to delete: " + t);
-                }
-            }
-            
-            //Add wanted acceptance timeslots
-            newAcceptanceDates:
-            for (String acceptanceDate : acceptanceDates) {
-                for (String oldDate : oldDates) {
-                    if (acceptanceDate.equals(oldDate)) {
-                        continue newAcceptanceDates;
-                    }
-                }
-                int currentTime = 9;
-                Timestamp newStartTime = Timestamp.valueOf(acceptanceDate + " 09:00:00");
-                while (currentTime <= 18) {
-                    Timestamp startTime = newStartTime;
-                    cal.setTimeInMillis(startTime.getTime());
-                    cal.add(Calendar.HOUR, 1);
-                    Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-                    
-                    Timeslot t = new Timeslot();
-                    t.setStartTime(startTime);
-                    t.setEndTime(endTime);
-                    t.setVenue("SIS Seminar Room 2-1");
-                    t.setSchedule(acceptanceSchedule);
-                    em.persist(t);
-                    currentTime++;
-                    newStartTime = endTime;
-                }
-            }
-            
-            /*
-              MIDTERM TIMESLOT UPDATING
-             */
-            
-            oldDates = new ArrayList<String>();
-            
-            //Delete unwanted midterm timeslots
-            oldMidtermDates:
-            for (Timeslot t : midtermTimeslots) {
-                logger.debug("Got midterm timeslot: " + t.getId() + ", " + t.getStartTime());
-                Timestamp startTime = t.getStartTime();
-                cal.setTimeInMillis(startTime.getTime());
-                String startDate = sdf.format(cal.getTime());
-                
-                //Filters out dates without timeslots
-                for (int i = 0; i < midtermDates.size(); i++) {
-                    String midtermDate = midtermDates.get(i);
-                    if (midtermDate.equals(startDate)) {
-                        oldDates.add(midtermDate);
-                        continue oldMidtermDates;
-                    }
-                }
-                
-                //If this is reached, the timeslot date doesn't exist. Therefore, remove it completely.
-                if (!TimeslotManager.delete(em, t, transaction)) {
-                    throw new Exception("Unable to delete: " + t);
-                }
-            }
-            
-            //Add wanted midterm timeslots
-            newMidtermDates:
-            for (String midtermDate : midtermDates) {
-                for (String oldDate : oldDates) {
-                    if (midtermDate.equals(oldDate)) {
-                        continue newMidtermDates;
-                    }
-                }
-                int currentTime = 9;
-                Timestamp newStartTime = Timestamp.valueOf(midtermDate + " 09:00:00");
-                while (currentTime <= 18) {
-                    Timestamp startTime = newStartTime;
-                    cal.setTimeInMillis(startTime.getTime());
-                    cal.add(Calendar.HOUR, 1);
-                    cal.add(Calendar.MINUTE, 30);
-                    Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-                    
-                    Timeslot t = new Timeslot();
-                    t.setStartTime(startTime);
-                    t.setEndTime(endTime);
-                    t.setVenue("SIS Seminar Room 2-1");
-                    t.setSchedule(midtermSchedule);
-                    em.persist(t);
-                    currentTime++;
-                    newStartTime = endTime;
-                }
-            }
-
-            /*
-              FINAL TIMESLOT UPDATING
-             */
-            
-            oldDates = new ArrayList<String>();
-            
-            //Delete unwanted final timeslots
-            oldFinalDates:
-            for (Timeslot t : finalTimeslots) {
-                logger.debug("Got final timeslot: " + t.getId() + ", " + t.getStartTime());
-                Timestamp startTime = t.getStartTime();
-                cal.setTimeInMillis(startTime.getTime());
-                String startDate = sdf.format(cal.getTime());
-                
-                //Filters out dates without timeslots
-                for (int i = 0; i < finalDates.size(); i++) {
-                    String finalDate = finalDates.get(i);
-                    if (finalDate.equals(startDate)) {
-                        oldDates.add(finalDate);
-                        continue oldFinalDates;
-                    }
-                }
-                
-                //If this is reached, the timeslot date doesn't exist. Therefore, remove it completely.
-                if (!TimeslotManager.delete(em, t, transaction)) {
-                    throw new Exception("Unable to delete: " + t);
-                }
-            }
-            
-            //Add wanted final timeslots
-            newFinalDates:
-            for (String finalDate : finalDates) {
-                for (String oldDate : oldDates) {
-                    if (finalDate.equals(oldDate)) {
-                        continue newFinalDates;
-                    }
-                }
-                int currentTime = 9;
-                Timestamp newStartTime = Timestamp.valueOf(finalDate + " 09:00:00");
-                while (currentTime <= 18) {
-                    Timestamp startTime = newStartTime;
-                    cal.setTimeInMillis(startTime.getTime());
-                    cal.add(Calendar.HOUR, 1);
-                    cal.add(Calendar.MINUTE, 30);
-                    Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-                    
-                    Timeslot t = new Timeslot();
-                    t.setStartTime(startTime);
-                    t.setEndTime(endTime);
-                    t.setVenue("SIS Seminar Room 2-1");
-                    t.setSchedule(finalSchedule);
-                    em.persist(t);
-                    currentTime++;
-                    newStartTime = endTime;
-                }
-            }
-
-
-            json.put("success", true);
-            json.put("message", "Schedules updated");
-            return SUCCESS;
-        } catch (Exception e) {
-            logger.error("Exception caught: " + e.getMessage());
-            if (MiscUtil.DEV_MODE) {
-                for (StackTraceElement s : e.getStackTrace()) {
-                    logger.debug(s.toString());
-                }
-            }
-            json.put("success", false);
-            json.put("message", "Error with CreateSchedule: Escalate to developers!");
-        } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
-		}
-        return SUCCESS;
-    }
-
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }
-
     public void setServletRequest(HttpServletRequest hsr) {
-        this.request = hsr;
+        request = hsr;
     }
 }

@@ -1,3 +1,4 @@
+<%@page import="manager.UserManager"%>
 <%@page import="model.role.Student"%>
 <%@page import="model.Team"%>
 <%@page import="model.Term"%>
@@ -10,18 +11,17 @@
 %>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>IS480 Scheduling</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System</title>
     </head>
     <body>
         <!-- Navigation -->
         <%@include file="navbar.jsp" %>
-
         <%
             Team team = null;
             String fullName = null;
             if (activeRole.equals(Role.STUDENT)) {
-                Student studentUser = (Student) session.getAttribute("user");
+                Student studentUser = UserManager.getUser(user.getId(), Student.class);
                 team = studentUser.getTeam();
                 fullName = studentUser.getFullName();
             }
@@ -35,7 +35,7 @@
             <div class="activeTerms">
                 <table>
                     <tr>
-                        <td style="width:90px; padding-bottom:11px"><b>Select Term</b></td>
+                        <td style="padding-right:10px"><b>Select Term</b></td>
                         <td><form id="activeTermForm" action="index" method="post">
                                 <select name="termId" style="float:right" onchange="this.form.submit()"> 
                                     <option value=""><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
@@ -63,6 +63,17 @@
                 </div>
             </s:if>
             <% }%>
+            
+            <div class="periodView">
+                <div class="btn-group">
+                  <button class="btn" id="previousWeek"><span class="icon-chevron-left"/></span></button>
+                  <button class="btn" id="weekView">Week View</button>
+                  <button class="btn" id="nextWeek"><span class="icon-chevron-right"/></span></button>
+                </div>
+                <div class="btn-group">
+                  <button class="btn" id="fullView">Full View</button>
+                </div>
+            </div>
 
             <!-- To display legend for the calendar -->
             <table class="legend">
@@ -74,39 +85,24 @@
                     <td style="width:15px"></td>
                     <td class="legendBox approvedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
                     <td style="width:15px"></td>
+                    <td class="legendBox rejectedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
+                    <td style="width:15px"></td>
+					<% if (activeRole.equals(Role.FACULTY)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
+					<% } else if (activeRole.equals(Role.TA)) { %>
+					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Your video signup</td>
+					<% } %>
                 </tr>
             </table>
-
         </div>
 
         <!-- Main schedule navigation -->
-        <div class="container page">
+        <div class="scheduleContainer container page">
             <ul id="milestoneTab" class="nav nav-tabs">
-                <!-- TODO: populate dynamic milestones -->
-                <li class="active">
-                    <a id="acceptance" href="#acceptance" data-toggle="tab">Acceptance</a>
-                </li>
-                <li class>
-                    <a id="midterm" href="#midterm" data-toggle="tab">Midterm</a>
-                </li>
-                <li class>
-                    <a id="final" href="#final" data-toggle="tab">Final</a>
-                </li>
+                <!-- milestone tabs populated dynamically -->
             </ul>
             <div id="milestoneTabContent" class="tab-content" hidden="">
-                <div class="tab-pane fade active in" id="acceptanceContent">
-                    <table id="acceptanceScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
-                    </table>
-                </div>
-                <div class="tab-pane fade" id="midtermContent" hidden>
-                    <table id="midtermScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
-                    </table>
-                </div>
-                <div class="tab-pane fade" id="finalContent" hidden>
-                    <table id="finalScheduleTable" class="scheduleTable table-condensed table-hover table-bordered">
-                    </table>
-                </div>
+                <!-- milestone tables populated dynamically -->
             </div>
             <div id="scheduleProgressBar" class="progress progress-striped active">
                 <div class="bar" style="width: 100%;"></div>
@@ -130,42 +126,78 @@
                     DECLARE COMMON VARIABLES
                 ******************************/
                
-                //Default milestoneStr is ACCEPTANCE
-                var milestoneStr = "ACCEPTANCE";
-                var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
-                var activeSemesterStr = "<%= activeTerm.getSemester()%>";
+                //Default milestone is ACCEPTANCE
+                var milestone = "ACCEPTANCE";
+                var year = "<%= activeTerm.getAcademicYear()%>";
+                var semester = "<%= activeTerm.getSemester()%>";
                 var scheduleData = null; //This state shall be stored here
+                var weekView = null;
                 
                 //Student-specific variables
-                //Team Name and bookingExists
-                var teamName = "<%= team != null ? team.getTeamName() : null%>";
-                var teamId = null;
+                var teamName = "<%= team != null ? team.getTeamName() : null%>"; //Student's active team name
                 
-                //Admin specific variables - All teams data if for admins
-                var teams = new Array();
+                //Admin specific variables
+                var teams = JSON.parse('<%= session.getAttribute("allTeams")%>'); //All teams JSON
                 var teamDropDownSelect = null;
                 var createBookingOutputForAdmin = null;
+				
+                //TA specific variables
+                var loggedInTa = <%= user.getId() %>;
                 
                 //Booking specific variables
                 var self = null;
-
+                var users = JSON.parse('<%= session.getAttribute("allUsers") %>'); //All users JSON
+                
+                populateMilestones();
                 loadDefault();
+                
+                //Build the base of the page (Milestone tabs and tables)
+                function populateMilestones() {
+                    var milestones = getScheduleData(null, year, semester).milestones;
+                    for (var i = 0; i < milestones.length; i++) {
+                        var milestone = milestones[i];
+                        
+                        //Add the milestone tab
+                        var $milestoneTab = $(document.createElement('li'));
+                        if (i === 0) $milestoneTab.addClass('active');
+                        var $milestoneTabLink = 
+                                $(document.createElement('a'))
+                                .attr('id', milestone.name.toLowerCase())
+                                .attr('href', '#' + milestone.name.toLowerCase())
+                                .attr('data-toggle', 'tab')
+                                .html(milestone.name);
+                        $milestoneTabLink.appendTo($milestoneTab);
+                        $milestoneTab.appendTo($('ul#milestoneTab'));
+                        
+                        //Add the milestone table
+                        var $milestoneDiv = 
+                                $(document.createElement('div'))
+                                .addClass('tab-pane fade')
+                                .attr('id', milestone.name.toLowerCase() + "Content");
+                        if (i === 0) $milestoneDiv.addClass('active in');
+                        var $milestoneTable = 
+                                $(document.createElement('table'))
+                                .attr('id', milestone.name.toLowerCase() + "ScheduleTable")
+                                .addClass('scheduleTable table-condensed table-hover table-bordered');
+                        $milestoneTable.appendTo($milestoneDiv);
+                        $milestoneDiv.appendTo($('div#milestoneTabContent'));
+                    }
+                }
 
                 function loadDefault() {
                     //Default schedule to see upon opening index page
-                    $("#milestoneTab a#" + milestoneStr.toLowerCase()).tab('show');
-                    populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                    $("#milestoneTab a#" + milestone.toLowerCase()).tab('show');
+                    populateSchedule(milestone, year, semester);
                 }
 
                 //Function to change schedule based on selected milestone tab
                 $('#milestoneTab a').on('click', function(e) {
                     $("#milestoneTab").removeClass('active in');
                     $(this).tab('show');
-                    clearSchedules();
-                    milestoneStr = $(this).attr('id').toUpperCase();
-                    activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
-                    activeSemesterStr = "<%= activeTerm.getSemester()%>";
-                    populateSchedule(milestoneStr, activeAcademicYearStr, activeSemesterStr);
+                    milestone = $(this).attr('id').toUpperCase();
+                    year = "<%= activeTerm.getAcademicYear()%>";
+                    semester = "<%= activeTerm.getSemester()%>";
+                    populateSchedule(milestone, year, semester);
                     return false;
                 });
 
@@ -178,22 +210,29 @@
                 function getScheduleData(milestone, year, semester) {
                     var toReturn = null;
                     var data = {
-                        milestoneString: milestone,
-                        academicYearString: year,
-                        semesterString: semester
+                        year: year,
+                        semester: semester
                     };
-                    //View Schedule AJAX
+                    if (milestone) {
+                        data["milestone"] = milestone;
+                    }
+                    //Get schedule action
                     $.ajax({
                         type: 'GET',
                         data: data,
-                        url: 'getSchedule',
                         async: false,
+                        url: 'getSchedule',
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
-                        toReturn = response;
+                        if (response.success) {
+                            toReturn = response;
+                        } else {
+                            var eid = btoa(response.message);
+                            window.location = "error.jsp?eid=" + eid;
+                        }
                     }).fail(function(error) {
-                        alert("There was an error in retrieving schedule");
+                        toReturn = "AJAX fail";
                     });
                     return toReturn;
                 }
@@ -201,6 +240,7 @@
                 //View Schedule stuff
                 //Function to populate schedule data based on ACTIVE TERM
                 function populateSchedule(milestone, year, semester) {
+                    clearSchedules(); //Clear all schedules first
                     //Hide schedule tab and show progress bar
                     $("#milestoneTabContent").hide();
                     $("#scheduleProgressBar").show();
@@ -271,162 +311,207 @@
                 function appendViewBookingPopover(bodyTd) {
                     //Get View Booking Data
                     var timeslots = scheduleData.timeslots;
-                    var viewBookingData = timeslots[bodyTd.attr('value')];
+                    var booking = bodyTd.children('.booking');
+                    var timeslot = timeslots[bodyTd.attr('value')];
 
-                    //Append bookingDiv classes based on status
-                    var bookingDiv = bodyTd.children('.booking');
-                    if (bookingDiv) {
-                        if (viewBookingData.status === "APPROVED") {
-                            bookingDiv.addClass('approvedBooking');
-                        } else if (viewBookingData.status === "REJECTED") {
-                            bookingDiv.addClass('rejectedBooking');
+                    //Append booking classes based on status
+                    if (booking) {
+                        if (timeslot.status === "APPROVED") {
+                            booking.addClass('approvedBooking');
+                        } else if (timeslot.status === "REJECTED") {
+                            booking.addClass('rejectedBooking');
                         } else {
-                            bookingDiv.addClass('pendingBooking');
+                            booking.addClass('pendingBooking');
                         }
+                    }
+                    
+                    //Getting the content
+                    //Additional details
+                    var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
+
+                    //Output in the form of a table
+                    var bookingDetails = $(document.createElement('table'));
+                    bookingDetails.attr('id', 'viewTimeslotTable');
+                    var outputData = [
+                        ["Team", timeslot.team],
+                        ["Status", timeslot.status],
+                        ["Date", timeslot.startDate],
+                        ["Time", timeslot.time],
+                        ["Venue", timeslot.venue],
+                        ["Students", timeslot.students],
+                        ["Faculty", timeslot.faculties],
+                        ["TA", timeslot.TA],
+                        ["Optional", optionalAttendees]
+                    ];
+
+                    //Add Delete and Update button if user is a student with a team
+                    if (timeslot.team === teamName) {
+                        var buttonDelete = $(document.createElement('button'));
+                        buttonDelete.attr('id', 'deleteBookingBtn');
+                        buttonDelete.addClass('popoverBtn btn btn-danger');
+                        var iconDelete = $(document.createElement('i'));
+                        iconDelete.addClass('icon-trash icon-white');
+                        buttonDelete.append(iconDelete);
+                        buttonDelete.append("Delete");
+
+                        var buttonUpdate = $(document.createElement('button'));
+                        buttonUpdate.attr('id', 'updateBookingBtn');
+                        buttonUpdate.addClass('popoverBtn btn btn-info');
+                        var iconUpdate = $(document.createElement('i'));
+                        iconUpdate.addClass('icon-edit icon-white');
+                        buttonUpdate.append(iconUpdate);
+                        buttonUpdate.append("Save");
+
+                        outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
+                    }
+
+                    //Make fields editable and add Update and Delete buttons if user is admin
+                    if (<%=activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+                        //Replace startDate and startTime with editable fields
+                        for (var i = 0; i < outputData.length; i++) {
+                            if (outputData[i][0] === "Venue") {
+                                var input = $(document.createElement('input'));
+                                input.attr('id', 'updateFormVenue');
+                                input.attr('type', 'text');
+                                input.attr('placeholder', outputData[i][1]);
+                                input.addClass('updateFormVenue popoverInput');
+                                input.val(outputData[i][1]).change();
+                                outputData[i][1] = input;
+                            }
+                            if (outputData[i][0] === "Date") {
+                                var input = $(document.createElement('input'));
+                                input.attr('id', 'updateFormDate');
+                                input.attr('type', 'text');
+                                input.attr('placeholder', outputData[i][1]);
+                                input.attr('title', 'Enter a new date (YYYY-MM-DD)');
+                                input.addClass('updateFormDate popoverInput');
+                                input.datepicker({
+                                    dateFormat: "yy-mm-dd",
+                                    beforeShowDay: $.datepicker.noWeekends
+                                });
+                                input.val(outputData[i][1]).change();
+                                outputData[i][1] = input;
+                            }
+                            if (outputData[i][0] === "Time") {
+                                var input = $(document.createElement('input'));
+                                input.attr('id', 'updateFormStartTime');
+                                input.attr('type', 'text');
+                                input.attr('placeholder', outputData[i][1]);
+                                input.attr('title', 'Enter a new start time (HH:MM)');
+                                input.addClass('updateFormStartTime popoverInput');
+                                input.timepicker({
+                                    minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
+                                    maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
+                                    step: 30,
+                                    forceRoundTime: true,
+                                    timeFormat: 'H:i'
+                                });
+                                input.val(outputData[i][1]).change();
+                                outputData[i][1] = input;
+                            }
+                        }
+                        //Add Update AND Delete button
+                        var buttonDelete = $(document.createElement('button'));
+                        buttonDelete.attr('id', 'deleteBookingBtn');
+                        buttonDelete.addClass('popoverBtn btn btn-danger');
+                        var iconDelete = $(document.createElement('i'));
+                        iconDelete.addClass('icon-trash icon-white');
+                        buttonDelete.append(iconDelete);
+                        buttonDelete.append("Delete");
+
+                        var buttonUpdate = $(document.createElement('button'));
+                        buttonUpdate.attr('id', 'updateBookingBtn');
+                        buttonUpdate.addClass('popoverBtn btn btn-info');
+                        var iconUpdate = $(document.createElement('i'));
+                        iconUpdate.addClass('icon-edit icon-white');
+                        buttonUpdate.append(iconUpdate);
+                        buttonUpdate.append("Save");
+
+                        outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
+                    }
+
+                    //Append all fields
+                    for (var i = 0; i < outputData.length; i++) {
+                        var outputTr = $(document.createElement('tr'));
+                        var outputTdKey = $(document.createElement('td')).html(outputData[i][0]);
+                        var outputTdValue = null;
+                        if (outputData[i][1] instanceof Array) {
+                            var outputArray = outputData[i][1];
+                            var outputArrayStr = "";
+                            //If print students
+                            if (outputData[i][0] === "Students") {
+                                for (var j = 0; j < outputArray.length; j++) {
+                                    outputArrayStr += outputArray[j].name + "<br/>";
+                                }
+                            }
+                            //If print faculty
+                            if (outputData[i][0] === "Faculty") {
+                                for (var j = 0; j < outputArray.length; j++) {
+                                    outputArrayStr += outputArray[j].name + " (" + outputArray[j].status.toLowerCase() + ")" + "<br/>";
+                                }
+                            }
+                            outputTdValue = $(document.createElement('td')).html(outputArrayStr);
+                        } else {
+                            outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
+                        }
+                        outputTr.append(outputTdKey);
+                        outputTr.append(outputTdValue);
+                        bookingDetails.append(outputTr);
                     }
 
                     //Popover
-                    bodyTd.popover({
-                        container: bodyTd, //This is important for the popover to overflow the schedule
-                        trigger: 'manual',
-                        html: 'true',
-                        content: function() {
-                            //Output in the form of a table
-                            var outputTable = $(document.createElement('table'));
-                            outputTable.attr('id', 'viewTimeslotTable');
-                            var outputData = [
-                                ["Team", viewBookingData.team],
-                                ["Status", viewBookingData.status],
-                                ["Date", viewBookingData.startDate],
-                                ["Time", viewBookingData.time],
-                                ["Team Wiki", viewBookingData.teamWiki],
-                                ["Students", viewBookingData.students],
-                                ["Faculty", viewBookingData.faculties]
-                            ];
-                            
-                            //Add Delete button if user if part of team
-                            if (viewBookingData.team === teamName) {
-                                var buttonDelete = $(document.createElement('button'));
-                                buttonDelete.attr('id', 'deleteBookingBtn');
-                                buttonDelete.addClass('popoverBtn btn btn-danger');
-                                var iconDelete = $(document.createElement('i'));
-                                iconDelete.addClass('icon-trash icon-white');
-                                buttonDelete.append(iconDelete);
-                                buttonDelete.append("Delete");
-                                outputData.push(["", buttonDelete]);
-                            }
-
-                            //Make fields editable and add Update and Delete buttons if user is admin
-                            if (<%=activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                                //Replace startDate and startTime with editable fields
-                                for (var i = 0; i < outputData.length; i++) {
-                                    if (outputData[i][0] === "Date") {
-                                        var input = $(document.createElement('input'));
-                                        input.attr('id', 'updateFormDate');
-                                        input.attr('type', 'text');
-                                        input.attr('placeholder', outputData[i][1]);
-                                        input.attr('title', 'Enter a new date (YYYY-MM-DD)');
-                                        outputData[i][1] = input;
-                                    }
-                                    if (outputData[i][0] === "Time") {
-                                        var input = $(document.createElement('input'));
-                                        input.attr('id', 'updateFormStartTime');
-                                        input.attr('type', 'text');
-                                        input.attr('placeholder', outputData[i][1]);
-                                        input.attr('title', 'Enter a new start time (HH:MM)');
-                                        outputData[i][1] = input;
-                                    }
-                                }
-                                //Add Update AND Delete button
-                                var buttonDelete = $(document.createElement('button'));
-                                buttonDelete.attr('id', 'deleteBookingBtn');
-                                buttonDelete.addClass('popoverBtn btn btn-danger');
-                                var iconDelete = $(document.createElement('i'));
-                                iconDelete.addClass('icon-trash icon-white');
-                                buttonDelete.append(iconDelete);
-                                buttonDelete.append("Delete");
-                                
-                                var buttonUpdate = $(document.createElement('button'));
-                                buttonUpdate.attr('id', 'updateBookingBtn');
-                                buttonUpdate.addClass('popoverBtn btn btn-info');
-                                var iconUpdate = $(document.createElement('i'));
-                                iconUpdate.addClass('icon-edit icon-white');
-                                buttonUpdate.append(iconUpdate);
-                                buttonUpdate.append("Save");
-                                
-                                outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
-                            }
-
-                            //Append all fields
-                            for (var i = 0; i < outputData.length; i++) {
-                                var outputTr = $(document.createElement('tr'));
-                                var outputTdKey = $(document.createElement('td')).html(outputData[i][0]);
-                                var outputTdValue = null;
-                                if (outputData[i][1] instanceof Array) {
-                                    var outputArray = outputData[i][1];
-                                    var outputArrayStr = "";
-                                    //If print students
-                                    if (outputData[i][0] === "Students") {
-                                        for (var j = 0; j < outputArray.length; j++) {
-                                            outputArrayStr += outputArray[j].name + "<br/>";
-                                        }
-                                    }
-                                    //If print faculty
-                                    if (outputData[i][0] === "Faculty") {
-                                        for (var j = 0; j < outputArray.length; j++) {
-                                            outputArrayStr += outputArray[j].name + " (" + outputArray[j].status.toLowerCase() + ")" + "<br/>";
-                                        }
-                                    }
-                                    outputTdValue = $(document.createElement('td')).html(outputArrayStr);
-                                } else {
-                                    outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
-                                }
-                                outputTr.append(outputTdKey);
-                                outputTr.append(outputTdValue);
-                                outputTable.append(outputTr);
-                            }
-                            return outputTable;
-                        },
-                        placement: function() {
-                            if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                return 'left';
+                    makePopover(
+                        booking,
+                        title = function() {
+                            if (timeslot.team === teamName) {
+                                return "<b>Your Booking</b>";
                             } else {
-                                return 'right';
+                                return "<b>Team Booking</b>";
                             }
                         },
-                        title: function() {
-                            var buttonClose = $(document.createElement('button'));
-                            buttonClose.attr('type', 'button');
-                            buttonClose.addClass('close');
-                            buttonClose.append("&times;"); //X sign
-                            if (viewBookingData.teamName === teamName) {
-                                return "Your Booking" + buttonClose.outerHTML();
-                            } else {
-                                return "Team Booking" + buttonClose.outerHTML();
-                            }
-                        }
-                    });
+                        bookingDetails
+                    );
                 }
                 
                 function appendCreateBookingPopover(bodyTd) {
                     if (bodyTd.hasClass('legendBox')) return;
                     //Initialize variables
-                    var popoverTitle = null;
-                    var termId = activeAcademicYearStr + "," + activeSemesterStr;
+                    var termId = year + "," + semester;
                     var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
                     var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
                     var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addMinutes(scheduleData.duration).toString('HH:mm');
+                    
+                    //Additional details
+                    var timeslot = scheduleData.timeslots[bodyTd.attr('value')];
+                    var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees');
+                    
+                    //If booking was deleted, 
+                    if (timeslot.lastBookingWasRemoved) {
+                        var deletedDiv = $(document.createElement('div'));
+                        if (timeslot.lastBookingRejectReason) {
+                            deletedDiv.addClass('rejectedBooking');
+                            makeTooltip(bodyTd, 'Removed by ' + timeslot.lastBookingEditedBy);
+                        } else {
+                            deletedDiv.addClass('deletedBookingOnTimeslot');
+                            deletedDiv.addClass('icon-info-sign icon-red');
+                            makeTooltip(deletedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
+                        }
+                        bodyTd.append(deletedDiv);
+                    }
 
                     //Create Booking outputTable
-                    var outputTable = $(document.createElement('table'));
-                    outputTable.attr('id', 'createTimeslotTable');
+                    var createBookingDetails = $(document.createElement('table'));
+                    createBookingDetails.attr('id', 'createTimeslotTable');
+                   
                     var outputData = [
                         ["Date", dateToView],
                         ["Time", startTimeToView + " - " + endTimeToView],
-                        ["Milestone", milestoneStr]
+                        ["Milestone", milestone],
+                        ["Venue", timeslot.venue],
+                        ["TA", timeslot.TA],
+                        ["Optional", optionalAttendees]
                     ];
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
-                        teamName = "<%= team != null ? team.getTeamName() : null%>";
                         outputData.unshift(["Team", teamName]); //Add to top of table
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
                         outputData.unshift(["Team", teamDropDownSelect.outerHTML()]); //Add to top of table
@@ -435,7 +520,6 @@
                         var timeslots = scheduleData.timeslots;
                         var unavailableTimeslotData = timeslots[bodyTd.attr('value')];
                         outputData.push(["Unavailable", unavailableTimeslotData.unavailable]);
-                        popoverTitle = "Unavailable Timeslot";
                         //TODO: Can create booking still? Add button here
                     } else {
                         var buttonCreate = $(document.createElement('button'));
@@ -446,7 +530,6 @@
                         buttonCreate.append(iconCreate);
                         buttonCreate.append("Book");
                         outputData.push(["", buttonCreate]);
-                        popoverTitle = "Available Timeslot";
                     }
                     //Print data
                     for (var i = 0; i < outputData.length; i++) {
@@ -462,36 +545,27 @@
                         var outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
                         outputTr.append(outputTdKey);
                         outputTr.append(outputTdValue);
-                        outputTable.append(outputTr);
+                        createBookingDetails.append(outputTr);
                     }
-
-                    bodyTd.popover({
-                        container: bodyTd,
-                        html: 'true',
-                        trigger: 'manual',
-                        placement: function() {
-                            if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                return 'left';
+                    
+                    makePopover(
+                        bodyTd,
+                        title = function(){
+                            if (bodyTd.is('.unavailableTimeslot')) {
+                                return "Unavailable Timeslot";
                             } else {
-                                return 'right';
+                                return "Available Timeslot";
                             }
                         },
-                        content: outputTable,
-                        title: function() {
-                            var buttonClose = $(document.createElement('button'));
-                            buttonClose.attr('type', 'button');
-                            buttonClose.addClass('close');
-                            buttonClose.append("&times;"); //X sign
-                            return popoverTitle + buttonClose.outerHTML();
-                        }
-                    });
+                        createBookingDetails
+                    );
                 }
                 
                 function appendChangeAvailabilityPopover(bodyTd) {
                     if (bodyTd.hasClass('legendBox')) return;
                     //Create Booking outputTable
-                    var outputTable = $(document.createElement('table'));
-                    outputTable.attr('id', 'createTimeslotTable');
+                    var changeAvailabailityDetails = $(document.createElement('table'));
+                    changeAvailabailityDetails.attr('id', 'createTimeslotTable');
                     var outputData = [];
                     if (bodyTd.is('.unavailableTimeslot')) {
                         var buttonAvail = $(document.createElement('button'));
@@ -519,29 +593,14 @@
                         var outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
                         outputTr.append(outputTdKey);
                         outputTr.append(outputTdValue);
-                        outputTable.append(outputTr);
+                        changeAvailabailityDetails.append(outputTr);
                     }
-
-                    bodyTd.popover({
-                        container: bodyTd,
-                        html: 'true',
-                        trigger: 'manual',
-                        placement: function() {
-                            if (bodyTd.parent().children().index(bodyTd) > 9) {
-                                return 'left';
-                            } else {
-                                return 'right';
-                            }
-                        },
-                        content: outputTable,
-                        title: function() {
-                            var buttonClose = $(document.createElement('button'));
-                            buttonClose.attr('type', 'button');
-                            buttonClose.addClass('close');
-                            buttonClose.append("&times;"); //X sign
-                            return "Change availability" + buttonClose.outerHTML();
-                        }
-                    });
+                    
+                    makePopover(
+                        bodyTd,
+                        "Change Availabaility",
+                        changeAvailabailityDetails
+                    );
                 }
                 
                 //Function to refresh booking exists
@@ -563,10 +622,9 @@
                                 }
                             }
                         }
-//                        console.log("Does booking exist? " + milestoneStr + " " + teamName + " " + bookingExists);
+//                        console.log("Does booking exist? " + milestone + " " + teamName + " " + bookingExists);
                         toReturn = {bookingExists:bookingExists, existingTimeslot: existingTimeslot};
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
-                        teams = JSON.parse('<%= session.getAttribute("allTeams")%>');
                         teamsPendingBooking = new Array();
                         teamDropDownSelect = $(document.createElement('select'));
                         teamDropDownSelect.attr('name', 'team');
@@ -596,12 +654,6 @@
 
                 //Function to create mouse UI events
                 function setupMouseEvents() {
-                    //Hide all popovers on page click
-                    $("body").on('click', function() {
-                        if ($('.popover').hasClass("in")) {
-                            $('.popover').parent().popover('hide');
-                        }
-                    });
                     
                     /*****************************
                      CALENDAR UI INTERACTION
@@ -611,23 +663,35 @@
                     $(".timeslotCell").mouseleave(function() {
                         $(this).removeClass("clickedCell");
                     });
+                    
+                    //Hide other popovers when others clicked
+                    $('body').off('click', '.bookedTimeslot');
+                    $('body').on('click', '.timeslotCell, .booking', function(e) {
+                        self = $(this);
+                        $('.booking').not(self).popover('hide');
+                        $('.timeslotCell').not(self).popover('hide');
+                        $.pnotify_remove_all();
+                        return false;
+                    });
 
                     //Popover for booked timeslot
                     $('body').off('click', '.bookedTimeslot');
-                    $('body').on('click', '.bookedTimeslot', function(e) {
+                    $('body').on('click', '.bookedTimeslot, .bookedTimeslot > .booking', function(e) {
+                        self = (!$(this).is('.booking')) ? $(this).children('.booking') : $(this);
                         if ($(e.target).parents('.popover').length) return false;
-//                        console.log(".bookedTimeslot clicked: " + $(e.target).attr('class'));
-                        self = $(this).is('.booking') ? $(this).parent('.timeslotCell') : $(this);
-                        $('.timeslotCell').not(self).popover('hide');
+//                        console.log(".booking clicked: " + $(e.target).attr('class'));
                         self.popover('show');
+                        self.find('ul').remove();
+                        appendTokenInput(self); //Optional attendees
                         return false;
                     });
                     
+                    //Popover for unbooked or unavailable timeslot
                     $('body').off('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking');
                     $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking', function(e) {
                         if (e.target === this) {
                             self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
-                            $('.timeslotCell').not(self).popover('hide');
+                            var timeslot = scheduleData.timeslots[self.attr('value')];
                             var refreshData = refreshScheduleData();
                             if (<%= activeRole.equals(Role.STUDENT) %>) {
                                 if (refreshData.bookingExists !== 0) {
@@ -639,6 +703,7 @@
                                     showNotification("WARNING", self, "You can only book for Term " + teamTerm);
                                     return false;
                                 }
+                                if (timeslot.lastBookingRejectReason) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingRejectReason);
                             }
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                                 //Make a dropdown of all teams that have not booked yet if user is admin
@@ -653,8 +718,11 @@
                                     return false;
                                 }
                             }
-//                            console.log(".unbookedTimeslot clicked.");
+                            console.log(".unbookedTimeslot clicked.");
+                            self.tooltip('hide');
                             self.popover('show');
+                            self.find('ul').remove(); //Remove all old tokenInputs
+                            appendTokenInput(self); //Optional attendees
                         }
                         return false;
                     });
@@ -675,26 +743,30 @@
                     //Create Booking Button
                     $(".timeslotCell").off('click', '#createBookingBtn');
                     $(".timeslotCell").on('click', '#createBookingBtn', function(e) {
-                        var returnData = createBooking(self);
+                        //NOTE: self is a .timeslotCell here
+                        var attendees = $(".optionalAttendees").tokenInput('get');
+                        var returnData = createBooking(self, attendees);
                         //REFRESH STATE OF scheduleData
-                        self.empty();
+                        self.popover('destroy');
+                        self.tooltip('destroy');
                         self.removeClass('unbookedTimeslot');
                         self.addClass('bookedTimeslot');
+                        var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
+                        if ($deletedDiv) $deletedDiv.remove();
                         var bookingDiv = $(document.createElement('div'));
                         bookingDiv.addClass('booking pendingBooking');
                         bookingDiv.html(returnData.booking.team);
                         bookingDiv.css('display', 'none');
                         self.append(bookingDiv);
-                        self.children('.booking').show('clip', 'slow');
-                        scheduleData.timeslots[self.attr('value')] = returnData.booking;
                         showNotification("SUCCESS", self, null);
+                        scheduleData.timeslots[self.attr('value')] = returnData.booking;
+                        refreshScheduleData();
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
-                            self.popover('destroy');
                             appendViewBookingPopover(self);
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                             appendPopovers();
                         }
-                        refreshScheduleData();
+                        bookingDiv.show('clip', 'slow');
                         return false;
                     });
 
@@ -702,97 +774,84 @@
                     $(".timeslotCell").off('click', '#deleteBookingBtn');
                     $(".timeslotCell").on('click', '#deleteBookingBtn', function(e) {
                         e.stopPropagation();
-                        deleteBooking(self);
-                        showNotification("ERROR", self, null);
-                        //REFRESH STATE OF scheduleData
-                        self.children('.booking').effect('clip', 'slow');
-                        self.popover('destroy');
-                        self.removeClass();
-                        self.addClass("timeslotCell unbookedTimeslot");
-                        delete scheduleData.timeslots[self.attr('value')];
-                        scheduleData.timeslots[self.attr('value')] = {id:self.attr('id').split(" ")[1], venue:"SIS Seminar Room 2-1", datetime: self.attr('value')};
+                        var timeslot = self.parents('.timeslotCell');
+                        deleteBooking(timeslot);
+                        showNotification("ERROR", timeslot, null);
+                        timeslot.removeClass();
+                        timeslot.addClass("timeslotCell unbookedTimeslot");
+                        timeslot.popover('destroy');
+                        delete scheduleData.timeslots[timeslot.attr('value')];
+                        scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
-                            self.popover('destroy');
-                            appendCreateBookingPopover(self);
+                            self.effect('clip', 'slow', function(){
+                                self.remove();
+                                var deletedDiv = $(document.createElement('div'));
+                                deletedDiv.addClass('deletedBookingOnTimeslot');
+                                deletedDiv.addClass('icon-info-sign');
+                                makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
+                                timeslot.append(deletedDiv);
+                            });
+                            appendCreateBookingPopover(timeslot);
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+                            self.effect('clip', 'slow', function(){
+                                self.remove();
+                            });
                             appendPopovers();
                         }
-                        refreshScheduleData();
                         return false;
                     });
                     
-                    $(".timeslotCell").on('mouseleave', "#updateFormDate", function(){
-                        var inputDate = $(this).val();
-                        if (inputDate) {
-                            inputDate = inputDate.replace(/ /g, '-');
-                            var date = Date.parse(inputDate);
-                            if (!date) {
-                                $(this).val("").change();
-                                showNotification("WARNING", self, "Please enter a proper date");
-                                return false;
-                            }
-                            var wellFormedDate = date.toString("yyyy-MM-dd");
-                            $(this).val(wellFormedDate).change();
-                        }
-                        return false;
-                    });
-                    
-                    $(".timeslotCell").on('mouseleave', "#updateFormStartTime", function(){
-                        var inputTime = $(this).val();
-                        if (inputTime) {
-                            inputTime = inputTime.split(" - ")[0];
-                            var time = Date.parse(inputTime);
-                            if (!time) {
-                                $(this).val("").change();
-                                showNotification("WARNING", self, "Please enter a proper time");
-                                return false;
-                            }
-                            var wellFormedTime = time.toString("HH:mm");
-                            $(this).val(wellFormedTime).change();
-                        }
-                        return false;
-                    });
-
                     //Update Booking Button
                     $(".timeslotCell").off('click', '#updateBookingBtn');
                     $(".timeslotCell").on('click', '#updateBookingBtn', function(e) {
                         e.stopPropagation();
-                        var startDateVal = document.getElementById('updateFormDate').value;
-                        var startTimeVal = document.getElementById('updateFormStartTime').value;
+                        var startDateVal = $('#updateFormDate').val();
+                        var startTimeVal = $('#updateFormStartTime').val();
                         var newDateTime = "";
-                        if (startDateVal !== null && startTimeVal !== null) {
-                            var startDate = Date.parse(startDateVal);
-                            var startTime = Date.parse($.trim(startTimeVal.split(" - ")[0]));
-                            if (!startDate || !startTime) {
-                                showNotification("WARNING", self, "Please enter a proper date and time");
-                                return false;
+                        if (startDateVal && startTimeVal) {
+                            var newDate = Date.parse(startDateVal);
+                            var newTime = Date.parse($.trim(startTimeVal.split(" - ")[0]));
+                            if (newDate && newTime) {
+                                newDateTime = newDate.toString("yyyy-MM-dd") + " " + newTime.toString("HH:mm:ss");
                             }
-                            newDateTime = startDate.toString("yyyy-MM-dd") + " " + startTime.toString("HH:mm:ss");
                         }
-                        console.log("New time: " + newDateTime);
-                        var returnData = updateBooking(self, newDateTime);
+                        var newVenue = $('#updateFormVenue').val();
+                        var attendees = $(".optionalAttendees").tokenInput('get');
+                        var timeslot = self.parents('.timeslotCell');
+                        var returnData = updateBooking(timeslot, newDateTime, newVenue, attendees);
                         if (returnData && returnData.success) {
-                            showNotification("INFO", self, null);
-                            scheduleData.timeslots[newDateTime] = returnData.booking;
-                            var newId = scheduleData.timeslots[newDateTime].id; //Add new booking
-                            var newBodyTd = $("#timeslot_" + newId);
-                            newBodyTd.empty();
-                            newBodyTd.removeClass('unbookedTimeslot');
-                            newBodyTd.addClass('bookedTimeslot');
-                            var bookingDiv = $(document.createElement('div'));
-                            bookingDiv.addClass(self.children('.booking').attr('class'));
-                            bookingDiv.html(self.children('.booking').text());
-                            bookingDiv.css('display', 'none');
-                            newBodyTd.append(bookingDiv);
-                            newBodyTd.children('.booking').show('clip', 'slow');
-                            self.children('.booking').effect('clip', 'slow'); //Delete old booking
-                            self.popover('destroy');
-                            newBodyTd.popover('destroy');
-                            appendViewBookingPopover(newBodyTd);
+                            showNotification("INFO", timeslot, null);
+                            if (newDateTime !== "" && newDateTime !== timeslot.attr('value')) {
+                                var newTimeslot = $("#timeslot_" + returnData.booking.id);
+                                newTimeslot.popover('destroy');
+                                newTimeslot.removeClass();
+                                newTimeslot.addClass('timeslotCell bookedTimeslot');
+                                var bookingDiv = $(document.createElement('div'));
+                                bookingDiv.addClass('booking pendingBooking');
+                                bookingDiv.html(returnData.booking.team);
+                                bookingDiv.css('display', 'none');
+                                newTimeslot.append(bookingDiv);
+                                scheduleData.timeslots[newTimeslot.attr('value')] = returnData.booking;
+                                appendViewBookingPopover(newTimeslot);
+                                
+                                timeslot.removeClass('bookedTimeslot');
+                                timeslot.addClass('unbookedTimeslot');
+                                timeslot.popover('destroy');
+                                self.effect('clip', 'slow', function(){
+                                   self.remove(); 
+                                });
+                                delete scheduleData.timeslots[timeslot.attr('value')];
+                                scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
+                                appendCreateBookingPopover(timeslot);
+                                bookingDiv.show('clip', 'slow');
+                            } else {
+                                scheduleData.timeslots[timeslot.attr('value')] = returnData.booking;
+                                self.popover('destroy');
+                                appendViewBookingPopover(timeslot);
+                            }
                         } else {
-                            showNotification("WARNING", self, returnData.message);
+                            showNotification("WARNING", timeslot, returnData.message);
                         }
-                        refreshScheduleData();
                         return false;
                     });
                     
@@ -821,31 +880,154 @@
                         appendChangeAvailabilityPopover(self);
                         return false;
                     });
+                    
+                    //Datepicker
+                    $('body').off('click', '#updateFormDate');
+                    $('body').on('click', '#updateFormDate', function(e){
+                        //Add date and timepickers
+                        if (e.target === this) {
+                            console.log("clicked " + $(this).parents(".bookedTimeslot").attr('value'));
+                            $(this).datepicker('show');
+                        }
+                        return false;
+                    });
+                    
+                    //Timepicker
+                    $('body').off('click', '#updateFormStartTime');
+                    $('body').on('click', '#updateFormStartTime', function(e){
+                        //Add timepicker
+                        if (e.target === this) {
+                            $(this).timepicker('show');
+                        }
+                        return false;
+                    });
+                    
+                    //Update booking validation
+                    $(".timeslotCell").on('mouseover', '#updateBookingBtn', function(){
+                        var inputDate = $("#updateFormDate").val();
+                        if (inputDate) {
+                            inputDate = inputDate.replace(/ /g, '-');
+                            var date = Date.parse(inputDate);
+                            if (!date) {
+                                $("#updateFormDate").val("").change();
+                                showNotification("WARNING", self, "Please enter a proper date");
+                                return false;
+                            }
+                            var wellFormedDate = date.toString("yyyy-MM-dd");
+                            $("#updateFormDate").val(wellFormedDate).change();
+                        }
+                        var inputTime = $("#updateFormStartTime").val();
+                        if (inputTime) {
+                            inputTime = inputTime.split(" - ")[0];
+                            var time = Date.parse(inputTime);
+                            if (!time) {
+                                $("#updateFormStartTime").val("").change();
+                                showNotification("WARNING", self, "Please enter a proper time");
+                                return false;
+                            }
+                            var wellFormedTime = time.toString("HH:mm");
+                            $("#updateFormStartTime").val(wellFormedTime).change();
+                        }
+                        return false;
+                    });
+                    
+                    //Update booking validation
+                    $(".timeslotCell").on('mouseleave', '#updateBookingBtn', function(){
+                        var inputDate = $("#updateFormDate").val();
+                        if (inputDate) {
+                            inputDate = inputDate.replace(/ /g, '-');
+                            var date = Date.parse(inputDate);
+                            if (!date) {
+                                $("#updateFormDate").val("").change();
+                                showNotification("WARNING", self, "Please enter a proper date");
+                                return false;
+                            }
+                            var wellFormedDate = date.toString("ddd, dd MMM yyyy");
+                            $("#updateFormDate").val(wellFormedDate).change();
+                        }
+                        var inputTime = $("#updateFormStartTime").val();
+                        if (inputTime) {
+                            inputTime = inputTime.split(" - ")[0];
+                            var time = Date.parse(inputTime);
+                            if (!time) {
+                                $("#updateFormStartTime").val("").change();
+                                showNotification("WARNING", self, "Please enter a proper time");
+                                return false;
+                            }
+                            var wellFormedTime = time.toString("HH:mm") + " - " + time.addMinutes(scheduleData.duration).toString("HH:mm");
+                            $("#updateFormStartTime").val(wellFormedTime).change();
+                        }
+                        return false;
+                    });
+                    
+                    //Week view functions
+                    $("#weekView").off('click');
+                    $("#weekView").on('click', function(){
+                        weekView = 0;
+                        $(".weekNum").remove();
+                        $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                        populateSchedule(milestone, year, semester);
+                        return false;
+                    });
+                    $("#nextWeek").off('click');
+                    $("#nextWeek").on('click', function(){
+                        if (weekView + 1 < 10) {
+                            ++weekView;
+                            $(".weekNum").remove();
+                            $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                            populateSchedule(milestone, year, semester);
+                        }
+                        return false;
+                    });
+                    $("#previousWeek").off('click');
+                    $("#previousWeek").on('click', function(){
+                        if (weekView <= 0) {
+                            return false;
+                        } else {
+                            --weekView;
+                            $(".weekNum").remove();
+                            $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                            populateSchedule(milestone, year, semester);
+                        }
+                        return false;
+                    });
+                    $("#fullView").off('click');
+                    $("#fullView").on('click', function(){
+                        weekView = null;
+                        $(".weekNum").remove();
+                        populateSchedule(milestone, year, semester);
+                        return false;
+                    });
                 }
                 
                 /***************************
                     AJAX CALL FUNCTIONS
                  ***************************/
                  
-                function createBooking(bodyTd) {
+                function createBooking(bodyTd, attendees) {
                     var toReturn = null;
                     var data = null;
                     var tName = null;
+                    var attendeesArray = new Array();
+                    for (var i = 0; i < attendees.length; i++) {
+                        attendeesArray.push(attendees[i].id?attendees[i].id:attendees[i].name);
+                    }
                     if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                             tName = $("#createTeamSelect option:selected").text();
                             var tId = $("#createTeamSelect").val();
                             data = {
                                 timeslotId: bodyTd.attr('id').split("_")[1],
-                                teamId: tId
+                                teamId: tId,
+                                "attendees[]": attendeesArray
                             };
                     } else if (<%= activeRole.equals(Role.STUDENT)%>) {
                         tName = teamName;
                         data = {
                             timeslotId: bodyTd.attr('id').split("_")[1],
-                            teamId: teamId
+                            "attendees[]": attendeesArray
                         };
                     }
-//                    console.log("Submitting create booking data: " + JSON.stringify(data));
+                    console.log("Submitting create booking data: " + JSON.stringify(data));
                     //Create Booking AJAX
                     $.ajax({
                         type: 'POST',
@@ -891,18 +1073,26 @@
                 }
 
                 //update booking function
-                function updateBooking(bodyTd, newDateTime) {
+                function updateBooking(bodyTd, newDateTime, newVenue, attendees) {
                     //getfunction up the timeslotID for that cell and send as request
                     var toReturn = null;
                     var cellId = bodyTd.attr('id').split("_")[1];
-                    var data = {timeslotId: cellId, changedDate: newDateTime};
-//                    console.log("Submitting update booking data: " + JSON.stringify(data));
+                    var attendeesArray = new Array();
+                    for (var i = 0; i < attendees.length; i++) {
+                        attendeesArray.push(attendees[i].id?attendees[i].id:attendees[i].name);
+                    }
+                    var data = {timeslotId: cellId, attendees: attendeesArray};
+                    if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
+                        data["newDateTime"] = newDateTime;
+                        data["newVenue"] = newVenue;
+                    }
+                    console.log("Submitting update booking data: " + JSON.stringify(data));
                     //Update booking AJAX
                     $.ajax({
                         type: 'POST',
                         async: false,
                         url: 'updateBookingJson',
-                        data: data,
+                        data: {jsonData: JSON.stringify(data)},
                         cache: false,
                         dataType: 'json'
                     }).done(function(response) {
@@ -935,6 +1125,7 @@
                         timeslot_data.splice(index, 1);
                     }
                     timeslotsData["timeslot_data[]"] = timeslot_data;
+                    timeslotsData["scheduleId"] = scheduleData.id;
 //                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
                     $.ajax({
                         type: 'POST',
@@ -970,12 +1161,12 @@
 
                 //Function to make schedule based on GetScheduleAction response
                 function makeSchedule() {
-                    var tableClass = "scheduleTable";
+                    var tableClass = "scheduleTable:first";
                     var timeslots = scheduleData.timeslots;
                     
                     //TODO: Get from server/admin console/whatevs
-                    var minTime = 9;
-                    var maxTime = 19;
+                    var minTime = scheduleData.dayStartTime;
+                    var maxTime = scheduleData.dayEndTime;
 
                     var timesArray = new Array();
                     for (var i = minTime; i < maxTime; i++) {
@@ -985,19 +1176,8 @@
                         timesArray.push(timeVal.toString("HH:mm:ss"));
                     }
                     
-                    var datesArray = getDateArrayBetween(Date.parse(scheduleData.startDate), Date.parse(scheduleData.endDate)); //Gets whole range of dates
-//                    var datesArray = datesHashArray; //Gets only specific dates
-
-                    //Get dates between minDate and maxDate
-                    function getDateArrayBetween(startDate, stopDate) {
-                        var dateArray = new Array();
-                        var currentDate = startDate;
-                        while (currentDate <= stopDate) {
-                            dateArray.push(currentDate);
-                            currentDate = new Date(currentDate).addDays(1);
-                        }
-                        return dateArray;
-                    }
+                    var datesArray = getDateArrayBetween(scheduleData.startDate, scheduleData.endDate, weekView); //Gets full schedule
+//                    var datesArray = datesHashArray; //Gets only timeslot dates
 
                     //Append header names
                     var headerDom = $(document.createElement('thead'));
@@ -1008,6 +1188,8 @@
                     for (i = 0; i < datesArray.length; i++) {
                         var headerVal = new Date(datesArray[i]).toString('dd MMM') + "<br/>" + new Date(datesArray[i]).toString('ddd');
                         headerTd = $(document.createElement('td'));
+                        headerTd.addClass('dateCol');
+                        headerTd.attr('id', 'col_' + (i + 1));
                         headerTd.html(headerVal);
                         headerTr.append(headerTd);
                     }
@@ -1050,6 +1232,7 @@
                                 var id = timeslot.id;
                                 var team = timeslot.team;
                                 var isAvailable = timeslot.available;
+								var taId = timeslot.taId;
                                 bodyTd.attr('id', 'timeslot_' + id);
                                 bodyTd.attr('value', datetimeString);
 
@@ -1066,6 +1249,16 @@
                                         bodyTd.addClass('unbookedTimeslot');
                                     }
                                 }
+								
+								//TA specific class allocation
+								if (<%= activeRole.equals(Role.TA) %> && taId !== undefined ) {
+									if (loggedInTa === taId) {
+										bodyTd.addClass('taChosenTimeslot');
+									} else {
+										bodyTd.addClass('otherTATimeslot');
+									}
+								}
+								
                                 var temp = null;
                                 bodyTd.attr('align', 'center');
                                 var duration = scheduleData.duration;
@@ -1096,10 +1289,28 @@
                     return 0;
                 }
                 
+                //Get dates between startDate and stopDate
+                function getDateArrayBetween(startDate, stopDate, weekNum) {
+                    var dateArray = new Array();
+                    startDate = Date.parse(startDate);
+                    stopDate = Date.parse(stopDate);
+                    if (weekNum !== null) {
+                        startDate.addWeeks(weekNum);
+                        stopDate = startDate.clone().addWeeks(1).addDays(-1);
+                    }
+                    var currentDate = startDate;
+                    while (currentDate <= stopDate) {
+                        dateArray.push(currentDate);
+                        currentDate = new Date(currentDate).addDays(1);
+                    }
+                    return dateArray;
+                }
+                
                 /*****************************
-                 NOTIFICATIONS
+                 PLUGINS AND COMPONENTS
                  ****************************/
-
+                
+                /* PINES NOTIFY */
                 function showNotification(action, bodyTd, notificationMessage) {
                     var opts = {
                         title: "Note",
@@ -1121,18 +1332,18 @@
                     var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
                     switch (action) {
                         case "SUCCESS":
-                            opts.title = "Booked";
-                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.title = "Booked"; else opts.title = "Note";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
                             opts.type = "success";
                             break;
                         case "ERROR":
-                            opts.title = "Deleted";
-                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.title = "Deleted"; else opts.title = "Rejected";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
                             opts.type = "error";
                             break;
                         case "INFO":
-                            opts.title = "Updated";
-                            opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.title = "Updated"; else opts.title = "Note";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
                             opts.type = "info";
                             break;
                         case "WARNING":
@@ -1151,12 +1362,100 @@
                     }
                     $.pnotify(opts);
                 }
-
+                
+                /* TOKEN INPUT */
+                function appendTokenInput(booking){
+                    booking.find('.optionalAttendees').tokenInput('destroy');
+                    var opts = {
+                        preventDuplicates: true,
+                        theme: "facebook",
+                        allowFreeTagging: true,
+                        allowTabOut: true,
+                        propertyToSearch: "name",
+                        resultsLimit: 4,
+                        hintText: "Add users or emails",
+                        noResultsText: "Press [TAB] to add as email",
+                        tokenFormatter: function(item) {
+                            if (item && item.id) {
+                                return "<li><p>" + item.id + "</p></li>";
+                            } else if (item) {
+                                return "<li><p>" + item.name + "</p></li>";
+                            }
+                        }
+                    };
+                    var timeslot = scheduleData.timeslots[booking.parents('.timeslotCell').attr('value')];
+                    if (timeslot) {
+                        //View Booking Data
+                        opts["prePopulate"] = timeslot.optionals;
+                        if (<%= activeRole.equals(Role.FACULTY) %> || (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName)) {
+                            opts["disabled"] = true;
+                        }
+                    }
+                    booking.find('.optionalAttendees').tokenInput(users, opts);
+                }
+                
+//                $(".booking").draggable({
+////                    helper: "clone",
+//                    appendTo: "body"
+//                });
+//                $(".unbookedTimeslot").droppable({
+//                        tolerance:"intersect",
+//                        drop: function(event, ui) {
+//                            var drop_p = $(this).offset();
+//                            var drag_p = ui.draggable.offset();
+//                            var left_end = drop_p.left - drag_p.left + 1;
+//                            var top_end = drop_p.top - drag_p.top + 1;
+//                            ui.draggable.animate({
+//                                top: '+=' + top_end,
+//                                left: '+=' + left_end
+//                            });
+//                        }
+//                });
             };
+            
+            /* POPOVER */
+            function makePopover(container, title, content) {
+                container.popover({
+                    container: container,
+                    trigger: 'manual',
+                    html: true,
+                    title: title,
+//                    title: function(){
+//                        var buttonClose = $(document.createElement('button'));
+//                        buttonClose.attr('type', 'button');
+//                        buttonClose.addClass('close');
+//                        buttonClose.append("&times;"); //X sign
+//                        return title + buttonClose.outerHTML();
+//                    },
+                    content: content,
+                    placement: function(){
+                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 9) {
+                            return 'left';
+                        } else {
+                            return 'right';
+                        }
+                    }
+                });
+            }
+            
+            /* POPOVER */
+            function makeTooltip(container, title) {
+                container.tooltip({
+                    container: container,
+                    html: true,
+                    title: title,
+                    placement: function(){
+                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 9) {
+                            return 'left';
+                        } else {
+                            return 'right';
+                        }
+                    }
+                });
+            }
 
             addLoadEvent(viewScheduleLoad);
         </script>
         <br/>
-        <%--<%@include file="navbar_footer.jsp" %>--%>
     </body>
 </html>

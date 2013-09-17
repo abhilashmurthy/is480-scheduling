@@ -4,6 +4,7 @@
     Author     : Prakhar
 --%>
 
+<%@page import="manager.UserManager"%>
 <%@page import="java.util.Set"%>
 <%@page import="model.role.Faculty"%>
 <%@page import="com.opensymphony.xwork2.ActionContext"%>
@@ -19,7 +20,8 @@
 %>
 <html>
     <head>
-        <title>Faculty Availability</title>
+        <%@include file="header.jsp" %>
+        <title>IS480 Scheduling System | Your Availability</title>
         <style type="text/css">
             .timeslotsTable tr:first-child {
                 font-size: 16px !important;
@@ -97,7 +99,7 @@
         %>
 
         <%
-                        Faculty facultyUser = (Faculty) session.getAttribute("user");
+             Faculty facultyUser = UserManager.getUser(user.getId(), Faculty.class);
         %>
 
         <!-- Edit Availability -->
@@ -167,11 +169,18 @@
                 var unavailableTimeslots = new Array();
                 var scheduleData = null;
                 var selectedMilestone = null;
-                var milestones = ["ACCEPTANCE", "MIDTERM", "FINAL"]; //TODO: Remove hardcoding
-
+                var milestones = new Array();
+                
+                loadMilestones();
                 loadUnavailableTimeslots();
-//                loadScheduleDates();
                 loadSelectDropdown();
+                
+                function loadMilestones() {
+                    var milestonesData = getScheduleData(null, activeAcademicYearStr, activeSemesterStr);
+                    for (var i = 0; i < milestonesData.milestones.length; i++) {
+                        milestones.push(milestonesData.milestones[i].name);
+                    }
+                };
 
                 function loadUnavailableTimeslots() {
                     <s:iterator value="unavailableTimeslotIds">
@@ -198,31 +207,9 @@
                 
                 $("#milestoneTimeslotsSelect").val(milestones[0]).change(); //Select first milestone
 
-                function loadScheduleDates() {
-                    //Get acceptance schedule data
-                    var milestoneStr = "ACCEPTANCE";
-                    scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
-                    acceptanceId = scheduleData.id;
-                    loadScheduleTimeslots(milestoneStr, scheduleData);
-
-                    //Get midterm schedule data
-                    var milestoneStr = "MIDTERM";
-                    scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
-                    midtermId = scheduleData.id;
-                    loadScheduleTimeslots(milestoneStr, scheduleData);
-
-                    //Get final schedule data
-                    var milestoneStr = "FINAL";
-                    scheduleData = getScheduleData(milestoneStr, activeAcademicYearStr, activeSemesterStr);
-                    finalId = scheduleData.id;
-                    loadScheduleTimeslots(milestoneStr, scheduleData);
-                }
-
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableId = "timeslotsTable";
                     var table = $("#" + tableId);
-//                    table.prev('h4').remove();
-//                    table.before("<h4>" + milestoneStr.toUpperCase() + "</h4>"); //Add milestone title
                     makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeString"));
                     populateTimeslotsTable(tableId, scheduleData);
                     populateUnavailableTimeslots(tableId, scheduleData);
@@ -240,13 +227,15 @@
                     return dateArray;
                 }
 
-                function getScheduleData(milestoneString, academicYearString, semesterString) {
+                function getScheduleData(milestone, year, semester) {
                     var toReturn = null;
                     var data = {
-                        milestoneString: milestoneString,
-                        academicYearString: academicYearString,
-                        semesterString: semesterString
+                        year: year,
+                        semester: semester
                     };
+                    if (milestone) {
+                        data["milestone"] = milestone;
+                    }
                     console.log("Submitting data: " + JSON.stringify(data));
                     //Get schedule action
                     $.ajax({
@@ -496,6 +485,7 @@
                     }
 
                     timeslotsData["timeslot_data[]"] = timeslot_data;
+                    timeslotsData["scheduleId"] = scheduleData.id;
 
                     console.log('Availability data is: ' + JSON.stringify(timeslotsData));
                     $.ajax({
