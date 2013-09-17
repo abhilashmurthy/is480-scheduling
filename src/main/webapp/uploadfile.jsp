@@ -55,7 +55,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="file" id="fileUploaded" name="fileUploaded" accept="text/comma-separated-values, text/csv, 
+							<input type="file" id="fileUploaded" accept="text/comma-separated-values, text/csv, 
 								application/csv, application/excel, application/vnd.ms-excel, application/vnd.msexcel" 
 								onchange="checkFile(this);" />
 						</td>
@@ -94,24 +94,16 @@
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
 				$(this).button('loading');
-				var file = $('#fileUploaded').val();
-				alert(file.size);
-				var termSelected = $('#termChosen').val();
 				
+				var file = $('#fileUploaded').val();
+
 				//Checking whether user has selected file or not
 				if (file === "" || file === null) {
 					showNotification("ERROR", "Please select a file!");
 					$("#submitFormBtn").button('reset');
 					return false;
 				}
-				
-				//Checking whether user has selected term or not
-				if (termSelected === "" || termSelected === null) {
-					showNotification("ERROR", "Please select a term!");
-					$("#submitFormBtn").button('reset');
-					return false;
-				}
-				
+
 				//Checking the extension of the file
 				var validExts = new Array(".xlsx", ".xls", ".csv");
 				file = file.substring(file.lastIndexOf('.'));
@@ -122,9 +114,32 @@
 					return false;
 				} 
 				
+				var fileSize = $("#fileUploaded")[0].files[0].size;
+				//If file size is greater than 2 mb then display error
+				if (fileSize > 2097152) {
+					showNotification("ERROR", "File size too large! It should be less than 2 mb!");
+					$("#submitFormBtn").button('reset');
+					return false;
+				}
+				
+				//If file size is 0 then display error
+				if (fileSize === 0) {
+					showNotification("ERROR", "The file is empty! Please upload correct file!");
+					$("#submitFormBtn").button('reset');
+					return false;
+				}
+				
+				var termSelected = $('#termChosen').val();
+				//Checking whether user has selected term or not
+				if (termSelected === "" || termSelected === null) {
+					showNotification("ERROR", "Please select a term!");
+					$("#submitFormBtn").button('reset');
+					return false;
+				}
+				
 				var fileJson = {};
 				fileJson['termId'] = termSelected;
-				fileJson['fileUploaded'] = file;
+//				fileJson['fileUploaded'] = file;
 				
 //				$('input[type="file"]').ajaxfileupload({
 //				   'action': 'uploadFileToBackend',
@@ -142,10 +157,11 @@
 //					 console.log('no file selected');
 //				   }
 //				});
+				alert(JSON.stringify(fileJson));
 				$.ajax({
 					type: 'POST',
 					async: false,
-					url: 'updateUserPreferences',
+					url: 'uploadFileToBackend',
 					data: {jsonData: JSON.stringify(fileJson)}	
 				}).done(function(response) {
 					$("#submitFormBtn").button('reset');

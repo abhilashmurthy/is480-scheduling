@@ -4,6 +4,7 @@
  */
 package userAction;
 
+import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
+import org.json.JSONObject;
 import util.MiscUtil;
 
 /**
@@ -39,7 +41,12 @@ public class UploadFileAction extends ActionSupport implements ServletRequestAwa
 			
 			//Checking role of the user
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
-				
+				JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+				long termId = inputData.getLong("termId");
+			} else {
+				request.setAttribute("error", "Oops. You're not authorized to access this page!");
+				logger.error("User cannot access this page");
+				return ERROR;
 			}
 			json.put("success", true);
 			
