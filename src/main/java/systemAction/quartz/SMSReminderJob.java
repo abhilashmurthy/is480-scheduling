@@ -68,7 +68,6 @@ public class SMSReminderJob implements Job {
                 logger.debug("Booking: " + booking + ". SMS sending..");
                 StringBuilder msg = new StringBuilder();
                 msg
-                    .append("flashsms:")
                     .append("From: IS480 Scheduling System. ")
                     .append("Team ")
                     .append(booking.getTeam().getTeamName())
@@ -76,6 +75,8 @@ public class SMSReminderJob implements Job {
                     .append(smsDateFormat.format(booking.getTimeslot().getStartTime()))
                     .append(" ")
                     .append(smsTimeFormat.format(booking.getTimeslot().getStartTime()))
+                    .append(" at ")
+                    .append(booking.getTimeslot().getVenue())
                     .append(" for FYP ")
                     .append(booking.getTimeslot().getSchedule().getMilestone().getName())
                     .append(". See you there!");
