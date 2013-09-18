@@ -58,7 +58,7 @@
 					$("#offPref").attr('checked', 'checked');
 				} else {
 					$('#setMobileNumber').show();
-					$("#mobileNumber").attr("placeholder", mobileNo);
+					$("#mobileNumber").attr("value", mobileNo);
 					$("#onPref" ).prop("checked", true);
 					$("#offPref" ).prop("checked", false);
 				}
@@ -82,6 +82,12 @@
 					mobNo = $('#mobileNumber').val();
 					//Checking whether mobile number is incorrect or not
 					if (mobNo === "" || mobNo.length < 8) {
+						showNotification("ERROR", "Mobile Number is invalid!");
+						$("#submitFormBtn").button('reset');
+						return false;
+					}
+					//Checking whether the mobile number starts with 8 or 9
+					if (mobNo.substring(0,1) !== "8" && mobNo.substring(0,1) !== "9") {
 						showNotification("ERROR", "Mobile Number is invalid!");
 						$("#submitFormBtn").button('reset');
 						return false;
