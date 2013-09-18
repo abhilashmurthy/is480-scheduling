@@ -12,7 +12,6 @@ import constant.Role;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
@@ -50,6 +49,13 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 				//Getting input data from url
 				JSONObject activeTermsObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
 				JSONArray activeTermsArray = (JSONArray) activeTermsObject.getJSONArray("activeTerms");
+				
+				//Checking whether atleast 1 term has been marked active
+				if (activeTermsArray.length() == 0) {
+					json.put("message", "Please select atleast 1 active term!");
+					json.put("success", false);
+					return SUCCESS;
+				}
 				
 				//Constructing the active terms list to be stored in db
 				ArrayList<Long> activeTermIds = new ArrayList<Long>();
