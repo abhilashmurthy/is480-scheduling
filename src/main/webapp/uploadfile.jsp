@@ -10,7 +10,7 @@
 <html>
     <head>
         <%@include file="header.jsp" %>
-        <title>IS480 Scheduling System | Upload File </title>
+        <title>IS480 Scheduling System | CSV Upload </title>
     </head>
     <body>
         <%@include file="navbar.jsp" %>
@@ -25,7 +25,7 @@
          %>
 		 
         <div class="container">
-			<h3>Upload File</h3>
+			<h3>CSV Upload</h3>
 			<form enctype="multipart/form-data" action="UploadFileAction">
 			<div style="float: left; margin-right: 50px;">
 			<table class="table" style="width:auto">
