@@ -14,13 +14,24 @@
 <html>
     <head>
         <%@include file="header.jsp" %>
-        <title>IS480 Scheduling System | Booking History</title>
+		<title>
+		<%  Role activeR = (Role) session.getAttribute("activeRole"); %>
+		<% if (activeR.equals(Role.ADMINISTRATOR) || activeR.equals(Role.COURSE_COORDINATOR)) { %>
+	        IS480 Scheduling System | All Bookings
+		<% } else { %>
+			IS480 Scheduling System | My Bookings
+		<% } %>
+		</title>
 		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
 		<div class="container">
-		<h3 style="float: left; margin-right: 50px;">Booking History</h3> 
+		<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)){ %>
+			<h3 style="float: left; margin-right: 50px;">All Bookings</h3> 
+		<% } else { %>
+			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
+		<% } %>
 		<s:if test="%{data != null && data.size() > 0}">
 			<div style="float:right">
 				<input type="hidden" id="dropdownValues"/>
