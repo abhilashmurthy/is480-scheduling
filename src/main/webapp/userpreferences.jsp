@@ -39,7 +39,7 @@
 						</td>
 						<td>
 							<input type="text" id="mobileNumber" name="mobileNumber" placeholder="e.g. 81256296" 
-								   style="width:110px" data-mask="99999999">
+								   style="width:110px" class="input-medium bfh-phone" data-format="dddddddd">
 						</td>
 					</tr>
 				</tbody>
@@ -48,8 +48,8 @@
         </div>
 		
 		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.js"></script>
-		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.min.js"></script>
+		<script type="text/javascript" src="js/plugins/bootstrap-formhelpers-phone.format.js"></script>
+		<script type="text/javascript" src="js/plugins/bootstrap-formhelpers-phone.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
 				var mobileNo = '<s:property value="mobileNumber"/>';
@@ -59,7 +59,7 @@
 //					$("#offPref").attr('checked', 'checked');
 				} else {
 					$('#setMobileNumber').show();
-					$("#mobileNumber").attr("placeholder", mobileNo);
+					$("#mobileNumber").attr("value", mobileNo);
 					$("#onPref" ).prop("checked", true);
 					$("#offPref" ).prop("checked", false);
 //					$("#offPref").checked = false;
@@ -95,6 +95,12 @@
 					mobNo = $('#mobileNumber').val();
 					//Checking whether mobile number is incorrect or not
 					if (mobNo === "") {
+						showNotification("ERROR", "Mobile Number is invalid!");
+						$("#submitFormBtn").button('reset');
+						return false;
+					}
+					//Checking whether the mobile number starts with 8 or 9
+					if (mobNo.substring(0,1) !== "8" && mobNo.substring(0,1) !== "9") {
 						showNotification("ERROR", "Mobile Number is invalid!");
 						$("#submitFormBtn").button('reset');
 						return false;
