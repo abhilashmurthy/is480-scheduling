@@ -59,7 +59,8 @@ public class ClearPendingBookingJob implements Job {
             if (pendingBookings.isEmpty()) {
                 throw new NoResultException();
             }
-
+			
+			int count = 0;
             for (Booking pendingBooking : pendingBookings) {
                 //Do the time calculation
                 cal.clear();
@@ -82,11 +83,12 @@ public class ClearPendingBookingJob implements Job {
                     ts.setCurrentBooking(null);
                     em.persist(pendingBooking);
                     em.persist(ts);
+					count++;
                 }
             }
             em.getTransaction().commit();
             logItem.setSuccess(true);
-            logItem.setMessage("Pending bookings cleared.");
+            logItem.setMessage(count + " Pending bookings cleared.");
         } catch (NoResultException n) {
             //Normal, no pending bookings found
             logItem.setSuccess(true);
