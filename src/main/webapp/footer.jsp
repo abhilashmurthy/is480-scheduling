@@ -14,3 +14,6 @@
 <script type="text/javascript" src="js/plugins/jquery.pnotify.min.js"></script>
 <!-- jQuery tokenInput -->
 <script type="text/javascript" src="js/plugins/jquery.tokeninput.js"></script>
+<!-- Phone Format -->
+<script type="text/javascript" src="js/plugins/bootstrap-formhelpers-phone.format.js"></script>
+<script type="text/javascript" src="js/plugins/bootstrap-formhelpers-phone.js"></script>

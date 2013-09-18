@@ -10,6 +10,7 @@
 <link href="css/jquery.pnotify.default.css" rel="stylesheet">
 <link href="css/token-input.css" rel="stylesheet">
 <link href="css/token-input-facebook.css" rel="stylesheet">
+<link href="css/bootstrap-formhelpers.css" rel="stylesheet">
 <!-- Google Fonts -->
 <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
 

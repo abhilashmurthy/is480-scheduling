@@ -22,24 +22,23 @@
 				<tbody>
 					<tr align="center">
 						<td style="width:250px">Subscribe to SMS Notification</td>
-						<form>
 						<td style="width:50px"> 
 							<input type="radio" id="onPref" class="pref" name="pref" value="on">&nbsp; On 
 						</td>
 						<td>
 							<input type="radio" id="offPref" class="pref" name="pref" value="off">&nbsp; Off 
 						</td>
-						</form>
 					</tr>
 					<tr id="setMobileNumber">
 						<td>SMS Notification will be sent to:</td>
 						<td style="width:70px"> 
-							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px"/>
+							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px">
 							<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
 						</td>
 						<td>
-							<input type="text" id="mobileNumber" name="mobileNumber" placeholder="e.g. 81256296" 
-								   style="width:110px" data-mask="99999999">
+							<form>
+								<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd">
+							</form>
 						</td>
 					</tr>
 				</tbody>
@@ -48,29 +47,21 @@
         </div>
 		
 		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.js"></script>
-		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.min.js"></script>
+<!--		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.js"></script>
+		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.min.js"></script>-->
 		<script type="text/javascript">
 			$(document).ready(function(){
 				var mobileNo = '<s:property value="mobileNumber"/>';
 				if (mobileNo === null || mobileNo === "") {
 					$('#setMobileNumber').hide();
 					$("#offPref" ).prop("checked", true);
-//					$("#offPref").attr('checked', 'checked');
+					$("#offPref").attr('checked', 'checked');
 				} else {
 					$('#setMobileNumber').show();
 					$("#mobileNumber").attr("placeholder", mobileNo);
 					$("#onPref" ).prop("checked", true);
 					$("#offPref" ).prop("checked", false);
-//					$("#offPref").checked = false;
-//					document.getElementById('mobileNumber').Value = mobileNo;
 				}
-				//When the page is first loaded
-//				if ($("#offPref").is(':checked')) {
-//					$('#setMobileNumber').hide();
-//				} else if ($("#onPref").is(':checked')) {
-//					$('#setMobileNumber').show();
-//				}
 			});
 			
 			//For hiding and showing table row
@@ -82,10 +73,6 @@
 				}
 			});
 			
-			
-			//For restricting mobile number to 8 digits
-//			$('#mobileNumber').inputmask();
-			
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
 				$(this).button('loading');
@@ -94,7 +81,7 @@
 				if($('#mobileNumber').is(':visible')) {
 					mobNo = $('#mobileNumber').val();
 					//Checking whether mobile number is incorrect or not
-					if (mobNo === "") {
+					if (mobNo === "" || mobNo.length < 8) {
 						showNotification("ERROR", "Mobile Number is invalid!");
 						$("#submitFormBtn").button('reset');
 						return false;

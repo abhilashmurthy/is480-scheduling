@@ -1226,7 +1226,6 @@
                             bodyTd.addClass('timeslotCell');
                             
                             //If timeslot is available
-                            //TODO: Remove hardcoding of milestone data
                             if (timeslot) {
                                 var id = timeslot.id;
                                 var team = timeslot.team;
