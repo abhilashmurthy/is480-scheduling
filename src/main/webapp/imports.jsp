@@ -11,6 +11,9 @@
 <link href="css/token-input.css" rel="stylesheet">
 <link href="css/token-input-facebook.css" rel="stylesheet">
 <link href="css/bootstrap-formhelpers.css" rel="stylesheet">
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+
 <!-- Google Fonts -->
 <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
 

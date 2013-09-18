@@ -116,8 +116,8 @@
 				
 				var fileSize = $("#fileUploaded")[0].files[0].size;
 				//If file size is greater than 2 mb then display error
-				if (fileSize > 2097152) {
-					showNotification("ERROR", "File size too large! It should be less than 2 mb!");
+				if (fileSize > 5242880) {
+					showNotification("ERROR", "File size too large! It should be less than 5 mb!");
 					$("#submitFormBtn").button('reset');
 					return false;
 				}

@@ -47,14 +47,8 @@
             </button>
             <a class="brand" href="index">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
-                <ul class="nav">
+                <ul class="nav navbar-nav">
 				<%  if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
-						<!--<li class="dropdown">
-							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown"><b>Booking</b><b class="caret"></b></a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="approveReject">Approve Booking</a></li>
-							</ul>
-						</li>-->
 						<li class="dropdown">
 							<a href="#" id="scheduleDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Schedule</b><b class="caret" style="border-bottom-color: white; border-top-color: white"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
@@ -98,26 +92,43 @@
 						<li id="bookingHistory"><a href="taAvailability" class="navbar-title"><b>Sign Up for Filming!</b></a></li>
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } %>
-                </ul>
-            </div>
-			
-            <div class="btn-group userbox">
-                <button class="btn" id="userDashboard"><i class="icon-user icon-black"></i>&nbsp;<%= user.getFullName()%></button>
-                <button class="btn btn-success dropdown-toggle" id="userAccess" data-toggle="dropdown">
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
-                    <li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
-                    <li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
+				
+				<!-- To display the user information -->
+				<li id="userInfo">
+					<a class="navbar-title">
+					<i class="icon-user icon-white"></i>&nbsp;<% out.print(user.getFullName());%>&nbsp;|&nbsp;
+					<% if (activeRole.equals(Role.STUDENT)) { %>
+						Student
+					<% } else if (activeRole.equals(Role.ADMINISTRATOR)) { %>
+						Administrator
+					<% } else if (activeRole.equals(Role.COURSE_COORDINATOR)) { %>
+						Course Coordinator
+					<% } else if (activeRole.equals(Role.FACULTY)) { %>
+						Faculty
+					<% } else if (activeRole.equals(Role.TA)) { %>
+						TA
+					<% } %>
+					</a>
+				</li>
+				
+				<!-- To display the settings menu -->
+				<li class="dropdown">
+					<a class="dropdown-toggle navbar-title" data-toggle="dropdown" href="#">
+						<i class="icon-cog icon-large"></i>
+					</a>
+					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
+						<li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
+						<li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
+					</ul>
+				</li>
+			</div>
+		</div>
+	</div>
 </div>
 				
 <!-- USER DASHBOARD POPOVER CONTENT -->
-<div style="visibility: collapse" id="userDashboardContent" hidden="">
-    <!--<p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>-->
+<!--<div style="visibility: collapse" id="userDashboardContent" hidden="">
+    <p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>
 	
 	 <% if (activeRole.equals(Role.STUDENT)) { 
 			Student student = UserManager.getUser(user.getId(), Student.class);
@@ -126,11 +137,11 @@
 	 <% } %>
     
 	<strong>Current Role</strong>
-	<!-- For all roles -->
+	 For all roles 
 	<ul class="unstyled">
 		<li><%= activeRole.getDisplayName() %></li>
 	</ul>
-	<!-- For multiple roles -->
+	 For multiple roles 
 	<%  if (userRoles.size() > 1) { %>
 		<%  if (isAdministrator == true || isCourseCoordinator == true) { %>
 			<strong>Other Role(s)</strong><br/>
@@ -149,7 +160,7 @@
 			</form>
 		<% } %>		
 	<% } %>
-</div>
+</div>-->
 
 <script type="text/javascript">
     //Makes use of footer.jsp's jQuery and bootstrap imports
