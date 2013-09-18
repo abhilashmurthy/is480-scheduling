@@ -35,8 +35,10 @@
 		<s:if test="%{data != null && data.size() > 0}">
 			<div style="float:right">
 				<input type="hidden" id="dropdownValues"/>
-				Hide Columns <i style="font-size:13px">(Press Ctrl)</i>:&nbsp;
-				<select id="hideColumns" size="4" multiple="multiple" style="font-size:13px; width:200px" onchange="onChangeInDropdown();">
+				Hide Columns:
+				<a rel="tooltip" data-placement="right" title="Press Ctrl to select / deselect columns">
+				<select id="hideColumns" size="4" multiple="multiple" style="font-size:13px; width:200px" 
+						onchange="onChangeInDropdown();">
 					<% if (activeRole.equals(Role.STUDENT)){ %>
 						<option value="1">My Team</option>
 					<% } else { %>
@@ -53,6 +55,7 @@
 					<option value="6">Booking Status</option>
 					<option value="7">Reason for Rejection</option>
 				</select>
+				</a>
 			</div>
 			
 			<div style="clear: both;">
@@ -171,7 +174,6 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<script type="text/javascript">
-			
 		//For data tables
 		$(document).ready(function(){
 			//To select all values in multiple select dropdown by default
@@ -212,6 +214,13 @@
 			});
 		});
 		
+		$(document).on('mouseenter','[rel=tooltip]', function(){
+			$(this).tooltip('show');
+		});
+
+		$(document).on('mouseleave','[rel=tooltip]', function(){
+			$(this).tooltip('hide');
+		});
 //		$("#teamHide").click(function() {
 ////                $('td:nth-child(2)').hide();
 //			 // if your table has header(th), use this
