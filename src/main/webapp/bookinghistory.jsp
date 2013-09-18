@@ -24,7 +24,7 @@
 		<s:if test="%{data != null && data.size() > 0}">
 			<div style="float:right">
 				<input type="hidden" id="dropdownValues"/>
-				Hide/Show Columns:&nbsp;
+				Hide Columns <i style="font-size:13px">(Press Ctrl)</i>:&nbsp;
 				<select id="hideColumns" size="4" multiple="multiple" style="font-size:13px; width:200px" onchange="onChangeInDropdown();">
 					<% if (activeRole.equals(Role.STUDENT)){ %>
 						<option value="1">My Team</option>

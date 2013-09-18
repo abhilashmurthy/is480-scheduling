@@ -128,7 +128,10 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
             }
             request.setAttribute("error", "Error with ResponseAction: Escalate to developers!");
             return ERROR;
-        }
+        } finally {
+			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
+		}
     }
 
     public ArrayList<HashMap<String, String>> getData() {
