@@ -92,11 +92,14 @@
 						<li id="bookingHistory"><a href="taAvailability" class="navbar-title"><b>Sign Up for Filming!</b></a></li>
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } %>
-				
+				</ul>
+			</div>
+				<ul class="nav pull-right">
 				<!-- To display the user information -->
 				<li id="userInfo">
 					<a class="navbar-title">
-					<i class="icon-user icon-white"></i>&nbsp;<% out.print(user.getFullName());%>&nbsp;|&nbsp;
+					<i class="icon-user icon-white icon-large"></i>&nbsp;<% out.print(user.getFullName());%>
+					&nbsp;-&nbsp;
 					<% if (activeRole.equals(Role.STUDENT)) { %>
 						Student
 					<% } else if (activeRole.equals(Role.ADMINISTRATOR)) { %>
@@ -108,20 +111,20 @@
 					<% } else if (activeRole.equals(Role.TA)) { %>
 						TA
 					<% } %>
-					</a>
+					</a>	
 				</li>
-				
+							
 				<!-- To display the settings menu -->
 				<li class="dropdown">
 					<a class="dropdown-toggle navbar-title" data-toggle="dropdown" href="#">
-						<i class="icon-cog icon-large"></i>
+						<i class="icon-cogs icon-large"></i>
 					</a>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
 						<li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
 						<li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
 					</ul>
 				</li>
-			</div>
+			</ul>
 		</div>
 	</div>
 </div>

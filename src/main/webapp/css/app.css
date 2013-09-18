@@ -356,15 +356,15 @@ input, button, select, textarea {
 /* COLORS FOR NAVBAR ITEMS */
 .navbar-title {
 	color: white !important;
-        border: 2px solid black !important;
-        border-radius: 5px;
-        box-sizing: border-box;
+/*	border: 2px solid black !important;
+	border-radius: 5px;
+	box-sizing: border-box;*/
 }
 
 .navbar-title:hover {
-        border-radius: 5px;
-        box-sizing: border-box;
-        color: gainsboro !important;
+/*	border-radius: 5px;
+	box-sizing: border-box;*/
+	color: gainsboro !important;
 }
 
 .popoverBtn {
