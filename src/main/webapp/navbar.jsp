@@ -120,6 +120,33 @@
 						<i class="icon-cogs icon-large"></i>
 					</a>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
+						<%  if (userRoles.size() > 1) { %>
+						<%  if (isAdministrator == true || isCourseCoordinator == true) { %>
+						<li class="dropdown-submenu">
+							<a tabindex="-1" href="#"><i class="icon-user"></i>&nbsp&nbsp;Switch Role:</a>
+							<ul class="dropdown-menu">
+							<form id="myform" action="setRole" method="post">
+								<% if (isAdministrator && (!activeRole.equals(Role.ADMINISTRATOR))) { %>
+								<li>
+									<button type="submit" class="btn-link" value="Administrator" name="administrator">Administrator</button>
+								</li>
+								<% } %>
+								<% if (isFaculty && (!activeRole.equals(Role.FACULTY))) { %>
+								<li>
+									<button type="submit" class="btn-link" value="Faculty" name="faculty">Faculty</button>
+								</li>
+								<% } %>
+								<% if (isCourseCoordinator && (!activeRole.equals(Role.COURSE_COORDINATOR))) {  %>
+								<li>
+									<button type="submit" class="btn-link" value="Course Coordinator" name="courseCoordinator">Course Coordinator</button>
+								</li>
+								<% } %>
+							</form>
+							 </ul>
+						</li>
+							<% } %>		
+						<% } %>
+							
 						<li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
 						<li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
 					</ul>
@@ -128,42 +155,7 @@
 		</div>
 	</div>
 </div>
-				
-<!-- USER DASHBOARD POPOVER CONTENT -->
-<!--<div style="visibility: collapse" id="userDashboardContent" hidden="">
-    <p><strong>Name</strong><br/><% out.print(user.getFullName());%></p>
-	
-	 <% if (activeRole.equals(Role.STUDENT)) { 
-			Student student = UserManager.getUser(user.getId(), Student.class);
-	 %>
-		<p><strong>Team</strong><br/><% out.print(student.getTeam().getTeamName());%></p>
-	 <% } %>
-    
-	<strong>Current Role</strong>
-	 For all roles 
-	<ul class="unstyled">
-		<li><%= activeRole.getDisplayName() %></li>
-	</ul>
-	 For multiple roles 
-	<%  if (userRoles.size() > 1) { %>
-		<%  if (isAdministrator == true || isCourseCoordinator == true) { %>
-			<strong>Other Role(s)</strong><br/>
-			<form id="myform" action="setRole" method="post">
-			<div class="btn-group">
-				<% if (isAdministrator && (!activeRole.equals(Role.ADMINISTRATOR))) { %>
-					<button type="submit" class="btn btn-small" value="Administrator" name="administrator">Administrator</button><br/>
-				<% } %>
-				<% if (isFaculty && (!activeRole.equals(Role.FACULTY))) { %>
-					<button type="submit" class="btn btn-small" value="Faculty" name="faculty">Faculty</button><br/>
-				<% } %>
-				<% if (isCourseCoordinator && (!activeRole.equals(Role.COURSE_COORDINATOR))) {  %>
-					<button type="submit" class="btn btn-small" value="Course Coordinator" name="courseCoordinator">Course Coordinator</button>
-				<% } %>
-			</div>
-			</form>
-		<% } %>		
-	<% } %>
-</div>-->
+
 
 <script type="text/javascript">
     //Makes use of footer.jsp's jQuery and bootstrap imports
@@ -173,23 +165,23 @@
         $(".dropdown-toggle").dropdown();
         
         //Dashboard popover
-        $('#userDashboard').on('click', function(e) {
-            e.stopPropagation();
-            if ($(".userbox").hasClass('open')) {
-                $(".userbox").removeClass('open');
-            }
-            $(this).popover({
-                container: '#userDashboard',
-                placement: 'bottom',
-                title: '<b>Your Information</b>',
-                trigger: 'manual',
-                html: true,
-                content: function() {
-                    return $('#userDashboardContent').html();
-                }
-            });
-            $(this).popover('show');
-        });
+//        $('#userDashboard').on('click', function(e) {
+//            e.stopPropagation();
+//            if ($(".userbox").hasClass('open')) {
+//                $(".userbox").removeClass('open');
+//            }
+//            $(this).popover({
+//                container: '#userDashboard',
+//                placement: 'bottom',
+//                title: '<b>Your Information</b>',
+//                trigger: 'manual',
+//                html: true,
+//                content: function() {
+//                    return $('#userDashboardContent').html();
+//                }
+//            });
+//            $(this).popover('show');
+//        });
         
         //Logout link
         $("#logoutLink").on('click', function() {
