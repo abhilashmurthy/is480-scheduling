@@ -155,9 +155,6 @@
     //Makes use of footer.jsp's jQuery and bootstrap imports
     navbarLoad = function(){
         
-        //Nav specific
-        console.log("nav init");
-        
         //Dropdown menu from bootstrap
         $(".dropdown-toggle").dropdown();
         

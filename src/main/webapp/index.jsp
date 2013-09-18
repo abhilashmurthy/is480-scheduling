@@ -120,7 +120,6 @@
             //Makes use of footer.jsp's jQuery and bootstrap imports
             viewScheduleLoad = function() {
                 //Index page stuff
-                console.log("index init");
                 
                 /*****************************
                     DECLARE COMMON VARIABLES
