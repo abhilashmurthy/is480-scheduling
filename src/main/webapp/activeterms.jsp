@@ -138,6 +138,13 @@
 					var activeTermData = new Object();
 					activeTermData["defaultTerm"] = $("#defaultActiveTermList").find(":selected").val();
 					activeTermData["activeTerms"] = generateArray($(":radio:checked[value='true']"));
+					
+					if (activeTermData.activeTerms.length === 0) {
+						showNotification("WARNING", "Please select atleast one active term!");
+						$("#submitFormBtn").button('reset');
+						return;
+					}
+					
 					$.ajax({
 						type: 'POST',
 						async: false,
