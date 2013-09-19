@@ -55,4 +55,10 @@ public class SettingsManager {
 		Query q = em.createQuery("select s from Settings s where name = :name");
 		return (Settings) q.setParameter("name", name).getSingleResult();
 	}
+	
+	public static String getNotificationSettings (EntityManager em) {
+		Settings s = getByName(em, "manageNotifications");
+		return s.getValue();
+	}
+	
 }
