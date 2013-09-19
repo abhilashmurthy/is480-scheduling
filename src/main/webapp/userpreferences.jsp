@@ -10,6 +10,8 @@
 <html>
     <head>
         <%@include file="header.jsp" %>
+		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
+		<link href="css/bootstrap-switch.css" rel="stylesheet">
         <title>IS480 Scheduling System | Preferences </title>
     </head>
     <body>
@@ -28,16 +30,19 @@
 						<td>
 							<input type="radio" id="offPref" class="pref" name="pref" value="off">&nbsp; Off 
 						</td>
+						
 					</tr>
 					<tr id="setMobileNumber">
 						<td>SMS Notification will be sent to:</td>
 						<td style="width:70px"> 
-							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px">
+							<!--<a >-->
+							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px" rel="tooltip" data-placement="bottom" title="Singapore">
+							<!--</a>-->
 							<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
 						</td>
 						<td>
 							<form>
-								<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd">
+								<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd" value="">
 							</form>
 						</td>
 					</tr>
@@ -47,8 +52,9 @@
         </div>
 		
 		<%@include file="footer.jsp"%>
-<!--		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.js"></script>
-		<script type="text/javascript" src="js/plugins/bootstrap-inputmask.min.js"></script>-->
+		<script type="text/javascript" src="js/plugins/bootstrap-switch.js"></script>
+		<script type="text/javascript" src="js/plugins/bootstrap-switch.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/1.7/bootstrap-switch.min.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
 				var mobileNo = '<s:property value="mobileNumber"/>';
@@ -116,6 +122,15 @@
 				});
 			});
 
+			//Tooltip
+			$(document).on('mouseenter','[rel=tooltip]', function(){
+				$(this).tooltip('show');
+			});
+
+			$(document).on('mouseleave','[rel=tooltip]', function(){
+				$(this).tooltip('hide');
+			});
+			
 			//Notification-------------
 			function showNotification(action, notificationMessage) {
 				var opts = {
