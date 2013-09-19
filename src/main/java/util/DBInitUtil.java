@@ -799,10 +799,14 @@ public class DBInitUtil {
         finMap.put("attendees", finReqList);
         milestoneList.add(finMap);
         milestones.setValue(new Gson().toJson(milestoneList));
-
+		
+		Settings manageNotifications = new Settings();
+		manageNotifications.setName("manageNotifications");
+		manageNotifications.setValue("email,On,2,sms,On,1");
         //Persistence
         em.persist(activeTerms);
         em.persist(defaultTerm);
         em.persist(milestones);
+		em.persist(manageNotifications);
     }
 }
