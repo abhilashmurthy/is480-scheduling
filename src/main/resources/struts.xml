@@ -100,6 +100,10 @@
 		<action name="taAvailability" method="execute">
 			<result>/tasignup.jsp</result>
 		</action>
+		
+		<action name="getNotificationSettings" class="systemAction.GetNotificationSettingsAction" method="execute">
+            <result name="success">/managenotifications.jsp</result>
+        </action>
 				
     </package>
 
@@ -218,6 +222,13 @@
 				  <param name="root">json</param>
 			</result>
         </action>
+		
+		<action name="updateNotificationSettings" class="userAction.UpdateNotificationSettingsAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+		
 		
     </package>
 
