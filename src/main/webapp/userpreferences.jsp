@@ -23,27 +23,33 @@
 			<table id="smsTable" class="table">
 				<tbody>
 					<tr align="center">
-						<td style="width:250px">Subscribe to SMS Notification</td>
-						<td style="width:50px"> 
+						<td style="width:250px">Subscribe to SMS Notification:</td>
+<!--						<td style="width:50px"> 
 							<input type="radio" id="onPref" class="pref" name="pref" value="on">&nbsp; On 
 						</td>
 						<td>
 							<input type="radio" id="offPref" class="pref" name="pref" value="off">&nbsp; Off 
+						</td>-->
+						<td style="width:70px"> 
+							<div id="switchButton" class="make-switch switch-small" data-on="success" data-off="danger">
+								<input type="checkbox">
+							</div>
 						</td>
-						
+						<td></td>
 					</tr>
 					<tr id="setMobileNumber">
 						<td>SMS Notification will be sent to:</td>
 						<td style="width:70px"> 
 							<!--<a >-->
-							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px" rel="tooltip" data-placement="bottom" title="Singapore">
+							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px">
 							<!--</a>-->
 							<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
 						</td>
 						<td>
-							<form>
-								<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd" value="">
-							</form>
+						<form>
+							<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd"
+								placeholder="e.g. 81256296" rel="tooltip" data-placement="bottom" title="Enter Singapore No." />
+						</form>
 						</td>
 					</tr>
 				</tbody>
@@ -53,32 +59,45 @@
 		
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="js/plugins/bootstrap-switch.js"></script>
-		<script type="text/javascript" src="js/plugins/bootstrap-switch.min.js"></script>
+		<!--<script type="text/javascript" src="js/plugins/bootstrap-switch.min.js"></script>-->
 		<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/1.7/bootstrap-switch.min.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
 				var mobileNo = '<s:property value="mobileNumber"/>';
 				if (mobileNo === null || mobileNo === "") {
 					$('#setMobileNumber').hide();
-					$("#offPref" ).prop("checked", true);
-					$("#offPref").attr('checked', 'checked');
+//					$("#offPref" ).prop("checked", true);
+					$('#switchButton').bootstrapSwitch('setState', false); 
+//					$("#offPref").attr('checked', 'checked');
 				} else {
+//					$("#mobileNumber").attr("value", mobileNo);
+//					$("#mobileNumber").val(mobileNo);
 					$('#setMobileNumber').show();
-					$("#mobileNumber").attr("value", mobileNo);
-					$("#onPref" ).prop("checked", true);
-					$("#offPref" ).prop("checked", false);
+					$('#switchButton').bootstrapSwitch('setState', true);
+					$('#mobileNumber').attr('placeholder', mobileNo);
+//					$("#onPref" ).prop("checked", true);
+//					$("#offPref" ).prop("checked", false);
 				}
 			});
 			
 			//For hiding and showing table row
-			$("input:radio").change(function () {
-				if ($(this).val() === 'on') {
+//			$("input:radio").change(function () {
+//				if ($(this).val() === 'on') {
+//					$('#setMobileNumber').show();
+//				} else {
+//					$('#setMobileNumber').hide();
+//				}
+//			});
+
+			//For hiding and showing table row
+			$('#switchButton').on('switch-change', function(e, data) {
+				if (data.value === true) {
 					$('#setMobileNumber').show();
 				} else {
 					$('#setMobileNumber').hide();
 				}
 			});
-			
+
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
 				$(this).button('loading');
@@ -121,7 +140,7 @@
 					showNotification("WARNING", "Oops. Something went wrong. Please try again!");
 				});
 			});
-
+			
 			//Tooltip
 			$(document).on('mouseenter','[rel=tooltip]', function(){
 				$(this).tooltip('show');
