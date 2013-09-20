@@ -31,7 +31,7 @@
                 font-size: 18px;
                 height: 25px;
                 padding: 10px;
-                text-align: left;
+                text-align: center;
                 /*border-bottom: 1px solid black;*/
             }
 
@@ -83,7 +83,7 @@
             .createScheduleTabList li a, .createScheduleTabList li p {
                 font-size: 20px;
                 font-weight: bold;
-                padding: 20px 10px 20px 10px !important;
+                padding: 20px 0px 20px 10px !important;
             }
             
             .schedulePanel {
@@ -101,9 +101,30 @@
             .tab-content {
                 padding-top: 50px;
             }
-            
+			
+			.fuelux .spinner input {
+				width: 206px !important;
+			}
+			
+			input {
+				margin-top: -5px;
+			}
+			
+			#semesterNameAvailabilityChecker {
+				display: inline-table;
+				margin-left: 10px;
+				margin-top: -3px;
+			}
+			
+			.scheduleDayTimePoint {
+				display: block;
+				vertical-align: middle;
+				padding-bottom: 10px;
+			}
+			
             .scheduleDayTimeSelect {
                 width: 45px;
+				margin-bottom: 0 !important;
             }
         </style>
     </head>
@@ -161,10 +182,7 @@
                     <li class="emptyHiddenTab">
                         <p></p>
                     </li>
-                    <li class="createTermTab active">
-                        <a href="#createTermTab" data-toggle="tab">Create Term</a>
-                    </li>
-                    <li class="createScheduleTab">
+                    <li class="createScheduleTab active">
                         <a href="#createScheduleTab" data-toggle="tab">Create Schedule</a>
                     </li>
                     <li class="createTimeslotsTab">
@@ -172,52 +190,43 @@
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="createTermTab">
+                    <div class="tab-pane active" id="createScheduleTab">
                         <!-- Create Term -->
-                        <div id="createTermPanel" class="schedulePanel">
-                            <h3>Create Term</h3>
-                            <form id="createTermForm">
-                                <table id="createTermTable">
-                                    <tr>
-                                        <td class="formLabelTd">
-                                            Choose Year
-                                        </td>
-                                        <td> <!-- Putting default values for testing purposes -->
-                                            <div class="input-append">
-                                                <input id="yearInput" type="text" name="year" value="<%= nextYear %>" disabled/>
-                                                <div class="btn-group">
-                                                    <button class="btn" type="button" id="plusYearBtn">&#9650;</button>
-                                                    <button class="btn" type="button" id="minusYearBtn">&#9660;</button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="formLabelTd">
-                                            Semester Name
-                                        </td>
-                                        <td>
-                                            <input id="semesterInput" type="text" name="semester" placeholder="<%= nextSem %>"/>
-                                        </td>
-                                    </tr>
-                                    <tr id="createTermSubmitRow"><td></td><td><input id="createTermSubmitBtn" type="submit" class="btn btn-primary" value="Create" data-loading-text="Done"/></td></tr>
-                                </table>
-                            </form>
-                            <h4 id="termResultMessage"></h4>
-                        </div>
-                    </div>
-                    <div class="tab-pane" id="createScheduleTab">
-                        <!-- Create Schedule -->
-                        <div id="createSchedulePanel" class="schedulePanel">
-                            <h3 id="createScheduleTitle">Create Schedule</h3>
-                            <form id="createScheduleForm">
-                                <table id="createScheduleTable">
-                                    <tr><th>Milestone</th><th>Dates</th><th>Day Start</th><th>Day End</th></tr>
-                                    <tr id="createScheduleSubmitRow"><td></td><td><input id="createScheduleSubmitBtn" type="submit" value="Create" data-loading-text="Done" class="btn btn-primary"/></td></tr>
-                                </table>
-                            </form>
-                            <h4 id="scheduleResultMessage"></h4>
-                        </div>
+						<form id="createTermForm">
+							<div id="createTermPanel" class="schedulePanel">
+								<h3 id="createScheduleTitle">Create Schedule</h3>
+								<table id="createTermTable">
+									<tr>
+										<td class="formLabelTd">Year</td>
+										<td class="fuelux"> <!-- Putting default values for testing purposes -->
+											<div id="yearSpinnerInput" class="spinner">
+												<input id="yearInput" type="text" class="spinner-input"/>
+												<div class="spinner-buttons  btn-group btn-group-vertical">
+													<button class="btn spinner-up" type="button">
+														<i class="icon-chevron-up"></i>
+													</button>
+													<button class="btn spinner-down" type="button">
+														<i class="icon-chevron-down"></i>
+													</button>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td class="formLabelTd">Semester Name</td>
+										<td><input id="semesterInput" type="text" name="semester" placeholder="<%= nextSem %>"/><div id="semesterNameAvailabilityChecker"></div></td>
+									</tr>
+								</table>
+							</div>
+							<!-- Create Schedule -->
+							<div id="createSchedulePanel" class="schedulePanel">
+									<table id="createScheduleTable">
+										<tr><th>Milestone</th><th colspan="2">Dates</th><th>Day Hours</th></tr>
+										<tr id="createScheduleSubmitRow"><td></td><td><input id="createScheduleSubmitBtn" type="submit" value="Create" data-loading-text="Done" class="btn btn-primary"/></td></tr>
+									</table>
+								<h4 id="scheduleResultMessage"></h4>
+							</div>
+						</form>
                     </div>
                     <div class="tab-pane" id="createTimeslotsTab">
                         <!-- Create Timeslots -->
@@ -238,20 +247,10 @@
         <%@include file="footer.jsp" %>
         <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
-            createScheduleLoad = function() {
-                
-                $(".createScheduleTab a").removeAttr('data-toggle');
-                $(".createTimeslotsTab a").removeAttr('data-toggle');
-
-                var termData = null;
-                var scheduleData = null;
-                var timeslotsData = null;
-                var acceptanceId = null;
-                var midtermId = null;
-                var finalId = null;
-                
+            createScheduleLoad = function() {                
                 //Initialize variables
-                var milestones = null;
+                var milestones = JSON.parse('<s:property escape="false" value="milestoneJson"/>');
+                var termNames = JSON.parse('<s:property escape="false" value="termNameJson"/>');
                 var schedules = null;
                 var selectedSchedule = null;
                 
@@ -259,102 +258,58 @@
                  NAV
                  ------------------------------------------*/
                  
+                $(".createTimeslotsTab a").removeAttr('data-toggle');
                  $(".scheduleLeftNav li a").on('click', function(){
                      if (!$(this).attr('data-toggle')) {
                         var activeTab = $('.scheduleLeftNav').children('.active').children('a').html();
                         showNotification("WARNING", "Please " + activeTab + " First!");
                      }
+					 return false;
                  });
-                 
-                 function showNotification(action, message) {
-                     var opts = {
-                        title: "Note",
-                        text: message,
-                        type: "warning",
-                        icon: false,
-                        sticker: false,
-                        mouse_reset: false,
-                        animation: "fade",
-                        animate_speed: "fast",
-                        before_open: function(pnotify) {
-                           pnotify.css({
-                              top: "52px",
-                              left: ($(window).width() / 2) - (pnotify.width() / 2)
-                           });
-                        }
-                     };
-                     switch (action) {
-                         case "WARNING":
-                             opts.type = "warning";
-                             opts.title = "Note";
-                             break;
-                         case "SUCCESS":
-                            opts.type = "success";
-                            opts.title = "Created";
-                            break;
-                         case "ERROR":
-                            opts.type = "error";
-                            opts.title = "Warning";
-                            break;
-                         default:
-                             alert("Something went wrong");
-                     }
-                    $.pnotify(opts);
-                 }
 
                 /*----------------------------------------
                  CREATE TERM
                  ------------------------------------------*/
-                 
-                //Plus Minus Buttons 
-                $("#plusYearBtn").on('click', function(){
-                    var currentYear = parseInt($("#yearInput").val());
-                    $("#yearInput").attr('value', (currentYear + 1));
-                });
-                $("#minusYearBtn").on('click', function(){
-                    var currentYear = parseInt($("#yearInput").val());
-                    $("#yearInput").attr('value', (currentYear - 1));
-                });
-
-                //Create Term AJAX Call
-                $("#createTermForm").on('submit', function() {
-                    $("#createTermSubmitBtn").button('loading');
-                    $("#yearInput").attr('disabled', false);
-                    termData = {
-                        year: $("#yearInput").val(),
-                        semester: $("#semesterInput").val()
-                    };
-                    $.ajax({
-                        type: 'GET',
-                        url: 'createTermJson',
-                        data: {jsonData: JSON.stringify(termData)},
-                        dataType: 'json'
-                    }).done(function(response) {
-                        if (response.success) {
-                            showNotification("SUCCESS", "Term added");
-                            setTimeout(function(){displayCreateSchedule(response);}, 2000);
-                        } else {
-                            //Display error message
-                            showNotification("ERROR", response.message);
-                            $("#createTermSubmitBtn").button('reset');
-                        }
-
-                    }).fail(function(error) {
-                        console.log("Create Term Form AJAX Fail");
-                    });
-                    $("#yearInput").attr('disabled', true);
-                    return false;
-                });
+				
+				//Spinner
+				$("#yearSpinnerInput").spinner({
+					value: parseInt('<%= nextYear %>'),
+					min: 2013,
+					max: 9999,
+					step: 1
+				});
+				
+				//Term name availability check
+				$("#semesterInput").on('keyup', function(){
+					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('icon-refresh icon-spin'));
+					return false;
+				});
+				
+				$("#semesterInput, #yearSpinnerInput").on('change blur changed', function(){
+					var semName = $.trim($("#semesterInput").val());
+					var yearVal = $("#yearSpinnerInput").spinner('value');
+					if (!semName) {
+						$("#semesterNameAvailabilityChecker").empty();
+						return false;
+					}
+					for (var i = 0; i < termNames.length; i++) {
+						if (yearVal === termNames[i].year && semName === termNames[i].term) {
+							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('icon-remove')).append(' Term name already exists');
+							return false;
+						}
+					}
+					$("#semesterNameAvailabilityChecker").css('color', 'green').html($(document.createElement('span')).addClass('icon-ok'));
+					return false;
+				});
                 
                 /*----------------------------------------
                  CREATE SCHEDULE
                  ------------------------------------------*/
 
+				displayCreateSchedule();
+
                 //Display Schedule
-                function displayCreateSchedule(data) {
-                
-                    //Add milestones info
-                    milestones = data.milestones;
+                function displayCreateSchedule() {
                 
                     //Display Create Schedule
                     $("#createSchedulePanel").show();
@@ -376,116 +331,168 @@
                         var milestone = milestones[i];
                         var milestoneTr = $(document.createElement('tr'));
                         //Milestone name
-                        var milestoneTd = $(document.createElement('td'));
-                            milestoneTd.addClass('formLabelTd');
-                            milestoneTd.html(milestone.name);
+                        var milestoneTd = $(document.createElement('td'))
+								.addClass('formLabelTd')
+								.html(milestone.name);
                             milestoneTr.append(milestoneTd);
-                        //Milestone dates[]
-                        var milestoneDatesTd = $(document.createElement('td'));
-                            var milestoneInput = $(document.createElement('input'));
-                            milestoneInput.attr('type', 'text');
-                            milestoneInput.attr('name', milestone.name.toLowerCase() + "Dates");
-                            milestoneInput.attr('id', "milestone_" + milestone.id);
-                            milestoneInput.attr('class', "milestoneOrder_" + milestone.order);
-                            milestoneInput.addClass('input-medium datepicker');
-                            milestoneInput.multiDatesPicker({
-                                dateFormat: "yy-mm-dd",
-                                defaultDate: Date.today(),
-                                minDate: Date.today(),
-                                beforeShowDay: $.datepicker.noWeekends
-                            });
-                            milestoneDatesTd.append(milestoneInput);
-                        milestoneTr.append(milestoneDatesTd);
-                        //Milestone Day Start
-                        var milestoneDayStartTd = $(document.createElement('td'));
-                            var milestoneInput = $(document.createElement('input'));
-                                milestoneInput.attr('type', 'text');
-                                milestoneInput.attr('id', "milestoneDayStart_" + milestone.id);
-                                milestoneInput.attr('class', "scheduleDayTimeSelect");
-                                milestoneInput.attr('name', milestone.name.toLowerCase() + "DayStartTime");
-                                milestoneInput.timepicker({
-                                    minTime: '07:00',
-                                    maxTime: '18:00',
-                                    step: 60,
-                                    forceRoundTime: true,
-                                    timeFormat: 'H:i',
-                                    scrollDefaultTime: '09:00'
-                                });
-                                milestoneInput.attr('value', '09:00');
-                            milestoneDayStartTd.append(milestoneInput);
-                        milestoneTr.append(milestoneDayStartTd);
-                        var milestoneDayEndTd = $(document.createElement('td'));
-                            var milestoneInput = $(document.createElement('input'));
-                                milestoneInput.attr('type', 'text');
-                                milestoneInput.attr('id', "milestoneDayEnd_" + milestone.id);
-                                milestoneInput.attr('class', "scheduleDayTimeSelect");
-                                milestoneInput.attr('name', milestone.name.toLowerCase() + "DayEndTime");
-                                milestoneInput.timepicker({
-                                    minTime: '07:00',
-                                    maxTime: '21:00',
-                                    step: 60,
-                                    forceRoundTime: true,
-                                    timeFormat: 'H:i',
-                                    scrollDefaultTime: '18:00'
-                                });
-                                milestoneInput.attr('value', '18:00');
-                            milestoneDayEndTd.append(milestoneInput);
-                        milestoneTr.append(milestoneDayEndTd);
+                        var milestoneDatesTd = $(document.createElement('td'))
+							.append(
+								//Milestone dates[] MultiDatesPicker
+								$(document.createElement('div'))
+									.attr('name', milestone.name.toLowerCase() + "Dates")
+									.attr('id', "milestone_" + milestone.name)
+									.attr('class', "milestoneOrder_" + milestone.order)
+									.addClass('datepicker')
+									.multiDatesPicker({
+										dateFormat: "yy-mm-dd",
+										defaultDate: Date.today(),
+										minDate: Date.today(),
+										beforeShowDay: $.datepicker.noWeekends,
+										onSelect: function(date) {
+											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
+											resetDisabledDates(date, order);
+										}
+									})
+							);
+						var milestonePillboxTd = $(document.createElement('td'))
+							.addClass('fuelux')
+							.append(
+								//Milestone dates[] Pillbox
+								$(document.createElement('div'))
+									.attr('id', milestone.name.toLowerCase() + 'Pillbox')
+									.addClass('pillbox')
+									.append(
+										$(document.createElement('ul'))
+											.append($(document.createElement('li')).addClass('status-info').html('Testing'))
+									)
+									.pillbox()
+							);
+                        milestoneTr.append(milestoneDatesTd).append(milestonePillboxTd);
+                        var milestoneDayTimeTd = $(document.createElement('td'))
+							.append(
+								//Milestone Day Start
+								$(document.createElement('span'))
+									.addClass('scheduleDayTimePoint')
+									.append("Start ")
+									.append(
+										$(document.createElement('input'))
+											.attr('type', 'text')
+											.attr('id', "milestoneDayStart_" + milestone.id)
+											.attr('name', milestone.name.toLowerCase() + "DayStartTime")
+											.attr('value', '09:00')
+											.addClass('scheduleDayTimeSelect')
+											.timepicker({
+													minTime: '07:00',
+													maxTime: '18:00',
+													step: 60,
+													forceRoundTime: true,
+													timeFormat: 'H:i',
+													scrollDefaultTime: '09:00'
+											})
+									)
+							)
+							.append(
+								//Milestone Day End
+								$(document.createElement('span'))
+									.addClass('scheduleDayTimePoint')
+									.append("End ")
+									.append(
+										$(document.createElement('input'))
+											.attr('type', 'text')
+											.attr('id', "milestoneDayEnd_" + milestone.id)
+											.attr('name', milestone.name.toLowerCase() + "DayEndime")
+											.attr('value', '18:00')
+											.addClass('scheduleDayTimeSelect')
+											.timepicker({
+													minTime: '07:00',
+													maxTime: '18:00',
+													step: 60,
+													forceRoundTime: true,
+													timeFormat: 'H:i',
+													scrollDefaultTime: '18:00'
+											})
+									)
+							);
+                        milestoneTr.append(milestoneDayTimeTd);
                         milestoneTr.insertBefore('#createScheduleSubmitRow');
                     }
                     $(".createScheduleTab a").tab('show');
-                    console.log("Showed tab");
-                    
-                    //Reset Disabled Dates for validation
-                    for (var i = 0; i < milestones.length; i++) {
-                        var milestone = milestones[i];
-                        if (milestone.order > 1) {
-                            resetDisabledDates("milestoneOrder_" + (milestone.order - 1), "milestoneOrder_" + milestone.order);
-                        }
-                    }
+					disableDatePickers();
                 }
+				
+				function disableDatePickers() {
+					//Disabled subsequent
+					$(".datepicker").each(function(i, e){
+						if (i > 0) {
+							$(this).multiDatesPicker('resetDates', 'picked');
+							$(this).datepicker('option', 'maxDate', -2);
+						}
+					});
+				}
                 
                 //Reset Dates On Change
-                function resetDisabledDates(first, second) {
-                    var firstDates = $("." + first).multiDatesPicker('getDates');
-                    var lastFirstDate = null;
-                    if (firstDates) lastFirstDate = firstDates[firstDates.length - 1];
-                    
-                    //Disable consequent select dates when first dates are not selected 
-                    if (!lastFirstDate) {
-                        $("." + second).attr('disabled', true);
-                    } else {
-                        $("." + second).attr('disabled', false);
-                    }
-                    
-                    $("body").on('mouseover', function(){
-                        firstDates = $("." + first).multiDatesPicker('getDates');
-                        if (firstDates) {
-                            lastFirstDate = firstDates[firstDates.length - 1];
-                            if (lastFirstDate) {
-                                $("." + second).attr('disabled', false);
-                            } else {
-                                $("." + second).attr('disabled', true);
-                            };
-                        }
-                    });
-                    
-                    //Mouseover required to completely reset the datepicker
-                    $("." + second).on('mouseover', function() {
-                        $("." + second).datepicker("destroy");
-                    });
-
-                    //Limits the dates to > end date of previous milestone
-                    $("." + second).on('mousedown', function() {
-                        //Enable only if acceptance has values
-                        if (lastFirstDate) {
-                            $("." + second).multiDatesPicker({
-                                dateFormat: "yy-mm-dd",
-                                minDate: new Date(lastFirstDate).addDays(1),
-                                beforeShowDay: $.datepicker.noWeekends
-                            });
-                        }
-                    });
+                function resetDisabledDates(minDateStr, orderNum) {
+					var isSelected = $(".milestoneOrder_" + orderNum).multiDatesPicker('gotDate', Date.parse(minDateStr));
+					var $nextMilestone = $(".milestoneOrder_" + (orderNum + 1));
+					if ($nextMilestone.length && isSelected) {
+						//A date has been added
+						//Reset all subsequent dates
+						for (var i = orderNum + 1; i > 0; i++) {
+							var $subseqMilestone = $(".milestoneOrder_" + i);
+							if (!$subseqMilestone.length) break; //No more milestones
+							$subseqMilestone.multiDatesPicker('resetDates', 'picked');
+						}
+						$nextMilestone.datepicker('destroy');
+						var minDate = Date.parse(minDateStr);
+						$nextMilestone.multiDatesPicker({
+							dateFormat: "yy-mm-dd",
+							defaultDate: minDate,
+							minDate: minDate.addDays(1),
+							beforeShowDay: $.datepicker.noWeekends,
+							onSelect: function(date) {
+								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
+								resetDisabledDates(date, order);
+							}
+						});
+					} else if ($nextMilestone.length) {
+						// A date has been removed
+						var dates = $(".milestoneOrder_" + orderNum).multiDatesPicker('getDates');
+						if (dates.length > 0) {
+							$nextMilestone.multiDatesPicker('resetDates', 'picked');
+							$nextMilestone.datepicker('destroy');
+							$nextMilestone.multiDatesPicker({
+								dateFormat: "yy-mm-dd",
+								defaultDate: Date.parse(dates[dates.length - 1]),
+								minDate: Date.parse(dates[dates.length - 1]).addDays(1),
+								beforeShowDay: $.datepicker.noWeekends,
+								onSelect: function(date) {
+									var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
+									resetDisabledDates(date, order);
+								}
+							});
+						} else {
+							//Reset all subsequent dates
+							var nextOrder = parseInt($nextMilestone.attr('class').split(" ")[0].split("_")[1]);
+							for (var i = nextOrder; i > 0; i++) {
+								$nextMilestone = $(".milestoneOrder_" + i);
+								if (!$nextMilestone.length) break; //No more milestones
+								$nextMilestone.multiDatesPicker('resetDates', 'picked');
+								$nextMilestone.datepicker('destroy');
+								$nextMilestone.multiDatesPicker({
+									dateFormat: "yy-mm-dd",
+									defaultDate: Date.today(),
+									minDate: Date.today(),
+									beforeShowDay: $.datepicker.noWeekends,
+									onSelect: function(date) {
+										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
+										resetDisabledDates(date, order);
+									}
+								});
+								$nextMilestone.datepicker('option', 'maxDate', -2);
+							}
+						}
+					}
+					
                 }
                 
                 //Reset Start and End Times
@@ -560,7 +567,10 @@
                         }
                     }
 //                    console.log("Milestone array is now: " + JSON.stringify(milestones));
-                    var createScheduleData = {"milestones[]":milestones};
+                    var createScheduleData = {
+						year: $("#yearSpinnerInput").spinner('value'), 
+						semester: $("#semesterInput").val(),
+						"milestones[]":milestones};
                     $.ajax({
                         type: 'POST',
                         url: 'createScheduleJson',
@@ -630,7 +640,7 @@
                 //Submit to server
                 $("#createTimeslotsSubmitBtn").on('click', function() {
                     $("#createTimeslotsSubmitBtn").button('loading');
-                    timeslotsData = {};
+                    var timeslotsData = {};
                     var timeslots_array = new Array();
 
                     var inputData = $("div.start-marker", ".timeslotsTable").get();
@@ -779,6 +789,47 @@
                         triggerTimeslot(this, duration);
                     });
                 }
+				
+				/**********************/
+				/*   NOTIFICATIONS    */
+				/**********************/
+				
+				function showNotification(action, message) {
+					var opts = {
+					   title: "Note",
+					   text: message,
+					   type: "warning",
+					   icon: false,
+					   sticker: false,
+					   mouse_reset: false,
+					   animation: "fade",
+					   animate_speed: "fast",
+					   before_open: function(pnotify) {
+						  pnotify.css({
+							 top: "52px",
+							 left: ($(window).width() / 2) - (pnotify.width() / 2)
+						  });
+					   }
+					};
+					switch (action) {
+						case "WARNING":
+							opts.type = "warning";
+							opts.title = "Note";
+							break;
+						case "SUCCESS":
+						   opts.type = "success";
+						   opts.title = "Created";
+						   break;
+						case "ERROR":
+						   opts.type = "error";
+						   opts.title = "Warning";
+						   break;
+						default:
+							alert("Something went wrong");
+					}
+				   $.pnotify(opts);
+				}
+				
             };
             
             addLoadEvent(createScheduleLoad);

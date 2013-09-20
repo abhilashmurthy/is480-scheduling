@@ -53,7 +53,7 @@
 							<a href="#" id="scheduleDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Schedule</b><b class="caret" style="border-bottom-color: white; border-top-color: white"></b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href="newSchedule">Create Schedule</a></li>-->
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="createschedule.jsp">Create Schedule</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="createSchedule">Create Schedule</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="editschedule.jsp">Edit Schedule</a></li>
 							</ul>
 						</li>

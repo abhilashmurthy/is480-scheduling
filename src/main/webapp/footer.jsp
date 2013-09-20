@@ -4,8 +4,9 @@
 <!-- jQuery UI -->
 <script type="text/javascript" src="js/plugins/jquery-ui-1.10.3.custom.min.js"></script>
 <script type="text/javascript" src="js/plugins/jquery.timepicker.min.js"></script>
-<!-- Bootstrap -->
-<script type="text/javascript" src="js/plugins/bootstrap.js"></script>
+<!-- Bootstrap + FuelUX -->
+<script type="text/javascript" src="js/plugins/loader.min.js"></script>
+<!--<script type="text/javascript" src="js/plugins/bootstrap.js"></script>-->
 <!-- DateJS -->
 <script type="text/javascript" src="js/plugins/date.js"></script>
 <!-- OuterHTML -->

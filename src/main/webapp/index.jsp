@@ -28,7 +28,7 @@
         %>
 
         <!-- Welcome Text -->
-        <div class="container page" >
+        <div class="container page">
             <h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>
 
             <!-- To display the list of active terms -->
@@ -119,7 +119,7 @@
             //Makes use of footer.jsp's jQuery and bootstrap imports
             viewScheduleLoad = function() {
                 //Index page stuff
-                
+				
                 /*****************************
                     DECLARE COMMON VARIABLES
                 ******************************/
