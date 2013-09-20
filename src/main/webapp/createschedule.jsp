@@ -119,7 +119,7 @@
 			.pillbox {
 				border: 1px solid grey;
 				border-radius: 10px;
-				max-width: 80px;
+				width: 80px;
 				margin: auto;
 			}
 			
@@ -377,7 +377,7 @@
 								//Milestone dates[] Pillbox
 								$(document.createElement('div'))
 									.attr('id', milestone.name.toLowerCase() + 'Pillbox')
-									.attr('hidden', 'true')
+									.css('opacity', '0')
 									.addClass('pillbox')
 									.append($(document.createElement('ul')))
 									.pillbox()
@@ -518,7 +518,7 @@
 						var $pillBox = $("#" + milestone + "Pillbox ul");
 						$pillBox.empty();
 						var dates = $("#milestone_" + milestone).multiDatesPicker('getDates');
-						if (dates.length > 0) $pillBox.parent().show(); else $pillBox.parent().hide();
+						if (dates.length > 0) $pillBox.parent().css('opacity', '100'); else $pillBox.parent().css('opacity', '0');
 						for (var i = 0; i < dates.length; i++) {
 							$pillBox.append($(document.createElement('li')).addClass('status-info').append(Date.parse(dates[i]).toString('dd MMM')));
 						}
