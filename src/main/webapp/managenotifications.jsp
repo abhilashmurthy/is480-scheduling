@@ -89,7 +89,7 @@
 				</div>
 
 					<div id="smsFrequencyBlock">
-					SMS sent (days before):
+					SMS sent (hours before):
 					<div class="input-append">	
 						<input id="smsFrequency" style="width: 18px;height: 20px" type="text" value="<s:property value="smsFrequency"/>" disabled />
 						<div class="btn-group">
@@ -150,7 +150,7 @@
 					}
 
 					function downOne(id) {
-						if (parseInt(id.value, 0) !== 0) {
+						if (parseInt(id.value, 0) > 1) {
 							id.value--;
 						}
 					}
