@@ -116,10 +116,26 @@
 				margin-top: -3px;
 			}
 			
+			.pillbox {
+				border: 1px solid grey;
+				border-radius: 10px;
+				max-width: 80px;
+				margin: auto;
+			}
+			
+			.pillbox li {
+				border-radius: 5px !important;
+			}
+			
+			.dayHours {
+				padding-left: 20px;
+			}
+			
 			.scheduleDayTimePoint {
 				display: block;
 				vertical-align: middle;
 				padding-bottom: 10px;
+				padding-left: 20px;
 			}
 			
             .scheduleDayTimeSelect {
@@ -221,7 +237,7 @@
 							<!-- Create Schedule -->
 							<div id="createSchedulePanel" class="schedulePanel">
 									<table id="createScheduleTable">
-										<tr><th>Milestone</th><th colspan="2">Dates</th><th>Day Hours</th></tr>
+										<tr><th>Milestone</th><th colspan="2">Dates</th><th class="dayHours">Day Hours</th></tr>
 										<tr id="createScheduleSubmitRow"><td></td><td><input id="createScheduleSubmitBtn" type="submit" value="Create" data-loading-text="Done" class="btn btn-primary"/></td></tr>
 									</table>
 								<h4 id="scheduleResultMessage"></h4>
@@ -340,7 +356,7 @@
 								//Milestone dates[] MultiDatesPicker
 								$(document.createElement('div'))
 									.attr('name', milestone.name.toLowerCase() + "Dates")
-									.attr('id', "milestone_" + milestone.name)
+									.attr('id', "milestone_" + milestone.name.toLowerCase())
 									.attr('class', "milestoneOrder_" + milestone.order)
 									.addClass('datepicker')
 									.multiDatesPicker({
@@ -351,6 +367,7 @@
 										onSelect: function(date) {
 											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 											resetDisabledDates(date, order);
+											updatePillbox();
 										}
 									})
 							);
@@ -360,11 +377,9 @@
 								//Milestone dates[] Pillbox
 								$(document.createElement('div'))
 									.attr('id', milestone.name.toLowerCase() + 'Pillbox')
+									.attr('hidden', 'true')
 									.addClass('pillbox')
-									.append(
-										$(document.createElement('ul'))
-											.append($(document.createElement('li')).addClass('status-info').html('Testing'))
-									)
+									.append($(document.createElement('ul')))
 									.pillbox()
 							);
                         milestoneTr.append(milestoneDatesTd).append(milestonePillboxTd);
@@ -452,6 +467,7 @@
 							onSelect: function(date) {
 								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 								resetDisabledDates(date, order);
+								updatePillbox();
 							}
 						});
 					} else if ($nextMilestone.length) {
@@ -468,6 +484,7 @@
 								onSelect: function(date) {
 									var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 									resetDisabledDates(date, order);
+									updatePillbox();
 								}
 							});
 						} else {
@@ -486,14 +503,27 @@
 									onSelect: function(date) {
 										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 										resetDisabledDates(date, order);
+										updatePillbox();
 									}
 								});
 								$nextMilestone.datepicker('option', 'maxDate', -2);
 							}
 						}
 					}
-					
                 }
+				
+				function updatePillbox() {
+					$(".datepicker").each(function(){
+						var milestone = $(this).attr('id').split("_")[1];
+						var $pillBox = $("#" + milestone + "Pillbox ul");
+						$pillBox.empty();
+						var dates = $("#milestone_" + milestone).multiDatesPicker('getDates');
+						if (dates.length > 0) $pillBox.parent().show(); else $pillBox.parent().hide();
+						for (var i = 0; i < dates.length; i++) {
+							$pillBox.append($(document.createElement('li')).addClass('status-info').append(Date.parse(dates[i]).toString('dd MMM')));
+						}
+					});
+				}
                 
                 //Reset Start and End Times
                 $("body").on('mouseover', '.scheduleDayTimeSelect', function(e){
