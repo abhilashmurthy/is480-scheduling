@@ -64,15 +64,14 @@
             </s:if>
             <% }%>
             
+			
             <div class="periodView">
-                <div class="btn-group">
-                  <button class="btn" id="previousWeek"><span class="icon-chevron-left"/></span></button>
-                  <button class="btn" id="weekView">Week View</button>
-                  <button class="btn" id="nextWeek"><span class="icon-chevron-right"/></span></button>
-                </div>
-                <div class="btn-group">
-                  <button class="btn" id="fullView">Full View</button>
-                </div>
+				<span id="weekViewLabel">Select View: </span>
+				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
+					<input type="checkbox" checked>
+				</div>
+				<span id="previousWeek" class="traverseWeek icon-circle-arrow-left" style="color: #5bc0de; display: none;"></span>
+				<span id="nextWeek" class="traverseWeek icon-circle-arrow-right" style="color: #5bc0de; display: none;"></span>
             </div>
 
             <!-- To display legend for the calendar -->
@@ -131,6 +130,7 @@
                 var semester = "<%= activeTerm.getSemester()%>";
                 var scheduleData = null; //This state shall be stored here
                 var weekView = null;
+				var maxWeekView = null;
                 
                 //Student-specific variables
                 var teamName = "<%= team != null ? team.getTeamName() : null%>"; //Student's active team name
@@ -197,6 +197,7 @@
                     year = "<%= activeTerm.getAcademicYear()%>";
                     semester = "<%= activeTerm.getSemester()%>";
                     populateSchedule(milestone, year, semester);
+					$("#weekView").bootstrapSwitch('setState', true);
                     return false;
                 });
 
@@ -678,7 +679,6 @@
                     $('body').on('click', '.bookedTimeslot, .bookedTimeslot > .booking', function(e) {
                         self = (!$(this).is('.booking')) ? $(this).children('.booking') : $(this);
                         if ($(e.target).parents('.popover').length) return false;
-//                        console.log(".booking clicked: " + $(e.target).attr('class'));
                         self.popover('show');
                         self.find('ul').remove();
                         appendTokenInput(self); //Optional attendees
@@ -960,41 +960,52 @@
                     });
                     
                     //Week view functions
-                    $("#weekView").off('click');
-                    $("#weekView").on('click', function(){
-                        weekView = 0;
-                        $(".weekNum").remove();
-                        $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
-                        populateSchedule(milestone, year, semester);
+					$("#weekView").off('switch-change');
+                    $("#weekView").on('switch-change', function(e, data){
+						setTimeout(function(){
+							if (data.value) {
+								//Full View
+								weekView = null;
+								$(".weekNum").remove();
+								$(".traverseWeek").hide();
+							} else {
+								//Week View
+								$(".traverseWeek").css('opacity', '100');
+								weekView = 0;
+								$("#previousWeek").css('opacity', '0');
+								if (maxWeekView === 1) $("#nextWeek").css('opacity', '0');
+								$(".weekNum").remove();
+								$(".traverseWeek").show();
+								$("#previousWeek").after($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+							}
+							populateSchedule(milestone, year, semester);
+						}, 500);
                         return false;
                     });
-                    $("#nextWeek").off('click');
+					$("#nextWeek").off('click');
                     $("#nextWeek").on('click', function(){
-                        if (weekView + 1 < 10) {
+						$(".traverseWeek").css('opacity', '100');
+                        if (weekView + 1 < maxWeekView) {
                             ++weekView;
                             $(".weekNum").remove();
-                            $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                            $("#previousWeek").after($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
                             populateSchedule(milestone, year, semester);
                         }
+						if (weekView + 1 === maxWeekView) $(this).css('opacity', '0');
                         return false;
                     });
-                    $("#previousWeek").off('click');
+					$("#previousWeek").off('click');
                     $("#previousWeek").on('click', function(){
+						$(".traverseWeek").css('opacity', '100');
                         if (weekView <= 0) {
                             return false;
                         } else {
                             --weekView;
                             $(".weekNum").remove();
-                            $("#previousWeek").parents('.periodView').prepend($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
+                            $("#previousWeek").after($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
                             populateSchedule(milestone, year, semester);
                         }
-                        return false;
-                    });
-                    $("#fullView").off('click');
-                    $("#fullView").on('click', function(){
-                        weekView = null;
-                        $(".weekNum").remove();
-                        populateSchedule(milestone, year, semester);
+						if (weekView === 0) $(this).css('opacity', '0');
                         return false;
                     });
                 }
@@ -1292,6 +1303,9 @@
                     var dateArray = new Array();
                     startDate = Date.parse(startDate);
                     stopDate = Date.parse(stopDate);
+					var diffLong = Math.abs(stopDate.getTime() - startDate.getTime());
+					var diffDays = Math.ceil(diffLong / (1000 * 3600 * 24));
+					maxWeekView = Math.ceil(diffDays/7);
                     if (weekNum !== null) {
                         startDate.addWeeks(weekNum);
                         stopDate = startDate.clone().addWeeks(1).addDays(-1);

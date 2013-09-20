@@ -10,8 +10,6 @@
 <html>
     <head>
         <%@include file="header.jsp" %>
-		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
-		<link href="css/bootstrap-switch.css" rel="stylesheet">
         <title>IS480 Scheduling System | Preferences </title>
     </head>
     <body>
@@ -55,8 +53,6 @@
         </div>
 		
 		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="js/plugins/bootstrap-switch.js"></script>
-		<!--<script type="text/javascript" src="js/plugins/bootstrap-switch.min.js"></script>-->
 		<script type="text/javascript">
 			userPreferencesLoad = function() {
 				var mobileNo = '<s:property value="mobileNumber"/>';

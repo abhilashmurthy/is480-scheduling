@@ -17,3 +17,5 @@
 <!-- Phone Format -->
 <script type="text/javascript" src="js/plugins/bootstrap-formhelpers-phone.format.js"></script>
 <script type="text/javascript" src="js/plugins/bootstrap-formhelpers-phone.js"></script>
+<!-- Bootstrap Switch -->
+<script type="text/javascript" src="js/plugins/bootstrap-switch.js"></script>

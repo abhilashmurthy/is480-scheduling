@@ -84,9 +84,18 @@ input, button, select, textarea {
     clear: both;
 }
 
+#weekViewLabel {
+	font-size: 14px;
+	padding-right: 5px;
+}
+
+#previousWeek {
+	margin-left: 5px;
+}
+
 .weekNum {
     display: inline;
-    padding-right: 10px;
+    padding: 0 10px 0 10px;
 }
 
 #milestoneTabContent {
