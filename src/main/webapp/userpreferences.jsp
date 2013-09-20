@@ -35,7 +35,7 @@
 						</td>
 						<td></td>
 					</tr>
-					<tr id="setMobileNumber">
+					<tr id="setMobileNumber" hidden>
 						<td>SMS Notification will be sent to:</td>
 						<td style="width:70px">
 							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px"/>
@@ -57,7 +57,6 @@
 			userPreferencesLoad = function() {
 				var mobileNo = '<s:property value="mobileNumber"/>';
 				$('#switchButton').bootstrapSwitch('setState', false);
-				$('#setMobileNumber').hide();
 				if (mobileNo !== null && mobileNo !== "") {
 					$('#setMobileNumber').show();
 					$('#switchButton').bootstrapSwitch('setState', true);
@@ -76,11 +75,14 @@
 				//Submit changes to backend
 				$('#submitFormBtn').click(function() {
 					$(this).button('loading');
-					var mobNo = $('#mobileNumber').val();
-					if (mobNo === "" || mobNo.length < 8 || (mobNo.substring(0,1) !== "8" && mobNo.substring(0,1) !== "9")) {
-						showNotification("ERROR", "Mobile Number is invalid!");
-						$("#submitFormBtn").button('reset');
-						return false;
+					var mobNo = "";
+					if ($('#setMobileNumber').is(":visible")) {
+						mobNo = $('#mobileNumber').val();
+						if (mobNo === "" || mobNo.length < 8 || (mobNo.substring(0,1) !== "8" && mobNo.substring(0,1) !== "9")) {
+							showNotification("ERROR", "Mobile Number is invalid!");
+							$("#submitFormBtn").button('reset');
+							return false;
+						}
 					}
 					var mobJson = {mobileNumber: mobNo};
 					$.ajax({
