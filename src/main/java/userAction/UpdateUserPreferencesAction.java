@@ -46,6 +46,11 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
 
 			//Check whether mobile number entered contains only digits
 			if (number != null && !number.equals("")) {
+				if (userToUpdate.getMobileNumber().equals(number)) {
+					json.put("message", "No changes made...");
+					json.put("success", true);
+					return SUCCESS;
+				}
 				if (Pattern.matches("[a-zA-Z]+", number) == true || number.length() < 8){
 					json.put("message", "Mobile Number is invalid!");
 					json.put("success", false);

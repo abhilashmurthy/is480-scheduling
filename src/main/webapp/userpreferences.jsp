@@ -58,7 +58,7 @@
 				var mobileNo = '<s:property value="mobileNumber"/>';
 				$('#switchButton').bootstrapSwitch('setState', false);
 				$('#setMobileNumber').hide();
-				if (mobileNo !== null) {
+				if (mobileNo !== null && mobileNo !== "") {
 					$('#setMobileNumber').show();
 					$('#switchButton').bootstrapSwitch('setState', true);
 					$('#mobileNumber').val(mobileNo).change();
@@ -92,7 +92,11 @@
 						$("#submitFormBtn").button('reset');
 						console.log(response);
 						if (response.success) {
-							showNotification("SUCCESS", response.message);
+							if (response.message.split("No changes").length > 1) {
+								showNotification("WARNING", response.message);
+							} else {
+								showNotification("SUCCESS", response.message);
+							}
 						} else {
 							showNotification("ERROR", response.message);
 						}
