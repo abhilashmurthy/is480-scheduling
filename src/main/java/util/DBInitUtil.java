@@ -802,7 +802,7 @@ public class DBInitUtil {
 		
 		Settings manageNotifications = new Settings();
 		manageNotifications.setName("manageNotifications");
-		manageNotifications.setValue("email,On,2,sms,On,1");
+		manageNotifications.setValue("email,On,2,sms,On,24");
         //Persistence
         em.persist(activeTerms);
         em.persist(defaultTerm);
