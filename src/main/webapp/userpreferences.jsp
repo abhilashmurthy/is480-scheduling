@@ -39,16 +39,13 @@
 					</tr>
 					<tr id="setMobileNumber">
 						<td>SMS Notification will be sent to:</td>
-						<td style="width:70px"> 
-							<!--<a >-->
-							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px">
-							<!--</a>-->
+						<td style="width:70px">
+							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px"/>
 							<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
 						</td>
 						<td>
 						<form>
-							<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd"
-								placeholder="e.g. 81256296" rel="tooltip" data-placement="bottom" title="Enter Singapore No." />
+							<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd" placeholder="e.g. 81256296" rel="tooltip" data-placement="right" title="Enter Singapore No." />
 						</form>
 						</td>
 					</tr>
@@ -60,137 +57,109 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="js/plugins/bootstrap-switch.js"></script>
 		<!--<script type="text/javascript" src="js/plugins/bootstrap-switch.min.js"></script>-->
-		<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/1.7/bootstrap-switch.min.js"></script>
 		<script type="text/javascript">
-			$(document).ready(function(){
+			userPreferencesLoad = function() {
 				var mobileNo = '<s:property value="mobileNumber"/>';
-				if (mobileNo === null || mobileNo === "") {
-					$('#setMobileNumber').hide();
-//					$("#offPref" ).prop("checked", true);
-					$('#switchButton').bootstrapSwitch('setState', false); 
-//					$("#offPref").attr('checked', 'checked');
-				} else {
-//					$("#mobileNumber").attr("value", mobileNo);
-//					$("#mobileNumber").val(mobileNo);
+				$('#switchButton').bootstrapSwitch('setState', false);
+				$('#setMobileNumber').hide();
+				if (mobileNo !== null) {
 					$('#setMobileNumber').show();
 					$('#switchButton').bootstrapSwitch('setState', true);
-					$('#mobileNumber').attr('placeholder', mobileNo);
-//					$("#onPref" ).prop("checked", true);
-//					$("#offPref" ).prop("checked", false);
+					$('#mobileNumber').val(mobileNo).change();
 				}
-			});
-			
-			//For hiding and showing table row
-//			$("input:radio").change(function () {
-//				if ($(this).val() === 'on') {
-//					$('#setMobileNumber').show();
-//				} else {
-//					$('#setMobileNumber').hide();
-//				}
-//			});
 
-			//For hiding and showing table row
-			$('#switchButton').on('switch-change', function(e, data) {
-				if (data.value === true) {
-					$('#setMobileNumber').show();
-				} else {
-					$('#setMobileNumber').hide();
-				}
-			});
-
-			//Submit changes to backend
-			$('#submitFormBtn').click(function() {
-				$(this).button('loading');
-				var mobNo = "";
-				//Checking if the element is visible on page currently or not
-				if($('#mobileNumber').is(':visible')) {
-					mobNo = $('#mobileNumber').val();
-					//Checking whether mobile number is incorrect or not
-					if (mobNo === "" || mobNo.length < 8) {
-						showNotification("ERROR", "Mobile Number is invalid!");
-						$("#submitFormBtn").button('reset');
-						return false;
-					}
-					//Checking whether the mobile number starts with 8 or 9
-					if (mobNo.substring(0,1) !== "8" && mobNo.substring(0,1) !== "9") {
-						showNotification("ERROR", "Mobile Number is invalid!");
-						$("#submitFormBtn").button('reset');
-						return false;
-					}
-				}
-				var mobJson = {};
-				mobJson['mobileNumber'] = mobNo;
-				
-				$.ajax({
-					type: 'POST',
-					async: false,
-					url: 'updateUserPreferences',
-					data: {jsonData: JSON.stringify(mobJson)}	
-				}).done(function(response) {
-					$("#submitFormBtn").button('reset');
-					console.log(response);
-					if (response.success) {
-						showNotification("SUCCESS", response.message);
+				//For hiding and showing table row
+				$('#switchButton').on('switch-change', function(e, data) {
+					if (data.value === true) {
+						$('#setMobileNumber').show();
 					} else {
-						showNotification("ERROR", response.message);
+						$('#setMobileNumber').hide();
 					}
-				}).fail(function(response) {
-					$("#submitFormBtn").button('reset');
-					console.log(response);
-					showNotification("WARNING", "Oops. Something went wrong. Please try again!");
 				});
-			});
-			
-			//Tooltip
-			$(document).on('mouseenter','[rel=tooltip]', function(){
-				$(this).tooltip('show');
-			});
 
-			$(document).on('mouseleave','[rel=tooltip]', function(){
-				$(this).tooltip('hide');
-			});
-			
-			//Notification-------------
-			function showNotification(action, notificationMessage) {
-				var opts = {
-					title: "Note",
-					text: notificationMessage,
-					type: "warning",
-					icon: false,
-					sticker: false,
-					mouse_reset: false,
-					animation: "fade",
-					animate_speed: "slow",
-					before_open: function(pnotify) {
-						pnotify.css({
-						   top: "52px",
-						   left: ($(window).width() / 2) - (pnotify.width() / 2)
-						});
+				//Submit changes to backend
+				$('#submitFormBtn').click(function() {
+					$(this).button('loading');
+					var mobNo = $('#mobileNumber').val();
+					if (mobNo === "" || mobNo.length < 8 || (mobNo.substring(0,1) !== "8" && mobNo.substring(0,1) !== "9")) {
+						showNotification("ERROR", "Mobile Number is invalid!");
+						$("#submitFormBtn").button('reset');
+						return false;
 					}
-				};
-				switch (action) {
-					case "SUCCESS":
-						opts.title = "Updated";
-						opts.type = "success";
-						break;
-					case "ERROR":
-						opts.title = "Error";
-						opts.type = "error";
-						break;
-					case "INFO":
-						opts.title = "Error";
-						opts.type = "info";
-						break;
-					case "WARNING":
-						$.pnotify_remove_all();
-						opts.title = "Note";
-						opts.type = "warning";
-						break;
-					default:
-						alert("Something went wrong");
+					var mobJson = {mobileNumber: mobNo};
+					$.ajax({
+						type: 'POST',
+						async: false,
+						url: 'updateUserPreferences',
+						data: {jsonData: JSON.stringify(mobJson)}	
+					}).done(function(response) {
+						$("#submitFormBtn").button('reset');
+						console.log(response);
+						if (response.success) {
+							showNotification("SUCCESS", response.message);
+						} else {
+							showNotification("ERROR", response.message);
+						}
+					}).fail(function(response) {
+						$("#submitFormBtn").button('reset');
+						console.log(response);
+						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
+					});
+					return false;
+				});
+
+				//Tooltip
+				$('body').on('mouseenter', '[rel=tooltip]', function() {
+					$(this).tooltip('show');
+				});
+				$('body').on('mouseleave', '[rel=tooltip]', function() {
+					$(this).tooltip('hide');
+				});
+
+				//Notification-------------
+				function showNotification(action, notificationMessage) {
+					var opts = {
+						title: "Note",
+						text: notificationMessage,
+						type: "warning",
+						icon: false,
+						sticker: false,
+						mouse_reset: false,
+						animation: "fade",
+						animate_speed: "fast",
+						before_open: function(pnotify) {
+							pnotify.css({
+								top: "52px",
+								left: ($(window).width() / 2) - (pnotify.width() / 2)
+							});
+						}
+					};
+					switch (action) {
+						case "SUCCESS":
+							opts.title = "Updated";
+							opts.type = "success";
+							break;
+						case "ERROR":
+							opts.title = "Error";
+							opts.type = "error";
+							break;
+						case "INFO":
+							opts.title = "Error";
+							opts.type = "info";
+							break;
+						case "WARNING":
+							$.pnotify_remove_all();
+							opts.title = "Note";
+							opts.type = "warning";
+							break;
+						default:
+							alert("Something went wrong");
+					}
+					$.pnotify(opts);
 				}
-				$.pnotify(opts);
-			}
+			};
+			
+			addLoadEvent(userPreferencesLoad);
 		</script>
     </body>
 </html>
