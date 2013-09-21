@@ -100,14 +100,16 @@
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
-						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
-						</s:elseif>
-						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
 							<tr class="info">
-						</s:elseif>--%>
+						</s:if>
 								<%--<td><%= count %></td>--%>
 								<td><s:property value="teamName"/></td>
 								<td><s:property value="milestone"/></td>
@@ -134,14 +136,16 @@
 						<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
-						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
-						</s:elseif>
-						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
 							<tr class="warning">
-						</s:elseif>--%>
+						</s:if>
 							<%--<td><%= count %></td>--%>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
@@ -211,7 +215,8 @@
 //				"bAutoWidth": false,
 //				"asStripClasses": null,
 				"bSortClasses": false,
-				"aaSorting":[]
+				"aaSorting":[],
+//				"oSearch": {"sSearch": "Initial search"}
 			});
 		});
 		
