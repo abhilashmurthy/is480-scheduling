@@ -78,7 +78,7 @@ public class CreateTermAction extends ActionSupport implements ServletRequestAwa
                         requiredAttendees.add(reqArray.getString(j));
                     }
 
-                    Milestone m = new Milestone(name, duration, newTerm, requiredAttendees);
+                    Milestone m = new Milestone(order, name, duration, newTerm, requiredAttendees);
                     em.persist(m);
                     milestoneInfo.put("name", m.getName());
                     milestoneInfo.put("id", m.getId());

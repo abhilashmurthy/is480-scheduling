@@ -6,7 +6,6 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,6 +31,7 @@ public class Milestone implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
+	private int milestoneOrder;
 	private String name;
 	private int slotDuration;
 	@Column(length=19000000)
@@ -43,13 +43,22 @@ public class Milestone implements Serializable {
         
 	public Milestone() {}
 
-	public Milestone(String name, int slotDuration, Term term, ArrayList<String> requiredAttendees) {
+	public Milestone(int milestoneOrder, String name, int slotDuration, Term term, ArrayList<String> requiredAttendees) {
+		this.milestoneOrder = milestoneOrder;
 		this.name = name;
 		this.slotDuration = slotDuration;
 		this.term = term;
 		this.requiredAttendees = requiredAttendees;
 	}
 
+	public int getMilestoneOrder() {
+		return milestoneOrder;
+	}
+
+	public void setMilestoneOrder(int milestoneOrder) {
+		this.milestoneOrder = milestoneOrder;
+	}
+	
 	public Term getTerm() {
 		return term;
 	}

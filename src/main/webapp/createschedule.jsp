@@ -202,7 +202,7 @@
                 <div class="tab-content">
                     <div class="tab-pane active" id="createScheduleTab">
                         <!-- Create Term -->
-						<form id="createTermForm">
+						<form id="createScheduleForm">
 							<div id="createTermPanel" class="schedulePanel">
 								<h3 id="createScheduleTitle">Create Schedule</h3>
 								<table id="createTermTable">
@@ -409,7 +409,7 @@
 										$(document.createElement('input'))
 											.attr('type', 'text')
 											.attr('id', "milestoneDayEnd_" + milestone.id)
-											.attr('name', milestone.name.toLowerCase() + "DayEndime")
+											.attr('name', milestone.name.toLowerCase() + "DayEndTime")
 											.attr('value', '18:00')
 											.addClass('scheduleDayTimeSelect')
 											.timepicker({

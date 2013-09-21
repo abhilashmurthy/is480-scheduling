@@ -23,6 +23,7 @@
 		<% } %>
 		</title>
 		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+		<link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
@@ -36,9 +37,8 @@
 			<div style="float:right">
 				<input type="hidden" id="dropdownValues"/>
 				Hide Columns:
-				<a rel="tooltip" data-placement="right" title="Press Ctrl to select / deselect columns">
-				<select id="hideColumns" size="4" multiple="multiple" style="font-size:13px; width:200px" 
-						onchange="onChangeInDropdown();">
+				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
+				<select id="hideColumns" class="multiselect" multiple="multiple" onchange="onChangeInDropdown();">
 					<% if (activeRole.equals(Role.STUDENT)){ %>
 						<option value="1">My Team</option>
 					<% } else { %>
@@ -55,11 +55,10 @@
 					<option value="6">Booking Status</option>
 					<option value="7">Reason for Rejection</option>
 				</select>
-				</a>
+				<!--</a>-->
 			</div>
 			
 			<div style="clear: both;">
-			<br/>
 			<table id="bookingHistoryTable" class="table table-hover zebra-striped" style="font-size: 13px;">
 				<thead>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
@@ -100,14 +99,16 @@
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
-						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
-						</s:elseif>
-						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
 							<tr class="info">
-						</s:elseif>--%>
+						</s:if>
 								<%--<td><%= count %></td>--%>
 								<td><s:property value="teamName"/></td>
 								<td><s:property value="milestone"/></td>
@@ -134,14 +135,16 @@
 						<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
 							<tr class="warning">
-						</s:if><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
 							<tr class="success">
-						</s:elseif><s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
 							<tr class="error">
-						</s:elseif>
-						<%--<s:elseif test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
 							<tr class="warning">
-						</s:elseif>--%>
+						</s:if>
 							<%--<td><%= count %></td>--%>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
@@ -173,6 +176,7 @@
 		
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="js/plugins/bootstrap-multiselect.js"></script>
 		<script type="text/javascript">
 		//For data tables
 		$(document).ready(function(){
@@ -210,9 +214,40 @@
 				"bInfo": false,
 //				"bAutoWidth": false,
 //				"asStripClasses": null,
-				"bSortClasses": false
+				"bSortClasses": false,
+				"aaSorting":[],
+//				"oSearch": {"sSearch": "Initial search"}
 			});
+			
+			//Tooltip and placeholder for search box of datatable
+			$('.dataTables_filter input').attr("placeholder", "e.g. Acceptance");
+			$('.dataTables_filter input').attr("title", "Search any keyword in the table below");
+			$('.dataTables_filter input').on('mouseenter', function(){
+				$(this).tooltip('show');
+			});
+			
+			//For the multiselect dropdown
+			$('.multiselect').multiselect({
+			   buttonClass: 'btn',
+			   buttonWidth: '175px',
+			   buttonContainer: '<div class="btn-group" />',
+			   maxHeight: false,
+			   buttonText: function(options) {
+				   if (options.length === 0) {
+					   return 'None selected <b class="caret"></b>';
+				   } else if (options.length > 1) {
+					   return options.length + ' selected <b class="caret"></b>';
+				   } else {
+					   var selected = '';
+					   options.each(function() {
+					   selected += $(this).text() + ', ';
+					   });
+					   return selected.substr(0, selected.length -2) + ' <b class="caret"></b>';
+				   }
+			   }
+		   });
 		});
+	
 		
 		$(document).on('mouseenter','[rel=tooltip]', function(){
 			$(this).tooltip('show');
