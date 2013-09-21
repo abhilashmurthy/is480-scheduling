@@ -125,20 +125,19 @@ public class DBInitUtil {
         /*
          * MILESTONE TABLE POPULATION
          */
-        Milestone acceptance = new Milestone();
-        acceptance.setName("Acceptance");
-        acceptance.setSlotDuration(60);
-        acceptance.setTerm(term12013);
+		ArrayList<String> acceptanceAttendees = new ArrayList<String>();
+		acceptanceAttendees.add("Supervisor");
+        Milestone acceptance = new Milestone(1, "Acceptance", 60, term12013, acceptanceAttendees);
 
-        Milestone midterm = new Milestone();
-        midterm.setName("Midterm");
-        midterm.setSlotDuration(90);
-        midterm.setTerm(term12013);
+		ArrayList<String> midtermAttendees = new ArrayList<String>();
+		midtermAttendees.add("Reviewer1");
+		midtermAttendees.add("Reviewer2");
+        Milestone midterm = new Milestone(2, "Midterm", 90, term12013, midtermAttendees);
 
-        Milestone finalMilestone = new Milestone();
-        finalMilestone.setName("Final");
-        finalMilestone.setSlotDuration(90);
-        finalMilestone.setTerm(term12013);
+		ArrayList<String> finalAttendees = new ArrayList<String>();
+		finalAttendees.add("Supervisor");
+		finalAttendees.add("Reviewer1");
+        Milestone finalMilestone = new Milestone(3, "Final", 90, term12013, finalAttendees);
 
         // Persistence
         em.persist(acceptance);
