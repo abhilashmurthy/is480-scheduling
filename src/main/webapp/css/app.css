@@ -338,6 +338,27 @@ input, button, select, textarea {
     font-weight: normal;
 }
 
+#venueInput {
+	margin-bottom: 0 !important;
+}
+
+#createTimeslotsSubmitBtn {
+	display: inline;
+	margin-left: 10px;
+}
+
+#timeslotsProgressBar {
+	display: block;
+	margin-top: 10px;
+	width: 220px;
+}
+
+#createTimeslotsMilestoneLabel {
+	display: block;
+	vertical-align: top;
+	margin-top: 5px;
+}
+
 #closeBookingBtn {
     float: right;
 }
