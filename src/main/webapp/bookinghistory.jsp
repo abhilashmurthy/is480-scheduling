@@ -218,7 +218,14 @@
 				"aaSorting":[],
 //				"oSearch": {"sSearch": "Initial search"}
 			});
+			
+			$('.dataTables_filter input').attr("placeholder", "e.g. Acceptance");
+			$('.dataTables_filter input').attr("title", "Search any keyword in the table below");
+			$('.dataTables_filter input').on('mouseenter', function(){
+				$(this).tooltip('show');
+			});
 		});
+	
 		
 		$(document).on('mouseenter','[rel=tooltip]', function(){
 			$(this).tooltip('show');

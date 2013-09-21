@@ -255,7 +255,13 @@
 //				"asStripClasses": null,
 				//To prevent highlighing of sorted column
 				"bSortClasses": false
-			})
+			});
+			
+			$('.dataTables_filter input').attr("placeholder", "e.g. Acceptance");
+			$('.dataTables_filter input').attr("title", "Search any keyword in the table below");
+			$('.dataTables_filter input').on('mouseenter', function(){
+				$(this).tooltip('show');
+			});
 		});
 		
 		//Notification-------------
