@@ -8,16 +8,9 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
-import manager.MilestoneManager;
-import manager.ScheduleManager;
 import manager.SettingsManager;
 import manager.TermManager;
 import model.Milestone;
@@ -30,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static userAction.CreateTermAction.logger;
 import util.MiscUtil;
 
 /**
@@ -54,7 +46,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
             JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
 			int year = inputData.getInt("year");
             String semester = inputData.getString("semester");
-			JSONArray scheduleData = inputData.getJSONArray("schedules[]");
+			JSONArray scheduleData = inputData.getJSONArray("milestones[]");
 			
 			//Beginning database transaction
 			em.getTransaction().begin();
@@ -66,6 +58,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 				return SUCCESS;
 			}
 			
+			//Return error if schedule data is not enough for the number of milestones created
 			if (milestones.size() != scheduleData.length()) {
 				logger.error("Term already exists");
 				json.put("message", "Term already exists");
@@ -93,12 +86,8 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
             json.put("success", false);
             json.put("message", "Error with CreateSchedule: Escalate to developers!");
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+            if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+			if (em != null && em.isOpen()) em.close();
         }
         return SUCCESS;
     }
@@ -116,7 +105,6 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
 		//Creating term and milestones in DB
 		if (year != 0 && semester != null && !semester.equals("")) {
-			em.getTransaction().begin();
 			Term newTerm = new Term(year, semester);
 			em.persist(newTerm);
 			json.put("termId", newTerm.getId());
@@ -151,15 +139,16 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 		return createdMilestones;
 	}
 	
-	private ArrayList<HashMap<String, Object>> createSchedules(EntityManager em, ArrayList<Milestone> milestones, JSONArray scheduleData) throws JSONException {
+	private ArrayList<HashMap<String, Object>> createSchedules(
+			EntityManager em, ArrayList<Milestone> milestones, JSONArray scheduleData) throws JSONException {
 		ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
 		
 		for (int i = 0; i < scheduleData.length(); i++) {
 			JSONObject obj = scheduleData.getJSONObject(i);
-			Milestone m = findMilestone(obj.getInt("milestoneOrder"), milestones);
+			Milestone m = findMilestone(obj.getInt("order"), milestones);
 			if (m == null) {
-				logger.error("Term already exists");
-				json.put("message", "Term already exists");
+				logger.error("Milestone with ID: " + obj.getInt("milestoneOrder") + " not found");
+				json.put("message", "Milestone not found");
 				json.put("success", false);
 				return null;
 			}
@@ -179,6 +168,12 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			
 			Timestamp startTimestamp = Timestamp.valueOf(milestoneDates.getString(0) + " 00:00:00");
 			Timestamp endTimestamp = Timestamp.valueOf(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
+			if (startTimestamp.after(endTimestamp)) { //Checking if the start time is after the end time for a milestone
+				logger.error("Start time after end time!");
+				json.put("message", "Start time is after the end time for a milestone!");
+				json.put("success", false);
+				return null;
+			}
 			int dayStartTime = obj.getInt("dayStartTime");
 			int dayEndTime = obj.getInt("dayEndTime");
 
