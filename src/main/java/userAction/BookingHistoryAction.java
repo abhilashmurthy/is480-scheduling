@@ -7,6 +7,7 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.util.ArrayList;
@@ -25,12 +26,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import manager.BookingManager;
 import model.Booking;
 import model.Term;
 import model.role.Faculty;
 import model.role.Student;
+import model.role.TA;
 import util.MiscUtil;
 
 /**
@@ -78,8 +79,15 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				
 			} else if (activeRole.equals(Role.TA)) {
 				/* TO DO after TA Model class is ready */
-				// TA ta = (TA) session.getAttribute("user");
-				// bookings = ta.getSubscribedBookings();
+				 TA ta = (TA) session.getAttribute("user");
+				 List<Timeslot> taTimeslots = null;
+				 taTimeslots = ta.getChosenTimeslots();
+				 for (Timeslot t : taTimeslots) {
+					Booking taBooking = t.getCurrentBooking();
+					if (taBooking != null) {
+						bookings.add(taBooking);
+					}
+				 }
 			} else {
 				
 				Faculty faculty = null;
@@ -95,10 +103,54 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					}
 				}
 			}
-				
+			
+			
 			//Iterating over the list and getting the necessary details
 			if (bookings != null && bookings.size() > 0) {
+				List<Booking> pendingBookings = new ArrayList<Booking>();
+				List<Booking> approvedBookings = new ArrayList<Booking>();
+				List<Booking> rejectedBookings = new ArrayList<Booking>();
+				List<Booking> deletedBookings = new ArrayList<Booking>();
+				
+				/* Arranging the booking depending on their status. 
+				 * Bookings will be displayed in the following order: PENDING->APPROVED->RJEJECTED->DELETED
+				 */
 				for (Booking b: bookings) {
+					if (b.getBookingStatus() == BookingStatus.PENDING) {
+						pendingBookings.add(b);
+					} else if (b.getBookingStatus() == BookingStatus.APPROVED) {
+						approvedBookings.add(b);
+					} else if (b.getBookingStatus() == BookingStatus.REJECTED) {
+						rejectedBookings.add(b);
+					} else if (b.getBookingStatus() == BookingStatus.DELETED) {
+						deletedBookings.add(b);
+					}
+				}
+				
+				//Adding bookings in the relevant order
+				ArrayList<Booking> orderedBookings = new ArrayList<Booking>();
+				if (pendingBookings.size() > 0) {
+					for (Booking b : pendingBookings) {
+						orderedBookings.add(b);
+					}
+				}
+				if (approvedBookings.size() > 0) {
+					for (Booking b : approvedBookings) {
+						orderedBookings.add(b);
+					}
+				}
+				if (rejectedBookings.size() > 0) {
+					for (Booking b : rejectedBookings) {
+						orderedBookings.add(b);
+					}
+				}
+				if (deletedBookings.size() > 0) {
+					for (Booking b : deletedBookings) {
+						orderedBookings.add(b);
+					}
+				}
+				
+				for (Booking b: orderedBookings) {
 					Timeslot timeslot = b.getTimeslot();
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd, EEE");

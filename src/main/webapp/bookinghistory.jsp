@@ -210,7 +210,8 @@
 				"bInfo": false,
 //				"bAutoWidth": false,
 //				"asStripClasses": null,
-				"bSortClasses": false
+				"bSortClasses": false,
+				"aaSorting":[]
 			});
 		});
 		
