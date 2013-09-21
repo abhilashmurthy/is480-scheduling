@@ -295,9 +295,28 @@
 					return false;
 				});
 				
+				//Term name availability check
 				$("#semesterInput, #yearSpinnerInput").on('change blur changed', function(){
 					var semName = $.trim($("#semesterInput").val());
 					var yearVal = $("#yearSpinnerInput").spinner('value');
+					//Update multiDatesPickers to year selected
+					$(".datepicker").each(function(){
+						var $nextMilestone = $(this);
+						$nextMilestone.multiDatesPicker('resetDates', 'picked');
+						$nextMilestone.datepicker('destroy');
+						$nextMilestone.multiDatesPicker({
+							dateFormat: "yy-mm-dd",
+							defaultDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
+							minDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
+							beforeShowDay: $.datepicker.noWeekends,
+							onSelect: function(date) {
+								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
+								resetDisabledDates(date, order);
+								updatePillbox();
+							}
+						});
+					});
+					updatePillbox();
 					if (!semName) {
 						$("#semesterNameAvailabilityChecker").empty();
 						return false;
@@ -433,6 +452,7 @@
 					//Disabled subsequent
 					$(".datepicker").each(function(i, e){
 						if (i > 0) {
+							//Disable datepicker
 							$(this).multiDatesPicker('resetDates', 'picked');
 							$(this).datepicker('option', 'maxDate', -2);
 						}
@@ -455,7 +475,7 @@
 						var minDate = Date.parse(minDateStr);
 						$nextMilestone.multiDatesPicker({
 							dateFormat: "yy-mm-dd",
-							defaultDate: minDate,
+							defaultDate: minDate.addDays(1),
 							minDate: minDate.addDays(1),
 							beforeShowDay: $.datepicker.noWeekends,
 							onSelect: function(date) {
@@ -475,9 +495,10 @@
 							$nextMilestone.multiDatesPicker('resetDates', 'picked');
 							$nextMilestone.datepicker('destroy');
 							if (dates.length > 0) {
+								//If picked dates are still there
 								$nextMilestone.multiDatesPicker({
 									dateFormat: "yy-mm-dd",
-									defaultDate: Date.parse(dates[dates.length - 1]),
+									defaultDate: Date.parse(dates[dates.length - 1]).addDays(1),
 									minDate: Date.parse(dates[dates.length - 1]).addDays(1),
 									beforeShowDay: $.datepicker.noWeekends,
 									onSelect: function(date) {
@@ -487,6 +508,7 @@
 									}
 								});
 							} else {
+								//If picked dates are not there anymore
 								$nextMilestone.multiDatesPicker({
 									dateFormat: "yy-mm-dd",
 									defaultDate: Date.today(),
@@ -498,6 +520,7 @@
 										updatePillbox();
 									}
 								});
+								//Disable datepicker
 								$nextMilestone.datepicker('option', 'maxDate', -2);
 							}
 						}
