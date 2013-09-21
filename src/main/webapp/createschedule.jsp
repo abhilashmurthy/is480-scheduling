@@ -117,14 +117,8 @@
 			}
 			
 			.pillbox {
-				border: 1px solid grey;
-				border-radius: 10px;
 				width: 80px;
 				margin: auto;
-			}
-			
-			.pillbox li {
-				border-radius: 5px !important;
 			}
 			
 			.dayHours {
@@ -445,7 +439,7 @@
 					});
 				}
                 
-                //Reset Dates On Change
+                //Reset Dates On Adding/Removing from multiDatesPicker
                 function resetDisabledDates(minDateStr, orderNum) {
 					var isSelected = $(".milestoneOrder_" + orderNum).multiDatesPicker('gotDate', Date.parse(minDateStr));
 					var $nextMilestone = $(".milestoneOrder_" + (orderNum + 1));
@@ -471,30 +465,28 @@
 							}
 						});
 					} else if ($nextMilestone.length) {
-						// A date has been removed
+						//A date has been removed
+						//Reset all subsequent dates
 						var dates = $(".milestoneOrder_" + orderNum).multiDatesPicker('getDates');
-						if (dates.length > 0) {
+						var nextOrder = parseInt($nextMilestone.attr('class').split(" ")[0].split("_")[1]);
+						for (var i = nextOrder; i > 0; i++) {
+							$nextMilestone = $(".milestoneOrder_" + i);
+							if (!$nextMilestone.length) break; //No more milestones
 							$nextMilestone.multiDatesPicker('resetDates', 'picked');
 							$nextMilestone.datepicker('destroy');
-							$nextMilestone.multiDatesPicker({
-								dateFormat: "yy-mm-dd",
-								defaultDate: Date.parse(dates[dates.length - 1]),
-								minDate: Date.parse(dates[dates.length - 1]).addDays(1),
-								beforeShowDay: $.datepicker.noWeekends,
-								onSelect: function(date) {
-									var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
-									resetDisabledDates(date, order);
-									updatePillbox();
-								}
-							});
-						} else {
-							//Reset all subsequent dates
-							var nextOrder = parseInt($nextMilestone.attr('class').split(" ")[0].split("_")[1]);
-							for (var i = nextOrder; i > 0; i++) {
-								$nextMilestone = $(".milestoneOrder_" + i);
-								if (!$nextMilestone.length) break; //No more milestones
-								$nextMilestone.multiDatesPicker('resetDates', 'picked');
-								$nextMilestone.datepicker('destroy');
+							if (dates.length > 0) {
+								$nextMilestone.multiDatesPicker({
+									dateFormat: "yy-mm-dd",
+									defaultDate: Date.parse(dates[dates.length - 1]),
+									minDate: Date.parse(dates[dates.length - 1]).addDays(1),
+									beforeShowDay: $.datepicker.noWeekends,
+									onSelect: function(date) {
+										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
+										resetDisabledDates(date, order);
+										updatePillbox();
+									}
+								});
+							} else {
 								$nextMilestone.multiDatesPicker({
 									dateFormat: "yy-mm-dd",
 									defaultDate: Date.today(),
@@ -511,6 +503,19 @@
 						}
 					}
                 }
+				
+				//Reset Dates on crossing from Pillbox
+				$(".pillbox ul").on('click', function(e){
+					var $pill = $(e.target);
+					if (!$pill.is('li')) return false;
+					var date = $pill.text();
+					var milestone = $pill.parents('.pillbox').attr('id').split('Pillbox')[0];
+					var $datepicker = $("#milestone_" + milestone);
+					$datepicker.multiDatesPicker('removeDates', Date.parse(date));
+					var order = parseInt($datepicker.attr('class').split(" ")[0].split("_")[1]);
+					resetDisabledDates(date, order);
+					updatePillbox();
+				});
 				
 				function updatePillbox() {
 					$(".datepicker").each(function(){
