@@ -10,7 +10,7 @@ import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.io.IOException;
-import java.sql.Timestamp;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +37,6 @@ import model.role.Student;
 import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.hibernate.Hibernate;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -117,20 +114,14 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 json.put("dayStartTime", activeSchedule.getDayStartTime());
                 json.put("dayEndTime", activeSchedule.getDayEndTime());
 
-                //Get unavailable timeslots if user is a student
-                Set<Timeslot> supervisorAvailability = null;
-                Set<Timeslot> reviewer1Availability = null;
-                Set<Timeslot> reviewer2Availability = null;
+				//Populating specific user role obejcts and getting unavailable timeslots if user is a faculty member
                 User user = (User) request.getSession().getAttribute("user");
-                if (user.getRole() == Role.STUDENT) {
-                    student = em.find(Student.class, user.getId());
-                    Team team = student.getTeam();
-                    supervisorAvailability = team.getSupervisor().getUnavailableTimeslots();
-                    reviewer1Availability = team.getReviewer1().getUnavailableTimeslots();
-                    reviewer2Availability = team.getReviewer2().getUnavailableTimeslots();
-                } else if (user.getRole() == Role.FACULTY) {
+				Set<Timeslot> facultyAvailability = null;
+				if (user.getRole() == Role.STUDENT) {
+					student = em.find(Student.class, user.getId());
+				} else if (user.getRole() == Role.FACULTY) {
                     faculty = em.find(Faculty.class, user.getId());
-                    supervisorAvailability = faculty.getUnavailableTimeslots();
+                    facultyAvailability = faculty.getUnavailableTimeslots();
                 }
 
                 ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
@@ -223,31 +214,15 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
 
                         //TODO Update code after manage milestones is completed!
                         Milestone m = activeSchedule.getMilestone();
-                        if (m.getName().equalsIgnoreCase("acceptance")) {
-                            if (supervisorAvailability.contains(t)) { //Supervisor
+						ArrayList<String> requiredAttendees = m.getRequiredAttendees();
+						for (String roleName : requiredAttendees) {
+							Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
+							Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
+							if (roleUser.getUnavailableTimeslots().contains(t)) {
                                 available = false;
-                                unavailable.add(team.getSupervisor().getFullName());
+                                unavailable.add(roleUser.getFullName());
                             }
-                        } else if (m.getName().equalsIgnoreCase("midterm")) {
-                            if (reviewer1Availability.contains(t)) { //Reviewer 1
-                                available = false;
-                                unavailable.add(team.getReviewer1().getFullName());
-                            }
-                            if (reviewer2Availability.contains(t)) { //Reviewer 2
-                                available = false;
-                                unavailable.add(team.getReviewer2().getFullName());
-                            }
-                        } else if (m.getName().equalsIgnoreCase("final")) {
-                            if (supervisorAvailability.contains(t)) { //Supervisor
-                                available = false;
-                                unavailable.add(team.getSupervisor().getFullName());
-                            }
-                            if (reviewer1Availability.contains(t)) { //Reviewer 1
-                                available = false;
-                                unavailable.add(team.getReviewer1().getFullName());
-                            }
-                        }
-
+						}
                         map.put("available", available);
                         map.put("unavailable", unavailable);
                         
@@ -275,7 +250,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                     //Miscellaneous Role specific information
                     if (user.getRole() == Role.FACULTY) {
                         boolean available = true;
-                        if (supervisorAvailability.contains(t)) {
+                        if (facultyAvailability.contains(t)) {
                             available = false;
                         }
                         map.put("available", available);
