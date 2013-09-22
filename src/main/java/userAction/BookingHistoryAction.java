@@ -213,15 +213,15 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			return SUCCESS;
 
 		} catch (Exception e) {
-//            logger.error("Exception caught: " + e.getMessage());
-//            if (MiscUtil.DEV_MODE) {
-//                for (StackTraceElement s : e.getStackTrace()) {
-//                    logger.debug(s.toString());
-//                }
-//            }
-//            json.put("success", false);
-//            json.put("message", "Error with BookingHistory: Escalate to developers!");
-			request.setAttribute("error", "Error with BookingHistory: Escalate to developers!");
+            logger.error("Exception caught: " + e.getMessage());
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            json.put("success", false);
+            json.put("message", "Error with BookingHistory: Escalate to developers!");
+//			request.setAttribute("error", "Error with BookingHistory: Escalate to developers!");
         } finally {
 			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();

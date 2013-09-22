@@ -26,7 +26,7 @@
 		 
         <div class="container">
 			<h3>CSV Upload</h3>
-			<form enctype="multipart/form-data" action="UploadFileAction">
+			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
 			<div style="float: left; margin-right: 50px;">
 			<table class="table" style="width:auto">
 				<thead>
@@ -35,7 +35,7 @@
 				<tbody>
 					<tr>
 						<td>
-						<select id="termChosen">
+						<select id="termChosen" name="termChosen">
 							<s:iterator value="dataList">
 								<option value="<s:property value="termId"/>">
 									<s:property value="termName"/>
@@ -55,9 +55,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="file" id="fileUploaded" accept="text/comma-separated-values, text/csv, 
-								application/csv, application/excel, application/vnd.ms-excel, application/vnd.msexcel" 
-								onchange="checkFile(this);" />
+							<input type="file" id="fileUploaded" name="csvFile" onchange="checkFile(this);" />
 						</td>
 					</tr>
 				</tbody>
@@ -66,7 +64,8 @@
 			
 			<div style="clear: both;">
 				<br/>
-				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
+				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." 
+					style="margin-bottom: 20px;">Save</button>
 			</div>
 			</form>
         </div>
@@ -79,12 +78,13 @@
 			
 			//To check whether the file selected has correct extension or not
 			function checkFile(sender) {
-				var validExts = new Array(".xlsx", ".xls", ".csv");
+//				var validExts = new Array(".xlsx", ".xls", ".csv");
+				var validExts = new Array(".csv");
 				var fileExt = sender.value;
 				fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
 				if (validExts.indexOf(fileExt) < 0) {
-					showNotification("ERROR", "Invalid file selected! Valid files are of " +
-						   validExts.toString() + " types.");
+					showNotification("ERROR", "Invalid file selected! File should be " +
+						   validExts.toString() + " type");
 					return false;
 				} else {
 					return true;
@@ -93,10 +93,11 @@
 			
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
+//			function validate(saveButton) {
 				$(this).button('loading');
+//				saveButton.button('loading');
 				
 				var file = $('#fileUploaded').val();
-
 				//Checking whether user has selected file or not
 				if (file === "" || file === null) {
 					showNotification("ERROR", "Please select a file!");
@@ -105,11 +106,12 @@
 				}
 
 				//Checking the extension of the file
-				var validExts = new Array(".xlsx", ".xls", ".csv");
+//				var validExts = new Array(".xlsx", ".xls", ".csv");
+				var validExts = new Array(".csv");
 				file = file.substring(file.lastIndexOf('.'));
 				if (validExts.indexOf(file) < 0) {
-					showNotification("ERROR", "Invalid file selected! Valid files are of " +
-						   validExts.toString() + " types.");
+					showNotification("ERROR", "Invalid file selected! File should be " +
+						   validExts.toString() + " type");
 				    $("#submitFormBtn").button('reset');
 					return false;
 				} 
@@ -137,8 +139,9 @@
 					return false;
 				}
 				
-				var fileJson = {};
-				fileJson['termId'] = termSelected;
+				return true;
+//				var fileJson = {};
+//				fileJson['termId'] = termSelected;
 //				fileJson['fileUploaded'] = file;
 				
 //				$('input[type="file"]').ajaxfileupload({
@@ -157,26 +160,27 @@
 //					 console.log('no file selected');
 //				   }
 //				});
-				alert(JSON.stringify(fileJson));
-				$.ajax({
-					type: 'POST',
-					async: false,
-					url: 'uploadFileToBackend',
-					data: {jsonData: JSON.stringify(fileJson)}	
-				}).done(function(response) {
-					$("#submitFormBtn").button('reset');
-					console.log(response);
-					if (response.success) {
-						showNotification("SUCCESS", response.message);
-					} else {
-						showNotification("ERROR", response.message);
-					}
-				}).fail(function(response) {
-					$("#submitFormBtn").button('reset');
-					console.log(response);
-					showNotification("WARNING", "Oops. Something went wrong. Please try again!");
-				});
+//				alert(JSON.stringify(fileJson));
+//				$.ajax({
+//					type: 'POST',
+//					async: false,
+//					url: 'uploadFileToBackend',
+//					data: {jsonData: JSON.stringify(fileJson)}	
+//				}).done(function(response) {
+//					$("#submitFormBtn").button('reset');
+//					console.log(response);
+//					if (response.success) {
+//						showNotification("SUCCESS", response.message);
+//					} else {
+//						showNotification("ERROR", response.message);
+//					}
+//				}).fail(function(response) {
+//					$("#submitFormBtn").button('reset');
+//					console.log(response);
+//					showNotification("WARNING", "Oops. Something went wrong. Please try again!");
+//				});
 			});
+//			}
 
 			//Notification-------------
 			function showNotification(action, notificationMessage) {
