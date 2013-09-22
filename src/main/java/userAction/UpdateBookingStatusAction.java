@@ -140,7 +140,6 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				booking.setResponseList(responseList);
 				bookingsToUpdate.add(booking);
 
-				//TODO Send an email when booking's rejected
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();

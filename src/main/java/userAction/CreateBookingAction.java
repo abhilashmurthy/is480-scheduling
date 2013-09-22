@@ -128,8 +128,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 HashSet<User> reqAttendees = new HashSet<User>();
                 reqAttendees.addAll(team.getMembers());
 
-                //Create booking response entries based on milestone
-                //TODO Remove hardcoding after milestone management is implemented
+                //Create booking response entries based on required attendees for milestone
                 HashMap<User, Response> responseList = new HashMap<User, Response>();
                 Milestone milestone = timeslot.getSchedule().getMilestone();
 				ArrayList<String> requiredAttendees = milestone.getRequiredAttendees();
