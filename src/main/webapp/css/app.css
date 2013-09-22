@@ -347,9 +347,14 @@ input, button, select, textarea {
 	margin-left: 10px;
 }
 
+#createTimeslotsTab select {
+	margin-bottom: 0 !important;
+}
+
 #timeslotsProgressBar {
 	display: block;
-	margin-top: 10px;
+	margin-top: auto;
+	margin-bottom: auto;
 	width: 220px;
 }
 

@@ -47,13 +47,19 @@
 					<option value="2">Presentation</option>
 					<option value="3">Date & Time</option>
 					<option value="4">Venue</option>
-					<% if (activeRole.equals(Role.FACULTY)) { %>
-						<option value="5">My Response</option>
-					<% } else { %>
-						<option value="5">Response</option>
+					<% if (!activeRole.equals(Role.TA)) { %>
+						<% if (activeRole.equals(Role.FACULTY)) { %>
+							<option value="5">My Response</option>
+						<% } else { %>
+							<option value="5">Response</option>
+						<% } %>
 					<% } %>
-					<option value="6">Booking Status</option>
-					<option value="7">Reason for Rejection</option>
+					<% if (!activeRole.equals(Role.TA)) { %>
+						<option value="6">Booking Status</option>
+					<% } %>
+					<% if (!activeRole.equals(Role.TA)) { %>
+						<option value="7">Reason for Rejection</option>
+					<% } %>
 				</select>
 				<!--</a>-->
 			</div>
@@ -89,6 +95,14 @@
 							<th>My Response</th>
 							<th>Booking Status</th>
 							<th>Reason for Rejection</th>
+						</tr>
+					<% } else { %>
+						<tr>
+							<!--<th>#</th>-->
+							<th>Team</th>
+							<th>Presentation</th>
+							<th>Date & Time</th>
+							<th>Venue</th>
 						</tr>
 					<% } %>
 				</thead>
@@ -160,6 +174,25 @@
 								<!--<td>-</td>-->
 							<%--</s:else>--%>
 							<%--<% count = count + 1; %>--%>
+						</tr>
+						<% } else { %>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Pending')}"> 
+							<tr class="warning">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Approved')}">
+							<tr class="success">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Rejected')}">
+							<tr class="error">
+						</s:if>
+						<s:if test="%{overallBookingStatus.equalsIgnoreCase('Deleted')}">
+							<tr class="warning">
+						</s:if>
+							<%--<td><%= count %></td>--%>
+							<td><s:property value="teamName"/></td>
+							<td><s:property value="milestone"/></td>
+							<td><s:property value="date"/> <s:property value="time"/></td>
+							<td><s:property value="venue"/></td>
 						</tr>
 						<% } %>
 					</s:iterator>

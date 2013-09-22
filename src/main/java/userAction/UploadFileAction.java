@@ -4,10 +4,12 @@
  */
 package userAction;
 
+import au.com.bytecode.opencsv.CSVReader;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,7 +20,11 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import org.json.JSONObject;
 import util.MiscUtil;
-
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 /**
  *
  * @author Prakhar
@@ -41,8 +47,22 @@ public class UploadFileAction extends ActionSupport implements ServletRequestAwa
 			
 			//Checking role of the user
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
-				JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
-				long termId = inputData.getLong("termId");
+				String fileName = request.getParameter("csvFile");
+				long termChosen = Long.parseLong(request.getParameter("termChosen"));
+				
+//				FileInputStream fis = new FileInputStream(fileName);
+//				BufferedReader br = new BufferedReader(new FileReader(fileName));
+				//Specifying the delimiter to be used
+				CSVReader reader = new CSVReader(new FileReader(fileName),',');
+				String[] nextLine;
+				//Read one line at a time
+				while ((nextLine = reader.readNext()) != null)
+				{
+					for(String token : nextLine) {
+						//Print all tokens
+						System.out.println(token);
+					}
+				}
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
 				logger.error("User cannot access this page");

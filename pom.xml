@@ -125,6 +125,13 @@
                     <artifactId>quartz-jobs</artifactId>
                     <version>2.2.0</version>
                 </dependency>
+				
+		<!-- Parsing CSV -->
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+		</dependency>
     
 	</dependencies>
 

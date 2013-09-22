@@ -83,7 +83,7 @@
             .createScheduleTabList li a, .createScheduleTabList li p {
                 font-size: 20px;
                 font-weight: bold;
-                padding: 20px 0px 20px 10px !important;
+                padding: 20px 0px 20px 5px !important;
             }
             
             .schedulePanel {
@@ -136,6 +136,7 @@
                 width: 45px;
 				margin-bottom: 0 !important;
             }
+			
         </style>
     </head>
     <body>
@@ -243,7 +244,8 @@
                         <div id="createTimeslotsPanel" class="schedulePanel">
                             <h3 id="createTimeslotsTitle">Create Timeslots</h3>
                             <table id="createTimeslotsTable">
-                                <tr><td id ="createTimeslotsMilestoneLabel">Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select><div id="timeslotsProgressBar" class="progress progress-striped"><div class="bar bar-success" style="width: 0%;"></div></div></td></tr>
+								<tr><td>Progress</td><td><div id="timeslotsProgressBar" class="progress progress-striped"><div class="bar bar-success" style="width: 0%;"></div></div></td></tr>
+                                <tr><td>Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td></tr>
                                 <tr><td>Venue</td><td><input id="venueInput" type="text" name="venue" placeholder="SIS Seminar Room 2-1"/><button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button></td></tr>
                                 <tr><td></td><td><table class="timeslotsTable table-condensed table-hover table-bordered table-striped" hidden></table></td></tr>
                             </table>
@@ -268,12 +270,20 @@
                  NAV
                  ------------------------------------------*/
                  
+				 //Disable createTimeslotsTab first
                 $(".createTimeslotsTab a").removeAttr('data-toggle');
                  $(".scheduleLeftNav li a").on('click', function(){
                      if (!$(this).attr('data-toggle')) {
                         var activeTab = $('.scheduleLeftNav').children('.active').children('a').html();
                         showNotification("WARNING", "Please " + activeTab + " First!");
+						return false;
                      }
+					 var href = $(this).attr('href').split('#')[1];
+					 $(".tab-pane, .nav-tabs li").removeClass('active');
+					 $(".tab-pane").hide();
+					 $("#" + href).addClass('active');
+					 $(".nav-tabs ." + href).addClass('active');
+					 $("#" + href).show();
 					 return false;
                  });
 
@@ -304,7 +314,7 @@
 						return false;
 					}
 					for (var i = 0; i < termNames.length; i++) {
-						if (yearVal === termNames[i].year && semName === termNames[i].term) {
+						if (yearVal === termNames[i].year && semName.toLowerCase() === termNames[i].term.toLowerCase()) {
 							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('icon-remove')).append(' Term name already exists');
 							return false;
 						}
@@ -348,8 +358,7 @@
                 
                     //Display Create Schedule
                     $("#createSchedulePanel").show();
-                    $(".createScheduleTab a").attr('data-toggle', 'tab');
-                        
+					
                     //Order comparator
                     function compare(a, b) {
                         if (a.order < b.order) {
@@ -662,18 +671,39 @@
                             console.log("Received: " + JSON.stringify(response));
                             schedules = response.schedules;
                             showNotification("SUCCESS", "Created dates successfully");
+							disableScheduleControls();
                             setTimeout(function(){displayCreateTimeslots();}, 1000);
                         } else {
 							showNotification("WARNING", response.message);
+							$("#createScheduleSubmitBtn").button('reset');
                         }
                     }).fail(function(error) {
                         console.log("createScheduleData AJAX FAIL");
 						var eid = btoa("Erro in CreateScheduleAction: Escalate to developers!");
 						window.location = "error.jsp?eid=" + eid;
                     });
-					$("#createScheduleSubmitBtn").button('reset');
                     return false;
                 });
+				
+				function disableScheduleControls() {
+					$("#createScheduleTab form :input").attr('disabled', true);
+					$("#createScheduleTab .datepicker").each(function(){
+						var $nextMilestone = $(this);
+						var datesArray = $nextMilestone.multiDatesPicker('getDates');
+						var dates = new Array();
+						for (var i = 0; i < datesArray.length; i++){
+							dates.push(Date.parse(datesArray[i]));
+						}
+						$nextMilestone.datepicker('destroy');
+						$nextMilestone.multiDatesPicker({
+							minDate: dates[0],
+							addDates: dates,
+							disabled: true
+						});
+					});
+					$(".pillbox ul").off('click');
+					$("#createScheduleTitle").css('display', 'inline').after($(document.createElement('div')).addClass('statusText').css('color', 'green').html($(document.createElement('span')).addClass('icon-ok')).append(' Please Create Timeslots'));
+				}
 
                 /*----------------------------------------
                  CREATE TIMESLOTS
@@ -681,6 +711,7 @@
 
                 //Display create timeslots
                 function displayCreateTimeslots() {
+					$('body').animate({scrollTop:0}, '500', 'swing');
                     $("#createTimeslotsPanel").show();
                     $(".createTimeslotsTab a").attr('data-toggle', 'tab');
                     for (var i = 0; i < schedules.length; i++) {
@@ -698,6 +729,7 @@
 				//Reset timeslots on change milestone dropdown
                 $("#milestoneTimeslotsSelect").on('change', function(e){
 					$(this).next('.statusText').remove();
+					$("#venueInput").attr('disabled', false);
                     $(".timeslotsTable").empty();
                     var selectedMilestone = $(this).val();
                     selectedSchedule = null;
@@ -711,8 +743,10 @@
                     makeTimeslotTable("timeslotsTable", selectedSchedule.dates, selectedSchedule.dayStartTime, selectedSchedule.dayEndTime);
                     populateTimeslotsTable(selectedSchedule.duration);
                     $("#createTimeslotsSubmitBtn").button('reset');
-                    if (selectedSchedule.isCreated) { //Don't let them create again
+                    if (selectedSchedule.isCreated) { 
+						//If schedule is created, don't let them create again
                         $("#createTimeslotsSubmitBtn").button('loading');
+                        $("#venueInput").attr('disabled', true);
                         $(this).after($(document.createElement('div')).addClass('statusText').css('color', 'green').html($(document.createElement('span')).addClass('icon-ok')).append(' Timeslots created already'));
                     }
                     $(".timeslotsTable").show();
@@ -733,6 +767,7 @@
                     
                     timeslotsData["scheduleId"] = selectedSchedule.scheduleId;
                     timeslotsData["timeslots"] = timeslots_array;
+					selectedSchedule["timeslots"] = timeslots_array;
                     timeslotsData["venue"] = $("#venueInput").val();
                     console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
                     $.ajax({
@@ -752,8 +787,8 @@
 							$("#timeslotsProgressBar").children(".bar").css('width', ((totalCreated/schedules.length) * 100) + '%');
 							if ((totalCreated/schedules.length) === 1) {
 								//Go to manage active terms page
-								showNotification("SUCCESS", "Schedule ready now");
-								setTimeout(function(){window.location = "manageActiveTerms";}, 2000);
+								showNotification("WARNING", "Schedule ready now");
+								setTimeout(function(){window.location = "index";}, 2000);
 							} else {
 								//Select next milestone
 								showNotification("SUCCESS", response.message);
@@ -836,6 +871,7 @@
                 }
                 
                 $('body').on('click', '.timeslotcell', function(e) {
+					if (selectedSchedule.isCreated) return false; //If created already, disable timeslot selection
                     console.log("clicked timeslotcell");
                     triggerTimeslot(this, selectedSchedule.duration);
                     return false;
@@ -892,7 +928,19 @@
 
                 function populateTimeslotsTable(duration) {
                     $(".timeslotcell").each(function() {
-                        triggerTimeslot(this, duration);
+						if (selectedSchedule.isCreated) {
+							//If schedule is created already, populate only selected timeslots
+							var timeslots = selectedSchedule.timeslots;
+							for (var i = 0; i < timeslots.length; i++) {
+								if ($(this).attr('value') === timeslots[i]) {
+									triggerTimeslot(this, duration);
+									break;
+								}
+							}
+						} else {
+							//If schedule not yet created, populate all timeslots
+							triggerTimeslot(this, duration);
+						}
                     });
                 }
 				
@@ -931,7 +979,7 @@
 						   opts.title = "Warning";
 						   break;
 						default:
-							alert("Something went wrong");
+							alert("Something went wrong - Notifications");
 					}
 				   $.pnotify(opts);
 				}

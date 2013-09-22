@@ -67,7 +67,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			*/
 			Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
 			
-			Set<Booking> bookings = null;
+			Set<Booking> bookings = new HashSet<Booking>();
 			//Retrieving all bookings for admin and course coordinator
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
 				//Getting all the bookings for the active term
@@ -84,7 +84,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				 taTimeslots = ta.getChosenTimeslots();
 				 for (Timeslot t : taTimeslots) {
 					Booking taBooking = t.getCurrentBooking();
-					if (taBooking != null) {
+					if (taBooking != null && taBooking.getBookingStatus() == BookingStatus.APPROVED) {
 						bookings.add(taBooking);
 					}
 				 }
@@ -213,15 +213,15 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			return SUCCESS;
 
 		} catch (Exception e) {
-//            logger.error("Exception caught: " + e.getMessage());
-//            if (MiscUtil.DEV_MODE) {
-//                for (StackTraceElement s : e.getStackTrace()) {
-//                    logger.debug(s.toString());
-//                }
-//            }
-//            json.put("success", false);
-//            json.put("message", "Error with BookingHistory: Escalate to developers!");
-			request.setAttribute("error", "Error with BookingHistory: Escalate to developers!");
+            logger.error("Exception caught: " + e.getMessage());
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            json.put("success", false);
+            json.put("message", "Error with BookingHistory: Escalate to developers!");
+//			request.setAttribute("error", "Error with BookingHistory: Escalate to developers!");
         } finally {
 			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
