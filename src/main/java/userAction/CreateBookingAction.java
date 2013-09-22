@@ -8,6 +8,7 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Response;
 import constant.Role;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import model.Milestone;
 import model.Team;
 import model.Timeslot;
 import model.User;
+import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
 import notification.email.NewBookingEmail;
@@ -130,23 +132,13 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 //TODO Remove hardcoding after milestone management is implemented
                 HashMap<User, Response> responseList = new HashMap<User, Response>();
                 Milestone milestone = timeslot.getSchedule().getMilestone();
-                if (milestone.getName().equalsIgnoreCase("acceptance")) {
-                    responseList.put(team.getSupervisor(), Response.PENDING);
-                    reqAttendees.add(team.getSupervisor());
-                } else if (milestone.getName().equalsIgnoreCase("midterm")) {
-                    responseList.put(team.getReviewer1(), Response.PENDING);
-                    reqAttendees.add(team.getReviewer1());
-                    responseList.put(team.getReviewer2(), Response.PENDING);
-                    reqAttendees.add(team.getReviewer2());
-                } else if (milestone.getName().equalsIgnoreCase("final")) {
-                    responseList.put(team.getSupervisor(), Response.PENDING);
-                    reqAttendees.add(team.getSupervisor());
-                    responseList.put(team.getReviewer1(), Response.PENDING);
-                    reqAttendees.add(team.getReviewer1());
-                } else {
-                    logger.error("FATAL ERROR: Code not to be reached!");
-                    throw new Exception();
-                }
+				ArrayList<String> requiredAttendees = milestone.getRequiredAttendees();
+				for (String roleName : requiredAttendees) {
+					Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
+					Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
+					responseList.put(roleUser, Response.PENDING);
+                    reqAttendees.add(roleUser);
+				}
                 
                 //Add optional attendees
                 HashSet<String> optionalAttendees = new HashSet<String>();

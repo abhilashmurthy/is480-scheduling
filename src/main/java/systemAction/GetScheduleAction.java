@@ -212,7 +212,6 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         boolean available = true;
                         ArrayList<String> unavailable = new ArrayList<String>();
 
-                        //TODO Update code after manage milestones is completed!
                         Milestone m = activeSchedule.getMilestone();
 						ArrayList<String> requiredAttendees = m.getRequiredAttendees();
 						for (String roleName : requiredAttendees) {
