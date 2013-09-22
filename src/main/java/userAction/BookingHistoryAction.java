@@ -67,7 +67,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			*/
 			Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
 			
-			Set<Booking> bookings = null;
+			Set<Booking> bookings = new HashSet<Booking>();
 			//Retrieving all bookings for admin and course coordinator
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
 				//Getting all the bookings for the active term
@@ -84,7 +84,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				 taTimeslots = ta.getChosenTimeslots();
 				 for (Timeslot t : taTimeslots) {
 					Booking taBooking = t.getCurrentBooking();
-					if (taBooking != null) {
+					if (taBooking != null && taBooking.getBookingStatus() == BookingStatus.APPROVED) {
 						bookings.add(taBooking);
 					}
 				 }
