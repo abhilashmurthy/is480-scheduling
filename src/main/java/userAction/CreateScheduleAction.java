@@ -6,6 +6,7 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Role;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +42,15 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
         try {
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
+			
+			//Checking user role
+			Role activeRole = (Role) request.getSession().getAttribute("activeRole");
+			if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) {
+				logger.error("Unauthorized user");
+				json.put("message", "You do not have the permission to perform this function!");
+				json.put("success", false);
+				return SUCCESS;
+			}
 
             //Getting input data
             JSONObject inputData = new JSONObject(request.getParameter("jsonData"));

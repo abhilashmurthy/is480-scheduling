@@ -244,7 +244,7 @@
                         <div id="createTimeslotsPanel" class="schedulePanel">
                             <h3 id="createTimeslotsTitle">Create Timeslots</h3>
                             <table id="createTimeslotsTable">
-								<tr><td>Progress</td><td><div id="timeslotsProgressBar" class="progress progress-striped"><div class="bar bar-success" style="width: 0%;"></div></div></td></tr>
+								<tr><td>Progress</td><td><div id="timeslotsProgressBar" class="progress"><div class="bar bar-success" style="width: 0%;"></div></div></td></tr>
                                 <tr><td>Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td></tr>
                                 <tr><td>Venue</td><td><input id="venueInput" type="text" name="venue" placeholder="SIS Seminar Room 2-1"/><button id="createTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Create</button></td></tr>
                                 <tr><td></td><td><table class="timeslotsTable table-condensed table-hover table-bordered table-striped" hidden></table></td></tr>

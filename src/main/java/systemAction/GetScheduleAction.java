@@ -137,7 +137,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
 
                     if (t.getCurrentBooking() != null) {
                         Booking b = t.getCurrentBooking();
-                        boolean isMyTeam = false;
+                        boolean isMyTeam = false; //Variable to track if the booking belongs to the faculty member logged in
                         Date startDate = new Date(t.getStartTime().getTime());
                         Date endDate = new Date(t.getEndTime().getTime());
                         map.put("team", b.getTeam().getTeamName());
@@ -172,7 +172,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                                 facultyMap.put("name", facultyUser.getFullName());
                                 facultyMap.put("status", statusList.get(facultyUser).toString());
                                 if (user.getRole() == Role.FACULTY && facultyUser.equals(faculty)) {
-                                    isMyTeam = true;
+                                    isMyTeam = true; //Booking belongs to faculty member as he's part of the response list
                                 }
                                 faculties.add(facultyMap);
                             }
@@ -212,7 +212,6 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         boolean available = true;
                         ArrayList<String> unavailable = new ArrayList<String>();
 
-                        //TODO Update code after manage milestones is completed!
                         Milestone m = activeSchedule.getMilestone();
 						ArrayList<String> requiredAttendees = m.getRequiredAttendees();
 						for (String roleName : requiredAttendees) {

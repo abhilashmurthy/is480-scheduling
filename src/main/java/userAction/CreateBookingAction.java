@@ -8,6 +8,7 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Response;
 import constant.Role;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,21 +29,14 @@ import model.Milestone;
 import model.Team;
 import model.Timeslot;
 import model.User;
+import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
 import notification.email.NewBookingEmail;
 import notification.email.RespondToBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.ee.servlet.QuartzInitializerListener;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import systemAction.quartz.SMSReminderJob;
 import util.MiscUtil;
 
 /**
@@ -126,27 +120,16 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 HashSet<User> reqAttendees = new HashSet<User>();
                 reqAttendees.addAll(team.getMembers());
 
-                //Create booking response entries based on milestone
-                //TODO Remove hardcoding after milestone management is implemented
+                //Create booking response entries based on required attendees for milestone
                 HashMap<User, Response> responseList = new HashMap<User, Response>();
                 Milestone milestone = timeslot.getSchedule().getMilestone();
-                if (milestone.getName().equalsIgnoreCase("acceptance")) {
-                    responseList.put(team.getSupervisor(), Response.PENDING);
-                    reqAttendees.add(team.getSupervisor());
-                } else if (milestone.getName().equalsIgnoreCase("midterm")) {
-                    responseList.put(team.getReviewer1(), Response.PENDING);
-                    reqAttendees.add(team.getReviewer1());
-                    responseList.put(team.getReviewer2(), Response.PENDING);
-                    reqAttendees.add(team.getReviewer2());
-                } else if (milestone.getName().equalsIgnoreCase("final")) {
-                    responseList.put(team.getSupervisor(), Response.PENDING);
-                    reqAttendees.add(team.getSupervisor());
-                    responseList.put(team.getReviewer1(), Response.PENDING);
-                    reqAttendees.add(team.getReviewer1());
-                } else {
-                    logger.error("FATAL ERROR: Code not to be reached!");
-                    throw new Exception();
-                }
+				ArrayList<String> requiredAttendees = milestone.getRequiredAttendees();
+				for (String roleName : requiredAttendees) {
+					Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
+					Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
+					responseList.put(roleUser, Response.PENDING);
+                    reqAttendees.add(roleUser);
+				}
                 
                 //Add optional attendees
                 HashSet<String> optionalAttendees = new HashSet<String>();
@@ -215,9 +198,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 json.put("booking", map);
 
                 em.getTransaction().commit();
-				
-				//Schedule job for SMS reminders
-				scheduleSMSReminder(booking);
             } catch (Exception e) {
                 //Rolling back write operations
                 logger.error("Exception caught: " + e.getMessage());
@@ -299,30 +279,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
         return true;
     }
-
-	//Method to schedule a job to send an SMS reminder 24 hrs before the presentation
-	private void scheduleSMSReminder(Booking b) throws Exception {
-		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
-				.getServletContext()
-				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
-		Scheduler scheduler = factory.getScheduler();
-		
-		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
-				.usingJobData("bookingId", b.getId())
-				.withIdentity(b.getId().toString(),"SMS Reminders").build();
-		
-		//Calculating the time to trigger the job
-		Calendar scheduledTime = Calendar.getInstance();
-		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
-		scheduledTime.setTime(presentationStartTime);
-		scheduledTime.add(Calendar.DAY_OF_MONTH, -1); //Subtracting a day from the presentation start time
-//		scheduledTime.add(Calendar.SECOND, 10); //For testing
-		
-		Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(),"SMS Reminders")
-				.startAt(scheduledTime.getTime()).build();
-		
-		scheduler.scheduleJob(jd, tr);
-	}
 	
     public Long getTeamId() {
         return teamId;

@@ -5,15 +5,20 @@
     Description:
         Purpose of the stylesheet follows.
 */
+@font-face {
+	font-family: customFont;
+	font-weight: normal;
+	src: url('font/HelveticaNeueLight.ttf') format('truetype'), url('font/HelveticaNeueLight.woff') format('woff');
+}
 
 body {
     padding-top: 50px; /* 1px to make the container go all the way to the bottom of the topbar */
     padding-left: 10px;
-    font-family: 'Droid Sans', sans-serif !important;
+    font-family: customFont, 'Droid Sans', sans-serif !important;
     /*font: 0.7em/1.5em "Trebuchet MS",Verdana,sans-serif !important;*/
 }
 input, button, select, textarea {
-    font-family: 'Droid Sans', sans-serif !important;
+    font-family: customFont, 'Droid Sans', sans-serif !important;
 }
 
 .navbar .container {

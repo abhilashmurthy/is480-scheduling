@@ -38,7 +38,6 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 
     @Override
     public String execute() throws Exception {
-		//TODO EntityManager not being closed!
 		EntityManager em = null;
         try {
 			em = MiscUtil.getEntityManagerInstance();

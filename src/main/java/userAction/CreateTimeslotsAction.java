@@ -7,6 +7,7 @@ package userAction;
 import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Role;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static userAction.CreateScheduleAction.logger;
 import util.MiscUtil;
 
 /**
@@ -42,6 +44,15 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
         EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
+			
+			//Checking user role
+			Role activeRole = (Role) request.getSession().getAttribute("activeRole");
+			if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) {
+				logger.error("Unauthorized user");
+				json.put("message", "You do not have the permission to perform this function!");
+				json.put("success", false);
+				return SUCCESS;
+			}
 
             //Getting input data
             JSONObject scheduleData = new JSONObject(request.getParameter("jsonData"));
