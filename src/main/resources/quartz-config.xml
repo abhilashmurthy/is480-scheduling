@@ -25,6 +25,27 @@
             </cron>
         </trigger>
     </schedule>
+	
+    <schedule>
+        <job>
+            <name>BackupDatabaseJob</name>
+            <group>DatabaseJobs</group>
+            <description>This will backup the MYSQL is480-scheduling database</description>
+            <job-class>systemAction.quartz.BackupDatabaseJob</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>TriggerAt12AM</name>
+                <job-name>BackupDatabaseJob</job-name>
+                <job-group>DatabaseJobs</job-group>
+                <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
+                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
+                <!-- Testing: It will run every 10 minutes -->
+                <cron-expression>0 */10 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
     
     <schedule>
         <job>
