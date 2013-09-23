@@ -97,7 +97,8 @@ public class TestBackupDB {
 					.append(" --host=").append(host)
 					.append(" --port=").append(port)
 					.append(" --user=").append(user)
-					.append(" ").append(dbName);
+					.append(" ").append(dbName)
+					.append(" --hex-blob");
 
 			logger.debug("Command = " + command.toString());
 

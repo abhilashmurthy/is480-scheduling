@@ -113,7 +113,8 @@ public class BackupDatabaseJob implements Job {
 					.append(" --host=").append(host)
 					.append(" --port=").append(port)
 					.append(" --user=").append(user)
-					.append(" ").append(dbName);
+					.append(" ").append(dbName)
+					.append(" --hex-blob");
 
 			Runtime runtime = Runtime.getRuntime();
 			process = runtime.exec(command.toString());
