@@ -65,6 +65,7 @@
                 border-right: 5px solid transparent;
                 border-top: 10px solid #5C7AFF;
                 z-index: 1;
+				float: left;
             }
             .chosen {
                 background-color: #B8F79E !important ;
@@ -73,9 +74,28 @@
                 background-color: #F7A8A8 !important ;
             }
             
-            .teamExists {
+/*            .teamExists {
                 background-color: #F9FCBD !important;
-            }
+            }*/
+			
+			.chosen.teamExists {
+				background-color: #00C918 !important ;
+			}
+			
+			.unavailable.teamExists {
+				background-color: #F56753 !important ;
+			}
+			
+			.unavailable > .teamName {
+				color: white;
+				font-weight: bold;
+				font-size: 12px;
+			}
+			
+			.chosen > .teamName {
+				font-weight: bold;
+				font-size: 12px;
+			}
             
             .availabilityLegend {
                 position: absolute;
@@ -315,14 +335,12 @@
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                             if (timeslot) {
                                 if (timeslot.isMyTeam) {
-                                    td.html("<b>" + timeslot.team + "</b>");
-                                    td.attr("value", "timeslot_" + timeslot.id);
+                                    td.html("<span class='teamName'>" + timeslot.team + "</span>");
                                     td.attr("align", "center");
                                     td.addClass("teamExists");
-                                } else {
-                                    td.addClass("markable");
-                                    td.attr("value", "timeslot_" + timeslot.id);
                                 }
+								td.addClass("markable");
+								td.attr("value", "timeslot_" + timeslot.id);
                             }
                             tr.append(td);
                         }
@@ -349,7 +367,7 @@
                         //Checking if the cell clicked is the start of the chosen timeslot (Important!)
                         if ($(e).children().index(".start-marker") !== -1) {
                             $(e).removeClass("chosen");
-                            $(e).children().remove();
+                            $(e).children().remove(".start-marker");
                             for (i = 1; i < slotSize; i++) {
                                 var nextRow = $(tbody).children().get(row + i);
                                 var nextCell = $(nextRow).children().get(col);
@@ -372,7 +390,7 @@
                             $(e).addClass("unavailable");
                             var marker = document.createElement("div");
                             $(marker).addClass("start-marker");
-                            $(e).append(marker);
+                            $(e).prepend(marker);
                             for (i = 1; i < slotSize; i++) {
                                 var nextRow = $(tbody).children().get(row + i);
                                 var nextCell = $(nextRow).children().get(col);
@@ -384,7 +402,7 @@
                         //Section for a cell thats available
                         if ($(e).children().index(".start-marker") !== -1) {
                             $(e).removeClass("unavailable");
-                            $(e).children().remove();
+                            $(e).children().remove(".start-marker");
                             for (i = 1; i < slotSize; i++) {
                                 var nextRow = $(tbody).children().get(row + i);
                                 var nextCell = $(nextRow).children().get(col);
@@ -408,7 +426,7 @@
                             $(e).addClass("chosen");
                             var marker = document.createElement("div");
                             $(marker).addClass("start-marker");
-                            $(e).append(marker);
+                            $(e).prepend(marker);
                             for (i = 1; i < slotSize; i++) {
                                 var nextRow = $(tbody).children().get(row + i);
                                 var nextCell = $(nextRow).children().get(col);
