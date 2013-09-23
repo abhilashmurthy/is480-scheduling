@@ -278,6 +278,10 @@ public class DeploymentDB {
 
         User uCourseCoordinator = new User("benjamingan", "Benjamin GAN Kok Siew", null, Role.COURSE_COORDINATOR, null);
         
+        TA ta1 = new TA("justin.lim.2010", "Justin LIM Ding Yang", null, term12013);
+        
+        TA ta2 = new TA("kxleong.2010", "Michelle LEONG Kai Xin", null, term12013);
+                
         Faculty u1 = new Faculty ("alanmegargel", "Alan MEGARGEL", null, term12013);
         
         Faculty u2 = new Faculty ("benjamingan", "Benjamin GAN Kok Siew", null, term12013);
@@ -615,6 +619,8 @@ public class DeploymentDB {
         // Persistence
         em.persist(uAdmin);
         em.persist(uCourseCoordinator);
+        em.persist(ta1);
+        em.persist(ta2);
         em.persist(u1);
         em.persist(u2);
         em.persist(u3);
