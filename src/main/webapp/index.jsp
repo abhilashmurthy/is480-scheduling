@@ -1304,7 +1304,7 @@
                     stopDate = Date.parse(stopDate);
 					var diffLong = Math.abs(stopDate.getTime() - startDate.getTime());
 					var diffDays = Math.ceil(diffLong / (1000 * 3600 * 24));
-					maxWeekView = Math.ceil(diffDays/7);
+					maxWeekView = diffDays%7 === 0?(diffDays/7) + 1:Math.ceil(diffDays/7);
                     if (weekNum !== null) {
                         startDate.addWeeks(weekNum);
                         stopDate = startDate.clone().addWeeks(1).addDays(-1);
