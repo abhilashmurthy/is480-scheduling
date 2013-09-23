@@ -141,14 +141,17 @@
                                 <table class='availabilityLegend'>
                                     <tr>
                                         <!-- <td style="width:50px"><b>Legend:</b></td>-->
-                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Available</td> 
+                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available</td> 
                                         <!--<td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Unavailable</td>--> 
                                     </tr>
-                                    <tr>
-                                        <td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Unavailable</td> 
+									<tr>
+                                        <td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available & there's a team</td> 
                                     </tr>
                                     <tr>
-                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Oh dear, there's a team</td> 
+                                        <td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm unavailable</td> 
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color:#F56753;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Oh dear, I'm unavailable & there's a team!</td> 
                                     </tr>
                                 </table>
                             </td>
