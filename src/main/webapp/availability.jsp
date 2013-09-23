@@ -440,7 +440,7 @@
                 }
 
                 $('body').on('click', 'td.chosen , td.unavailable', function(e){
-                    triggerTimeslot(e.target, scheduleData.duration);
+                    triggerTimeslot(this, scheduleData.duration);
                 });
 
                 function populateTimeslotsTable(tableId, scheduleData) {
