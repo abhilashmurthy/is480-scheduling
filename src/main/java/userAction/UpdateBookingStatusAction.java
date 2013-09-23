@@ -32,8 +32,16 @@ import notification.email.RejectedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONObject;
 import org.hibernate.Hibernate;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.ee.servlet.QuartzInitializerListener;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import systemAction.quartz.SMSReminderJob;
 import util.MiscUtil;
 
 /**
@@ -143,10 +151,11 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
+					scheduleSMSReminder(booking); //Scheduling SMS reminders to be sent exactly 24 hrs before the booking
 				}
                                 
-                                booking.setLastEditedBy(user.getFullName());
-                                booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+				booking.setLastEditedBy(user.getFullName());
+				booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			
 				//Updating the time slot 
 				EntityTransaction transaction = em.getTransaction();
@@ -186,6 +195,30 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 		}
 		return SUCCESS;
     }
+	
+	//Method to schedule a job to send an SMS reminder 24 hrs before the presentation
+	private void scheduleSMSReminder(Booking b) throws Exception {
+		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
+				.getServletContext()
+				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
+		Scheduler scheduler = factory.getScheduler();
+		
+		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
+				.usingJobData("bookingId", b.getId())
+				.withIdentity(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS).build();
+		
+		//Calculating the time to trigger the job
+		Calendar scheduledTime = Calendar.getInstance();
+		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
+		scheduledTime.setTime(presentationStartTime);
+		scheduledTime.add(Calendar.DAY_OF_MONTH, -1); //Subtracting a day from the presentation start time
+//		scheduledTime.add(Calendar.SECOND, 30); //For testing
+		
+		Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS)
+				.startAt(scheduledTime.getTime()).build();
+		
+		scheduler.scheduleJob(jd, tr);
+	}
 
     //Getters and Setters
     public void setServletRequest(HttpServletRequest hsr) {

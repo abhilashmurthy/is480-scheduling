@@ -26,6 +26,11 @@ import model.User;
 import notification.email.DeletedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.hibernate.Hibernate;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.ee.servlet.QuartzInitializerListener;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -75,12 +80,15 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 				//Forcing initialization for sending email
 				Hibernate.initialize(b.getTeam().getMembers());
 				Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
+				
+				deleteSMSReminder(b);
+
 				//Sending email
 				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(b, (User)request.getSession().getAttribute("user"));
 				deletedEmail.sendEmail();
-
+				
                 //if the booking has been removed successfully
-                json.put("message", "Booking deleted successfully! Deletion email has been sent to all attendees. (Coming soon..)");
+                json.put("message", "Booking deleted successfully! All attendees have been notified via email.");
 
             } catch (Exception e) {
                 logger.error("Exception caught: " + e.getMessage());
@@ -110,6 +118,18 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 		}
         return SUCCESS;
     }
+	
+	//Deleting the scheduled job to send SMS reminders
+	private void deleteSMSReminder(Booking b) throws Exception {
+		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
+				.getServletContext()
+				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
+		Scheduler scheduler = factory.getScheduler();
+		
+		boolean deleted = scheduler.deleteJob(new JobKey(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS));
+		
+		logger.info("SMS Reminder Job Deleted = " + deleted);
+	}
 
     public HttpServletRequest getRequest() {
         return request;

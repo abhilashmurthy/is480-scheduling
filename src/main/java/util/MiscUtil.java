@@ -26,6 +26,11 @@ public class MiscUtil {
 	public static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("scheduler");
 	
 	/**
+	 * 
+	 */
+	public static final String SMS_REMINDER_JOBS = "SMS Reminders";
+	
+	/**
 	 * Boolean variable to check if the system is currently running in development mode
 	 */
 	public static final boolean DEV_MODE = Boolean.parseBoolean(getProperty("General", "DEV_MODE"));
