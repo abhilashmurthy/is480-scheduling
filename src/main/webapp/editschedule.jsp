@@ -186,8 +186,7 @@
         %>
 
         <!-- Edit Schedule Container -->
-        <div id="editSchedulePage" class="container">
-            
+        <div id="editSchedulePage" class="container">            
             <div class="editScheduleTabList tabbable tabs-left">
                 <ul class="scheduleLeftNav nav nav-tabs">
                     <li class="emptyHiddenTab">
@@ -200,16 +199,23 @@
                         <a href="#editTimeslotsTab" data-toggle="tab">Edit Timeslots</a>
                     </li>
                 </ul>
-                <div class="tab-content">
+                <div class="tab-content editScheduleTabContent">
                     <div class="tab-pane active" id="editScheduleTab">
                         <!-- Edit Term -->
-						<form id="editScheduleForm">
+						<form id="editScheduleForm" method="POST">
 							<div id="editTermPanel" class="schedulePanel">
 								<h3 id="editScheduleTitle">Edit Schedule</h3>
 								<table id="editTermTable">
 									<tr>
-										<td class="formLabelTd">Year</td>
-										<td><input id="yearInput" type="text" name="year"/></td>
+									<td class="formLabelTd">Select Term</td>
+									<td>
+										<select name="termId" onchange="this.form.submit()">
+											<option value="" selected><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
+											<s:iterator value="termData">
+												<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
+											</s:iterator>
+										</select>
+									</td>
 									</tr>
 									<tr>
 										<td class="formLabelTd">Semester Name</td>
@@ -240,9 +246,8 @@
                             <h4 id="timeslotResultMessage"></h4>
                         </div>
                     </div>
-                </div>
+                </div>				
             </div>
-
         </div>
         <%@include file="footer.jsp" %>
 		<script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
@@ -290,7 +295,7 @@
 									.addClass('datepicker')
 									.multiDatesPicker({
 										dateFormat: "yy-mm-dd",
-										defaultDate: dates[0],
+										defaultDate: dates.length > 0?dates[0]:Date.today(),
 										minDate: Date.today(),
 										beforeShowDay: $.datepicker.noWeekends,
 										onSelect: function(date) {
@@ -299,7 +304,7 @@
 											updatePillbox();
 										}
 									})
-									.multiDatesPicker('addDates', dates)
+									.multiDatesPicker(dates.length > 0?'addDates':'resetDates', dates.length > 0?dates:'picked')
 									.datepicker('refresh')
 							);
 						var milestonePillboxTd = $(document.createElement('td'))
