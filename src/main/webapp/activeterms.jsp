@@ -171,6 +171,7 @@
 //						$("#responseMessage").text("Oops. Something went wrong. Please try again!");
 						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
 					});
+					return false;
 				});
 				
 				//Generate array of active term IDs

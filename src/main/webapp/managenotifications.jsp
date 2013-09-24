@@ -105,7 +105,7 @@
 
 			</s:iterator>
 				
-				<button type="button" id="saveButton" class="btn btn-primary" style="width:80px; height:30px;" id="save" onclick="edited();">
+				<button type="button" id="saveButton" class="btn btn-primary" style="width:80px; height:30px;">
 					<strong>Save</strong>
 				</button>
 			
@@ -184,7 +184,9 @@
 						
 					}
 					
-					function edited(){
+					$("#saveButton").on('click', function(e){
+						e.preventDefault();
+						e.stopPropagation();
 						var values = $('input:checked').map(function() {
 							return this.value;
 						}).get();
@@ -248,20 +250,21 @@
 						   //$("#addRowBtn").button('reset');
 						   showNotification("WARNING", "Oops.. something went wrong");
 						});
-
-					}
+						
+						return false;
+					});
 					
 					//Notification-------------
 					function showNotification(action, notificationMessage) {
 						var opts = {
 							title: "Note",
 							text: notificationMessage,
-							type: "action",
+							type: "warning",
 							icon: false,
 							sticker: false,
 							mouse_reset: false,
 							animation: "fade",
-							animate_speed: "medium",
+							animate_speed: "fast",
 							before_open: function(pnotify) {
 								pnotify.css({
 								   top: "52px",

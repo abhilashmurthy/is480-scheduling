@@ -137,7 +137,7 @@ input, button, select, textarea {
 }
 
 .popover {
-/*    width: 100%;*/
+	/*    width: 100%;*/
     max-width: 400px !important;
     font-weight: normal;
     z-index: 1031 !important;
@@ -150,7 +150,7 @@ input, button, select, textarea {
 .token-input-token-facebook, .token-input-list, .token-input-list-facebook, .token-input-dropdown-facebook, #token-input-, #createTeamSelect {
     max-width: 200px !important;
     z-index: 1032 !important;
-    
+
     /* Bootstrap stuff */
     background-color: #ffffff;
     border: 1px solid #cccccc;
@@ -181,7 +181,10 @@ input, button, select, textarea {
 .bookedTimeslot:hover, .unbookedTimeslot:hover {
     box-sizing: border-box;
     border: 2px solid darkblue;
-    cursor: pointer !important;
+}
+
+.timeslotCell {
+	cursor: pointer !important;
 }
 
 .noTimeslot {
@@ -191,51 +194,51 @@ input, button, select, textarea {
 
 .unbookedTimeslot {
     /*box-sizing: border-box;*/
-/*    background-color: #AEC7C9 !important; 
-    border: 1px solid #dddddd;*/
+	/*    background-color: #AEC7C9 !important; 
+		border: 1px solid #dddddd;*/
 }
 
 .unavailableTimeslot {
-/*    background-size: 50px 50px;
-    background-color: #ac0;
-    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-                      transparent 50%, rgba(255, 255, 255, .6) 2%, rgba(255, 255, 255, .6) 75%,
-                      transparent 0%);
-    background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-                      transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
-                      transparent 75%, transparent);
-    background-image: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-                      transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
-                      transparent 75%, transparent);
-    -pie-background: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-                     transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
-                     transparent 75%, transparent) 0 0 / 50px 50px #ac0;*/
+	/*    background-size: 50px 50px;
+		background-color: #ac0;
+		background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						  transparent 50%, rgba(255, 255, 255, .6) 2%, rgba(255, 255, 255, .6) 75%,
+						  transparent 0%);
+		background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						  transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+						  transparent 75%, transparent);
+		background-image: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						  transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+						  transparent 75%, transparent);
+		-pie-background: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						 transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+						 transparent 75%, transparent) 0 0 / 50px 50px #ac0;*/
     /*background-color: #269;*/
     background-size: 100px 100px, 100px 100px, 2px 2px, 2px 2px;
     background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
     background-image: -webkit-linear-gradient(white 2px, transparent 2px),
-                      -webkit-linear-gradient(0, white 2px, transparent 2px),
-                      -webkit-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
-                      -webkit-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
+		-webkit-linear-gradient(0, white 2px, transparent 2px),
+		-webkit-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
+		-webkit-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
     background-image: -moz-linear-gradient(white 2px, transparent 2px),
-                      -moz-linear-gradient(0, white 2px, transparent 2px),
-                      -moz-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
-                      -moz-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
+		-moz-linear-gradient(0, white 2px, transparent 2px),
+		-moz-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
+		-moz-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
     background-image: linear-gradient(white 2px, transparent 2px),
-                      linear-gradient(90deg, white 2px, transparent 2px),
-                      linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px);
+		linear-gradient(90deg, white 2px, transparent 2px),
+		linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px);
     -pie-background: linear-gradient(white 2px, transparent 2px) -2px -2px / 100px,
-                     linear-gradient(90deg, white 2px, transparent 2px) -2px -2px / 100px,
-                     linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
-                     linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
-                     #269;
+		linear-gradient(90deg, white 2px, transparent 2px) -2px -2px / 100px,
+		linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
+		linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
+		#269;
 }
 
 .bookedTimeslot {
-/*    box-sizing: border-box;
-    background-color: #AEC7C9 !important; 
-    border: 1px solid #dddddd;*/
+	/*    box-sizing: border-box;
+		background-color: #AEC7C9 !important; 
+		border: 1px solid #dddddd;*/
     text-align: center;
     vertical-align: middle;
     font-size: 14px;
@@ -306,9 +309,14 @@ input, button, select, textarea {
     clear: both;
 }
 
+.legend td {
+	height: 20px;
+}
+
 .legendBox {
-    height: 20px;
+    line-height: 20px;
     max-height: 20px;
+	width: 10px;
 }
 
 .scheduleContainer {
@@ -405,14 +413,14 @@ input, button, select, textarea {
 /* COLORS FOR NAVBAR ITEMS */
 .navbar-title {
 	color: white !important;
-/*	border: 2px solid black !important;
-	border-radius: 5px;
-	box-sizing: border-box;*/
+	/*	border: 2px solid black !important;
+		border-radius: 5px;
+		box-sizing: border-box;*/
 }
 
 .navbar-title:hover {
-/*	border-radius: 5px;
-	box-sizing: border-box;*/
+	/*	border-radius: 5px;
+		box-sizing: border-box;*/
 	color: gainsboro !important;
 }
 
@@ -425,4 +433,25 @@ input, button, select, textarea {
     left:40%;
     top:9%;
     margin: auto !important;
+}
+
+.teamExists {
+	background-color: #faf4a8 !important ;
+}
+
+.timeslotsTable th {
+	font-size: 14px;
+	font-weight: normal;
+}
+
+.timeslotsLegend {
+	float: right;
+	overflow: auto;
+	line-height: 10px;
+	margin-left: 50px;
+}
+
+.timeslotsLegend td.legendBox {
+	border: 1px solid black;
+	max-width: 20px;
 }

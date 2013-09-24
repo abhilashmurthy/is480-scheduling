@@ -1,6 +1,6 @@
 <%-- 
     Document   : AcceptReject
-    Editd on : Jul 2, 2013, 11:14:06 PM
+    Updated on : Jul 2, 2013, 11:14:06 PM
     Author     : Prakhar
 --%>
 
@@ -236,7 +236,7 @@
                     <div class="tab-pane" id="editTimeslotsTab">
                         <!-- Edit Timeslots -->
                         <div id="editTimeslotsPanel" class="schedulePanel">
-                            <h3 id="editTimeslotsTitle">Edit Timeslots</h3>
+                            <h3 id="editTimeslotsTitle">Edit Timeslots</h3>		
 								<table id="editTimeslotsTable">
 									<tr>
 										<td class="formLabelTd">Select Term</td>
@@ -250,10 +250,20 @@
 										</td>
 									</tr>
 									<tr><td class="formLabelTd">Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td></tr>
-									<tr><td class="formLabelTd">Venue</td><td><input id="venueInput" type="text" name="venue" placeholder="SIS Seminar Room 2-1"/><button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Edit</button></td></tr>
+									<tr><td class="formLabelTd">Venue</td>
+										<td>
+											<input id="venueInput" type="text" name="venue" placeholder="SIS Seminar Room 2-1"/>
+											<button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Edit</button>
+											<table class='timeslotsLegend'>
+												<tr>
+													<td class='legendBox' style="background-color:#B8F79E;"><div class='start-marker'></div></td><td>Available</td>
+													<td class='legendBox' style="background-color:#faf4a8;"></td><td>Team Booking</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
 									<tr><td></td><td><table class="timeslotsTable table-condensed table-hover table-bordered table-striped"></table></td></tr>
-								</table>
-                            <h4 id="timeslotResultMessage"></h4>
+								</table>	
                         </div>
                     </div>
                 </div>				
@@ -531,7 +541,7 @@
 								$("#editScheduleSubmitBtn").button('reset');
 								return false;
 							}
-							schedule["dates"] = dates;
+							schedule["dates[]"] = dates;
                             if (milestoneItem.name.split("DayStartTime")[0].toLowerCase() === schedule.milestoneName.toLowerCase()) {
                                 if (milestoneItem.value.length < 1) {
                                     showNotification("WARNING", "Please select valid times for milestone: " + schedule.milestoneName);
@@ -574,27 +584,24 @@
 					};
 					
 					console.log("editScheduleData is: " + JSON.stringify(editScheduleData));
-//                    $.ajax({
-//                        type: 'POST',
-//                        url: 'editScheduleJson',
-//                        data: {jsonData: JSON.stringify(editScheduleData)},
-//                        dataType: 'json'
-//                    }).done(function(response) {
-//                        if (response.success) {
-//                            console.log("Received: " + JSON.stringify(response));
-//                            schedules = response.schedules;
-//                            showNotification("SUCCESS", "Editd dates successfully");
-//							disableScheduleControls();
-//                            setTimeout(function(){displayEditTimeslots();}, 1000);
-//                        } else {
-//							showNotification("WARNING", response.message);
-//							$("#editScheduleSubmitBtn").button('reset');
-//                        }
-//                    }).fail(function(error) {
-//                        console.log("editScheduleData AJAX FAIL");
-//						var eid = btoa("Erro in EditScheduleAction: Escalate to developers!");
-//						window.location = "error.jsp?eid=" + eid;
-//                    });
+                    $.ajax({
+                        type: 'POST',
+                        url: 'updateScheduleJson',
+                        data: {jsonData: JSON.stringify(editScheduleData)},
+                        dataType: 'json'
+                    }).done(function(response) {
+                        if (response.success) {
+                            schedules = response.schedules;
+                            showNotification("SUCCESS", "Edited dates successfully");
+                        } else {
+							showNotification("WARNING", response.message);
+							$("#editScheduleSubmitBtn").button('reset');
+                        }
+                    }).fail(function(error) {
+                        console.log("editScheduleData AJAX FAIL");
+						var eid = btoa("Erro in EditScheduleAction: Escalate to developers!");
+						window.location = "error.jsp?eid=" + eid;
+                    });
 					$("#editScheduleSubmitBtn").button('reset');
                     return false;
                 });
@@ -618,8 +625,34 @@
 				function resetTimeslots(milestone, year, semester) {
 					$(".timeslotsTable").empty();
 					selectedSchedule = getScheduleData(milestone, year, semester);
-					makeTimeslotTable("timeslotsTable", selectedSchedule.timeslots, selectedSchedule.dayStartTime, selectedSchedule.dayEndTime);
+					makeTimeslotTable("timeslotsTable", selectedSchedule.timeslots, selectedSchedule.startDate, selectedSchedule.endDate, selectedSchedule.dayStartTime, selectedSchedule.dayEndTime);
 					populateTimeslotsTable(selectedSchedule.timeslots, selectedSchedule.duration);
+					//Set venue to the venue present in the largest number of timeslots
+					var venuesSet = new HashSet();
+					for (var i = 0; i < selectedSchedule.timeslots.length; i++) {
+						venuesSet.add(selectedSchedule.timeslots[i].venue);
+					}
+					var venueCount = {};
+					for (var i = 0; i < venuesSet.values().length; i++) {
+						venueCount[venuesSet.values()[i]] = 0;
+					}
+					for (var i = 0; i < selectedSchedule.timeslots.length; i++) {
+						venueCount[selectedSchedule.timeslots[i].venue] = ++venueCount[selectedSchedule.timeslots[i].venue];
+					}
+					var maxVenue = function(){
+						var max = 0;
+						var venue = null;
+						for (var key in venueCount) {
+							if (venueCount.hasOwnProperty(key)) {
+								if (venueCount[key] > max) {
+									max = venueCount[key];
+									venue = key;
+								}
+							}
+						}
+						return venue;
+					};
+					$("#venueInput").val(maxVenue).change();
 				}
 
 				$("#editTimeslotsTermId").on('change', function(e){
@@ -640,7 +673,7 @@
                     return false; 
                 });
                 
-                //Submit to server
+                //Submit Update Timeslots
                 $("#editTimeslotsSubmitBtn").on('click', function() {
                     $("#editTimeslotsSubmitBtn").button('loading');
                     var timeslotsData = {};
@@ -650,69 +683,73 @@
                         var obj = inputData[i];
                         timeslots_array.push($(obj).parent().attr("value"));
                     }
-                    timeslotsData["scheduleId"] = selectedSchedule.scheduleId;
+                    timeslotsData["scheduleId"] = selectedSchedule.id;
                     timeslotsData["timeslots"] = timeslots_array;
-					selectedSchedule["timeslots"] = timeslots_array;
                     timeslotsData["venue"] = $("#venueInput").val();
                     console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
-                    $.ajax({
-                        type: 'POST',
-                        url: 'editTimeslotsJson',
-                        data: {jsonData: JSON.stringify(timeslotsData)},
-                        dataType: 'json'
-                    }).done(function(response) {
-                        if (response.success) {
-                            console.log("editTimeslotsJson was successful");
-							//Set isEditd to true
-                            selectedSchedule["isEditd"] = true;
-							var totalEditd = 0;
-							for (var i = 0; i < schedules.length; i++) {
-								if (schedules[i].isEditd) ++totalEditd;
-							}
-							$("#timeslotsProgressBar").children(".bar").css('width', ((totalEditd/schedules.length) * 100) + '%');
-							if ((totalEditd/schedules.length) === 1) {
-								//Go to manage active terms page
-								showNotification("WARNING", "Schedule ready now");
-								setTimeout(function(){window.location = "index";}, 2000);
-							} else {
-								//Select next milestone
-								showNotification("SUCCESS", response.message);
-								var nextOrder = null;
-								for (var i = 0; i < milestones.length; i++) {
-									if (milestones[i].name === selectedSchedule.milestoneName) {
-										 nextOrder = milestones[i].order + 1;
-										 break;
-									}
-								}
-								for (var i = 0; i < milestones.length; i++) {
-									if (milestones[i].order === nextOrder) {
-										 $("#milestoneTimeslotsSelect").val(milestones[i].name).change(); //Select next milestone
-										 break;
-									}
-								}
-							}
-                        } else {
-                            var eid = btoa(response.message);
-                            console.log(response.message);
-                            window.location = "error.jsp?eid=" + eid;
-                        }
-                    }).fail(function(error) {
-                        console.log("editTimeslotsJson AJAX FAIL");
-                        showNotification("ERROR", "Oops.. something went wrong");
-                    });
+//                    $.ajax({
+//                        type: 'POST',
+//                        url: 'editTimeslotsJson',
+//                        data: {jsonData: JSON.stringify(timeslotsData)},
+//                        dataType: 'json'
+//                    }).done(function(response) {
+//                        if (response.success) {
+//                            console.log("editTimeslotsJson was successful");
+//							//Set isUpdated to true
+//                            selectedSchedule["isUpdated"] = true;
+//							var totalUpdated = 0;
+//							for (var i = 0; i < schedules.length; i++) {
+//								if (schedules[i].isUpdated) ++totalUpdated;
+//							}
+//							$("#timeslotsProgressBar").children(".bar").css('width', ((totalUpdated/schedules.length) * 100) + '%');
+//							if ((totalUpdated/schedules.length) === 1) {
+//								//Go to manage active terms page
+//								showNotification("WARNING", "Schedule ready now");
+//								setTimeout(function(){window.location = "index";}, 2000);
+//							} else {
+//								//Select next milestone
+//								showNotification("SUCCESS", response.message);
+//								var nextOrder = null;
+//								for (var i = 0; i < milestones.length; i++) {
+//									if (milestones[i].name === selectedSchedule.milestoneName) {
+//										 nextOrder = milestones[i].order + 1;
+//										 break;
+//									}
+//								}
+//								for (var i = 0; i < milestones.length; i++) {
+//									if (milestones[i].order === nextOrder) {
+//										 $("#milestoneTimeslotsSelect").val(milestones[i].name).change(); //Select next milestone
+//										 break;
+//									}
+//								}
+//							}
+//                        } else {
+//                            var eid = btoa(response.message);
+//                            console.log(response.message);
+//                            window.location = "error.jsp?eid=" + eid;
+//                        }
+//                    }).fail(function(error) {
+//                        console.log("editTimeslotsJson AJAX FAIL");
+//                        showNotification("ERROR", "Oops.. something went wrong");
+//                    });
+					$("#editTimeslotsSubmitBtn").button('reset');
                     return false;
                 });
                 
                 
-                function makeTimeslotTable(tableClass, timeslots, dayStart, dayEnd) {
+                function makeTimeslotTable(tableClass, timeslots, startDate, endDate, dayStart, dayEnd) {
                     var thead = $(document.createElement("thead"));
+					var dateArray = null;
 					
-					//Get dates from timeslots
+					//Get dates from timeslots -- This won't work because new timeslots are being added
 					var datesHashSet = new HashSet();
 					for (var i = 0; i < timeslots.length; i++) {
 						datesHashSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
 					}
-					var dateArray = datesHashSet.values().sort();
+//					dateArray = datesHashSet.values().sort();
+					
+					//Get dates from startdate and enddate
+					dateArray = getDateArrayBetween(startDate, endDate);
 
                     //Creating table header with dates
                     thead.append("<th></th>"); //Empty cell for time column
@@ -761,12 +798,13 @@
                 }
                 
                 $('body').on('click', '.timeslotcell', function(e) {
-					if (selectedSchedule.isEditd) return false; //If editd already, disable timeslot selection
+					if ($(this).is('.teamExists')) return false;
                     console.log("clicked timeslotcell");
                     triggerTimeslot(this, selectedSchedule.duration);
                     return false;
                 });
                 
+				
                 /*
                  * METHOD TO CHOOSE TIMESLOTS ON THE EDITD TABLE
                  */
@@ -818,16 +856,28 @@
 
                 function populateTimeslotsTable(timeslots, duration) {
                     $(".timeslotcell").each(function() {
+						var $this = $(this);
 						if (timeslots) {
-							//If schedule is editd already, populate only selected timeslots
+							//populate only selected timeslots
 							for (var i = 0; i < timeslots.length; i++) {
-								if ($(this).attr('value') === timeslots[i].datetime) {
-									triggerTimeslot(this, duration);
+								if ($this.attr('value') === timeslots[i].datetime) {
+									if (timeslots[i].team) {
+										//If team exists, don't clickable
+										var slotSize = selectedSchedule.duration / 30;
+										$this.css('text-align', 'center').html('Booking');
+										var $nextTr = $this.closest('tr');
+										for (var k = 0; k < slotSize; k++) {
+											$nextTr.children().eq($this.index()).addClass('teamExists');
+											var $nextTr = $nextTr.next();
+										}
+									} else {
+										triggerTimeslot(this, duration);
+									}
 									break;
 								}
 							}
 						} else {
-							//If schedule not yet editd, populate all timeslots
+							//If schedule not yet edited, populate all timeslots
 							triggerTimeslot(this, duration);
 						}
                     });
@@ -863,6 +913,19 @@
                     return toReturn;
                 }
 				
+                //Get dates between startDate and stopDate
+                function getDateArrayBetween(startDate, stopDate) {
+                    var dateArray = new Array();
+                    startDate = Date.parse(startDate);
+                    stopDate = Date.parse(stopDate);
+                    var currentDate = startDate;
+                    while (currentDate <= stopDate) {
+                        dateArray.push(currentDate);
+                        currentDate = new Date(currentDate).addDays(1);
+                    }
+                    return dateArray;
+                }
+				
 				/**********************/
 				/*   NOTIFICATIONS    */
 				/**********************/
@@ -891,7 +954,7 @@
 							break;
 						case "SUCCESS":
 						   opts.type = "success";
-						   opts.title = "Editd";
+						   opts.title = "Updated";
 						   break;
 						case "ERROR":
 						   opts.type = "error";

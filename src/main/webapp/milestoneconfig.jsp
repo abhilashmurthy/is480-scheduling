@@ -105,7 +105,7 @@
                 <table>
                     <tr>
                         <td>
-                            <button type="button" id="saveButton" class="btn btn-primary" style="width:80px; height:30px;" id="save<%=counter%>" onclick="edited();">
+                            <button type="button" id="saveButton" class="btn btn-primary" style="width:80px; height:30px;" id="save<%=counter%>">
                                 <strong>Save</strong>
                             </button>
                         </td>
@@ -185,8 +185,8 @@
                 var idToPass = "#id" + number;
                 $(idToPass).remove();
             }
-
-            function edited() {
+			
+			$("#saveButton").on('click', function(){
                 //get total length (here length is +1)
                 //var count2 = $('#milestoneConfigTable :last td');
                 var rows = document.getElementsByTagName("table")[0].rows;
@@ -301,7 +301,7 @@
 					showNotification("WARNING", "Oops.. something went wrong");
                  });
 				 return false;
-            }
+			});
 
 			function timedRefresh(timeoutPeriod) {
 				setTimeout("location.reload(true);", timeoutPeriod);
