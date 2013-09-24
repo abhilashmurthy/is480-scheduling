@@ -6,9 +6,15 @@
         Purpose of the stylesheet follows.
 */
 @font-face {
-	font-family: customFont;
+	font-family: customFontLight;
 	font-weight: normal;
 	src: url('font/HelveticaNeueLight.ttf') format('truetype'), url('font/HelveticaNeueLight.woff') format('woff');
+}
+
+@font-face {
+	font-family: customFont;
+	font-weight: normal;
+	src: url('font/HelveticaNeue.ttf') format('truetype'), url('font/HelveticaNeue.woff') format('woff');
 }
 
 body {
