@@ -747,7 +747,6 @@
 						datesHashSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
 					}
 //					dateArray = datesHashSet.values().sort();
-					
 					//Get dates from startdate and enddate
 					dateArray = getDateArrayBetween(startDate, endDate);
 
