@@ -385,7 +385,7 @@
 								$(document.createElement('div'))
 									.attr('name', milestone.name.toLowerCase() + "Dates")
 									.attr('id', "milestone_" + milestone.name.toLowerCase())
-									.attr('class', "milestoneOrder_" + milestone.order)
+									.attr('class', "milestoneOrder_" + milestone.milestoneOrder)
 									.addClass('datepicker')
 									.multiDatesPicker({
 										dateFormat: "yy-mm-dd",

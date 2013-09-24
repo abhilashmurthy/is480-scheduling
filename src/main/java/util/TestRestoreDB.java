@@ -64,7 +64,7 @@ public class TestRestoreDB {
 			Calendar cal = Calendar.getInstance();
 			Timestamp now = new Timestamp(cal.getTimeInMillis());
 			
-			String[] executeCmd = new String[]{mySQLDir + "mysql", "--user=" + user, dbName,"-e", "source "+restorePath+"is480Scheduling_20130923_215045.sql"};
+			String[] executeCmd = new String[]{mySQLDir + "mysql", "--user=" + user, dbName,"-e", "source "+restorePath+"is480Scheduling_20130924_150000.sql"};
 
 			Runtime runtime = Runtime.getRuntime();
 			p = runtime.exec(executeCmd);

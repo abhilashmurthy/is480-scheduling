@@ -61,7 +61,7 @@ public class PrepareCreateScheduleAction extends ActionSupport implements Servle
 				}
 				milestoneInfo.put("name", name);
 				milestoneInfo.put("duration", duration);
-				milestoneInfo.put("order", order);
+				milestoneInfo.put("milestoneOrder", order);
 				milestoneInfo.put("attendees", requiredAttendees);
 				milestoneList.add(milestoneInfo);
 			}
