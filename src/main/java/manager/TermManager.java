@@ -76,7 +76,6 @@ public class TermManager {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Database Operation Error");
-            em.getTransaction().rollback();
         }
         return result;
     }
