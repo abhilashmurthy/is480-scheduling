@@ -73,10 +73,6 @@
             <result name="success">/schedule.jsp</result>
         </action>
 		
-        <action name="createSchedule" class="userAction.CreateScheduleAction" method="execute">
-            <result name="success">/scheduleconfirmation.jsp</result>
-        </action>
-		
         <action name="bookingHistory" class="userAction.BookingHistoryAction" method="execute">
             <result name="success">/bookinghistory.jsp</result>
         </action>
@@ -107,6 +103,10 @@
 		
 		<action name="createSchedule" class="systemAction.PrepareCreateScheduleAction" method="execute">
             <result name="success">/createschedule.jsp</result>
+        </action>
+		
+		<action name="editSchedule" class="systemAction.PrepareEditScheduleAction" method="execute">
+            <result name="success">/editschedule.jsp</result>
         </action>
 				
     </package>

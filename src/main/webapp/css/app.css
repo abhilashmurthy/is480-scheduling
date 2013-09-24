@@ -327,9 +327,13 @@ input, button, select, textarea {
 .activeTerms {
     float: right;
     margin-top: -45px;
-/*	position: absolute;
-	left:71%;
-	top:10%;*/
+}
+
+.editScheduleActiveTerms {
+	position: relative;
+	margin-top: 20px;
+	z-index: 10;
+	float: right;
 }
 
 

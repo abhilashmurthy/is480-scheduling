@@ -16,6 +16,7 @@ import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
+import manager.SettingsManager;
 import manager.TimeslotManager;
 import model.Milestone;
 import model.Schedule;
@@ -37,6 +38,8 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
 	//Struts variables
 	String scheduleJson;
 	String termNameJson;
+	private long termId;
+	private ArrayList<HashMap<String, String>> termData = new ArrayList<HashMap<String, String>>();
 
     @Override
     public String execute() throws Exception {
@@ -44,7 +47,23 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
 		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         try {
             em = MiscUtil.getEntityManagerInstance();
+			ArrayList<Term> allActiveTerms = SettingsManager.getActiveTerms(em);
 			Term activeTerm = (Term) request.getSession().getAttribute("currentActiveTerm");
+			
+			//Changing active term
+			for (Term term : allActiveTerms) {
+				if (termId != 0 && termId == term.getId()) {
+					request.getSession().setAttribute("currentActiveTerm", term);
+					activeTerm = term;
+					continue;
+				}
+				if (activeTerm.equals(term)) continue;
+				HashMap<String, String> map = new HashMap<String, String>();
+				long idOfTerm = term.getId();
+				map.put("termName", term.getDisplayName());
+				map.put("termId", String.valueOf(idOfTerm));
+				termData.add(map);
+			}
 			
 			//Get milestones and schedules
 			List<Milestone> milestones = MilestoneManager.findByTerm(em, activeTerm);
@@ -107,6 +126,22 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
 
 	public void setTermNameJson(String termNameJson) {
 		this.termNameJson = termNameJson;
+	}
+	
+	public long getTermId() {
+		return termId;
+	}
+
+	public void setTermId(long termId) {
+		this.termId = termId;
+	}
+
+	public ArrayList<HashMap<String, String>> getTermData() {
+		return termData;
+	}
+
+	public void setTermData(ArrayList<HashMap<String, String>> termData) {
+		this.termData = termData;
 	}
 
     public void setServletRequest(HttpServletRequest hsr) {
