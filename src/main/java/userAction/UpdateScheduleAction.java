@@ -11,12 +11,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
+import manager.TimeslotManager;
 import model.Schedule;
 import model.Term;
 import model.Timeslot;
@@ -83,7 +85,6 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 					return SUCCESS;
 				}
 				
-//				LinkedHashSet<String> existingDates = TimeslotManager.getUniqueDatesForSchedule(em, updatedSch);
 				LinkedHashSet<String> newDates = new LinkedHashSet<String>();
 				JSONArray chosenDates = schData.getJSONArray("dates[]");
 				for (int j = 0; j < chosenDates.length(); j++) {
@@ -94,7 +95,9 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 				int newDayEnd = schData.getInt("dayEndTime");
 				
 				Set<Timeslot> currentTimeslots = updatedSch.getTimeslots();
-				for (Timeslot t : currentTimeslots) { //Clean up and verify timeslots based on new info provided (dates, start/end times)
+				Iterator<Timeslot> iter = currentTimeslots.iterator();
+				while (iter.hasNext()) { //Clean up and verify timeslots based on new info provided (dates, start/end times)
+					Timeslot t = iter.next();
 					String tDate = t.getStartTime().toString().split(" ")[0];
 					if (newDates.contains(tDate)) { //Day still exists in the schedule
 						//Checking start time
@@ -102,7 +105,8 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 						tStartTime.setTimeInMillis(t.getStartTime().getTime());
 						if ((tStartTime.get(Calendar.HOUR_OF_DAY) < newDayStart)) { //Timeslot breaches new limits
 							if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
-								em.remove(t);
+								TimeslotManager.delete(em, t);
+								iter.remove();
 								continue;
 							} else { //Abort update if there's an active booking for the timeslot
 								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
@@ -118,7 +122,8 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 						if ((tEndTime.get(Calendar.HOUR_OF_DAY) > newDayEnd) ||
 							(tEndTime.get(Calendar.HOUR_OF_DAY) == newDayEnd && tEndTime.get(Calendar.MINUTE) > 0)) { //Timeslot breaches new limits
 							if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
-								em.remove(t);
+								TimeslotManager.delete(em, t);
+								iter.remove();
 								continue;
 							} else { //Abort update if there's an active booking for the timeslot
 								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
@@ -129,7 +134,8 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 						}
 					} else { //Day has been removed from the schedule
 						if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
-							em.remove(t);
+							TimeslotManager.delete(em, t);
+							iter.remove();
 							continue;
 						} else { //Abort update if there's an active booking for the timeslot
 							logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
@@ -164,10 +170,9 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 				updatedSch.setEndDate(endTimestamp);
 				updatedSch.setDayStartTime(newDayStart);
 				updatedSch.setDayEndTime(newDayEnd);
-				em.persist(updatedSch);
 				updatedSchedules.add(updatedSch);
 			}
-			
+			em.flush();
 			em.getTransaction().commit();
 			json.put("schedules", scheduleList);
 			json.put("success", true);
