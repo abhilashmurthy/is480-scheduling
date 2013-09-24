@@ -59,9 +59,10 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
 				}
 				if (activeTerm.equals(term)) continue;
 				HashMap<String, String> map = new HashMap<String, String>();
-				long idOfTerm = term.getId();
 				map.put("termName", term.getDisplayName());
-				map.put("termId", String.valueOf(idOfTerm));
+				map.put("termId", String.valueOf(term.getId()));
+				map.put("year", String.valueOf(term.getAcademicYear()));
+				map.put("semester", term.getSemester());
 				termData.add(map);
 			}
 			

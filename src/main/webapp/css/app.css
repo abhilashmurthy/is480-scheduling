@@ -357,7 +357,7 @@ input, button, select, textarea {
 	margin-bottom: 0 !important;
 }
 
-#createTimeslotsSubmitBtn {
+#createTimeslotsSubmitBtn, #editTimeslotsSubmitBtn {
 	display: inline;
 	margin-left: 10px;
 }
