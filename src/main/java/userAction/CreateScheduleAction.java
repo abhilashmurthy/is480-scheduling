@@ -153,6 +153,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			EntityManager em, ArrayList<Milestone> milestones, JSONArray scheduleData) throws JSONException {
 		ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
 		
+		ArrayList<Schedule> createdSchedules = new ArrayList<Schedule>();
 		for (int i = 0; i < scheduleData.length(); i++) {
 			JSONObject obj = scheduleData.getJSONObject(i);
 			Milestone m = findMilestone(obj.getInt("order"), milestones);
@@ -180,6 +181,22 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			Timestamp endTimestamp = Timestamp.valueOf(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
 			int dayStartTime = obj.getInt("dayStartTime");
 			int dayEndTime = obj.getInt("dayEndTime");
+			
+			//Check if the current schedule dates overlap with any previous schedules in the same term
+			if (!createdSchedules.isEmpty()) {
+				for (Schedule prevSch : createdSchedules) {
+					if (prevSch.getEndDate().compareTo(startTimestamp) >= 0) {
+						logger.error(startTimestamp.toString()
+								+ " is before the end date of Schedule[id="
+								+ prevSch.getId()
+								+ ", milestone=" + prevSch.getMilestone().getName()
+								+ "], " + prevSch.getEndDate());
+						json.put("message", "Schedules have overlapping dates! Please choose the correct dates.");
+						json.put("success", false);
+						return null;
+					}
+				}
+			}
 
 			Schedule s = new Schedule();
 			s.setMilestone(m);
@@ -189,6 +206,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			s.setDayEndTime(dayEndTime);
 
 			em.persist(s);
+			createdSchedules.add(s);
 			scheduleJson.put("scheduleId", s.getId());
 			scheduleList.add(scheduleJson);
 		}
