@@ -178,12 +178,6 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			
 			Timestamp startTimestamp = Timestamp.valueOf(milestoneDates.getString(0) + " 00:00:00");
 			Timestamp endTimestamp = Timestamp.valueOf(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
-			if (startTimestamp.after(endTimestamp)) { //Checking if the start time is after the end time for a milestone
-				logger.error("Start time after end time!");
-				json.put("message", "Start time is after the end time for a milestone!");
-				json.put("success", false);
-				return null;
-			}
 			int dayStartTime = obj.getInt("dayStartTime");
 			int dayEndTime = obj.getInt("dayEndTime");
 
