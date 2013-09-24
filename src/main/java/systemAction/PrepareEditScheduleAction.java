@@ -14,12 +14,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
-import manager.SettingsManager;
-import model.Settings;
+import manager.MilestoneManager;
+import manager.ScheduleManager;
+import manager.TimeslotManager;
+import model.Milestone;
+import model.Schedule;
 import model.Term;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -28,12 +30,12 @@ import util.MiscUtil;
  *
  * @author Prakhar
  */
-public class PrepareCreateScheduleAction extends ActionSupport implements ServletRequestAware {
+public class PrepareEditScheduleAction extends ActionSupport implements ServletRequestAware {
     private HttpServletRequest request;
-    static final Logger logger = LoggerFactory.getLogger(PrepareCreateScheduleAction.class);
+    static final Logger logger = LoggerFactory.getLogger(PrepareEditScheduleAction.class);
 	
 	//Struts variables
-	String milestoneJson;
+	String scheduleJson;
 	String termNameJson;
 
     @Override
@@ -42,33 +44,26 @@ public class PrepareCreateScheduleAction extends ActionSupport implements Servle
 		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         try {
             em = MiscUtil.getEntityManagerInstance();
-			em.getTransaction().begin();
+			Term activeTerm = (Term) request.getSession().getAttribute("currentActiveTerm");
 			
-			//Get milestones
-			Settings milestoneSettings = SettingsManager.getMilestoneSettings(em);
-			JSONArray milestoneArray = new JSONArray(milestoneSettings.getValue());
-			ArrayList<HashMap<String, Object>> milestoneList = new ArrayList<HashMap<String, Object>>();
-			for (int i = 0; i < milestoneArray.length(); i++) {
-				HashMap<String, Object> milestoneInfo = new HashMap<String, Object>();
-				JSONObject obj = milestoneArray.getJSONObject(i);
-				String name = obj.getString("milestone");
-				int duration = obj.getInt("duration");
-				int order = obj.getInt("order");
-				JSONArray reqArray = obj.getJSONArray("attendees");
-				ArrayList<String> requiredAttendees = new ArrayList<String>();
-				for (int j = 0; j < reqArray.length(); j++) {
-					requiredAttendees.add(reqArray.getString(j));
-				}
-				milestoneInfo.put("name", name);
-				milestoneInfo.put("duration", duration);
-				milestoneInfo.put("order", order);
-				milestoneInfo.put("attendees", requiredAttendees);
-				milestoneList.add(milestoneInfo);
+			//Get milestones and schedules
+			List<Milestone> milestones = MilestoneManager.findByTerm(em, activeTerm);
+			ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
+			for (Milestone m : milestones) {
+				HashMap<String, Object> scheduleInfo = new HashMap<String, Object>();
+				Schedule s = ScheduleManager.findByMilestone(em, m);
+				scheduleInfo.put("scheduleId", s.getId());
+				scheduleInfo.put("milestoneName", m.getName());
+				scheduleInfo.put("dayStartTime", s.getDayStartTime());
+				scheduleInfo.put("dayEndTime", s.getDayEndTime());
+				scheduleInfo.put("milestoneOrder", m.getMilestoneOrder());
+				scheduleInfo.put("dates", TimeslotManager.getUniqueDatesForSchedule(em, s));
+				scheduleList.add(scheduleInfo);
 			}
-			milestoneJson = gson.toJson(milestoneList);
+			scheduleJson = gson.toJson(scheduleList);
 			
 			//Get Term Names
-			Query q = em.createQuery("select t from Term t");
+			Query q = em.createQuery("select t from Term t where t NOT IN (select t2 from Term t2 where t2 = :term)").setParameter("term", activeTerm);
 			List<Term> terms = q.getResultList();
 			List<HashMap<String, Object>> termsMap = new ArrayList<HashMap<String, Object>>();
 			for (Term t : terms) {
@@ -98,12 +93,12 @@ public class PrepareCreateScheduleAction extends ActionSupport implements Servle
         return SUCCESS;
     }
 	
-	public String getMilestoneJson() {
-		return milestoneJson;
+	public String getScheduleJson() {
+		return scheduleJson;
 	}
 
-	public void setMilestoneJson(String milestoneJson) {
-		this.milestoneJson = milestoneJson;
+	public void setScheduleJson(String scheduleJson) {
+		this.scheduleJson = scheduleJson;
 	}
 
 	public String getTermNameJson() {

@@ -7,6 +7,7 @@ package manager;
 import constant.Response;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -185,7 +186,16 @@ public class TimeslotManager {
         return timeslot;
     }
     
-
-    
-    
+	 public static LinkedHashSet<String> getUniqueDatesForSchedule(EntityManager em, Schedule s) {
+		 LinkedHashSet<String> uniqueDates = new LinkedHashSet<String>();
+		 Query q = em.createQuery("select t from Timeslot t where t.schedule = :schedule order by t.startTime")
+				 .setParameter("schedule", s);
+		 List<Timeslot> slots = q.getResultList();
+		 for (Timeslot t : slots) {
+			 Timestamp startTime = t.getStartTime();
+			 String dateStamp = startTime.toString().split(" ") [0];
+			 uniqueDates.add(dateStamp);
+		 }
+		 return uniqueDates;
+	 }
 }
