@@ -6,24 +6,21 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Role;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
-import manager.MilestoneManager;
-import manager.ScheduleManager;
 import manager.TimeslotManager;
-import model.Booking;
-import model.Milestone;
 import model.Schedule;
+import model.Term;
 import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
@@ -49,146 +46,136 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
 
+			//Checking user role
+			Role activeRole = (Role) request.getSession().getAttribute("activeRole");
+			if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) {
+				logger.error("Unauthorized user");
+				json.put("message", "You do not have the permission to perform this function!");
+				json.put("success", false);
+				return SUCCESS;
+			}
+			
+			//Getting the currently active term
+			Term activeTerm = (Term) request.getSession().getAttribute("currentActiveTerm");
+			
             //Getting input data
             JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
-            JSONArray milestones = inputData.getJSONArray("milestones[]");
+            String newSemesterName = inputData.getString("semester");
+			JSONArray scheduleData = inputData.getJSONArray("schedules");
 
-            //Creating schedule objects for all milestones
+            //Beginning overall transaction
             em.getTransaction().begin();
+			
+			//Updating term name
+			boolean termUpdated = updateTerm(em, activeTerm, newSemesterName);
+			
+			if (!termUpdated) {
+				return SUCCESS;
+			}
+			
             ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
-            for (int i = 0; i < milestones.length(); i++) {
-                HashMap<String, Object> scheduleJson = new HashMap<String, Object>();
-                JSONObject obj = milestones.getJSONObject(i);
-                long milestoneId = obj.getLong("id");
-                Milestone m = em.find(Milestone.class, milestoneId);
-                if (m == null) {
-                    json.put("success", false);
-                    json.put("message", "Milestone with ID: " + milestoneId + " not found");
-                    return SUCCESS;
-                }
-                scheduleJson.put("milestoneName", m.getName());
-                scheduleJson.put("duration", m.getSlotDuration());
-                scheduleJson.put("dayStartTime", obj.getInt("dayStartTime"));
-                scheduleJson.put("dayEndTime", obj.getInt("dayEndTime"));
-                
-                /************************
-                  SCHEDULE MANAGEMENT 
-                ************************/
-                
-                JSONArray milestoneDates = obj.getJSONArray("dates[]");
-                ArrayList<String> dates = new ArrayList<String>();
-                for (int j = 0; j < milestoneDates.length(); j++) {
-                    dates.add(milestoneDates.getString(j));
-                }
-                scheduleJson.put("dates", dates);
-                Timestamp startTimestamp = Timestamp.valueOf(milestoneDates.getString(0) + " 00:00:00");
-                Timestamp endTimestamp = Timestamp.valueOf(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
-                int dayStartTime = obj.getInt("dayStartTime");
-                int dayEndTime = obj.getInt("dayEndTime");
-
-                long scheduleId = obj.getLong("scheduleId");
-                Schedule s = em.find(Schedule.class, scheduleId);
-                s.setStartDate(startTimestamp);
-                s.setEndDate(endTimestamp);
-                s.setDayStartTime(dayStartTime);
-                s.setDayEndTime(dayEndTime);
-                em.merge(s);
-
-                
-                /************************
-                  TIMESLOT MANAGEMENT 
-                ************************/
-                Calendar cal = Calendar.getInstance();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-                List<Timeslot> oldTimeslots = TimeslotManager.findBySchedule(em, s);
-
-                //Delete unwanted acceptance timeslots
-                Map<Timestamp, Timestamp> keepTimestamps = new HashMap<Timestamp, Timestamp>();
-                keepTimestamps:
-                for (Timeslot t : oldTimeslots) {
-                    Timestamp startTimeslotTimestamp = t.getStartTime();
-                    Timestamp endTimeslotTimestamp = t.getEndTime();
-                    if (t.getCurrentBooking() != null) {
-                        keepTimestamps.put(startTimeslotTimestamp, endTimeslotTimestamp);
-                        continue keepTimestamps;
-                    }
-                    logger.debug("Got timeslot: " + t.getId() + ", " + t.getStartTime());
-                    //Filters out dates without timeslots
-                    for (int j = 0; j < milestoneDates.length(); j++) {
-                        String newDate = milestoneDates.getString(j);
-                        cal.clear();
-                        cal.set(Calendar.HOUR_OF_DAY, dayStartTime);
-                        Timestamp currentDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
-                        cal.set(Calendar.HOUR_OF_DAY, dayEndTime);
-                        Timestamp endDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
-                        while (currentDayTimestamp.before(endDayTimestamp)) {
-                            cal.clear();
-                            cal.setTimeInMillis(currentDayTimestamp.getTime());
-                            cal.add(Calendar.MINUTE, m.getSlotDuration());
-                            Timestamp nextTimeslotTimestamp = new Timestamp(cal.getTimeInMillis());
-                            if ((startTimeslotTimestamp.equals(currentDayTimestamp) && endTimeslotTimestamp.equals(nextTimeslotTimestamp)) && (endTimeslotTimestamp.before(endDayTimestamp) || endTimeslotTimestamp.equals(endDayTimestamp))) {
-                                keepTimestamps.put(startTimeslotTimestamp, endTimeslotTimestamp);
-                                continue keepTimestamps;
-                            }
-                            currentDayTimestamp = nextTimeslotTimestamp;
-                        }
-                    }
-                    //If this is reached, the timeslot doesn't exist. remove it completely.
-                    logger.debug("Removing timeslot: " + t.getId() + ", " + t.getStartTime());
-                    if (!TimeslotManager.delete(em, t, em.getTransaction())) { //Remove from database
-                        throw new Exception("Unable to delete: " + t);
-                    }
-                }
-
-                //Add new Timeslots -- WAIT SHOULD WE ADD NEW TIMESLOTS FOR ALL NEW DATES SELECTED??
-                logger.debug("Adding timeslots now");
-                logger.debug("These are the new dates: " + milestoneDates.toString());
-                for (int j = 0; j < milestoneDates.length(); j++) {
-                    //Add new Dates
-                    String newDate = milestoneDates.getString(j);
-                    cal.clear();
-                    cal.set(Calendar.HOUR_OF_DAY, dayStartTime);
-                    Timestamp currentDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
-                    cal.set(Calendar.HOUR_OF_DAY, dayEndTime);
-                    Timestamp endDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
-                    logger.debug("Day start: " + currentDayTimestamp + ", Day end: " + endDayTimestamp);
-                    newTimestamps: 
-                    while (currentDayTimestamp.before(endDayTimestamp)) {
-                        Timestamp endTimeslotTimestamp = keepTimestamps.get(currentDayTimestamp);
-                        for (Timestamp keepTimestamp : keepTimestamps.keySet()) {
-                            if (keepTimestamp.equals(currentDayTimestamp)) {
-                                logger.debug("Keeping: " + currentDayTimestamp);
-                                currentDayTimestamp = endTimeslotTimestamp; //Continue while loop
-                                continue newTimestamps;
-                            }
-                        }
-                        //This must be a new timeslot -- Add it
-                        cal.clear();
-                        cal.setTimeInMillis(currentDayTimestamp.getTime());
-                        cal.add(Calendar.MINUTE, m.getSlotDuration());
-                        endTimeslotTimestamp = new Timestamp(cal.getTimeInMillis());
-                        if (endTimeslotTimestamp.before(endDayTimestamp) || endTimeslotTimestamp.equals(endDayTimestamp)) { //Add only fitting timeslots
-                            Timeslot newT = new Timeslot();
-                            newT.setStartTime(currentDayTimestamp);
-                            newT.setEndTime(endTimeslotTimestamp);
-                            logger.debug("Persiting start: " + currentDayTimestamp + ", end: " + endTimeslotTimestamp);
-                            newT.setVenue("Not set yet");
-                            newT.setSchedule(s);
-                            logger.debug("Adding timeslot: " + currentDayTimestamp);
-                            em.persist(newT);
-                        }
-                        currentDayTimestamp = endTimeslotTimestamp; //Continue while loop
-                    }
-                }
-                logger.debug("Finished adding");
-
-                scheduleJson.put("scheduleId", scheduleId);
-                scheduleList.add(scheduleJson);
-            }
-            em.getTransaction().commit();
-            json.put("schedules", scheduleList);
-            json.put("success", true);
+			ArrayList<Schedule> updatedSchedules = new ArrayList<Schedule>();
+			for (int i = 0; i < scheduleData.length(); i++) {
+				JSONObject schData = scheduleData.getJSONObject(i);
+				Schedule updatedSch = em.find(Schedule.class, schData.getLong("scheduleId"));
+				if (updatedSch == null) {
+					logger.error("Schedule with ID: " + schData.getLong("scheduleId") + " not found.");
+					json.put("message", "Oops! Something went wrong");
+					json.put("success", false);
+					return SUCCESS;
+				}
+				
+				LinkedHashSet<String> newDates = new LinkedHashSet<String>();
+				JSONArray chosenDates = schData.getJSONArray("dates[]");
+				for (int j = 0; j < chosenDates.length(); j++) {
+					newDates.add(chosenDates.getString(j));
+				}
+				
+				int newDayStart = schData.getInt("dayStartTime");
+				int newDayEnd = schData.getInt("dayEndTime");
+				
+				Set<Timeslot> currentTimeslots = updatedSch.getTimeslots();
+				Iterator<Timeslot> iter = currentTimeslots.iterator();
+				while (iter.hasNext()) { //Clean up and verify timeslots based on new info provided (dates, start/end times)
+					Timeslot t = iter.next();
+					String tDate = t.getStartTime().toString().split(" ")[0];
+					if (newDates.contains(tDate)) { //Day still exists in the schedule
+						//Checking start time
+						Calendar tStartTime = Calendar.getInstance();
+						tStartTime.setTimeInMillis(t.getStartTime().getTime());
+						if ((tStartTime.get(Calendar.HOUR_OF_DAY) < newDayStart)) { //Timeslot breaches new limits
+							if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
+								TimeslotManager.delete(em, t);
+								iter.remove();
+								continue;
+							} else { //Abort update if there's an active booking for the timeslot
+								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+								json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
+								json.put("success", false);
+								return SUCCESS;
+							}
+						}
+						
+						//Checking end time
+						Calendar tEndTime = Calendar.getInstance();
+						tEndTime.setTimeInMillis(t.getEndTime().getTime());
+						if ((tEndTime.get(Calendar.HOUR_OF_DAY) > newDayEnd) ||
+							(tEndTime.get(Calendar.HOUR_OF_DAY) == newDayEnd && tEndTime.get(Calendar.MINUTE) > 0)) { //Timeslot breaches new limits
+							if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
+								TimeslotManager.delete(em, t);
+								iter.remove();
+								continue;
+							} else { //Abort update if there's an active booking for the timeslot
+								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+								json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
+								json.put("success", false);
+								return SUCCESS;
+							}
+						}
+					} else { //Day has been removed from the schedule
+						if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
+							TimeslotManager.delete(em, t);
+							iter.remove();
+							continue;
+						} else { //Abort update if there's an active booking for the timeslot
+							logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+							json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
+							json.put("success", false);
+							return SUCCESS;
+						}
+					}
+				}
+				
+				//Timeslot updates completed. Move on to check overall schedule object
+				Timestamp startTimestamp = Timestamp.valueOf(chosenDates.getString(0) + " 00:00:00");
+				Timestamp endTimestamp = Timestamp.valueOf(chosenDates.getString(chosenDates.length() - 1) + " 00:00:00");
+				//Check for date overlap
+				//Check if the current schedule dates overlap with any previous schedules in the same term
+				if (!updatedSchedules.isEmpty()) {
+					for (Schedule prevSch : updatedSchedules) {
+						if (prevSch.getEndDate().compareTo(startTimestamp) >= 0) {
+							logger.error(startTimestamp.toString()
+									+ " is before the end date of Schedule[id="
+									+ prevSch.getId()
+									+ ", milestone=" + prevSch.getMilestone().getName()
+									+ "], " + prevSch.getEndDate());
+							json.put("message", "Schedules have overlapping dates! Please choose the correct dates.");
+							json.put("success", false);
+							return SUCCESS;
+						}
+					}
+				}
+				//All clear. Updating information and storing in database
+				updatedSch.setStartDate(startTimestamp);
+				updatedSch.setEndDate(endTimestamp);
+				updatedSch.setDayStartTime(newDayStart);
+				updatedSch.setDayEndTime(newDayEnd);
+				updatedSchedules.add(updatedSch);
+			}
+			em.flush();
+			em.getTransaction().commit();
+			json.put("schedules", scheduleList);
+			json.put("success", true);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getClass().getName() + " " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -208,6 +195,31 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
         }
         return SUCCESS;
     }
+	
+	private boolean updateTerm(EntityManager em, Term activeTerm, String semester) {
+		Query q = em.createQuery("select t from Term t where t.academicYear = :year AND t.semester = :semester AND t NOT IN (:term)")
+				.setParameter("year", activeTerm.getAcademicYear())
+				.setParameter("semester", semester)
+				.setParameter("term", activeTerm);
+		List<Term> terms = q.getResultList();
+		//Checking if the term already exists
+		if (!terms.isEmpty()) {
+			logger.error("Term already exists");
+			json.put("message", "Term already exists");
+			json.put("success", false);
+			return false;
+		}
+		
+		//No conflict. Updating semester details
+		Term updatedTerm = em.find(Term.class, activeTerm.getId());
+		updatedTerm.setSemester(semester);
+		em.persist(updatedTerm);
+		
+		//Refreshing term object in session
+		request.getSession().setAttribute("currentActiveTerm", updatedTerm);
+		
+		return true;
+	}
 
     public HashMap<String, Object> getJson() {
         return json;

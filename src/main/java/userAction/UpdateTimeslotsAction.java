@@ -105,7 +105,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
             allDeletes.addAll(finalDeletes);
             
             for (Timeslot d : allDeletes) {
-                TimeslotManager.delete(em, d, transaction);
+                TimeslotManager.delete(em, d);
             }
             
             logger.debug("Deleted : " + allDeletes.size());

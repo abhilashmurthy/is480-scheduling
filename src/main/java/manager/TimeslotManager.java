@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import model.Booking;
 import model.Schedule;
 import model.Timeslot;
 import model.User;
@@ -93,31 +94,17 @@ public class TimeslotManager {
         return false;
     }
     
-    public static boolean delete(EntityManager em, Timeslot timeslot, EntityTransaction transaction) {
+    public static void delete(EntityManager em, Timeslot timeslot) {
         logger.trace("Deleting timeslot: " + timeslot);
-        boolean justHere = true;
-        try {
-            transaction = em.getTransaction();
-            if (!transaction.isActive()) {
-                transaction.begin();
-                justHere = false;
-            }
-            em.remove(timeslot);
-            logger.trace("All timeslots have been saved");
-            if (justHere) transaction.commit();
-            return true;
-        } catch (PersistenceException ex) {
-            //Rolling back data transactions
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            logger.error("Error making database call for update timeslot status");
-            ex.printStackTrace();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-        return false;
+		Query findBookings = em.createQuery("SELECT b from Booking b WHERE b.timeslot = :timeslot").setParameter("timeslot", timeslot);
+		List<Booking> bookings = findBookings.getResultList();
+		for (Booking b : bookings) {
+			b.setRequiredAttendees(null);
+		}
+		em.flush();
+        Query removeBookings = em.createQuery("DELETE FROM Booking b WHERE b.timeslot = :timeslot").setParameter("timeslot", timeslot);
+		removeBookings.executeUpdate();
+		em.remove(timeslot);
     }
 
     public static boolean deleteTimeslotBooking(EntityManager em, Timeslot ts) {
