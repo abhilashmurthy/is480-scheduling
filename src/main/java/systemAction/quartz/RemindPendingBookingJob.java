@@ -5,15 +5,26 @@
 package systemAction.quartz;
 
 import constant.BookingStatus;
+import constant.Response;
+import constant.Role;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import manager.UserManager;
 import model.Booking;
 import model.CronLog;
 import model.Timeslot;
+import model.User;
+import model.role.Faculty;
+import notification.email.FacultyReminderEmail;
+import org.hibernate.Hibernate;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -32,10 +43,10 @@ public class RemindPendingBookingJob implements Job {
     private int noOfDaysToRespond2;
 
     public void execute(JobExecutionContext jec) throws JobExecutionException {
-        logger.debug("Started reminder job");
+        logger.debug("Started faculty reminder");
 		//Initializing run log to be stored in database
 		CronLog logItem = new CronLog();
-		logItem.setJobName("Remind Pending Bookings");
+		logItem.setJobName("Remind faculty Bookings");
 		Calendar cal = Calendar.getInstance();
 		Timestamp now = new Timestamp(cal.getTimeInMillis());
 		logItem.setRunTime(now);
@@ -56,36 +67,75 @@ public class RemindPendingBookingJob implements Job {
 
                     for (Booking pendingBooking : pendingBookings) {
                         //get one day break
-                        cal.clear();
-                        cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
-                        cal.add(Calendar.DATE, noOfDaysToRespond1);
-                        Timestamp dueDate1 = new Timestamp(cal.getTimeInMillis());
+						Calendar cal2 = Calendar.getInstance();
+                        cal2.clear();
+                        cal2.setTimeInMillis(pendingBooking.getTimeslot().getStartTime().getTime());
+                        cal2.add(Calendar.DATE, 0);
+                        Timestamp dueDate1 = new Timestamp(cal2.getTimeInMillis());
                         
                         //get two days break
-                        cal.clear();
+                        /*cal.clear();
                         cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
                         cal.add(Calendar.DATE, noOfDaysToRespond2);
-                        Timestamp dueDate2 = new Timestamp(cal.getTimeInMillis());
+                        Timestamp dueDate2 = new Timestamp(cal.getTimeInMillis());*/
+						
+						long difference = (long)dueDate1.getTime()-(long)now.getTime();
+						long divideby = 60000L;
+						long differenceInMins = (long)difference / (long)divideby;
+						logger.debug("due date" + (long)dueDate1.getDate());
+						logger.debug("now " + (long)now.getTime());
+                        logger.debug(" the difference between due and now" + (long)difference);
                         
-                        
-                        //if due date is greater than now, send a reminder for action
-                        //if will check if the two day gap is greater than now, else
-                        //will check if there is a one day gap and submit a final reminder
-                        if (dueDate2.compareTo(now) >=0) {
+                        //if difference between due date and current time is less than or equal 24hours
+                        if ((long)dueDate1.getTime()-(long)now.getTime() <= 86400000) {
                             logger.debug("Booking: " + pendingBooking + ". First Reminder sent.");
-                            //TODO: Add email notification for this task (first reminder)
-                        }else if(dueDate1.compareTo(now) >=0){
+							
+							//get response list
+							HashMap<User,Response> allStatus = pendingBooking.getResponseList();
+							
+							for(Map.Entry<User, Response> entry  : allStatus.entrySet()) {
+								
+								User user = entry.getKey();
+								Response response = entry.getValue();
+								
+
+								if(user.getRole().equals(Role.FACULTY) && response.equals(Response.PENDING)){
+									
+									//Forcing initialization for sending email
+									Hibernate.initialize(pendingBooking.getTeam().getMembers());
+									Hibernate.initialize(pendingBooking.getTimeslot().getSchedule().getMilestone());
+				
+									
+									Faculty facultyMember = UserManager.getUser(user.getId(), Faculty.class);
+									
+									FacultyReminderEmail facultyReminder = new FacultyReminderEmail(pendingBooking,facultyMember,cal2);
+									facultyReminder.sendEmail();
+									
+								}
+							}
+							
+							
+							/*NewBookingEmail newEmail = new NewBookingEmail(booking);
+							RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
+							newEmail.sendEmail();
+							responseEmail.sendEmail();*/
+							
+							
+							
+                        }
+						
+						/*else if(dueDate1.compareTo(now) >=0){
                             logger.debug("Booking: " + pendingBooking + ". Second Reminder sent.");
                             //TODO: Add email notification for this task (last and final reminder)
-                        }
+                        }*/
                      }
-            em.getTransaction().commit();
+            //em.getTransaction().commit();
 			logItem.setSuccess(true);
-			logItem.setMessage("Pending bookings cleared.");
+			logItem.setMessage("Faculty reminded.");
         } catch (NoResultException n) {
             //Normal, no pending bookings found
 			logItem.setSuccess(true);
-			logItem.setMessage("No pending bookings to clear.");
+			logItem.setMessage("No faculty to remind.");
             logger.trace("There are no pending bookings now");
         } catch (Exception e) {
 			logItem.setSuccess(false);
@@ -107,6 +157,8 @@ public class RemindPendingBookingJob implements Job {
 				if (em.isOpen()) em.close();
 			}
         }
-        logger.debug("Finished RemindPendingBookingJob");
+        logger.debug("Finished reminding faculty");
     }
+	
+	
 }
