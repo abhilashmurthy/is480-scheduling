@@ -127,7 +127,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 				JSONObject obj = milestoneArray.getJSONObject(i);
 				String name = obj.getString("milestone");
 				int duration = obj.getInt("duration");
-				int order = obj.getInt("order");
+				int milestoneOrder = obj.getInt("order");
 				
 				JSONArray reqArray = obj.getJSONArray("attendees");
 				ArrayList<String> requiredAttendees = new ArrayList<String>();
@@ -135,7 +135,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 					requiredAttendees.add(reqArray.getString(j));
 				}
 
-				Milestone m = new Milestone(order, name, duration, newTerm, requiredAttendees);
+				Milestone m = new Milestone(milestoneOrder, name, duration, newTerm, requiredAttendees);
 				em.persist(m);
 				createdMilestones.add(m);
 			}
@@ -156,7 +156,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 		ArrayList<Schedule> createdSchedules = new ArrayList<Schedule>();
 		for (int i = 0; i < scheduleData.length(); i++) {
 			JSONObject obj = scheduleData.getJSONObject(i);
-			Milestone m = findMilestone(obj.getInt("order"), milestones);
+			Milestone m = findMilestone(obj.getInt("milestoneOrder"), milestones);
 			if (m == null) {
 				logger.error("Milestone with ID: " + obj.getInt("milestoneOrder") + " not found");
 				json.put("message", "Milestone not found");
@@ -214,9 +214,9 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 		return scheduleList;
 	}
 	
-	private Milestone findMilestone(int order, ArrayList<Milestone> milestones) {
+	private Milestone findMilestone(int milestoneOrder, ArrayList<Milestone> milestones) {
 		for (Milestone m : milestones) {
-			if (m.getMilestoneOrder() == order) {
+			if (m.getMilestoneOrder() == milestoneOrder) {
 				return m;
 			}
 		}

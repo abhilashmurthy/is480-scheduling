@@ -361,9 +361,9 @@
 					
                     //Order comparator
                     function compare(a, b) {
-                        if (a.order < b.order) {
+                        if (a.milestoneOrder < b.milestoneOrder) {
                             return -1;
-                        } else if (a.order > b.order) {
+                        } else if (a.milestoneOrder > b.milestoneOrder) {
                             return 1;
                         } else {
                             return 0;
@@ -661,6 +661,8 @@
 						"milestones[]":milestones
 					};
 					
+//					console.log("Submitting: " + JSON.stringify(createScheduleData));
+					
                     $.ajax({
                         type: 'POST',
                         url: 'createScheduleJson',
@@ -668,7 +670,7 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
-                            console.log("Received: " + JSON.stringify(response));
+//                            console.log("Received: " + JSON.stringify(response));
                             schedules = response.schedules;
                             showNotification("SUCCESS", "Created dates successfully");
 							disableScheduleControls();
@@ -769,7 +771,7 @@
                     timeslotsData["timeslots"] = timeslots_array;
 					selectedSchedule["timeslots"] = timeslots_array;
                     timeslotsData["venue"] = $("#venueInput").val();
-                    console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
+//                    console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
                     $.ajax({
                         type: 'POST',
                         url: 'createTimeslotsJson',
@@ -777,7 +779,6 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
-                            console.log("createTimeslotsJson was successful");
 							//Set isCreated to true
                             selectedSchedule["isCreated"] = true;
 							var totalCreated = 0;
@@ -795,12 +796,12 @@
 								var nextOrder = null;
 								for (var i = 0; i < milestones.length; i++) {
 									if (milestones[i].name === selectedSchedule.milestoneName) {
-										 nextOrder = milestones[i].order + 1;
+										 nextOrder = milestones[i].milestoneOrder + 1;
 										 break;
 									}
 								}
 								for (var i = 0; i < milestones.length; i++) {
-									if (milestones[i].order === nextOrder) {
+									if (milestones[i].milestoneOrder === nextOrder) {
 										 $("#milestoneTimeslotsSelect").val(milestones[i].name).change(); //Select next milestone
 										 break;
 									}
