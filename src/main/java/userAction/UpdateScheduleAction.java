@@ -11,9 +11,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
@@ -93,7 +93,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 				int newDayStart = schData.getInt("dayStartTime");
 				int newDayEnd = schData.getInt("dayEndTime");
 				
-				HashSet<Timeslot> currentTimeslots = (HashSet<Timeslot>) updatedSch.getTimeslots();
+				Set<Timeslot> currentTimeslots = updatedSch.getTimeslots();
 				for (Timeslot t : currentTimeslots) { //Clean up and verify timeslots based on new info provided (dates, start/end times)
 					String tDate = t.getStartTime().toString().split(" ")[0];
 					if (newDates.contains(tDate)) { //Day still exists in the schedule
@@ -103,6 +103,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 						if ((tStartTime.get(Calendar.HOUR_OF_DAY) < newDayStart)) { //Timeslot breaches new limits
 							if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
 								em.remove(t);
+								continue;
 							} else { //Abort update if there's an active booking for the timeslot
 								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
 								json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
@@ -114,9 +115,11 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 						//Checking end time
 						Calendar tEndTime = Calendar.getInstance();
 						tEndTime.setTimeInMillis(t.getEndTime().getTime());
-						if ((tEndTime.get(Calendar.HOUR_OF_DAY) >= newDayEnd && tEndTime.get(Calendar.MINUTE) > 0)) { //Timeslot breaches new limits
+						if ((tEndTime.get(Calendar.HOUR_OF_DAY) > newDayEnd) ||
+							(tEndTime.get(Calendar.HOUR_OF_DAY) == newDayEnd && tEndTime.get(Calendar.MINUTE) > 0)) { //Timeslot breaches new limits
 							if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
 								em.remove(t);
+								continue;
 							} else { //Abort update if there's an active booking for the timeslot
 								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
 								json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
@@ -127,6 +130,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 					} else { //Day has been removed from the schedule
 						if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
 							em.remove(t);
+							continue;
 						} else { //Abort update if there's an active booking for the timeslot
 							logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
 							json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
@@ -135,6 +139,33 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 						}
 					}
 				}
+				
+				//Timeslot updates completed. Move on to check overall schedule object
+				Timestamp startTimestamp = Timestamp.valueOf(chosenDates.getString(0) + " 00:00:00");
+				Timestamp endTimestamp = Timestamp.valueOf(chosenDates.getString(chosenDates.length() - 1) + " 00:00:00");
+				//Check for date overlap
+				//Check if the current schedule dates overlap with any previous schedules in the same term
+				if (!updatedSchedules.isEmpty()) {
+					for (Schedule prevSch : updatedSchedules) {
+						if (prevSch.getEndDate().compareTo(startTimestamp) >= 0) {
+							logger.error(startTimestamp.toString()
+									+ " is before the end date of Schedule[id="
+									+ prevSch.getId()
+									+ ", milestone=" + prevSch.getMilestone().getName()
+									+ "], " + prevSch.getEndDate());
+							json.put("message", "Schedules have overlapping dates! Please choose the correct dates.");
+							json.put("success", false);
+							return null;
+						}
+					}
+				}
+				//All clear. Updating information and storing in database
+				updatedSch.setStartDate(startTimestamp);
+				updatedSch.setEndDate(endTimestamp);
+				updatedSch.setDayStartTime(newDayStart);
+				updatedSch.setDayEndTime(newDayEnd);
+				em.persist(updatedSch);
+				updatedSchedules.add(updatedSch);
 			}
 			
 			em.getTransaction().commit();
