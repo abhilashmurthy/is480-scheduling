@@ -155,7 +155,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 									+ "], " + prevSch.getEndDate());
 							json.put("message", "Schedules have overlapping dates! Please choose the correct dates.");
 							json.put("success", false);
-							return null;
+							return SUCCESS;
 						}
 					}
 				}
