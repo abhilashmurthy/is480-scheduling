@@ -63,7 +63,7 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
 			scheduleJson = gson.toJson(scheduleList);
 			
 			//Get Term Names
-			Query q = em.createQuery("select t from Term t where t NOT IN (select t2 from Term t2 where t2 = :term)").setParameter("term", activeTerm);
+			Query q = em.createQuery("select t from Term t where t NOT IN (:term)").setParameter("term", activeTerm);
 			List<Term> terms = q.getResultList();
 			List<HashMap<String, Object>> termsMap = new ArrayList<HashMap<String, Object>>();
 			for (Term t : terms) {
