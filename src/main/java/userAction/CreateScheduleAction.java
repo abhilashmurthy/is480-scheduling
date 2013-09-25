@@ -9,6 +9,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
@@ -201,6 +202,12 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			Schedule s = new Schedule();
 			s.setMilestone(m);
 			s.setStartDate(startTimestamp);
+			//Calculating the real end of the schedule
+			Calendar endCal = Calendar.getInstance();
+			endCal.setTimeInMillis(endTimestamp.getTime());
+			endCal.add(Calendar.DAY_OF_MONTH, 1); //Adding a day
+			endCal.add(Calendar.MINUTE, - (s.getMilestone().getSlotDuration())); //Subtracting the slot duration
+			endTimestamp.setTime(endCal.getTimeInMillis());
 			s.setEndDate(endTimestamp);
 			s.setDayStartTime(dayStartTime);
 			s.setDayEndTime(dayEndTime);

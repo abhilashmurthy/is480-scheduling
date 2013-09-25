@@ -109,7 +109,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 								iter.remove();
 								continue;
 							} else { //Abort update if there's an active booking for the timeslot
-								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+								logger.error("Timeslot[id=" + t.getId() + "] has an active booking. Cannot be removed");
 								json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update schedule!");
 								json.put("success", false);
 								return SUCCESS;
@@ -126,7 +126,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 								iter.remove();
 								continue;
 							} else { //Abort update if there's an active booking for the timeslot
-								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+								logger.error("Timeslot[id=" + t.getId() + "] has an active booking. Cannot be removed");
 								json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update schedule!");
 								json.put("success", false);
 								return SUCCESS;
@@ -138,7 +138,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 							iter.remove();
 							continue;
 						} else { //Abort update if there's an active booking for the timeslot
-							logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+							logger.error("Timeslot[id=" + t.getId() + "] has an active booking. Cannot be removed");
 							json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update schedule!");
 							json.put("success", false);
 							return SUCCESS;
@@ -167,6 +167,12 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 				}
 				//All clear. Updating information and storing in database
 				updatedSch.setStartDate(startTimestamp);
+				//Calculating the real end of the schedule
+				Calendar endCal = Calendar.getInstance();
+				endCal.setTimeInMillis(endTimestamp.getTime());
+				endCal.add(Calendar.DAY_OF_MONTH, 1); //Adding a day
+				endCal.add(Calendar.MINUTE, - (updatedSch.getMilestone().getSlotDuration())); //Subtracting the slot duration
+				endTimestamp.setTime(endCal.getTimeInMillis());
 				updatedSch.setEndDate(endTimestamp);
 				updatedSch.setDayStartTime(newDayStart);
 				updatedSch.setDayEndTime(newDayEnd);

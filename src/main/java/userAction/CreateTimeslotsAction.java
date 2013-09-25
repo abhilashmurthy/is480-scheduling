@@ -26,7 +26,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static userAction.CreateScheduleAction.logger;
 import util.MiscUtil;
 
 /**
@@ -66,6 +65,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
             }
             JSONArray timeslotTimes = scheduleData.getJSONArray("timeslots");
 
+			boolean ignored = false;
+			Calendar schStart = Calendar.getInstance(); schStart.setTimeInMillis(s.getStartDate().getTime());
+			Calendar schEnd = Calendar.getInstance(); schEnd.setTimeInMillis(s.getEndDate().getTime());
             for (int j = 0; j < timeslotTimes.length(); j++) {
                 //Getting startTime and endTime
                 Timestamp startTime = Timestamp.valueOf(timeslotTimes.getString(j));
@@ -76,9 +78,18 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 endCal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
                 Timestamp endTime = new Timestamp(endCal.getTimeInMillis());
 				
+				//Check compliance with schedule start and end dates
+				if (!(startCal.compareTo(schStart) >= 0)
+						|| !(endCal.compareTo(schEnd) <= 0)) {
+					logger.warn("Timestamp " + startTime.toString() + " not compliant with day end time for Schedule[id=" + s.getId() + "]");
+					ignored = true;
+					continue;
+				}
+				
 				//Check start time compliance with day start
 				if ((startCal.get(Calendar.HOUR_OF_DAY) < s.getDayStartTime())) { //Timeslot breaches day start
 					logger.warn("Timestamp " + startTime.toString() + " not compliant with day start time for Schedule[id=" + s.getId() + "]");
+					ignored = true;
 					continue;
 				}
 				
@@ -86,8 +97,10 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 				if ((endCal.get(Calendar.HOUR_OF_DAY) > s.getDayEndTime()) ||
 					(endCal.get(Calendar.HOUR_OF_DAY) == s.getDayEndTime() && endCal.get(Calendar.MINUTE) > 0)) { //Timeslot breaches day end
 					logger.warn("Timestamp " + startTime.toString() + " not compliant with day end time for Schedule[id=" + s.getId() + "]");
+					ignored = true;
 					continue;
 				}
+				
                 Timeslot t = new Timeslot();
                 t.setStartTime(startTime);
                 t.setEndTime(endTime);

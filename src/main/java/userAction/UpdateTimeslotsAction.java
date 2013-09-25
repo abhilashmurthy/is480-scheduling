@@ -66,7 +66,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 			JSONArray inputDateTimes = inputData.getJSONArray("timeslots[]");
 			TreeSet<String> dateTimes = new TreeSet<String>();
 			for (int i =0; i < inputDateTimes.length(); i++) {
-				dateTimes.add(inputDateTimes.getString(i));
+				dateTimes.add(inputDateTimes.getString(i) + ".0");
 			}
 			
 			Set<Timeslot> timeslots = s.getTimeslots();
@@ -76,10 +76,11 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 				if (!dateTimes.contains(t.getStartTime().toString())) { //Timeslot has been removed from the schedule
 					if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
 						TimeslotManager.delete(em, t);
+						iter.remove();
 						dateTimes.remove(t.getStartTime().toString());
 						continue;
 					} else { //Abort update if there's an active booking for the timeslot
-						logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+						logger.error("Timeslot[id=" + t.getId() + "] has an active booking. Cannot be removed");
 						json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update timeslots!");
 						json.put("success", false);
 						return SUCCESS;
@@ -89,6 +90,9 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 				}
 			}
 			
+			boolean ignored = false;
+			Calendar schStart = Calendar.getInstance(); schStart.setTimeInMillis(s.getStartDate().getTime());
+			Calendar schEnd = Calendar.getInstance(); schEnd.setTimeInMillis(s.getEndDate().getTime());
 			//Create timeslot objects for newly chosen times
 			for (String timestampStr : dateTimes) {
                 //Getting startTime and endTime
@@ -100,9 +104,18 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                 endCal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
                 Timestamp endTime = new Timestamp(endCal.getTimeInMillis());
 				
+				//Check compliance with schedule start and end dates
+				if (!(startCal.compareTo(schStart) >= 0)
+						|| !(endCal.compareTo(schEnd) <= 0)) {
+					logger.warn("Timestamp " + startTime.toString() + " not compliant with day end time for Schedule[id=" + s.getId() + "]");
+					ignored = true;
+					continue;
+				}
+				
 				//Check start time compliance with day start
 				if ((startCal.get(Calendar.HOUR_OF_DAY) < s.getDayStartTime())) { //Timeslot breaches day start
 					logger.warn("Timestamp " + startTime.toString() + " not compliant with day start time for Schedule[id=" + s.getId() + "]");
+					ignored = true;
 					continue;
 				}
 				
@@ -110,8 +123,10 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 				if ((endCal.get(Calendar.HOUR_OF_DAY) > s.getDayEndTime()) ||
 					(endCal.get(Calendar.HOUR_OF_DAY) == s.getDayEndTime() && endCal.get(Calendar.MINUTE) > 0)) { //Timeslot breaches day end
 					logger.warn("Timestamp " + startTime.toString() + " not compliant with day end time for Schedule[id=" + s.getId() + "]");
+					ignored = true;
 					continue;
 				}
+				
                 Timeslot t = new Timeslot();
                 t.setStartTime(startTime);
                 t.setEndTime(endTime);
@@ -119,11 +134,13 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setSchedule(s);
                 em.persist(t);
             } //End of timeslot creation loop
-			
+			em.flush();
 			em.getTransaction().commit();
 			
             json.put("success", true);
-            json.put("message", "Timeslots udpated");
+			String message = "Timeslots updated successfully";
+			if (ignored) message += ". Certain timeslots were ignored as they breached the limits of the current schedule.";
+            json.put("message", message);
             return SUCCESS;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
