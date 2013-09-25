@@ -66,6 +66,7 @@
                 border-top: 10px solid #5C7AFF;
                 z-index: 1;
             }
+			
             .chosen {
                 background-color: #B8F79E !important ;
             }
@@ -256,7 +257,7 @@
 											<button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Edit</button>
 											<table class='timeslotsLegend'>
 												<tr>
-													<td class='legendBox' style="background-color:#B8F79E;"><div class='start-marker'></div></td><td>Available</td>
+													<td class='legendBox' style="background-color:#B8F79E;"></td><td>Available</td>
 													<td class='legendBox' style="background-color:#faf4a8;"></td><td>Team Booking</td>
 												</tr>
 											</table>
@@ -678,60 +679,31 @@
                     $("#editTimeslotsSubmitBtn").button('loading');
                     var timeslotsData = {};
                     var timeslots_array = new Array();
-                    var inputData = $("div.start-marker", ".timeslotsTable").get();
+                    var inputData = $("div.start-marker, div.defaultadd-marker", ".timeslotsTable").get();
                     for (var i = 0; i < inputData.length; i++) {
                         var obj = inputData[i];
                         timeslots_array.push($(obj).parent().attr("value"));
                     }
                     timeslotsData["scheduleId"] = selectedSchedule.id;
-                    timeslotsData["timeslots"] = timeslots_array;
+                    timeslotsData["timeslots[]"] = timeslots_array;
                     timeslotsData["venue"] = $("#venueInput").val();
                     console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
-//                    $.ajax({
-//                        type: 'POST',
-//                        url: 'editTimeslotsJson',
-//                        data: {jsonData: JSON.stringify(timeslotsData)},
-//                        dataType: 'json'
-//                    }).done(function(response) {
-//                        if (response.success) {
-//                            console.log("editTimeslotsJson was successful");
-//							//Set isUpdated to true
-//                            selectedSchedule["isUpdated"] = true;
-//							var totalUpdated = 0;
-//							for (var i = 0; i < schedules.length; i++) {
-//								if (schedules[i].isUpdated) ++totalUpdated;
-//							}
-//							$("#timeslotsProgressBar").children(".bar").css('width', ((totalUpdated/schedules.length) * 100) + '%');
-//							if ((totalUpdated/schedules.length) === 1) {
-//								//Go to manage active terms page
-//								showNotification("WARNING", "Schedule ready now");
-//								setTimeout(function(){window.location = "index";}, 2000);
-//							} else {
-//								//Select next milestone
-//								showNotification("SUCCESS", response.message);
-//								var nextOrder = null;
-//								for (var i = 0; i < milestones.length; i++) {
-//									if (milestones[i].name === selectedSchedule.milestoneName) {
-//										 nextOrder = milestones[i].order + 1;
-//										 break;
-//									}
-//								}
-//								for (var i = 0; i < milestones.length; i++) {
-//									if (milestones[i].order === nextOrder) {
-//										 $("#milestoneTimeslotsSelect").val(milestones[i].name).change(); //Select next milestone
-//										 break;
-//									}
-//								}
-//							}
-//                        } else {
-//                            var eid = btoa(response.message);
-//                            console.log(response.message);
-//                            window.location = "error.jsp?eid=" + eid;
-//                        }
-//                    }).fail(function(error) {
-//                        console.log("editTimeslotsJson AJAX FAIL");
-//                        showNotification("ERROR", "Oops.. something went wrong");
-//                    });
+                    $.ajax({
+                        type: 'POST',
+                        url: 'updateTimeslotsJson',
+                        data: {jsonData: JSON.stringify(timeslotsData)},
+                        dataType: 'json'
+                    }).done(function(response) {
+                        if (response.success) {
+                            console.log("editTimeslotsJson was successful");
+							showNotification("SUCCESS", response.message);
+                        } else {
+                            showNotification("ERROR", response.message);
+                        }
+                    }).fail(function(error) {
+                        console.log("editTimeslotsJson AJAX FAIL");
+                        showNotification("ERROR", "Oops.. something went wrong");
+                    });
 					$("#editTimeslotsSubmitBtn").button('reset');
                     return false;
                 });
@@ -863,7 +835,7 @@
 									if (timeslots[i].team) {
 										//If team exists, don't clickable
 										var slotSize = selectedSchedule.duration / 30;
-										$this.css('text-align', 'center').html('Booking');
+										$this.append($(document.createElement('div')).addClass('defaultadd-marker'));
 										var $nextTr = $this.closest('tr');
 										for (var k = 0; k < slotSize; k++) {
 											$nextTr.children().eq($this.index()).addClass('teamExists');
