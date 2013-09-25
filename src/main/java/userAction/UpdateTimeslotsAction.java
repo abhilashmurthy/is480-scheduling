@@ -52,6 +52,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 			
 			//Getting input data
             JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+			String venue = inputData.getString("venue");
 
             Schedule s = em.find(Schedule.class, inputData.getLong("scheduleId"));
             if (s == null) {
@@ -85,7 +86,8 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 						json.put("success", false);
 						return SUCCESS;
 					}
-				} else { //Do nothing. Timeslot still exists in schedule.
+				} else { //Just update the venue if required. Timeslot still exists in schedule.
+					if (venue != null && !venue.isEmpty()) t.setVenue(venue);
 					dateTimes.remove(t.getStartTime().toString());
 				}
 			}
@@ -130,7 +132,8 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                 Timeslot t = new Timeslot();
                 t.setStartTime(startTime);
                 t.setEndTime(endTime);
-                t.setVenue("N/A");
+                String venueToSet = (venue != null && !venue.isEmpty()) ? venue : "N/A" ;
+				t.setVenue(venueToSet);
                 t.setSchedule(s);
                 em.persist(t);
             } //End of timeslot creation loop
