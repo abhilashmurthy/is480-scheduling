@@ -426,7 +426,8 @@
 					 $(".tab-pane").hide();
 					 $("#" + href).addClass('active');
 					 $(".nav-tabs ." + href).addClass('active');
-					 loadInitialValues(); //Refreshes everything on page
+					 $("#milestoneTimeslotsSelect").empty();
+					 displayEditTimeslots();
 					 $("#" + href).show();
 					 return false;
                  });
@@ -602,7 +603,7 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
-                            schedules = response.schedules;
+//                            schedules = response.schedules;
                             showNotification("SUCCESS", "Updated dates successfully");
                         } else {
 							showNotification("WARNING", response.message);
@@ -700,14 +701,14 @@
 					var dateArray = null;
 					
 					// 1 -- Get dates from getScheduleAction timeslots
-//					var datesHashSet = new HashSet();
-//					for (var i = 0; i < timeslots.length; i++) {
-//						datesHashSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
-//					}
-//					dateArray = datesHashSet.values().sort();
-//					
+					var datesHashSet = new HashSet();
+					for (var i = 0; i < timeslots.length; i++) {
+						datesHashSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
+					}
+					dateArray = datesHashSet.values().sort();
+
 					// 2 -- Get dates from startdate and enddate
-					dateArray = getDateArrayBetween(startDate, endDate);
+//					dateArray = getDateArrayBetween(startDate, endDate);
 					
 					// 3 -- Get dates from datepickers
 //					var milestoneName = $("#milestoneTimeslotsSelect").val();

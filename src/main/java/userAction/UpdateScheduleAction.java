@@ -8,9 +8,11 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -146,6 +148,44 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 					}
 				}
 				
+				//ABHILASH MODIFIED
+				//Add new timeslots when new dates are selected
+				int duration = updatedSch.getMilestone().getSlotDuration();
+				Calendar cal = Calendar.getInstance();
+				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+				Set<Timeslot> newTimeslots = new HashSet<Timeslot>();
+				newDates: for (String newDate : newDates) {
+					iter = currentTimeslots.iterator();
+					while (iter.hasNext()) {
+						Timeslot t = iter.next();
+						if (t.getStartTime().toString().split(" ")[0].equals(newDate)) {
+							//New date already has timeslot, move on to next date
+							continue newDates;
+						}
+					}
+					//New date does not have timeslot. Add timeslots for this date
+					cal.clear();
+					cal.set(Calendar.HOUR_OF_DAY, newDayStart);
+					Timestamp currentDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
+					cal.set(Calendar.HOUR_OF_DAY, newDayEnd);
+					Timestamp endDayTimestamp = Timestamp.valueOf(newDate + " " + timeFormat.format(cal.getTime()));
+					while (currentDayTimestamp.before(endDayTimestamp)) {
+						cal.clear();
+						cal.setTimeInMillis(currentDayTimestamp.getTime());
+						cal.add(Calendar.MINUTE, duration);
+						Timestamp endSlotTimestamp = new Timestamp(cal.getTimeInMillis());
+						if (endSlotTimestamp.after(endDayTimestamp)) break; //Don't add incompliant timeslots
+						logger.debug("Persisting start: " + currentDayTimestamp + ", end: " + endSlotTimestamp + " for " + updatedSch.getMilestone().getName());
+						Timeslot newT = new Timeslot();
+						newT.setStartTime(currentDayTimestamp);
+						newT.setEndTime(endSlotTimestamp);
+						newT.setVenue("N/A");
+						newT.setSchedule(updatedSch);
+						em.persist(newT);
+						currentDayTimestamp = endSlotTimestamp; //Continue while loop
+					}
+				}
+				
 				//Timeslot updates completed. Move on to check overall schedule object
 				Timestamp startTimestamp = Timestamp.valueOf(chosenDates.getString(0) + " 00:00:00");
 				Timestamp endTimestamp = Timestamp.valueOf(chosenDates.getString(chosenDates.length() - 1) + " 00:00:00");
@@ -165,6 +205,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 						}
 					}
 				}
+				
 				//All clear. Updating information and storing in database
 				updatedSch.setStartDate(startTimestamp);
 				//Calculating the real end of the schedule
@@ -239,3 +280,6 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
         request = hsr;
     }
 }
+
+
+
