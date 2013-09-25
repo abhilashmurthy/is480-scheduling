@@ -253,7 +253,6 @@
 										<table class='timeslotsLegend'>
 											<tr>
 												<td class='legendBox' style="background-color:#B8F79E;"></td><td>Available</td>
-												<td class='legendBox' style="background-color:#faf4a8;"></td><td>Team Booking</td>
 											</tr>
 										</table>
 									</td>

@@ -44,9 +44,21 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
                 //get the current milestone settings
                 Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
 				
+				//convert settingsDetails into an array
+				String[] setArr = settingDetails.split(",");
+				
+				String toUpdate = "[{email[status:frequency],";
+				
+				toUpdate += setArr[1] + ",";
+				toUpdate += setArr[2] + ",";
+				toUpdate += "}{sms[status:frequency],";
+				toUpdate += setArr[4] + ",";
+				toUpdate += setArr[5] + ",";
+				toUpdate += "}]";
+				
 				//set to the updated list                				
 				em.getTransaction().begin();
-				currentSettings.setValue(settingDetails);
+				currentSettings.setValue(toUpdate);
 				em.persist(currentSettings);
 				em.getTransaction().commit();
 
