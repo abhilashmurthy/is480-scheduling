@@ -18,6 +18,7 @@ import model.Booking;
 import model.Schedule;
 import model.Timeslot;
 import model.User;
+import model.role.Faculty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,13 +96,21 @@ public class TimeslotManager {
     }
     
     public static void delete(EntityManager em, Timeslot timeslot) {
-        logger.trace("Deleting timeslot: " + timeslot);
+        logger.trace("Deleting timeslot: " + timeslot); //TODO: Optional attendees for bookings
+		//Finding all faculty that marked this timeslot as unavailable
+		Query findFaculty = em.createQuery("SELECT f from Faculty f WHERE :timeslot MEMBER OF f.unavailableTimeslots")
+				.setParameter("timeslot", timeslot);
+		List<Faculty> faculty = findFaculty.getResultList();
+		for (Faculty f : faculty) { //Removing this timeslot from these faculty's availibility
+			f.getUnavailableTimeslots().remove(timeslot);
+		}
+		//Finding all bookings related to this timeslot for removal
 		Query findBookings = em.createQuery("SELECT b from Booking b WHERE b.timeslot = :timeslot").setParameter("timeslot", timeslot);
 		List<Booking> bookings = findBookings.getResultList();
 		for (Booking b : bookings) {
 			b.setRequiredAttendees(null);
 		}
-		em.flush();
+		em.flush(); //Forcing write to database
         Query removeBookings = em.createQuery("DELETE FROM Booking b WHERE b.timeslot = :timeslot").setParameter("timeslot", timeslot);
 		removeBookings.executeUpdate();
 		em.remove(timeslot);

@@ -137,7 +137,8 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setSchedule(s);
                 em.persist(t);
             } //End of timeslot creation loop
-			em.flush();
+			
+			em.flush(); //Forcing write to database
 			em.getTransaction().commit();
 			
             json.put("success", true);
