@@ -228,7 +228,7 @@
 									</tr>
 									<tr>
 										<td class="formLabelTd">Semester Name</td>
-										<td><input id="semesterInput" type="text" name="semester" placeholder="<%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td><td><input id="editScheduleSubmitBtn" type="submit" value="Edit" data-loading-text="Done" class="btn btn-primary"/></td>
+										<td><input id="semesterInput" type="text" name="semester" placeholder="eg. <%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td><td><input id="editScheduleSubmitBtn" type="submit" value="Edit" data-loading-text="Done" class="btn btn-primary"/></td>
 									</tr>
 								</table>
 							</div>
