@@ -219,7 +219,7 @@
 									</tr>
 									<tr>
 										<td class="formLabelTd">Semester Name</td>
-										<td><input id="semesterInput" type="text" name="semester" placeholder="<%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td>
+										<td><input id="semesterInput" type="text" name="semester" placeholder="eg. <%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td>
 									</tr>
 								</table>
 							</div>
