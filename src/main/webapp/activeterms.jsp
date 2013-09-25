@@ -101,7 +101,7 @@
 		
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
-			loadActiveTerms = function() {
+			$(function() {
 				//Method to update the dropdown list based on the radio buttons selected
 				$(":radio").click(function(){
 					var dropdown = $("#defaultActiveTermList");
@@ -142,7 +142,7 @@
 					if (activeTermData.activeTerms.length === 0) {
 						showNotification("WARNING", "Please select atleast one active term!");
 						$("#submitFormBtn").button('reset');
-						return false;
+						return;
 					}
 					
 					$.ajax({
@@ -183,53 +183,49 @@
 					}
 					return arr;
 				}
-				
-				//Notification-------------
-				function showNotification(action, notificationMessage) {
-					var opts = {
-						title: "Note",
-						text: notificationMessage,
-						type: "warning",
-						icon: false,
-						sticker: false,
-						mouse_reset: false,
-						animation: "fade",
-						animate_speed: "fast",
-						before_open: function(pnotify) {
-							pnotify.css({
-							   top: "52px",
-							   left: ($(window).width() / 2) - (pnotify.width() / 2)
-							});
-						}
-					};
-					switch (action) {
-						case "SUCCESS":
-							opts.title = "Updated";
-							opts.type = "success";
-							break;
-						case "ERROR":
-							opts.title = "Error";
-							opts.type = "error";
-							break;
-						case "INFO":
-							opts.title = "Error";
-							opts.type = "info";
-							break;
-						case "WARNING":
-							$.pnotify_remove_all();
-							opts.title = "Note";
-							opts.type = "warning";
-							break;
-						default:
-							alert("Something went wrong");
+			});
+			
+			//Notification-------------
+			function showNotification(action, notificationMessage) {
+				var opts = {
+					title: "Note",
+					text: notificationMessage,
+					type: "warning",
+					icon: false,
+					sticker: false,
+					mouse_reset: false,
+					animation: "fade",
+					animate_speed: "fast",
+					before_open: function(pnotify) {
+						pnotify.css({
+						   top: "52px",
+						   left: ($(window).width() / 2) - (pnotify.width() / 2)
+						});
 					}
-					$.pnotify(opts);
-					return false;
+				};
+				switch (action) {
+					case "SUCCESS":
+						opts.title = "Updated";
+						opts.type = "success";
+						break;
+					case "ERROR":
+						opts.title = "Error";
+						opts.type = "error";
+						break;
+					case "INFO":
+						opts.title = "Error";
+						opts.type = "info";
+						break;
+					case "WARNING":
+						$.pnotify_remove_all();
+						opts.title = "Note";
+						opts.type = "warning";
+						break;
+					default:
+						alert("Something went wrong");
 				}
-			};
-			
-			
-			addLoadEvent(loadActiveTerms);
+				$.pnotify(opts);
+			}
 		</script>
     </body>
 </html>

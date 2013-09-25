@@ -57,7 +57,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         "smu_fullname",
         "smu_groups",
         "smu_username"};
-    private static final String SECRET_KEY = "psasLive2013";
+    private static final String SECRET_KEY = "psastest2012";
 
     public static String encode(String plain) {
         try {

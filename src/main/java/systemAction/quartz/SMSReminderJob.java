@@ -56,8 +56,8 @@ public class SMSReminderJob implements Job {
             long bookingId = dataMap.getLong("bookingId");
             Booking booking = em.find(Booking.class, bookingId);
 
-            //TODO SMS Functionality disabled. Re-enable once subscription has been activated!
-            if (true) {
+            //Block SMSs if system is in Dev Mode
+            if (MiscUtil.DEV_MODE) {
                 logItem.setSuccess(true);
                 logItem.setMessage("Job triggered with Booking ID: " + booking.getId() + ". SMS not sent.");
                 return;
