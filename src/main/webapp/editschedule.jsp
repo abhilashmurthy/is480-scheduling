@@ -45,6 +45,10 @@
                 color: darkblue;
                 padding-bottom: 20px;
             }
+			
+			.venueLabel {
+				vertical-align: top;
+			}
 
             .submitBtnRow {
                 border-bottom: none;
@@ -87,6 +91,10 @@
                 padding: 20px 0px 20px 5px !important;
             }
             
+			#editScheduleSubmitBtn {
+				margin-top: -15px;
+			}
+			
             .schedulePanel {
                 padding-left: 5%;
             }
@@ -220,7 +228,7 @@
 									</tr>
 									<tr>
 										<td class="formLabelTd">Semester Name</td>
-										<td><input id="semesterInput" type="text" name="semester" placeholder="<%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td>
+										<td><input id="semesterInput" type="text" name="semester" placeholder="<%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td><td><input id="editScheduleSubmitBtn" type="submit" value="Edit" data-loading-text="Done" class="btn btn-primary"/></td>
 									</tr>
 								</table>
 							</div>
@@ -228,7 +236,7 @@
 							<div id="editSchedulePanel" class="schedulePanel">
 									<table id="editScheduleTable">
 										<tr><th>Milestone</th><th colspan="2">Dates</th><th class="dayHours">Day Hours</th></tr>
-										<tr id="editScheduleSubmitRow"><td></td><td><input id="editScheduleSubmitBtn" type="submit" value="Edit" data-loading-text="Done" class="btn btn-primary"/></td></tr>
+										<tr id="editScheduleSubmitRow"><td></td></tr>
 									</table>
 								<h4 id="scheduleResultMessage"></h4>
 							</div>
@@ -251,7 +259,7 @@
 										</td>
 									</tr>
 									<tr><td class="formLabelTd">Milestone</td><td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td></tr>
-									<tr><td class="formLabelTd">Venue</td>
+									<tr><td class="venueLabel formLabelTd">Venue</td>
 										<td>
 											<input id="venueInput" type="text" name="venue" placeholder="SIS Seminar Room 2-1"/>
 											<button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Edit</button>
@@ -288,7 +296,10 @@
                 loadInitialValues();
                 
                 function loadInitialValues() {
-                    $("#semesterInput").val(activeSemesterStr);
+					$("#editScheduleTable").empty();
+					$("#editScheduleTable").append("<tr id='editScheduleSubmitRow'><td></td></tr>");
+					$("#milestoneTimeslotsSelect").empty();
+					$("#semesterInput").val(activeSemesterStr);
 					termNames = JSON.parse('<s:property escape="false" value="termNameJson"/>');
 					schedules = JSON.parse('<s:property escape="false" value="scheduleJson"/>');
                     displayEditSchedules();
@@ -409,13 +420,13 @@
                  ------------------------------------------*/
                  
 				 //Manual navigation because of struts URL
-                $(".editTimeslotsTab a").removeAttr('data-toggle');
                  $(".scheduleLeftNav li a").on('click', function(){
 					 var href = $(this).attr('href').split('#')[1];
 					 $(".tab-pane, .nav-tabs li").removeClass('active');
 					 $(".tab-pane").hide();
 					 $("#" + href).addClass('active');
 					 $(".nav-tabs ." + href).addClass('active');
+					 loadInitialValues(); //Refreshes everything on page
 					 $("#" + href).show();
 					 return false;
                  });
@@ -584,7 +595,6 @@
 						schedules: schedules
 					};
 					
-					console.log("editScheduleData is: " + JSON.stringify(editScheduleData));
                     $.ajax({
                         type: 'POST',
                         url: 'updateScheduleJson',
@@ -593,7 +603,7 @@
                     }).done(function(response) {
                         if (response.success) {
                             schedules = response.schedules;
-                            showNotification("SUCCESS", "Edited dates successfully");
+                            showNotification("SUCCESS", "Updated dates successfully");
                         } else {
 							showNotification("WARNING", response.message);
 							$("#editScheduleSubmitBtn").button('reset');
@@ -620,6 +630,7 @@
 						milestoneOption.html(schedule.milestoneName);
                         $("#milestoneTimeslotsSelect").append(milestoneOption);
                     }
+					$("#milestoneTimeslotsSelect").val(schedules[0].milestoneName).change();
                     resetTimeslots(schedules[0].milestoneName, activeAcademicYearStr, activeSemesterStr); //Select first milestone
                 }
 				
@@ -628,32 +639,7 @@
 					selectedSchedule = getScheduleData(milestone, year, semester);
 					makeTimeslotTable("timeslotsTable", selectedSchedule.timeslots, selectedSchedule.startDate, selectedSchedule.endDate, selectedSchedule.dayStartTime, selectedSchedule.dayEndTime);
 					populateTimeslotsTable(selectedSchedule.timeslots, selectedSchedule.duration);
-					//Set venue to the venue present in the largest number of timeslots
-					var venuesSet = new HashSet();
-					for (var i = 0; i < selectedSchedule.timeslots.length; i++) {
-						venuesSet.add(selectedSchedule.timeslots[i].venue);
-					}
-					var venueCount = {};
-					for (var i = 0; i < venuesSet.values().length; i++) {
-						venueCount[venuesSet.values()[i]] = 0;
-					}
-					for (var i = 0; i < selectedSchedule.timeslots.length; i++) {
-						venueCount[selectedSchedule.timeslots[i].venue] = ++venueCount[selectedSchedule.timeslots[i].venue];
-					}
-					var maxVenue = function(){
-						var max = 0;
-						var venue = null;
-						for (var key in venueCount) {
-							if (venueCount.hasOwnProperty(key)) {
-								if (venueCount[key] > max) {
-									max = venueCount[key];
-									venue = key;
-								}
-							}
-						}
-						return venue;
-					};
-					$("#venueInput").val(maxVenue).change();
+					$("#venueInput").attr('placeholder', 'Overwrite venue...');
 				}
 
 				$("#editTimeslotsTermId").on('change', function(e){
@@ -713,14 +699,19 @@
                     var thead = $(document.createElement("thead"));
 					var dateArray = null;
 					
-					//Get dates from timeslots -- This won't work because new timeslots are being added
-					var datesHashSet = new HashSet();
-					for (var i = 0; i < timeslots.length; i++) {
-						datesHashSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
-					}
+					// 1 -- Get dates from getScheduleAction timeslots
+//					var datesHashSet = new HashSet();
+//					for (var i = 0; i < timeslots.length; i++) {
+//						datesHashSet.add(Date.parse(timeslots[i].datetime).toString("yyyy-MM-dd"));
+//					}
 //					dateArray = datesHashSet.values().sort();
-					//Get dates from startdate and enddate
+//					
+					// 2 -- Get dates from startdate and enddate
 					dateArray = getDateArrayBetween(startDate, endDate);
+					
+					// 3 -- Get dates from datepickers
+//					var milestoneName = $("#milestoneTimeslotsSelect").val();
+//					dateArray = $("#milestone_" + milestoneName.toLowerCase()).multiDatesPicker('getDates');
 
                     //Creating table header with dates
                     thead.append("<th></th>"); //Empty cell for time column
@@ -770,7 +761,6 @@
                 
                 $('body').on('click', '.timeslotcell', function(e) {
 					if ($(this).is('.teamExists')) return false;
-                    console.log("clicked timeslotcell");
                     triggerTimeslot(this, selectedSchedule.duration);
                     return false;
                 });
