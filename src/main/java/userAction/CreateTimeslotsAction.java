@@ -69,15 +69,32 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
             for (int j = 0; j < timeslotTimes.length(); j++) {
                 //Getting startTime and endTime
                 Timestamp startTime = Timestamp.valueOf(timeslotTimes.getString(j));
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(startTime.getTime());
-                cal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
-                Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-
+				Calendar startCal = Calendar.getInstance();
+				startCal.setTimeInMillis(startTime.getTime());
+                Calendar endCal = Calendar.getInstance();
+				endCal.setTimeInMillis(startTime.getTime());
+                endCal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
+                Timestamp endTime = new Timestamp(endCal.getTimeInMillis());
+				
+				//Check start time compliance with day start
+				if ((startCal.get(Calendar.HOUR_OF_DAY) < s.getDayStartTime())) { //Timeslot breaches day start
+					logger.warn("Timestamp " + startTime.toString() + " not compliant with day start time for Schedule[id=" + s.getId() + "]");
+					continue;
+				}
+				
+				//Check end time compliance with day end
+				if ((endCal.get(Calendar.HOUR_OF_DAY) > s.getDayEndTime()) ||
+					(endCal.get(Calendar.HOUR_OF_DAY) == s.getDayEndTime() && endCal.get(Calendar.MINUTE) > 0)) { //Timeslot breaches day end
+					logger.warn("Timestamp " + startTime.toString() + " not compliant with day end time for Schedule[id=" + s.getId() + "]");
+					continue;
+				}
                 Timeslot t = new Timeslot();
                 t.setStartTime(startTime);
                 t.setEndTime(endTime);
-                t.setVenue(scheduleData.getString("venue"));
+				String venue = (scheduleData.getString("venue") != null
+						&& !scheduleData.getString("venue").isEmpty())
+						? scheduleData.getString("venue") : "N/A" ;
+                t.setVenue(venue);
                 t.setSchedule(s);
                 em.persist(t);
             } //End of timeslot creation loop

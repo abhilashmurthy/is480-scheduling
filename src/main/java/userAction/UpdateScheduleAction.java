@@ -110,7 +110,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 								continue;
 							} else { //Abort update if there's an active booking for the timeslot
 								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
-								json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
+								json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update schedule!");
 								json.put("success", false);
 								return SUCCESS;
 							}
@@ -127,7 +127,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 								continue;
 							} else { //Abort update if there's an active booking for the timeslot
 								logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
-								json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
+								json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update schedule!");
 								json.put("success", false);
 								return SUCCESS;
 							}
@@ -139,7 +139,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 							continue;
 						} else { //Abort update if there's an active booking for the timeslot
 							logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
-							json.put("message", "One or more active bookings will be affected. Cannot update schedule!");
+							json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update schedule!");
 							json.put("success", false);
 							return SUCCESS;
 						}
