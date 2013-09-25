@@ -154,7 +154,14 @@ public class DBInitUtil {
         acceptance12013.setMilestone(acceptance);
 		acceptance12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
 		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
-        acceptance12013.setEndDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
+		Timestamp accEndTimestamp = new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0);
+		//Calculating the real end of the schedule
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTimeInMillis(accEndTimestamp.getTime());
+		endCal.add(Calendar.DAY_OF_MONTH, 1); //Adding a day
+		endCal.add(Calendar.MINUTE, - (acceptance.getSlotDuration())); //Subtracting the slot duration
+		accEndTimestamp.setTime(endCal.getTimeInMillis());
+        acceptance12013.setEndDate(accEndTimestamp);
         acceptance12013.setDayStartTime(9);
         acceptance12013.setDayEndTime(19);
 
@@ -163,7 +170,13 @@ public class DBInitUtil {
 		cal.add(Calendar.MONTH, 1); //Midterm is after another month
 		midterm12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
 		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
-        midterm12013.setEndDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
+        Timestamp midEndTimestamp = new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0);
+		//Calculating the real end of the schedule
+		endCal.setTimeInMillis(midEndTimestamp.getTime());
+		endCal.add(Calendar.DAY_OF_MONTH, 1); //Adding a day
+		endCal.add(Calendar.MINUTE, - (midterm.getSlotDuration())); //Subtracting the slot duration
+		midEndTimestamp.setTime(endCal.getTimeInMillis());
+        midterm12013.setEndDate(midEndTimestamp);
         midterm12013.setDayStartTime(9);
         midterm12013.setDayEndTime(19);
 
@@ -172,7 +185,13 @@ public class DBInitUtil {
 		cal.add(Calendar.MONTH, 1); //Final is after another month
 		final12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
 		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
-        final12013.setEndDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
+        Timestamp finEndTimestamp = new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0);
+		//Calculating the real end of the schedule
+		endCal.setTimeInMillis(finEndTimestamp.getTime());
+		endCal.add(Calendar.DAY_OF_MONTH, 1); //Adding a day
+		endCal.add(Calendar.MINUTE, - (finalMilestone.getSlotDuration())); //Subtracting the slot duration
+		finEndTimestamp.setTime(endCal.getTimeInMillis());
+        final12013.setEndDate(finEndTimestamp);
         final12013.setDayStartTime(9);
         final12013.setDayEndTime(19);
 
