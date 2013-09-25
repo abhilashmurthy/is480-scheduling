@@ -93,12 +93,8 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                 for (Term term : allActiveTerms) {
                     HashMap<String, String> map = new HashMap<String, String>();
                     long idOfTerm = term.getId();
-                    String semester = term.getSemester();
-                    int startAcademicYear = term.getAcademicYear();
-                    int endAcademicYear = startAcademicYear + 1;
-                    String academicYear = String.valueOf(startAcademicYear) + "-" + String.valueOf(endAcademicYear);
 
-                    map.put("termName", (academicYear + " " + semester));
+                    map.put("termName", term.getDisplayName());
                     map.put("termId", String.valueOf(idOfTerm));
 
                     data.add(map);
