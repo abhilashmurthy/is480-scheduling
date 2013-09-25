@@ -228,7 +228,7 @@
 									</tr>
 									<tr>
 										<td class="formLabelTd">Semester Name</td>
-										<td><input id="semesterInput" type="text" name="semester" placeholder="eg. <%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td><td><input id="editScheduleSubmitBtn" type="submit" value="Edit" data-loading-text="Done" class="btn btn-primary"/></td>
+										<td><input id="semesterInput" type="text" name="semester" placeholder="eg. <%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td><td><input id="editScheduleSubmitBtn" type="submit" value="Save" data-loading-text="Done" class="btn btn-primary"/></td>
 									</tr>
 								</table>
 							</div>
@@ -262,7 +262,7 @@
 									<tr><td class="venueLabel formLabelTd">Venue</td>
 										<td>
 											<input id="venueInput" type="text" name="venue" placeholder="SIS Seminar Room 2-1"/>
-											<button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Edit</button>
+											<button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Done">Save</button>
 											<table class='timeslotsLegend'>
 												<tr>
 													<td class='legendBox' style="background-color:#B8F79E;"></td><td>Available</td>
