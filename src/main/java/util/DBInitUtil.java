@@ -820,7 +820,7 @@ public class DBInitUtil {
 		
 		Settings manageNotifications = new Settings();
 		manageNotifications.setName("manageNotifications");
-		manageNotifications.setValue("email,On,2,sms,On,24");
+		manageNotifications.setValue("[{email[status:frequency],On,2,}{sms[status:frequency],On,24,}]");
         //Persistence
         em.persist(activeTerms);
         em.persist(defaultTerm);

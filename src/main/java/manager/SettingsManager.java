@@ -61,4 +61,5 @@ public class SettingsManager {
 		return s.getValue();
 	}
 	
+	
 }

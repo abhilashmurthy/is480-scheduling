@@ -106,98 +106,100 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
             
             try {
-                em.getTransaction().begin();
+				synchronized(CreateBookingAction.class) {
+					em.getTransaction().begin();
 
-                Booking booking = new Booking();
+					Booking booking = new Booking();
 
-                //Assign information to booking
-                booking.setTimeslot(timeslot); 
-                booking.setTeam(team);
-				Timestamp currentTime = new Timestamp(Calendar.getInstance().getTimeInMillis());
-                booking.setCreatedAt(currentTime);
-                
-                //Add team members to attendees
-                HashSet<User> reqAttendees = new HashSet<User>();
-                reqAttendees.addAll(team.getMembers());
+					//Assign information to booking
+					booking.setTimeslot(timeslot); 
+					booking.setTeam(team);
+					Timestamp currentTime = new Timestamp(Calendar.getInstance().getTimeInMillis());
+					booking.setCreatedAt(currentTime);
 
-                //Create booking response entries based on required attendees for milestone
-                HashMap<User, Response> responseList = new HashMap<User, Response>();
-                Milestone milestone = timeslot.getSchedule().getMilestone();
-				ArrayList<String> requiredAttendees = milestone.getRequiredAttendees();
-				for (String roleName : requiredAttendees) {
-					Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
-					Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
-					responseList.put(roleUser, Response.PENDING);
-                    reqAttendees.add(roleUser);
+					//Add team members to attendees
+					HashSet<User> reqAttendees = new HashSet<User>();
+					reqAttendees.addAll(team.getMembers());
+
+					//Create booking response entries based on required attendees for milestone
+					HashMap<User, Response> responseList = new HashMap<User, Response>();
+					Milestone milestone = timeslot.getSchedule().getMilestone();
+					ArrayList<String> requiredAttendees = milestone.getRequiredAttendees();
+					for (String roleName : requiredAttendees) {
+						Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
+						Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
+						responseList.put(roleUser, Response.PENDING);
+						reqAttendees.add(roleUser);
+					}
+
+					//Add optional attendees
+					HashSet<String> optionalAttendees = new HashSet<String>();
+					if (optionalAttendeesArray != null) optionalAttendees = new HashSet<String>(Arrays.asList(optionalAttendeesArray));
+
+					booking.setResponseList(responseList);
+					booking.setRequiredAttendees(reqAttendees);
+					booking.setOptionalAttendees(optionalAttendees);
+					booking.setLastEditedBy(user.getFullName());
+					booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+					NewBookingEmail newEmail = new NewBookingEmail(booking);
+					RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
+					newEmail.sendEmail();
+					responseEmail.sendEmail();
+					em.persist(booking);
+
+					//Setting the current active booking in the timeslot object
+					timeslot.setCurrentBooking(booking);
+					em.persist(timeslot);
+
+					map.put("id", timeslot.getId());
+					map.put("datetime", dateFormat.format(timeslot.getStartTime()) + " " + timeFormat.format(timeslot.getStartTime()));
+					map.put("time", viewTimeFormat.format(timeslot.getStartTime()) + " - " + viewTimeFormat.format(timeslot.getEndTime()));
+					map.put("venue", timeslot.getVenue());
+					map.put("team", team.getTeamName());
+					map.put("startDate", viewDateFormat.format(new Date(timeslot.getStartTime().getTime())));
+					map.put("status", booking.getBookingStatus().toString());
+
+					//Adding all students
+					List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>();
+					Set<Student> teamMembers = team.getMembers();
+					for (User studentUser : teamMembers) {
+						HashMap<String, String> studentMap = new HashMap<String, String>();
+						studentMap.put("name", studentUser.getFullName());
+						students.add(studentMap);
+					}
+					map.put("students", students);
+
+					//Adding all faculty and their status
+					List<HashMap<String, String>> faculties = new ArrayList<HashMap<String, String>>();
+					HashMap<User, Response> statusList = responseList;
+					for (User facultyUser : statusList.keySet()) {
+						HashMap<String, String> facultyMap = new HashMap<String, String>();
+						facultyMap.put("name", facultyUser.getFullName());
+						facultyMap.put("status", statusList.get(facultyUser).toString());
+						faculties.add(facultyMap);
+					}
+					 map.put("faculties", faculties);
+
+					//Adding all optionals
+					List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>();
+					for (String optional : optionalAttendees) {
+						HashMap<String, String> optionalMap = new HashMap<String, String>();
+						optionalMap.put("id", optional);
+						optionalMap.put("name", optional);
+						optionals.add(optionalMap);
+					}
+					map.put("optionals", optionals);
+
+					TA ta = timeslot.getTA();
+					String TA = (ta != null) ? ta.getFullName() : "-";
+					map.put("TA", TA);
+					String teamWiki = "-";
+					map.put("teamWiki", teamWiki);
+
+					json.put("booking", map);
+
+					em.getTransaction().commit();
 				}
-                
-                //Add optional attendees
-                HashSet<String> optionalAttendees = new HashSet<String>();
-                if (optionalAttendeesArray != null) optionalAttendees = new HashSet<String>(Arrays.asList(optionalAttendeesArray));
-
-                booking.setResponseList(responseList);
-                booking.setRequiredAttendees(reqAttendees);
-                booking.setOptionalAttendees(optionalAttendees);
-                booking.setLastEditedBy(user.getFullName());
-                booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
-                NewBookingEmail newEmail = new NewBookingEmail(booking);
-                RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
-                newEmail.sendEmail();
-                responseEmail.sendEmail();
-                em.persist(booking);
-
-                //Setting the current active booking in the timeslot object
-                timeslot.setCurrentBooking(booking);
-                em.persist(timeslot);
-                
-                map.put("id", timeslot.getId());
-                map.put("datetime", dateFormat.format(timeslot.getStartTime()) + " " + timeFormat.format(timeslot.getStartTime()));
-                map.put("time", viewTimeFormat.format(timeslot.getStartTime()) + " - " + viewTimeFormat.format(timeslot.getEndTime()));
-                map.put("venue", timeslot.getVenue());
-                map.put("team", team.getTeamName());
-                map.put("startDate", viewDateFormat.format(new Date(timeslot.getStartTime().getTime())));
-                map.put("status", booking.getBookingStatus().toString());
-                
-                //Adding all students
-                List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>();
-                Set<Student> teamMembers = team.getMembers();
-                for (User studentUser : teamMembers) {
-                    HashMap<String, String> studentMap = new HashMap<String, String>();
-                    studentMap.put("name", studentUser.getFullName());
-                    students.add(studentMap);
-                }
-                map.put("students", students);
-                
-                //Adding all faculty and their status
-                List<HashMap<String, String>> faculties = new ArrayList<HashMap<String, String>>();
-                HashMap<User, Response> statusList = responseList;
-                for (User facultyUser : statusList.keySet()) {
-                    HashMap<String, String> facultyMap = new HashMap<String, String>();
-                    facultyMap.put("name", facultyUser.getFullName());
-                    facultyMap.put("status", statusList.get(facultyUser).toString());
-                    faculties.add(facultyMap);
-                }
-                 map.put("faculties", faculties);
-                
-                //Adding all optionals
-                List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>();
-                for (String optional : optionalAttendees) {
-                    HashMap<String, String> optionalMap = new HashMap<String, String>();
-                    optionalMap.put("id", optional);
-                    optionalMap.put("name", optional);
-                    optionals.add(optionalMap);
-                }
-                map.put("optionals", optionals);
-               
-				TA ta = timeslot.getTA();
-                String TA = (ta != null) ? ta.getFullName() : "-";
-                map.put("TA", TA);
-                String teamWiki = "-";
-                map.put("teamWiki", teamWiki);
-                
-                json.put("booking", map);
-
-                em.getTransaction().commit();
             } catch (Exception e) {
                 //Rolling back write operations
                 logger.error("Exception caught: " + e.getMessage());
