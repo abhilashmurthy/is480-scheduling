@@ -6,23 +6,21 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Role;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
-import manager.ScheduleManager;
 import manager.TimeslotManager;
 import model.Schedule;
 import model.Timeslot;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -37,157 +35,93 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
     static final Logger logger = LoggerFactory.getLogger(UpdateTimeslotsAction.class);
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
-    public HashMap<String, Object> getJson() {
-        return json;
-    }
-
-    public void setJson(HashMap<String, Object> json) {
-        this.json = json;
-    }
-
     @Override
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-            json.put("exception", false);
-            em = MiscUtil.getEntityManagerInstance();
+			em = MiscUtil.getEntityManagerInstance();
+			
+			//Checking user role
+			Role activeRole = (Role) request.getSession().getAttribute("activeRole");
+			if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) {
+				logger.error("Unauthorized user");
+				json.put("message", "You do not have the permission to perform this function!");
+				json.put("success", false);
+				return SUCCESS;
+			}
+			
+			//Getting input data
+            JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
 
-            Map parameters = request.getParameterMap();
-
-            //Getting schedule id's
-            int acceptanceId = Integer.parseInt(((String[]) parameters.get("acceptanceId"))[0]);
-            int midtermId = Integer.parseInt(((String[]) parameters.get("midtermId"))[0]);
-            int finalId = Integer.parseInt(((String[]) parameters.get("finalId"))[0]);
-
-            logger.debug("Got schedule ids");
-
-            //Getting timeslot values
-            String[] acceptanceTimeslotStrings = (String[]) parameters.get("timeslot_acceptance[]");
-            String[] midtermTimeslotStrings = (String[]) parameters.get("timeslot_midterm[]");
-            String[] finalTimeslotStrings = (String[]) parameters.get("timeslot_final[]");
-
-            logger.debug("Got string arrays of schedules");
-
-            for (String s : acceptanceTimeslotStrings) {
-                logger.debug("Acceptance timeslot: " + s);
+            Schedule s = em.find(Schedule.class, inputData.getLong("scheduleId"));
+            if (s == null) {
+                json.put("success", false);
+				json.put("message", "Oops. Something went wrong!");
+                logger.error("Schedule with ID: " + inputData.getLong("scheduleId") + " not found.");
+                return SUCCESS;
             }
-
-            //Making lists of STORED timeslots
-            Set<Timeslot> acceptanceTimeslots = new HashSet<Timeslot>();
-            Set<Timeslot> midtermTimeslots = new HashSet<Timeslot>();
-            Set<Timeslot> finalTimeslots = new HashSet<Timeslot>();
-            Calendar cal = Calendar.getInstance();
-            EntityTransaction transaction = null;
-
-            Schedule acceptanceSchedule = ScheduleManager.findById(em, acceptanceId);
-            Schedule midtermSchedule = ScheduleManager.findById(em, midtermId);
-            Schedule finalSchedule = ScheduleManager.findById(em, finalId);
-
-            logger.debug("Got all schedules: acceptance[" + acceptanceSchedule + "], midterm[" + midtermSchedule + "], final[" + finalSchedule + "]");
-            
-            //Get old based on schedules
-            List<Timeslot> oldAcceptanceTimeslots = TimeslotManager.findBySchedule(em, acceptanceSchedule);
-            List<Timeslot> oldMidtermTimeslots = TimeslotManager.findBySchedule(em, midtermSchedule);
-            List<Timeslot> oldFinalTimeslots = TimeslotManager.findBySchedule(em, finalSchedule);
-            
-            //Delete old timeslots
-            List<Timeslot> acceptanceDeletes = getTimeslotsToDelete(oldAcceptanceTimeslots, acceptanceTimeslotStrings);
-            List<Timeslot> midtermDeletes = getTimeslotsToDelete(oldMidtermTimeslots, midtermTimeslotStrings);
-            List<Timeslot> finalDeletes = getTimeslotsToDelete(oldFinalTimeslots, finalTimeslotStrings);
-            
-            for (Timeslot t : acceptanceDeletes) {
-                logger.debug("Acceptance delete: " + t.getStartTime());
-            }
-            
-            List<Timeslot> allDeletes = new ArrayList<Timeslot>();
-            allDeletes.addAll(acceptanceDeletes);
-            allDeletes.addAll(midtermDeletes);
-            allDeletes.addAll(finalDeletes);
-            
-            for (Timeslot d : allDeletes) {
-                TimeslotManager.delete(em, d);
-            }
-            
-            logger.debug("Deleted : " + allDeletes.size());
-            
-            //Add new timeslots
-            List<String> acceptanceAppends = getTimeslotsToAppend(oldAcceptanceTimeslots, acceptanceTimeslotStrings);
-            List<String> midtermAppends = getTimeslotsToAppend(oldMidtermTimeslots, midtermTimeslotStrings);
-            List<String> finalAppends = getTimeslotsToAppend(oldFinalTimeslots, finalTimeslotStrings);
-            
-            for (String s : acceptanceAppends) {
-                logger.debug("Acceptance append: " + s);
-            }
-            
-            //Append new timeslots
-            for (String s : acceptanceAppends) {
+			//Beginning overall transaction
+			em.getTransaction().begin();
+			
+			JSONArray inputDateTimes = inputData.getJSONArray("timeslots[]");
+			TreeSet<String> dateTimes = new TreeSet<String>();
+			for (int i =0; i < inputDateTimes.length(); i++) {
+				dateTimes.add(inputDateTimes.getString(i));
+			}
+			
+			Set<Timeslot> timeslots = s.getTimeslots();
+			Iterator<Timeslot> iter = timeslots.iterator();
+			while(iter.hasNext()) {
+				Timeslot t = iter.next();
+				if (!dateTimes.contains(t.getStartTime().toString())) { //Timeslot has been removed from the schedule
+					if (t.getCurrentBooking() == null) { //Delete slot if there's no booking
+						TimeslotManager.delete(em, t);
+						dateTimes.remove(t.getStartTime().toString());
+						continue;
+					} else { //Abort update if there's an active booking for the timeslot
+						logger.error("Timeslot[id=" + t.getId() + " has an active booking. Cannot be removed");
+						json.put("message", "Timeslot starting on " + t.getStartTime().toString() + " has an active booking. Cannot update timeslots!");
+						json.put("success", false);
+						return SUCCESS;
+					}
+				} else { //Do nothing. Timeslot still exists in schedule.
+					dateTimes.remove(t.getStartTime().toString());
+				}
+			}
+			
+			//Create timeslot objects for newly chosen times
+			for (String timestampStr : dateTimes) {
                 //Getting startTime and endTime
-                Timestamp startTime = Timestamp.valueOf(s);
-                cal.setTimeInMillis(startTime.getTime());
-                //TODO: Change the 1 to a variable
-                cal.add(Calendar.HOUR, 1);
-                Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-                
+                Timestamp startTime = Timestamp.valueOf(timestampStr);
+				Calendar startCal = Calendar.getInstance();
+				startCal.setTimeInMillis(startTime.getTime());
+                Calendar endCal = Calendar.getInstance();
+				endCal.setTimeInMillis(startTime.getTime());
+                endCal.add(Calendar.MINUTE, s.getMilestone().getSlotDuration());
+                Timestamp endTime = new Timestamp(endCal.getTimeInMillis());
+				
+				//Check start time compliance with day start
+				if ((startCal.get(Calendar.HOUR_OF_DAY) < s.getDayStartTime())) { //Timeslot breaches day start
+					logger.warn("Timestamp " + startTime.toString() + " not compliant with day start time for Schedule[id=" + s.getId() + "]");
+					continue;
+				}
+				
+				//Check end time compliance with day end
+				if ((endCal.get(Calendar.HOUR_OF_DAY) > s.getDayEndTime()) ||
+					(endCal.get(Calendar.HOUR_OF_DAY) == s.getDayEndTime() && endCal.get(Calendar.MINUTE) > 0)) { //Timeslot breaches day end
+					logger.warn("Timestamp " + startTime.toString() + " not compliant with day end time for Schedule[id=" + s.getId() + "]");
+					continue;
+				}
                 Timeslot t = new Timeslot();
                 t.setStartTime(startTime);
                 t.setEndTime(endTime);
-                //TODO: Change to the venue variable
-                t.setVenue("SIS Seminar Room 2-1");
-                //TODO: Handle write error
-                t.setSchedule(acceptanceSchedule);
+                t.setVenue("N/A");
+                t.setSchedule(s);
                 em.persist(t);
-                acceptanceTimeslots.add(t);
-            }
-            
-            logger.debug("Persisted acceptance timeslots: count " + acceptanceTimeslots.size());
-            
-                //Set midterm timeslots
-                for (String s : midtermAppends) {
-                    //Getting startTime and endTime
-                    Timestamp startTime = Timestamp.valueOf(s);
-                    cal.setTimeInMillis(startTime.getTime());
-                    //TODO: Change the 1 to a variable
-                    cal.add(Calendar.HOUR, 1);
-                    cal.add(Calendar.MINUTE, 30);
-                    Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-
-                    Timeslot t = new Timeslot();
-                    t.setStartTime(startTime);
-                    t.setEndTime(endTime);
-                    //TODO: Change to the venue variable
-                    t.setVenue("SIS Seminar Room 2-1");
-                    t.setSchedule(midtermSchedule);
-                    //TODO: Handle write error
-                    em.persist(t);
-                    midtermTimeslots.add(t);
-                }
-
-                logger.debug("Persisted midterm timeslots: count " + midtermTimeslots.size());
-
-                //Set final timeslots
-                for (String s : finalAppends) {
-                    //Getting startTime and endTime
-                    Timestamp startTime = Timestamp.valueOf(s);
-                    cal.setTimeInMillis(startTime.getTime());
-                    //TODO: Change the 1 to a variable
-                    cal.add(Calendar.HOUR, 1);
-                    cal.add(Calendar.MINUTE, 30);
-                    Timestamp endTime = new Timestamp(cal.getTimeInMillis());
-
-                    Timeslot t = new Timeslot();
-                    t.setStartTime(startTime);
-                    t.setEndTime(endTime);
-                    //TODO: Change to the venue variable
-                    t.setVenue("SIS Seminar Room 2-1");
-                    t.setSchedule(finalSchedule);
-                    //Save timeslot
-                    //TODO: Handle write error
-                    em.persist(t);
-                    finalTimeslots.add(t);
-                }
-                
-            logger.debug("Persisted final timeslots: count " + finalTimeslots.size());
-
+            } //End of timeslot creation loop
+			
+			em.getTransaction().commit();
+			
             json.put("success", true);
             json.put("message", "Timeslots udpated");
             return SUCCESS;
@@ -199,44 +133,22 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
                 }
             }
             json.put("success", false);
-            json.put("message", "Error with CreateTimeslots: Escalate to developers!");
+            json.put("message", "Error with UpdateTimeslots: Escalate to developers!");
         } finally {
 			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
 		}
         return SUCCESS;
     }
-    
-    public List<Timeslot> getTimeslotsToDelete(List<Timeslot> oldTimeslots, String[] newTimeslotStrings) {
-        List<Timeslot> timeslotsToDelete = new ArrayList<Timeslot>();
-        oldTimeslots:
-        for (Timeslot t : oldTimeslots) {
-            for (String s : newTimeslotStrings) {
-                if (t.getStartTime().equals(Timestamp.valueOf(s))) {
-                    continue oldTimeslots;
-                }
-            }
-            //Timeslot not found
-            timeslotsToDelete.add(t);
-        }
-        return timeslotsToDelete;
-    }
-    
-    public List<String> getTimeslotsToAppend(List<Timeslot> oldTimeslots, String[] newTimeslotStrings) {
-        List<String> timeslotsToAppend = new ArrayList<String>();
-        newTimeslots:
-        for (String s : newTimeslotStrings) {
-            for (Timeslot t : oldTimeslots) {
-                if (t.getStartTime().equals(Timestamp.valueOf(s))) {
-                    continue newTimeslots;
-                }
-            }
-            //Timeslot not found
-            timeslotsToAppend.add(s);
-        }
-        return timeslotsToAppend;
+
+    public HashMap<String, Object> getJson() {
+        return json;
     }
 
+    public void setJson(HashMap<String, Object> json) {
+        this.json = json;
+    }
+	
     public void setServletRequest(HttpServletRequest hsr) {
         request = hsr;
     }
