@@ -1432,53 +1432,5 @@ public class DeploymentDB {
         em.persist(u166);
         em.persist(u167);
         logger.info("User --> Team links persisted");
-
-        /*
-         * INITIALIZING SETTINGS
-         */
-        Settings activeTerms = new Settings();
-        activeTerms.setName("activeTerms");
-        ArrayList<Long> activeTermIds = new ArrayList<Long>();
-        activeTermIds.add(term12013.getId());
-        activeTerms.setValue(new Gson().toJson(activeTermIds));
-
-        Settings defaultTerm = new Settings();
-        defaultTerm.setName("defaultTerm");
-        defaultTerm.setValue(term12013.getId().toString());
-
-        Settings milestones = new Settings();
-        milestones.setName("milestones");
-        ArrayList<HashMap<String, Object>> milestoneList = new ArrayList<HashMap<String, Object>>();
-        HashMap<String, Object> accMap = new HashMap<String, Object>();
-        accMap.put("order", 1);
-        accMap.put("milestone", "Acceptance");
-        accMap.put("duration", 60);
-        String[] accReqList = {"Supervisor"};
-        accMap.put("attendees", accReqList);
-        milestoneList.add(accMap);
-        HashMap<String, Object> midMap = new HashMap<String, Object>();
-        midMap.put("order", 2);
-        midMap.put("milestone", "Midterm");
-        midMap.put("duration", 90);
-        String[] midReqList = {"Reviewer1", "Reviewer2"};
-        midMap.put("attendees", midReqList);
-        milestoneList.add(midMap);
-        HashMap<String, Object> finMap = new HashMap<String, Object>();
-        finMap.put("order", 3);
-        finMap.put("milestone", "Final");
-        finMap.put("duration", 90);
-        String[] finReqList = {"Supervisor", "Reviewer1"};
-        finMap.put("attendees", finReqList);
-        milestoneList.add(finMap);
-        milestones.setValue(new Gson().toJson(milestoneList));
-		
-		Settings manageNotifications = new Settings();
-		manageNotifications.setName("manageNotifications");
-		manageNotifications.setValue("email,On,2,sms,On,24");
-        //Persistence
-        em.persist(activeTerms);
-        em.persist(defaultTerm);
-        em.persist(milestones);
-		em.persist(manageNotifications);
     }
 }
