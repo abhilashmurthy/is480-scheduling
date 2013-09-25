@@ -418,8 +418,6 @@ public class DeploymentDB {
         Student u167 = new Student ("rui.wang.2011", "WANG Rui", null, term12013);
         
         // Persistence
-        em.persist(uAdmin);
-        em.persist(uCourseCoordinator);
         em.persist(ta1);
         em.persist(ta2);
         em.persist(u1);
