@@ -117,7 +117,9 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
             em.getTransaction().commit();
 
             json.put("success", true);
-            json.put("message", "Timeslots stored successfully");
+            String message = "Timeslots stored successfully";
+			if (ignored) message += ". Certain timeslots were ignored as they breached the limits of the current schedule.";
+            json.put("message", message);
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
