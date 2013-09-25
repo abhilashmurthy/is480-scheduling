@@ -59,6 +59,9 @@ public class Term implements Serializable {
 
 	public void setAcademicYear(int academicYear) {
 		this.academicYear = academicYear;
+		String endAcademicYear = String.valueOf(academicYear + 1);
+		displayName = String.valueOf(academicYear) + "-"
+				+ endAcademicYear.substring(2) + " " + semester;
 	}
 
 	public String getSemester() {
@@ -67,6 +70,9 @@ public class Term implements Serializable {
 
 	public void setSemester(String semester) {
 		this.semester = semester;
+		String endAcademicYear = String.valueOf(academicYear + 1);
+		displayName = String.valueOf(academicYear) + "-"
+				+ endAcademicYear.substring(2) + " " + semester;
 	}
 
 	public String getDisplayName() {
