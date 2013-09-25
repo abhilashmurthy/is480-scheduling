@@ -21,7 +21,9 @@
 			<table id="smsTable" class="table">
 				<tbody>
 					<tr align="center">
-						<td style="width:250px">Subscribe to SMS Notification:</td>
+						<td style="width:250px">Subscribe to SMS Notification:
+							<span style="font-style: italic;">(This feature is currently unavailable!)</span>
+						</td>
 <!--						<td style="width:50px"> 
 							<input type="radio" id="onPref" class="pref" name="pref" value="on">&nbsp; On 
 						</td>
