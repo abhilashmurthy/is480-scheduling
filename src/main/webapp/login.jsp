@@ -127,28 +127,13 @@
                 </p>
             </div>
         </div> <!-- /container -->
-		
-		<button id="testBtn" class="btn btn-inverse" data-loading-text="Logging in..." type="submit">Testing Login*</button>
-		<br />
-		<p id="testLoginMsg">* - To be used by developers for testing purposes only!</p>
 
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
-            $("#testBtn").click(function() {
-                $(this).button('loading');
-                var userId = prompt('Please enter the Username', '');
-                if (userId !== null && userId !== '') {
-                    window.location = 'login?bypass=true&smu_username=' + userId;
-                } else {
-                    alert('Invalid Username');
-                    $(this).button('reset');
-                }
-            });
-			
             $("#ssoBtn").click(function() {
                 $(this).button('loading');
                 //blink(this);
-                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
+                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480psasLive';
             });
         </script>
     </body>
