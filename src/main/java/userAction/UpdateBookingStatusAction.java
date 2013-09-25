@@ -22,7 +22,9 @@ import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
+import manager.SettingsManager;
 import model.Booking;
+import model.Settings;
 import model.Timeslot;
 import model.User;
 import model.role.Faculty;
@@ -211,13 +213,32 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 		Calendar scheduledTime = Calendar.getInstance();
 		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
 		scheduledTime.setTime(presentationStartTime);
-		scheduledTime.add(Calendar.DAY_OF_MONTH, -1); //Subtracting a day from the presentation start time
+		
+		//get the number of days for sms reminder
+		EntityManager em = MiscUtil.getEntityManagerInstance();
+		Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
+		String value = currentSettings.getValue();
+
+		//convert settingsDetails into an array
+		String[] setArr = value.split(",");
+
+		//get the number of days in hours
+		int noOfDaysToRespond = Integer.parseInt(setArr[5]);
+		noOfDaysToRespond = noOfDaysToRespond/24;
+
+		//see if the email functionality is set as on
+		boolean isOn = Boolean.parseBoolean(setArr[4]);
+		
+		scheduledTime.add(Calendar.DAY_OF_MONTH, -noOfDaysToRespond); //Subtracting a day from the presentation start time
 //		scheduledTime.add(Calendar.SECOND, 30); //For testing
 		
-		Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS)
-				.startAt(scheduledTime.getTime()).build();
-		
-		scheduler.scheduleJob(jd, tr);
+		//if sms reminders are on
+		if(isOn){
+			Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS)
+					.startAt(scheduledTime.getTime()).build();
+
+			scheduler.scheduleJob(jd, tr);
+		}
 	}
 
     //Getters and Setters

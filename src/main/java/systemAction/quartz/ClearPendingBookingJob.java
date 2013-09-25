@@ -12,9 +12,11 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import manager.SettingsManager;
 import manager.UserManager;
 import model.Booking;
 import model.CronLog;
+import model.Settings;
 import model.Timeslot;
 import model.User;
 import notification.email.RejectedBookingEmail;
@@ -43,9 +45,22 @@ public class ClearPendingBookingJob implements Job {
         logItem.setRunTime(now);
 
         EntityManager em = null;
-        noOfDaysToRespond = 2; //TODO: Remove hardcoding
+        
         try {
             em = MiscUtil.getEntityManagerInstance();
+			
+			//get the number of days for email reminder
+			Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
+			String value = currentSettings.getValue();
+			
+			//convert settingsDetails into an array
+			String[] setArr = value.split(",");
+			
+			//get the number of days
+			noOfDaysToRespond = Integer.parseInt(setArr[2]);
+			
+			//see if the email functionality is set as on
+			boolean isOn = Boolean.parseBoolean(setArr[1]);
             
             em.getTransaction().begin();
             
@@ -71,9 +86,10 @@ public class ClearPendingBookingJob implements Job {
                 //Delete booking is date is passed
                 if (now.after(dueDate)) {
                     //Send an email to inform that booking has been rejected by system
-                    RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(pendingBooking, systemAsUser);
-                    rejectedEmail.sendEmail();
-                    
+					if(isOn){
+						RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(pendingBooking, systemAsUser);
+						rejectedEmail.sendEmail();
+					}
                     logger.debug("Booking: " + pendingBooking + " passed due date. Deleting.");
                     pendingBooking.setBookingStatus(BookingStatus.REJECTED);
                     pendingBooking.setLastEditedBy("IS480 Scheduling System");

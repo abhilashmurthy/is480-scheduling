@@ -17,9 +17,11 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import manager.SettingsManager;
 import manager.UserManager;
 import model.Booking;
 import model.CronLog;
+import model.Settings;
 import model.Timeslot;
 import model.User;
 import model.role.Faculty;
@@ -39,8 +41,7 @@ import util.MiscUtil;
 public class RemindPendingBookingJob implements Job {
 
     private static Logger logger = LoggerFactory.getLogger(ClearPendingBookingJob.class);
-    private int noOfDaysToRespond1;
-    private int noOfDaysToRespond2;
+    private int noOfDaysToRespond;
 
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         logger.debug("Started faculty reminder");
@@ -52,10 +53,23 @@ public class RemindPendingBookingJob implements Job {
 		logItem.setRunTime(now);
 		
         EntityManager em = null;
-        noOfDaysToRespond1 = 1;
-        noOfDaysToRespond2 = 2;//TODO: Remove hardcoding
+        
         try {
             em = MiscUtil.getEntityManagerInstance();
+			
+			//get the number of days for email reminder
+			Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
+			String value = currentSettings.getValue();
+			
+			//convert settingsDetails into an array
+			String[] setArr = value.split(",");
+			
+			//get the number of days
+			noOfDaysToRespond = Integer.parseInt(setArr[2]);
+			noOfDaysToRespond--;
+			//see if the email functionality is set as on
+			boolean isOn = Boolean.parseBoolean(setArr[1]);
+
             em.getTransaction().begin();
             List<Booking> pendingBookings = null;
             //get all the pending bookings
@@ -72,22 +86,14 @@ public class RemindPendingBookingJob implements Job {
                         cal2.setTimeInMillis(pendingBooking.getTimeslot().getStartTime().getTime());
                         cal2.add(Calendar.DATE, 0);
                         Timestamp dueDate1 = new Timestamp(cal2.getTimeInMillis());
-                        
-                        //get two days break
-                        /*cal.clear();
-                        cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
-                        cal.add(Calendar.DATE, noOfDaysToRespond2);
-                        Timestamp dueDate2 = new Timestamp(cal.getTimeInMillis());*/
 						
 						long difference = (long)dueDate1.getTime()-(long)now.getTime();
-						long divideby = 60000L;
-						long differenceInMins = (long)difference / (long)divideby;
 						logger.debug("due date" + (long)dueDate1.getDate());
 						logger.debug("now " + (long)now.getTime());
                         logger.debug(" the difference between due and now" + (long)difference);
                         
                         //if difference between due date and current time is less than or equal 24hours
-                        if ((long)dueDate1.getTime()-(long)now.getTime() <= 86400000) {
+                        if ((long)dueDate1.getTime()-(long)now.getTime() <= noOfDaysToRespond*86400000 && isOn) {
                             logger.debug("Booking: " + pendingBooking + ". First Reminder sent.");
 							
 							//get response list
