@@ -15,7 +15,6 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -188,19 +187,36 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 		String smuUsername = request.getParameter("smu_username");
 		//Getting the active term
 		Term activeTerm = SettingsManager.getDefaultTerm(em);
-		//Getting the user based on username and active term
-		ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerm);
+		//Getting the user object based on the username
+//		User loggedInUser = em.find(User.class, smuUsername);
+		//Getting all the users from the system
+//		List<User> usersFromDB = UserManager.getAllUsers(em);
+		//Checking whether the user exists in the system or not
+//		boolean userExists = false;
+//		for (User user: usersFromDB) {
+//			if (loggedInUser.equals(user)) {
+//				userExists = true;
+				//If user is in the db get the users roles
+				//Getting the user based on username and active term
+				ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerm);
+				if (users.size() > 0) {
+					//Welcome to the system. 
+					session.setAttribute("userRoles", users);
+					session.setAttribute("currentActiveTerm", activeTerm);
+				} else {
+					//Kick user out
+					request.setAttribute("error", "Login failed. You are not authorized to access this system!");
+					request.getRequestDispatcher("login.jsp").forward(request, response);
+				}
+//			}
+//		}
 		
-		if (users.size() > 0) {
-			//Welcome to the system. 
-			session.setAttribute("userRoles", users);
-			session.setAttribute("currentActiveTerm", activeTerm);
-
-		} else {
-			//Kick user out
-			request.setAttribute("error", "Login failed. Please login with an authorized User ID!");
-			request.getRequestDispatcher("login.jsp").forward(request, response);
-		}
+		//If user is not in db
+//		if (userExists == false) {
+//			//Kick user out
+//			request.setAttribute("error", "Login failed. Please login with an authorized User ID!");
+//			request.getRequestDispatcher("login.jsp").forward(request, response);
+//		}
 	}
 
     public HttpServletRequest getServletRequest() {

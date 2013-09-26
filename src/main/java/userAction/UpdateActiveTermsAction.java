@@ -16,9 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
 import model.Settings;
+import model.Term;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.quartz.utils.FindbugsSuppressWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -87,6 +89,10 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 				em.persist(activeTerms);
 				em.persist(defaultTerm);
 				em.getTransaction().commit();
+				
+				//Getting the term object and updating the active term object in the session
+				Term defaultActiveTerm = em.find(Term.class, defaultActiveTermId);
+				session.setAttribute("currentActiveTerm", defaultActiveTerm);
 				
 				json.put("success", true);
 				json.put("message", "Your settings have been updated!");
