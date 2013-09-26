@@ -117,7 +117,12 @@
 			}
 			
 			.pillbox {
-				width: 80px;
+				width: 82px;
+				margin: auto;
+			}
+			
+			.pillbox li {
+				width: 82px;
 				margin: auto;
 			}
 			
@@ -575,7 +580,7 @@
 						var dates = $("#milestone_" + milestone).multiDatesPicker('getDates');
 						if (dates.length > 0) $pillBox.parent().css('opacity', '100'); else $pillBox.parent().css('opacity', '0');
 						for (var i = 0; i < dates.length; i++) {
-							$pillBox.append($(document.createElement('li')).addClass('status-info').append(Date.parse(dates[i]).toString('dd MMM')));
+							$pillBox.append($(document.createElement('li')).addClass('status-info').append(Date.parse(dates[i]).toString('dd MMM yy')));
 						}
 					});
 				}
