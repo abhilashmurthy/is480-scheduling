@@ -89,7 +89,7 @@ public class DeploymentDB {
         
         Faculty u3 = new Faculty ("cboesch", "Chris BOESCH", null, term12013);
         
-        Faculty u4 = new Faculty ("davidlo", "David LO ", null, term12013);
+        Faculty u4 = new Faculty ("davidlo", "David LO", null, term12013);
         
         Faculty u5 = new Faculty ("lxjiang", "JIANG Lingxiao", null, term12013);
         
@@ -105,17 +105,17 @@ public class DeploymentDB {
         
         Student u11 = new Student ("elmaliqueg.2011", "El-malique Bin Md GHAZALI", null, term12013);
         
-        Student u12 = new Student ("eugene.low.2011", "Eugene LOW Foo Mun", null, term12013);
+        //Student u12 = new Student ("eugene.low.2011", "Eugene LOW Foo Mun", null, term12013);
         
-        Student u13 = new Student ("eehian.tay.2011", "TAY Ee Hian", null, term12013);
+        //Student u13 = new Student ("eehian.tay.2011", "TAY Ee Hian", null, term12013);
         
-        Student u14 = new Student ("cheeyonglim.2011", "LIM Chee Yong", null, term12013);
+        //Student u14 = new Student ("cheeyonglim.2011", "LIM Chee Yong", null, term12013);
         
-        Student u15 = new Student ("joannaphoon.2011", "Joanna PHOON Mu En", null, term12013);
+        //Student u15 = new Student ("joannaphoon.2011", "Joanna PHOON Mu En", null, term12013);
         
-        Student u16 = new Student ("fennie.too.2011", "Fennie TOO Jingyan", null, term12013);
+        //Student u16 = new Student ("fennie.too.2011", "Fennie TOO Jingyan", null, term12013);
         
-        Student u17 = new Student ("matthew.c.2011", "Matthew CHEAH Kheng Boon", null, term12013);
+        //Student u17 = new Student ("matthew.c.2011", "Matthew CHEAH Kheng Boon", null, term12013);
         
         Student u18 = new Student ("haobo.wang.2011", "WANG Hao Bo", null, term12013);
         
@@ -281,7 +281,7 @@ public class DeploymentDB {
         
         Student u99 = new Student ("rachel.wang.2011", "Rachel WANG Yee Lin", null, term12013);
         
-        Student u100 = new Student ("lnugroho.2011@sis.smu.edu.sg", "Lydia NUGROHO", null, term12013);
+        Student u100 = new Student ("lnugroho.2011", "Lydia NUGROHO", null, term12013);
         
         Student u101 = new Student ("m.shahrain.2011", "Muhammad Shahrain Bin SARDON", null, term12013);
         
@@ -431,12 +431,12 @@ public class DeploymentDB {
         em.persist(u9);
         em.persist(u10);
         em.persist(u11);
-        em.persist(u12);
-        em.persist(u13);
-        em.persist(u14);
-        em.persist(u15);
-        em.persist(u16);
-        em.persist(u17);
+        //em.persist(u12);
+        //em.persist(u13);
+        //em.persist(u14);
+        //em.persist(u15);
+        //em.persist(u16);
+        //em.persist(u17);
         em.persist(u18);
         em.persist(u19);
         em.persist(u20);
@@ -606,21 +606,21 @@ public class DeploymentDB {
         members.add(u11);
         t1.setMembers(members);
 
-
-        Team t2 = new Team();
-        t2.setTerm(term12013);
-        t2.setTeamName("KUMUS");
-        t2.setSupervisor(u1);
+        // Team decided to do in 2014/15 Term 1
+        //Team t2 = new Team();
+        //t2.setTerm(term12013);
+        //t2.setTeamName("KUMUS");
+        //t2.setSupervisor(u1);
         //t2.setReviewer1(u8);
         //t2.setReviewer2(u6);
-        HashSet<Student> t2members = new HashSet<Student>();
-        t2members.add(u12);
-        t2members.add(u13);
-        t2members.add(u14);
-        t2members.add(u15);
-        t2members.add(u16);
-        t2members.add(u17);
-        t2.setMembers(t2members);
+        //HashSet<Student> t2members = new HashSet<Student>();
+        //t2members.add(u12);
+        //t2members.add(u13);
+        //t2members.add(u14);
+        //t2members.add(u15);
+        //t2members.add(u16);
+        //t2members.add(u17);
+        //t2.setMembers(t2members)
 
         Team t3 = new Team();
         t3.setTerm(term12013);
@@ -840,7 +840,7 @@ public class DeploymentDB {
         Team t18 = new Team();
         t18.setTerm(term12013);
         t18.setTeamName("JavaChips");
-        //t18.setSupervisor(u5);
+        t18.setSupervisor(u1);
         //t18.setReviewer1(u6);
         //t18.setReviewer2(u15);
         HashSet<Student> t18members = new HashSet<Student>();
@@ -911,8 +911,8 @@ public class DeploymentDB {
         
         Team t23 = new Team();
         t23.setTerm(term12013);
-        t23.setTeamName("Dr.Jean");
-        //t23.setSupervisor(u1);
+        t23.setTeamName("DR. Jean Labs");
+        t23.setSupervisor(u2);
         //t23.setReviewer1(u6);
         //t23.setReviewer2(u15);
         HashSet<Student> t23members = new HashSet<Student>();
@@ -968,7 +968,7 @@ public class DeploymentDB {
         Team t27 = new Team();
         t27.setTerm(term12013);
         t27.setTeamName("The Codefather");
-        //t27.setSupervisor(u1);
+        t27.setSupervisor(u1);
         //t27.setReviewer1(u6);
         //t27.setReviewer2(u15);
         HashSet<Student> t27members = new HashSet<Student>();
@@ -1035,7 +1035,7 @@ public class DeploymentDB {
 
         // Persistence
         em.persist(t1);
-        em.persist(t2);
+        //em.persist(t2);
         em.persist(t3);
         em.persist(t4);
         em.persist(t5);
@@ -1076,12 +1076,12 @@ public class DeploymentDB {
         u10.setTeam(t1);
         u11.setTeam(t1);
 
-        u12.setTeam(t2);
-        u13.setTeam(t2);
-        u14.setTeam(t2);
-        u15.setTeam(t2);
-        u16.setTeam(t2);
-        u17.setTeam(t2);
+        //u12.setTeam(t2);
+        //u13.setTeam(t2);
+        //u14.setTeam(t2);
+        //u15.setTeam(t2);
+        //u16.setTeam(t2);
+        //u17.setTeam(t2);
 
         u18.setTeam(t3);
         u19.setTeam(t3);
@@ -1270,12 +1270,12 @@ public class DeploymentDB {
         em.persist(u9);
         em.persist(u10);
         em.persist(u11);
-        em.persist(u12);
-        em.persist(u13);
-        em.persist(u14);
-        em.persist(u15);
-        em.persist(u16);
-        em.persist(u17);
+        //em.persist(u12);
+        //em.persist(u13);
+        //em.persist(u14);
+        //em.persist(u15);
+        //em.persist(u16);
+        //em.persist(u17);
         em.persist(u18);
         em.persist(u19);
         em.persist(u20);
