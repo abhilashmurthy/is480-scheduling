@@ -68,7 +68,7 @@ public class UploadFileAction extends ActionSupport implements ServletRequestAwa
 				logger.error("User cannot access this page");
 				return ERROR;
 			}
-			json.put("success", true);
+//			json.put("success", true);
 			
 		} catch (Exception e) {
            logger.error("Exception caught: " + e.getMessage());
