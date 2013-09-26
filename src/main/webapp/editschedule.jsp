@@ -767,58 +767,58 @@
                 
                 $('body').on('click', '.timeslotcell', function(e) {
 					if ($(this).is('.teamExists')) return false;
-                    triggerTimeslot(this, selectedSchedule.duration);
+                    triggerTimeslot($(this));
                     return false;
                 });
                 
-				
-                /*
-                 * METHOD TO CHOOSE TIMESLOTS ON THE EDITD TABLE
-                 */
-                function triggerTimeslot(e, duration) {
-                    if (!$(e).hasClass('timeslotcell')) return false;
-                    var col = $(e).parent().children().index(e);
-                    var tr = $(e).parent();
-                    var row = $(tr).parent().children().index(tr);
-                    var tbody = $(e).parents('.timeslotsTable').children('tbody');
-                    var slotSize = duration / 30;
-
-                    if ($(e).hasClass("chosen")) { //Section for a cell thats already highlighted
-                        //Checking if the cell clicked is the start of the chosen timeslot (Important!)
-                        if ($(e).children().index(".start-marker") !== -1) {
-                            $(e).removeClass("chosen");
-                            $(e).children().remove();
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).removeClass("chosen");
-                            }
-                        }
-                    } else { //Section for a non-highlighted cell
-                        //Checking if there will be an overlap of timeslots
-                        //Abort if there is going to be an overlap
-                        for (i = 1; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            if ($(nextCell).hasClass("chosen")) {
-                                return;
-                            }
-                        }
-
-                        var numRows = $(tbody).children().length;
-                        //Checking if there are enough cells for the slot duration
-                        if ((row + slotSize) <= numRows) {
-                            $(e).addClass("chosen");
-                            var marker = document.createElement("div");
-                            $(marker).addClass("start-marker");
-                            $(e).append(marker);
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).addClass("chosen");
-                            }
-                        }
-                    }
+				//Method to select timeslots on a table
+                function triggerTimeslot($timeslotCell) {
+                    if (!$timeslotCell.hasClass('timeslotcell')) return false;
+					var slotSize = selectedSchedule.duration / 30;
+					if ($timeslotCell.hasClass('chosen')) {
+						//Unselect a timeslot
+						var $prevTr = $timeslotCell.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+								//Unselect this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									$nextTr.children().eq($timeslotCell.index()).removeClass('chosen').empty();
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					} else {
+						//Select a timeslot
+						var foundOverlapping = false;
+						var $nextTr = $timeslotCell.closest('tr');
+						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
+						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
+						for (var i = 0; i < slotSize; i++) {
+							$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
+							$nextTr = $nextTr.next();
+							if (i !== slotSize - 1 && $nextTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+								//Uh oh, overlapping timeslot detected. Let's remove it.
+								var $overlappingTimeslot = $nextTr.children().eq($timeslotCell.index());
+								triggerTimeslot($overlappingTimeslot);
+								foundOverlapping = true;
+							}
+						}
+						if (foundOverlapping) {
+							//Actually, let's reset every consequent timeslot
+							var $nextTr = $timeslotCell.closest('tr');
+							while ($nextTr.parent().children().index($nextTr) + slotSize <= $nextTr.parent().children().length) {
+								if (!$nextTr.children().eq($timeslotCell.index()).hasClass('chosen')) {
+									var $consequentOverlappingTimeslot = $nextTr.children().eq($timeslotCell.index());
+									triggerTimeslot($consequentOverlappingTimeslot);
+								}
+								$nextTr = $nextTr.next();
+							}
+						}
+					}
+					return false;
                 }
 
                 function populateTimeslotsTable(timeslots, duration) {
@@ -838,14 +838,14 @@
 											var $nextTr = $nextTr.next();
 										}
 									} else {
-										triggerTimeslot(this, duration);
+										triggerTimeslot($(this));
 									}
 									break;
 								}
 							}
 						} else {
 							//If schedule not yet edited, populate all timeslots
-							triggerTimeslot(this, duration);
+							triggerTimeslot($(this));
 						}
                     });
                 }
@@ -931,8 +931,7 @@
 							alert("Something went wrong - Notifications");
 					}
 				   $.pnotify(opts);
-				}
-				
+				}				
             };
             
             addLoadEvent(editScheduleLoad);
