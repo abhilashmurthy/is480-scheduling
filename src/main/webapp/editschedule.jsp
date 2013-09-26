@@ -478,8 +478,23 @@
 						var dates = $nextMilestone.multiDatesPicker('getDates');
 						for (var j = 0; j < dates.length; j++) {
 							if (dates[j] === dateStr) {
+								//Date already selected for another milestone
 								$(".milestoneOrder_" + orderNum).multiDatesPicker('removeDates', dates[j]);
-								showNotification("WARNING", Date.parse(dateStr).toString("dd MMM") + " is already selected in " + $nextMilestone.attr('id').split("_")[1].toUpperCase());
+								showNotification("WARNING", Date.parse(dateStr).toString("dd-MMM-yy") + " is already selected in " + $nextMilestone.attr('id').split("_")[1].toUpperCase());
+								return false;
+							}
+							if (parseInt($nextMilestone.attr('class').split('milestoneOrder_')[1].substring(0, 1)) < orderNum && Date.parse(dateStr) < Date.parse($nextMilestone.multiDatesPicker('getDates')[$nextMilestone.multiDatesPicker('getDates').length - 1])) {
+								//Date selected is before the max selected date of the previous milestone
+								$(".milestoneOrder_" + orderNum).multiDatesPicker('removeDates', Date.parse(dateStr));
+								var thisMilestone = $(".milestoneOrder_" + orderNum).attr('id').split("_")[1].toUpperCase();
+								showNotification("WARNING", "Overlap Detected<br/> " + thisMilestone + " [" + Date.parse(dateStr).toString("dd-MMM-yy") + "] < " + $nextMilestone.attr('id').split("_")[1].toUpperCase() + " [" + Date.parse($nextMilestone.multiDatesPicker('getDates')[$nextMilestone.multiDatesPicker('getDates').length - 1]).toString('dd-MMM-yy') + "]");
+								return false;
+							}
+							if (parseInt($nextMilestone.attr('class').split('milestoneOrder_')[1].substring(0, 1)) > orderNum && Date.parse(dateStr) > Date.parse($nextMilestone.multiDatesPicker('getDates')[0])) {
+								//Date selected is after the min selected date of the next milestone
+								$(".milestoneOrder_" + orderNum).multiDatesPicker('removeDates', Date.parse(dateStr));
+								var thisMilestone = $(".milestoneOrder_" + orderNum).attr('id').split("_")[1].toUpperCase();
+								showNotification("WARNING", "Overlap Detected<br/> " + thisMilestone + " [" + Date.parse(dateStr).toString("dd-MMM-yy") + "] > " + $nextMilestone.attr('id').split("_")[1].toUpperCase() + " [" + Date.parse($nextMilestone.multiDatesPicker('getDates')[0]).toString('dd-MMM-yy') + "]");
 								return false;
 							}
 						}
@@ -907,6 +922,7 @@
 					   mouse_reset: false,
 					   animation: "fade",
 					   animate_speed: "fast",
+					   width: "350px",
 					   before_open: function(pnotify) {
 						  pnotify.css({
 							 top: "52px",

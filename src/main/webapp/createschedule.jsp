@@ -349,7 +349,7 @@
 						$nextMilestone.multiDatesPicker({
 							dateFormat: "yy-mm-dd",
 							defaultDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
-							minDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
+//							minDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
 							beforeShowDay: $.datepicker.noWeekends,
 							onSelect: function(date) {
 								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
@@ -405,7 +405,7 @@
 									.multiDatesPicker({
 										dateFormat: "yy-mm-dd",
 										defaultDate: Date.today(),
-										minDate: Date.today(),
+//										minDate: Date.today(),
 										beforeShowDay: $.datepicker.noWeekends,
 										onSelect: function(date) {
 											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
@@ -544,7 +544,7 @@
 								$nextMilestone.multiDatesPicker({
 									dateFormat: "yy-mm-dd",
 									defaultDate: Date.today(),
-									minDate: Date.today(),
+//									minDate: Date.today(),
 									beforeShowDay: $.datepicker.noWeekends,
 									onSelect: function(date) {
 										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
