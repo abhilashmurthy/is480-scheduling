@@ -340,7 +340,7 @@
 										dateFormat: "yy-mm-dd",
 										defaultDate: dates.length > 0?dates[0]:Date.today(),
 										minDate: Date.today(),
-										beforeShowDay: $.datepicker.noWeekends,
+//										beforeShowDay: $.datepicker.noWeekends,
 										onSelect: function(date) {
 											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 											checkPickedDates(date, order);
@@ -381,8 +381,8 @@
 											.attr('value', '09:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
-													minTime: '07:00',
-													maxTime: '16:00',
+													minTime: '00:00',
+													maxTime: '11:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
@@ -405,12 +405,12 @@
 											.attr('value', '18:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
-													minTime: '09:00',
-													maxTime: '18:00',
+													minTime: '12:00',
+													maxTime: '23:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
-													scrollDefaultTime: '18:00',
+													scrollDefaultTime: '19:00',
 													disableTextInput: true
 											})
 											.val(Date.parse(schedule.dayEndTime + ":00").toString("HH:mm")).change()

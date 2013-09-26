@@ -350,7 +350,7 @@
 							dateFormat: "yy-mm-dd",
 							defaultDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
 //							minDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
-							beforeShowDay: $.datepicker.noWeekends,
+//							beforeShowDay: $.datepicker.noWeekends,
 							onSelect: function(date) {
 								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 								resetDisabledDates(date, order);
@@ -406,7 +406,7 @@
 										dateFormat: "yy-mm-dd",
 										defaultDate: Date.today(),
 //										minDate: Date.today(),
-										beforeShowDay: $.datepicker.noWeekends,
+//										beforeShowDay: $.datepicker.noWeekends,
 										onSelect: function(date) {
 											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 											resetDisabledDates(date, order);
@@ -440,8 +440,8 @@
 											.attr('value', '09:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
-													minTime: '07:00',
-													maxTime: '16:00',
+													minTime: '00:00',
+													maxTime: '11:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
@@ -463,12 +463,12 @@
 											.attr('value', '18:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
-													minTime: '09:00',
-													maxTime: '18:00',
+													minTime: '12:00',
+													maxTime: '23:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
-													scrollDefaultTime: '18:00',
+													scrollDefaultTime: '19:00',
 													disableTextInput: true
 											})
 									)
@@ -509,7 +509,7 @@
 							dateFormat: "yy-mm-dd",
 							defaultDate: minDate.addDays(1),
 							minDate: minDate.addDays(1),
-							beforeShowDay: $.datepicker.noWeekends,
+//							beforeShowDay: $.datepicker.noWeekends,
 							onSelect: function(date) {
 								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 								resetDisabledDates(date, order);
@@ -532,7 +532,7 @@
 									dateFormat: "yy-mm-dd",
 									defaultDate: Date.parse(dates[dates.length - 1]).addDays(1),
 									minDate: Date.parse(dates[dates.length - 1]).addDays(1),
-									beforeShowDay: $.datepicker.noWeekends,
+//									beforeShowDay: $.datepicker.noWeekends,
 									onSelect: function(date) {
 										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 										resetDisabledDates(date, order);
@@ -545,7 +545,7 @@
 									dateFormat: "yy-mm-dd",
 									defaultDate: Date.today(),
 //									minDate: Date.today(),
-									beforeShowDay: $.datepicker.noWeekends,
+//									beforeShowDay: $.datepicker.noWeekends,
 									onSelect: function(date) {
 										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 										resetDisabledDates(date, order);
