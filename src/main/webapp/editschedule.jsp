@@ -521,6 +521,7 @@
 						$pillBox.empty();
 						var dates = $("#milestone_" + milestone).multiDatesPicker('getDates');
 						if (dates.length > 0) $pillBox.parent().css('opacity', '100'); else $pillBox.parent().css('opacity', '0');
+						dates.sort();
 						for (var i = 0; i < dates.length; i++) {
 							$pillBox.append($(document.createElement('li')).addClass('status-info').append(Date.parse(dates[i]).toString('dd MMM yy')));
 						}
