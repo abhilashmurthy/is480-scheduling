@@ -4,27 +4,11 @@
  */
 package util;
 
-import com.google.gson.Gson;
-import constant.Role;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.logging.Level;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
-import model.Milestone;
-import model.Schedule;
-import model.Settings;
 import model.Team;
 import model.Term;
-import model.Timeslot;
-import model.User;
 import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
@@ -73,7 +57,7 @@ public class DeploymentDB {
 
     private static void initDB(EntityManager em) throws Exception {
 		
-		Term term12013 = em.find(Term.class, 3L);
+		Term term12013 = em.find(Term.class, 2L);
 		
         /*
          * USER TABLE POPULATION

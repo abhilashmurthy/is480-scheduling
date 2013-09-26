@@ -460,7 +460,7 @@
 											.attr('type', 'text')
 											.attr('id', "milestoneDayEnd_" + milestone.name.toLowerCase())
 											.attr('name', milestone.name.toLowerCase() + "DayEndTime")
-											.attr('value', '18:00')
+											.attr('value', '19:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
 													minTime: '12:00',
