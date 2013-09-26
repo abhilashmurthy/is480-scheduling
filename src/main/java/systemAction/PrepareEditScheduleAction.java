@@ -51,18 +51,25 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
 			Term activeTerm = (Term) request.getSession().getAttribute("currentActiveTerm");
 			
 			//Changing active term
+            if (termId != 0) {
+                ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+                for (Term term : allActiveTerms) {
+                    if (term.getId() == termId) {
+                        request.getSession().setAttribute("currentActiveTerm", term);
+						activeTerm = term;
+                    }
+                }
+            }
+			
+            //Removing the active term set during login or in the above code from the list to be displayed
+            if (activeTerm != null) {
+                allActiveTerms.remove(activeTerm);
+            }
 			for (Term term : allActiveTerms) {
-				if (termId != 0 && termId == term.getId()) {
-					request.getSession().setAttribute("currentActiveTerm", term);
-					activeTerm = term;
-					continue;
-				}
-				if (activeTerm.equals(term)) continue;
 				HashMap<String, String> map = new HashMap<String, String>();
+				long idOfTerm = term.getId();
 				map.put("termName", term.getDisplayName());
-				map.put("termId", String.valueOf(term.getId()));
-				map.put("year", String.valueOf(term.getAcademicYear()));
-				map.put("semester", term.getSemester());
+				map.put("termId", String.valueOf(idOfTerm));
 				termData.add(map);
 			}
 			

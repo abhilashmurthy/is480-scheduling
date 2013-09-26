@@ -256,7 +256,7 @@
 										<td class="formLabelTd">Select Term</td>
 										<td>
 											<select class="termPicker" id="editTimeslotsTermId" name="editTimeslotsTermId">
-												<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
+												<option value=""><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
 												<s:iterator value="termData">
 													<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
 												</s:iterator>
@@ -294,6 +294,7 @@
 				var schedules = null;
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
+                var activeSemesterDiplayNameStr = "<%= activeTerm.getDisplayName() %>";
 				
 				//For Edit Timeslots
 				var selectedSchedule = null;
@@ -450,13 +451,12 @@
 				//Term name availability check
 				$("#semesterInput").on('change blur', function(){
 					var semName = $.trim($("#semesterInput").val());
-					var yearVal = $.trim($("#yearInput").val());
 					if (!semName) {
 						$("#semesterNameAvailabilityChecker").empty();
 						return false;
 					}
 					for (var i = 0; i < termNames.length; i++) {
-						if (parseInt(yearVal) === parseInt(termNames[i].year) && semName.toLowerCase() === termNames[i].term.toLowerCase()) {
+						if (parseInt(activeAcademicYearStr) === parseInt(termNames[i].year) && semName.toLowerCase() === termNames[i].term.toLowerCase()) {
 							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('icon-remove')).append(' Term name already exists');
 							return false;
 						}
@@ -626,6 +626,9 @@
                         if (response.success) {
 //                            schedules = response.schedules;
                             showNotification("SUCCESS", "Updated dates successfully");
+							if ($("#semesterNameAvailabilityChecker").is(":visible")) {
+								$(".termPicker").children(":contains('" + activeSemesterStr + "')").text(activeSemesterDiplayNameStr.split(" ")[0] + " " + term);
+							}
                         } else {
 							showNotification("WARNING", response.message);
 							$("#editScheduleSubmitBtn").button('reset');
