@@ -26,7 +26,8 @@
 		 
         <div class="container">
 			<h3>CSV Upload</h3>
-			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
+			<!--<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">-->
+			<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">
 			<div style="float: left; margin-right: 50px;">
 			<table class="table" style="width:auto">
 				<thead>
@@ -55,7 +56,8 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="file" id="fileUploaded" name="csvFile" onchange="checkFile(this);" />
+							<!--<input type="file" id="fileUploaded" name="csvFile" onchange="checkFile(this);" />-->
+							<s:file label="File" name="file" onchange="checkFile(this);"></s:file>
 						</td>
 					</tr>
 				</tbody>
@@ -64,10 +66,12 @@
 			
 			<div style="clear: both;">
 				<br/>
-				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." 
-					style="margin-bottom: 20px;">Save</button>
+<!--				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." 
+					style="margin-bottom: 20px;">Save</button>-->
+					<!--<input type="submit" id="submitFormBtn" value="Save"/>-->
+					<s:submit value="Upload"></s:submit>
 			</div>
-			</form>
+			</s:form>
         </div>
 		
 		<%@include file="footer.jsp"%>
@@ -84,7 +88,7 @@
 				fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
 				if (validExts.indexOf(fileExt) < 0) {
 					showNotification("ERROR", "Invalid file selected! File should be " +
-						   validExts.toString() + " type");
+						   validExts.toString() + " type!");
 					return false;
 				} else {
 					return true;
@@ -94,7 +98,7 @@
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
 //			function validate(saveButton) {
-				$(this).button('loading');
+//				$(this).button('loading');
 //				saveButton.button('loading');
 				
 				var file = $('#fileUploaded').val();
@@ -111,7 +115,7 @@
 				file = file.substring(file.lastIndexOf('.'));
 				if (validExts.indexOf(file) < 0) {
 					showNotification("ERROR", "Invalid file selected! File should be " +
-						   validExts.toString() + " type");
+						   validExts.toString() + " type!");
 				    $("#submitFormBtn").button('reset');
 					return false;
 				} 

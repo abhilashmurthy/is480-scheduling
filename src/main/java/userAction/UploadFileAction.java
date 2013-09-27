@@ -9,7 +9,7 @@ import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
-import java.io.BufferedReader;
+import java.io.File;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,58 +18,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
-import org.json.JSONObject;
 import util.MiscUtil;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
+import javax.servlet.ServletContext;
+import org.apache.struts2.util.ServletContextAware;
+//import util.FilesUtil;
 /**
  *
  * @author Prakhar
  */
-public class UploadFileAction extends ActionSupport implements ServletRequestAware {
+public class UploadFileAction extends ActionSupport implements ServletContextAware {
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(UploadFileAction.class);
     private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
     private HashMap<String, Object> json = new HashMap<String, Object>();
-
+	private File file;
+    private String fileContentType;
+    private String fileFileName;
+    private String filesPath;
+    private ServletContext context;
+	
     @Override
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
-            HttpSession session = request.getSession();
-            //Getting the active role of the user
-            Role activeRole = (Role) session.getAttribute("activeRole");
+//			System.out.println("File Name is:" + getFileFileName());
+//			System.out.println("File ContentType is:" + getFileContentType());
+			File csvFile = getFile();
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
 			
-			//Checking role of the user
-			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
-				String fileName = request.getParameter("csvFile");
-				long termChosen = Long.parseLong(request.getParameter("termChosen"));
-				
-//				FileInputStream fis = new FileInputStream(fileName);
-//				BufferedReader br = new BufferedReader(new FileReader(fileName));
-				//Specifying the delimiter to be used
-				CSVReader reader = new CSVReader(new FileReader(fileName),',');
-				String[] nextLine;
-				//Read one line at a time
-				while ((nextLine = reader.readNext()) != null)
-				{
-					for(String token : nextLine) {
-						//Print all tokens
-						System.out.println(token);
-					}
+			String[] nextLine;
+			//Read one line at a time
+			while ((nextLine = reader.readNext()) != null)
+			{
+				for(String token : nextLine) {
+					//Print all tokens
+					System.out.println(token);
 				}
-			} else {
-				request.setAttribute("error", "Oops. You're not authorized to access this page!");
-				logger.error("User cannot access this page");
-				return ERROR;
+				break;
 			}
+		
 //			json.put("success", true);
-			
+//			json.put("message", "File has been uploaded successfully!");
 		} catch (Exception e) {
            logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -108,5 +102,38 @@ public class UploadFileAction extends ActionSupport implements ServletRequestAwa
 
     public void setServletRequest(HttpServletRequest hsr) {
         this.request = hsr;
+    }
+	
+	public File getFile() {
+        return file;
+    }
+ 
+    public void setFile(File file) {
+        this.file = file;
+    }
+ 
+    public String getFileContentType() {
+        return fileContentType;
+    }
+ 
+    public void setFileContentType(String fileContentType) {
+        this.fileContentType = fileContentType;
+    }
+ 
+    public String getFileFileName() {
+        return fileFileName;
+    }
+ 
+    public void setFileFileName(String fileFileName) {
+        this.fileFileName = fileFileName;
+    }
+ 
+    public void setFilesPath(String filesPath) {
+        this.filesPath = filesPath;
+    }
+ 
+    @Override
+    public void setServletContext(ServletContext ctx) {
+        this.context=ctx;
     }
 } //end of class

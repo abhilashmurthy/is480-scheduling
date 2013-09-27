@@ -81,10 +81,6 @@
             <result name="success">/activeterms.jsp</result>
         </action>
 		
-		<action name="uploadFile" class="systemAction.GetTermsAction" method="execute">
-            <result name="success">/uploadfile.jsp</result>
-        </action>
-		
 		<action name="yourAvailability" class="systemAction.LoadAvailabilityAction" method="execute">
             <result name="success">/availability.jsp</result>
         </action>
@@ -105,8 +101,18 @@
             <result name="success">/createschedule.jsp</result>
         </action>
 		
-		<action name="uploadFileToBackend" class="userAction.UploadFileAction" method="execute">
+		<action name="uploadFile" class="systemAction.GetTermsAction" method="execute">
             <result name="success">/uploadfile.jsp</result>
+        </action>
+		
+		<action name="uploadFileToBackend" class="userAction.UploadFileAction" method="execute">
+			 <result name="success" type="redirect">
+                <param name="location">/uploadFile</param>
+            </result>
+			<interceptor-ref name="defaultStack">
+<!--                <param name="fileUpload.maximumSize">5242880</param>
+                <param name="fileUpload.allowedTypes">text/csv</param>-->
+            </interceptor-ref>
 		</action>
 
 		<action name="editSchedule" class="systemAction.PrepareEditScheduleAction" method="execute">
