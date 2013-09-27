@@ -26,10 +26,10 @@
 		 
         <div class="container">
 			<h3>CSV Upload</h3>
-			<!--<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">-->
-			<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">
+			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
+			<%--<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">--%>
 			<div style="float: left; margin-right: 50px;">
-			<table class="table" style="width:auto">
+			<table class="table table-hover" style="width:auto">
 				<thead>
 					<tr><th>Select Term</th></tr>
 				</thead>
@@ -48,16 +48,17 @@
 				</tbody>
 			</table>
 			</div>
+			
 			<div style="float:left;">
-				<table id="smsTable" class="table">
+				<table class="table table-hover">
 				<thead>
 					<tr><th>Upload File (.csv)</th></tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td>
-							<!--<input type="file" id="fileUploaded" name="csvFile" onchange="checkFile(this);" />-->
-							<s:file label="File" name="file" onchange="checkFile(this);"></s:file>
+							<input type="file" id="fileUploaded" name="file" onchange="checkFile(this);" />
+							<%--<s:file name="file" onchange="checkFile(this);"></s:file>--%>
 						</td>
 					</tr>
 				</tbody>
@@ -66,12 +67,13 @@
 			
 			<div style="clear: both;">
 				<br/>
-<!--				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." 
-					style="margin-bottom: 20px;">Save</button>-->
+				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Uploading..." 
+					style="margin-bottom: 20px;">Upload</button>
 					<!--<input type="submit" id="submitFormBtn" value="Save"/>-->
-					<s:submit value="Upload"></s:submit>
+					<%--<s:submit value="Upload"></s:submit>--%>
 			</div>
-			</s:form>
+			</form>
+			<%--</s:form>--%>
         </div>
 		
 		<%@include file="footer.jsp"%>
