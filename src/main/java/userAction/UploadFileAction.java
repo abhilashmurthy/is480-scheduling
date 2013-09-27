@@ -5,24 +5,19 @@
 package userAction;
 
 import au.com.bytecode.opencsv.CSVReader;
-import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Role;
 import java.io.File;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import util.MiscUtil;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
 import javax.servlet.ServletContext;
+import model.Term;
 import org.apache.struts2.util.ServletContextAware;
 //import util.FilesUtil;
 /**
@@ -48,18 +43,31 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
             em = MiscUtil.getEntityManagerInstance();
 //			System.out.println("File Name is:" + getFileFileName());
 //			System.out.println("File ContentType is:" + getFileContentType());
+			
+			//Getting the Term
+			long termId = Long.parseLong(request.getParameter("termChosen"));
+			Term term = em.find(Term.class, termId);
+			String termName = term.getDisplayName();
+			//Getting the file
 			File csvFile = getFile();
+			
+			// <-------------------Start Parsing the File ----------------------->
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
 			
 			String[] nextLine;
+			int lineNo = 0;
 			//Read one line at a time
 			while ((nextLine = reader.readNext()) != null)
 			{
-				for(String token : nextLine) {
-					//Print all tokens
-					System.out.println(token);
+				lineNo++;
+				//Not reading the 1st line
+				if (lineNo != 1) {
+					for(String token : nextLine) {
+						//Print all tokens
+						System.out.println(token);
+					}
+					break;
 				}
-				break;
 			}
 		
 //			json.put("success", true);
