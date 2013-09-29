@@ -41,6 +41,7 @@ public class Schedule implements Serializable {
 	private Timestamp endDate;
 	private int dayStartTime;
 	private int dayEndTime;
+	private boolean bookable;
 	
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -100,6 +101,14 @@ public class Schedule implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public boolean isBookable() {
+		return bookable;
+	}
+
+	public void setBookable(boolean bookable) {
+		this.bookable = bookable;
 	}
 
 	@Override

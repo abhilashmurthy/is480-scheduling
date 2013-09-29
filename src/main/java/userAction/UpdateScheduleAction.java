@@ -95,6 +95,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 				
 				int newDayStart = schData.getInt("dayStartTime");
 				int newDayEnd = schData.getInt("dayEndTime");
+				boolean bookable = schData.getBoolean("bookable");
 				
 				Set<Timeslot> currentTimeslots = updatedSch.getTimeslots();
 				Iterator<Timeslot> iter = currentTimeslots.iterator();
@@ -217,6 +218,7 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 				updatedSch.setEndDate(endTimestamp);
 				updatedSch.setDayStartTime(newDayStart);
 				updatedSch.setDayEndTime(newDayEnd);
+				updatedSch.setBookable(bookable);
 				updatedSchedules.add(updatedSch);
 			}
 			em.flush();

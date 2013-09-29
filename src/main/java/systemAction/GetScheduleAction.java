@@ -262,10 +262,20 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                 json.put("timeslots", mapList);
             } else {
                 //Return only milestones for this term
-                List<Milestone> milestonesForTerm = MilestoneManager.findByTerm(em, term);
-                ObjectMapper mapper = new ObjectMapper();
-                String milestonesJson = mapper.writeValueAsString(milestonesForTerm);
-                json.put("milestones", mapper.readValue(milestonesJson, List.class));
+				List<Milestone> milestonesForTerm = MilestoneManager.findByTerm(em, term);
+				ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
+				for (Milestone m : milestonesForTerm) {
+					HashMap<String, Object> map = new HashMap<String, Object>();
+					Schedule s = ScheduleManager.findByMilestone(em, m);
+					map.put("id", m.getId());
+					map.put("scheduleId", s.getId());
+					map.put("milestoneOrder", m.getMilestoneOrder());
+					map.put("name", m.getName());
+					map.put("slotDuration", m.getSlotDuration());
+					map.put("bookable", s.isBookable());
+					mapList.add(map);
+				}
+                json.put("milestones", mapList);
             }
             json.put("success", true);
         } catch (Exception e) {

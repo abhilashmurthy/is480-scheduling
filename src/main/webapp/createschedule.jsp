@@ -130,6 +130,10 @@
 				padding-left: 20px;
 			}
 			
+			.scheduleBookable {
+				padding-left: 40px;
+			}
+			
 			.scheduleDayTimePoint {
 				display: block;
 				vertical-align: middle;
@@ -237,7 +241,7 @@
 							<!-- Create Schedule -->
 							<div id="createSchedulePanel" class="schedulePanel">
 									<table id="createScheduleTable">
-										<tr><th>Milestone</th><th colspan="2">Dates</th><th class="dayHours">Day Hours</th></tr>
+										<tr><th>Milestone</th><th colspan="2">Dates</th><th class="dayHours">Day Hours</th><th class="scheduleBookable">Bookable</th></tr>
 										<tr id="createScheduleSubmitRow"><td></td><td><input id="createScheduleSubmitBtn" type="submit" value="Create" data-loading-text="Done" class="btn btn-primary"/></td></tr>
 									</table>
 								<h4 id="scheduleResultMessage"></h4>
@@ -473,7 +477,22 @@
 											})
 									)
 							);
-                        milestoneTr.append(milestoneDayTimeTd);
+						milestoneTr.append(milestoneDayTimeTd);
+						var milestoneBookableTd = $(document.createElement('td'))
+							.css('padding-left', '40px')
+							.append(
+								$(document.createElement('div'))
+									.attr('id', 'milestoneBookable_' + milestone.name.toLowerCase())
+									.addClass('make-switch switch-medium')
+									.attr('data-on', 'success')
+									.attr('data-off', 'danger')
+									.attr('data-on-label', 'Yes')
+									.attr('data-off-label', 'No')
+									.attr('padding-left', '30px')
+									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'milestoneBookable_' + milestone.name.toLowerCase()).attr('checked', true))
+									.bootstrapSwitch()
+							);
+                        milestoneTr.append(milestoneBookableTd);
                         milestoneTr.insertBefore('#createScheduleSubmitRow');
                     }
                     $(".createScheduleTab a").tab('show');
@@ -628,6 +647,7 @@
                         var milestoneItem = milestoneArray[i];
                         for (var j = 0; j < milestones.length; j++) {
                             var milestone = milestones[j];
+							milestone["bookable"] = $("#milestoneBookable_" + milestone.name.toLowerCase()).bootstrapSwitch('status');
 							var dates = $("#milestone_" + milestone.name.toLowerCase()).multiDatesPicker('getDates');
 							if (dates.length === 0) {
 								showNotification("WARNING", "Please pick dates for milestone: " + milestone.name);
@@ -677,7 +697,7 @@
 						"milestones[]":milestones
 					};
 					
-//					console.log("Submitting: " + JSON.stringify(createScheduleData));
+					console.log("Submitting: " + JSON.stringify(createScheduleData));
 					
                     $.ajax({
                         type: 'POST',
@@ -686,7 +706,6 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
-//                            console.log("Received: " + JSON.stringify(response));
                             schedules = response.schedules;
                             showNotification("SUCCESS", "Created dates successfully");
 							disableScheduleControls();
@@ -719,6 +738,7 @@
 							disabled: true
 						});
 					});
+					$(".make-switch").bootstrapSwitch('setActive', false);
 					$(".pillbox ul").off('click');
 					$("#createScheduleTitle").css('display', 'inline').after($(document.createElement('div')).addClass('statusText').css('color', 'green').html($(document.createElement('span')).addClass('icon-ok')).append(' Please Create Timeslots'));
 				}

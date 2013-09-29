@@ -152,6 +152,7 @@ public class DBInitUtil {
 		cal.add(Calendar.DAY_OF_MONTH, 7); //Adding a week
         Schedule acceptance12013 = new Schedule();
         acceptance12013.setMilestone(acceptance);
+		acceptance12013.setBookable(true);
 		acceptance12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
 		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
 		Timestamp accEndTimestamp = new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0);
@@ -167,6 +168,7 @@ public class DBInitUtil {
 
         Schedule midterm12013 = new Schedule();
         midterm12013.setMilestone(midterm);
+		midterm12013.setBookable(true);
 		cal.add(Calendar.MONTH, 1); //Midterm is after another month
 		midterm12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
 		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long
@@ -182,6 +184,7 @@ public class DBInitUtil {
 
         Schedule final12013 = new Schedule();
         final12013.setMilestone(finalMilestone);
+		final12013.setBookable(true);
 		cal.add(Calendar.MONTH, 1); //Final is after another month
 		final12013.setStartDate(new Timestamp(cal.get(Calendar.YEAR) - 1900, cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0));
 		cal.add(Calendar.DAY_OF_MONTH, 10); //Schedule is 10 days long

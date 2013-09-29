@@ -85,6 +85,7 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
 				scheduleInfo.put("dayEndTime", s.getDayEndTime());
 				scheduleInfo.put("milestoneOrder", m.getMilestoneOrder());
 				scheduleInfo.put("dates", TimeslotManager.getUniqueDatesForSchedule(em, s));
+				scheduleInfo.put("bookable", s.isBookable());
 				scheduleList.add(scheduleInfo);
 			}
 			scheduleJson = gson.toJson(scheduleList);

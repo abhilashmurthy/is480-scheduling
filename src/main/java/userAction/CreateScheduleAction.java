@@ -170,6 +170,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			scheduleJson.put("duration", m.getSlotDuration());
 			scheduleJson.put("dayStartTime", obj.getInt("dayStartTime"));
 			scheduleJson.put("dayEndTime", obj.getInt("dayEndTime"));
+			scheduleJson.put("bookable", obj.getBoolean("bookable"));
 			
 			JSONArray milestoneDates = obj.getJSONArray("dates[]");
 			ArrayList<String> dates = new ArrayList<String>();
@@ -182,6 +183,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			Timestamp endTimestamp = Timestamp.valueOf(milestoneDates.getString(milestoneDates.length() - 1) + " 00:00:00");
 			int dayStartTime = obj.getInt("dayStartTime");
 			int dayEndTime = obj.getInt("dayEndTime");
+			boolean bookable = obj.getBoolean("bookable");
 			
 			//Check if the current schedule dates overlap with any previous schedules in the same term
 			if (!createdSchedules.isEmpty()) {
@@ -211,6 +213,7 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 			s.setEndDate(endTimestamp);
 			s.setDayStartTime(dayStartTime);
 			s.setDayEndTime(dayEndTime);
+			s.setBookable(bookable);
 
 			em.persist(s);
 			createdSchedules.add(s);

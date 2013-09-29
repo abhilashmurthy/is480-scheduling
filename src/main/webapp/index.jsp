@@ -165,6 +165,7 @@
 					milestones.sort(compare);
                     for (var i = 0; i < milestones.length; i++) {
                         var milestone = milestones[i];
+						if (!milestone.bookable) continue;
 						$('ul#milestoneTab') //Add the milestone tab
 							.append(
 								$(document.createElement('li'))

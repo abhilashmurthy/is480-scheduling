@@ -139,6 +139,10 @@
 				padding-left: 20px;
 			}
 			
+			.scheduleBookable {
+				padding-left: 40px;
+			}
+			
 			.scheduleDayTimePoint {
 				display: block;
 				vertical-align: middle;
@@ -240,7 +244,7 @@
 							<!-- Edit Schedule -->
 							<div id="editSchedulePanel" class="schedulePanel">
 									<table id="editScheduleTable">
-										<tr><th>Milestone</th><th colspan="2">Dates</th><th class="dayHours">Day Hours</th></tr>
+										<tr><th>Milestone</th><th colspan="2">Dates</th><th class="dayHours">Day Hours</th><th class="scheduleBookable">Bookable</th></tr>
 										<tr id="editScheduleSubmitRow"><td></td></tr>
 									</table>
 								<h4 id="scheduleResultMessage"></h4>
@@ -417,6 +421,21 @@
 									)
 							);
                         milestoneTr.append(milestoneDayTimeTd);
+						var milestoneBookableTd = $(document.createElement('td'))
+							.css('padding-left', '40px')
+							.append(
+								$(document.createElement('div'))
+									.attr('id', 'milestoneBookable_' + schedule.milestoneName.toLowerCase())
+									.addClass('make-switch switch-medium')
+									.attr('data-on', 'success')
+									.attr('data-off', 'danger')
+									.attr('data-on-label', 'Yes')
+									.attr('data-off-label', 'No')
+									.attr('padding-left', '30px')
+									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'milestoneBookable_' + schedule.milestoneName.toLowerCase()).attr('checked', schedule.bookable))
+									.bootstrapSwitch()
+							);
+                        milestoneTr.append(milestoneBookableTd);
                         milestoneTr.insertBefore('#editScheduleSubmitRow');
                     }
                 }
@@ -570,6 +589,7 @@
                         for (var j = 0; j < schedules.length; j++) {
                             var schedule = schedules[j];
 							var dates = $("#milestone_" + schedule.milestoneName.toLowerCase()).multiDatesPicker('getDates');
+							schedule["bookable"] = $("#milestoneBookable_" + schedule.milestoneName.toLowerCase()).bootstrapSwitch('status');
 							if (dates.length === 0) {
 								showNotification("WARNING", "Please pick dates for milestone: " + schedule.milestoneName);
 								$("#editScheduleSubmitBtn").button('reset');
@@ -625,7 +645,7 @@
                     }).done(function(response) {
                         if (response.success) {
 //                            schedules = response.schedules;
-                            showNotification("SUCCESS", "Updated dates successfully");
+                            showNotification("SUCCESS", "Updated schedule successfully");
 							if ($("#semesterNameAvailabilityChecker").is(":visible")) {
 								$(".termPicker").children(":contains('" + activeSemesterStr + "')").text(activeSemesterDiplayNameStr.split(" ")[0] + " " + term);
 							}
