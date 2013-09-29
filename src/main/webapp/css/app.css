@@ -176,6 +176,7 @@ input, button, select, textarea {
 
 .popoverInput {
     width: 200px;
+	margin-bottom: 0 !important;
 }
 
 .bookedTimeslot:hover, .unbookedTimeslot:hover {

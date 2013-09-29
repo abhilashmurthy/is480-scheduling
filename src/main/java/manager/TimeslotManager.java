@@ -33,12 +33,16 @@ public class TimeslotManager {
     public static Timeslot findById(EntityManager em, long id) {
         logger.trace("Getting timeslot based on id.");
         Timeslot timeslot = null;
+		boolean justHere = false;
         try {
-            em.getTransaction().begin();
+            if (!em.getTransaction().isActive()) {
+				justHere = true;
+				em.getTransaction().begin();
+			}
             Query q = em.createQuery("select t from Timeslot t where t.id = :id")
                     .setParameter("id", id);
             timeslot = (Timeslot) q.getSingleResult();
-            em.getTransaction().commit();
+            if (justHere) em.getTransaction().commit();
             return timeslot;
         } catch (Exception e) {
             logger.error("Database Operation Error");

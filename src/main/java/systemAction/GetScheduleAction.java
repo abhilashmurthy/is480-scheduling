@@ -99,7 +99,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
             HttpSession session = request.getSession();
             Term term = (Term) session.getAttribute("currentActiveTerm");
 
-            if (milestone != null) {
+            if (milestone != null && !milestone.equals("")) {
                 //Return schedule data by milestone
                 Milestone milestoneObject = MilestoneManager.findByNameAndTerm(em, milestone, term);
                 Student student = null;
