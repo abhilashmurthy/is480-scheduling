@@ -339,7 +339,7 @@
 									.multiDatesPicker({
 										dateFormat: "yy-mm-dd",
 										defaultDate: dates.length > 0?dates[0]:Date.today(),
-										minDate: Date.today(),
+//										minDate: Date.today(),
 //										beforeShowDay: $.datepicker.noWeekends,
 										onSelect: function(date) {
 											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
@@ -814,6 +814,13 @@
 						var foundOverlapping = false;
 						var $nextTr = $timeslotCell.closest('tr');
 						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
+						for (var i = 0; i < slotSize; i++) {
+							$nextTr = $nextTr.next();
+							if (i !== slotSize - 1 && $nextTr.children().eq($timeslotCell.index()).hasClass('teamExists')) { //Invalid timeslot
+								return false;
+							}
+						}
+						$nextTr = $timeslotCell.closest('tr');
 						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
 						for (var i = 0; i < slotSize; i++) {
 							$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
