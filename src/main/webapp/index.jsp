@@ -163,13 +163,14 @@
                         }
                     }
 					milestones.sort(compare);
+					var setAsActive = true;
                     for (var i = 0; i < milestones.length; i++) {
                         var milestone = milestones[i];
 						if (!milestone.bookable) continue;
 						$('ul#milestoneTab') //Add the milestone tab
 							.append(
 								$(document.createElement('li'))
-									.addClass(milestone.milestoneOrder === 1?'active':'')
+									.addClass(setAsActive?'active':'')
 									.append(
 										$(document.createElement('a'))
 											.attr('id', milestone.name.toLowerCase())
@@ -183,13 +184,14 @@
 								$(document.createElement('div'))
 									.attr('id', milestone.name.toLowerCase() + "Content")
 									.addClass('tab-pane fade')
-									.addClass(milestone.milestoneOrder === 1?'active in':'')
+									.addClass(setAsActive?'active in':'')
 									.append(
 										$(document.createElement('table'))
 											.attr('id', milestone.name.toLowerCase() + "ScheduleTable")
 											.addClass('scheduleTable table-condensed table-hover table-bordered')
 									)
 							);
+						setAsActive = false;
                     }
                 }
 

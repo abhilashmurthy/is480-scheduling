@@ -306,7 +306,6 @@
                 loadInitialValues();
                 
                 function loadInitialValues() {
-					$("#editScheduleTable").empty();
 					$("#editScheduleTable").append("<tr id='editScheduleSubmitRow'><td></td></tr>");
 					$("#milestoneTimeslotsSelect").empty();
 					$("#semesterInput").val(activeSemesterStr);
@@ -431,7 +430,6 @@
 									.attr('data-off', 'danger')
 									.attr('data-on-label', 'Yes')
 									.attr('data-off-label', 'No')
-									.attr('padding-left', '30px')
 									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'milestoneBookable_' + schedule.milestoneName.toLowerCase()).attr('checked', schedule.bookable))
 									.bootstrapSwitch()
 							);
