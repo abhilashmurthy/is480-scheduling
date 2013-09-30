@@ -5,12 +5,10 @@
 package notification.email;
 
 import constant.Response;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import manager.UserManager;
 import model.Booking;
 import model.User;
@@ -51,6 +49,9 @@ public class DeletedBookingEmail extends EmailTemplate{
 		try {
 			em = MiscUtil.getEntityManagerInstance();
 			HashSet<String> emails = new HashSet<String>();
+			
+			//Adding the person who perform the delete action
+			emails.add(deletor.getUsername() + "@smu.edu.sg");
 
 			//Adding required attendees
 			for (User u : b.getResponseList().keySet()) {

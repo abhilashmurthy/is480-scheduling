@@ -255,6 +255,13 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             return false;
         }
 		
+		if (!timeslot.getSchedule().isBookable()) {
+			logger.error("Schedule not open for booking");
+            json.put("success", false);
+            json.put("message", "This milestone is currently not available for booking");
+            return false;
+		}
+		
 		//Check if the timeslot has already passed
 		Calendar now = Calendar.getInstance();
 		if (timeslot.getStartTime().before(now.getTime())) {
