@@ -86,7 +86,7 @@
                     <td style="width:15px"></td>
                     <td class="legendBox rejectedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
                     <td style="width:15px"></td>
-					<% if (activeRole.equals(Role.FACULTY)) {%>
+					<% if (!activeRole.equals(Role.TA)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
 					<% } else if (activeRole.equals(Role.TA)) { %>
 					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Your video signup</td>
@@ -136,7 +136,7 @@
                 
                 //Admin specific variables
                 var teams = JSON.parse('<%= session.getAttribute("allTeams")%>'); //All teams JSON
-                var teamDropDownSelect = null;
+                var $teamDropDownSelect = null;
                 var createBookingOutputForAdmin = null;
 				
                 //TA specific variables
@@ -276,374 +276,277 @@
                 //Append popover data
                 function appendPopovers() {
                     //Show progress bar
-                    $("#milestoneTabContent").hide();
-                    $("#scheduleProgressBar").show();
+                    $('#milestoneTabContent').hide();
+                    $('#scheduleProgressBar').show();
                     
                     //Delete all old popovers
-                    $(".timeslotCell").trigger('mouseleave');
-                    $(".timeslotCell").popover('destroy');
+                    $('.timeslotCell').trigger('mouseleave').popover('destroy');
                     
                     refreshScheduleData();
 
                     //Add View Booking popovers
-                    $(".bookedTimeslot").each(function() {
+                    $('.bookedTimeslot').each(function() {
                         appendViewBookingPopover($(this));
                     });
 
                     //Add Create Booking popover for all timeslots if is student, admin, or course coordinator
                     if (<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                        $(".unbookedTimeslot, .unavailableTimeslot").each(function() {
+                        $('.unbookedTimeslot, .unavailableTimeslot').each(function() {
                             appendCreateBookingPopover($(this));
                         });
                     }
                     if (<%= activeRole.equals(Role.FACULTY) %>) {
-                        $(".unbookedTimeslot, .unavailableTimeslot").each(function() {
+                        $('.timeslotCell').each(function() {
                             appendChangeAvailabilityPopover($(this));
                         });
                     }
                     //Show progress bar
-                    $("#scheduleProgressBar").hide();
-                    $("#milestoneTabContent").show();
+                    $('#scheduleProgressBar').hide();
+                    $('#milestoneTabContent').show();
                 }
                 
-                
-                function appendViewBookingPopover(bodyTd) {
-                    //Get View Booking Data
-                    var timeslots = scheduleData.timeslots;
-                    var booking = bodyTd.children('.booking');
-                    var timeslot = timeslots[bodyTd.attr('value')];
+                function appendViewBookingPopover($td) {
+                    var timeslot = scheduleData.timeslots[$td.attr('value')];
+					var $booking = $td.children('.booking');
+                    if ($booking) {$booking.addClass(timeslot.status.toLowerCase() + 'Booking');}
+					
+                    var $bookingDetailsTable = $(document.createElement('table'));
+                    $bookingDetailsTable.attr('id', 'viewTimeslotTable');
+					var outputData = {
+						Team: timeslot.team,
+						Status: timeslot.status,
+						Date: timeslot.startDate,
+						Time: timeslot.time,
+						Venue: timeslot.venue,
+						Students: function(){
+							var studentList = '';
+							for (var i = 0; i < timeslot.students.length; i++) {
+								studentList += (timeslot.students[i].name + "<br/>");
+							}
+							return studentList;
+						},
+						Faculty: function(){
+							var facultyList = '';
+							for (var i = 0; i < timeslot.faculties.length; i++) {
+								facultyList += (timeslot.faculties[i].name + " (" + timeslot.faculties[i].status.toLowerCase() + ")" + "<br/>");
+							}
+							return facultyList;
+						},
+						TA: timeslot.TA,
+						External: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+					};
 
-                    //Append booking classes based on status
-                    if (booking) {
-                        if (timeslot.status === "APPROVED") {
-                            booking.addClass('approvedBooking');
-                        } else if (timeslot.status === "REJECTED") {
-                            booking.addClass('rejectedBooking');
-                        } else {
-                            booking.addClass('pendingBooking');
-                        }
-                    }
-                    
-                    //Getting the content
-                    //Additional details
-                    var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput');
-
-                    //Output in the form of a table
-                    var bookingDetails = $(document.createElement('table'));
-                    bookingDetails.attr('id', 'viewTimeslotTable');
-                    var outputData = [
-                        ["Team", timeslot.team],
-                        ["Status", timeslot.status],
-                        ["Date", timeslot.startDate],
-                        ["Time", timeslot.time],
-                        ["Venue", timeslot.venue],
-                        ["Students", timeslot.students],
-                        ["Faculty", timeslot.faculties],
-                        ["TA", timeslot.TA],
-                        ["Optional", optionalAttendees]
-                    ];
-
-                    //Add Delete and Update button if user is a student with a team
+                    //Allow team to edit booking
                     if (timeslot.team === teamName) {
-                        var buttonDelete = $(document.createElement('button'));
-                        buttonDelete.attr('id', 'deleteBookingBtn');
-                        buttonDelete.addClass('popoverBtn btn btn-danger');
-                        var iconDelete = $(document.createElement('i'));
-                        iconDelete.addClass('icon-trash icon-white');
-                        buttonDelete.append(iconDelete);
-                        buttonDelete.append("Delete");
-
-                        var buttonUpdate = $(document.createElement('button'));
-                        buttonUpdate.attr('id', 'updateBookingBtn');
-                        buttonUpdate.addClass('popoverBtn btn btn-info');
-                        var iconUpdate = $(document.createElement('i'));
-                        iconUpdate.addClass('icon-edit icon-white');
-                        buttonUpdate.append(iconUpdate);
-                        buttonUpdate.append("Save");
-
-                        outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
+                        outputData[""] = (
+							$(document.createElement('button'))
+								.attr('id', 'deleteBookingBtn')
+								.addClass('popoverBtn btn btn-danger')
+								.append($(document.createElement('i')).addClass('icon-trash icon-white'))
+								.append('Delete')
+								.outerHTML()
+							+
+							$(document.createElement('button'))
+								.attr('id', 'updateBookingBtn')
+								.addClass('popoverBtn btn btn-info')
+								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append('Save')
+								.css('float', 'right')
+								.outerHTML()
+						);
                     }
 
-                    //Make fields editable and add Update and Delete buttons if user is admin
+                    //Allow admin to edit fields
                     if (<%=activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                        //Replace startDate and startTime with editable fields
-                        for (var i = 0; i < outputData.length; i++) {
-                            if (outputData[i][0] === "Venue") {
-                                var input = $(document.createElement('input'));
-                                input.attr('id', 'updateFormVenue');
-                                input.attr('type', 'text');
-                                input.attr('placeholder', outputData[i][1]);
-                                input.addClass('updateFormVenue popoverInput');
-                                input.val(outputData[i][1]).change();
-                                outputData[i][1] = input;
-                            }
-                            if (outputData[i][0] === "Date") {
-                                var input = $(document.createElement('input'));
-                                input.attr('id', 'updateFormDate');
-                                input.attr('type', 'text');
-                                input.attr('placeholder', outputData[i][1]);
-                                input.attr('title', 'Enter a new date (YYYY-MM-DD)');
-                                input.addClass('updateFormDate popoverInput');
-                                input.datepicker({
-                                    dateFormat: "yy-mm-dd",
-                                    beforeShowDay: $.datepicker.noWeekends
-                                });
-                                input.val(outputData[i][1]).change();
-                                outputData[i][1] = input;
-                            }
-                            if (outputData[i][0] === "Time") {
-                                var input = $(document.createElement('input'));
-                                input.attr('id', 'updateFormStartTime');
-                                input.attr('type', 'text');
-                                input.attr('placeholder', outputData[i][1]);
-                                input.attr('title', 'Enter a new start time (HH:MM)');
-                                input.addClass('updateFormStartTime popoverInput');
-                                input.timepicker({
-                                    minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
-                                    maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
-                                    step: 30,
-                                    forceRoundTime: true,
-                                    timeFormat: 'H:i'
-                                });
-                                input.val(outputData[i][1]).change();
-                                outputData[i][1] = input;
-                            }
-                        }
-                        //Add Update AND Delete button
-                        var buttonDelete = $(document.createElement('button'));
-                        buttonDelete.attr('id', 'deleteBookingBtn');
-                        buttonDelete.addClass('popoverBtn btn btn-danger');
-                        var iconDelete = $(document.createElement('i'));
-                        iconDelete.addClass('icon-trash icon-white');
-                        buttonDelete.append(iconDelete);
-                        buttonDelete.append("Delete");
-
-                        var buttonUpdate = $(document.createElement('button'));
-                        buttonUpdate.attr('id', 'updateBookingBtn');
-                        buttonUpdate.addClass('popoverBtn btn btn-info');
-                        var iconUpdate = $(document.createElement('i'));
-                        iconUpdate.addClass('icon-edit icon-white');
-                        buttonUpdate.append(iconUpdate);
-                        buttonUpdate.append("Save");
-
-                        outputData.push(["", buttonDelete.outerHTML() + buttonUpdate.outerHTML()]);
+						outputData.Venue =
+								$(document.createElement('input'))
+									.attr('id', 'updateFormVenue')
+									.attr('type', 'text')
+									.attr('placeholder', outputData.Venue)
+									.addClass('updateFormVenue popoverInput')
+									.val(outputData.Venue).change();
+						outputData.Date = 
+								$(document.createElement('input'))
+									.attr('id', 'updateFormDate')
+									.attr('type', 'text')
+									.attr('placeholder', outputData.Date)
+									.attr('title', 'Enter a new date (YYYY-MM-DD)')
+									.addClass('updateFormDate popoverInput')
+									.datepicker({dateFormat: "yy-mm-dd"})
+									.val(outputData.Date).change();
+						outputData.Time = 
+								$(document.createElement('input'))
+									.attr('id', 'updateFormStartTime')
+									.attr('type', 'text')
+									.attr('placeholder', outputData.Time)
+									.attr('title', 'Enter a new start time (HH:MM)')
+									.addClass('updateFormDate popoverInput')
+									.timepicker({
+										minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
+										maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
+										step: 30,
+										forceRoundTime: true,
+										timeFormat: 'H:i'
+									})
+									.val(outputData.Time).change();				
+                        outputData[""] = (
+							$(document.createElement('button'))
+								.attr('id', 'deleteBookingBtn')
+								.addClass('popoverBtn btn btn-danger')
+								.append($(document.createElement('i')).addClass('icon-trash icon-white'))
+								.append("Delete")
+								.outerHTML()
+							+
+							$(document.createElement('button'))
+								.attr('id', 'updateBookingBtn')
+								.addClass('popoverBtn btn btn-info')
+								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append("Save")
+								.outerHTML()
+						);
                     }
 
                     //Append all fields
-                    for (var i = 0; i < outputData.length; i++) {
-                        var outputTr = $(document.createElement('tr'));
-                        var outputTdKey = $(document.createElement('td')).html(outputData[i][0]);
-                        var outputTdValue = null;
-                        if (outputData[i][1] instanceof Array) {
-                            var outputArray = outputData[i][1];
-                            var outputArrayStr = "";
-                            //If print students
-                            if (outputData[i][0] === "Students") {
-                                for (var j = 0; j < outputArray.length; j++) {
-                                    outputArrayStr += outputArray[j].name + "<br/>";
-                                }
-                            }
-                            //If print faculty
-                            if (outputData[i][0] === "Faculty") {
-                                for (var j = 0; j < outputArray.length; j++) {
-                                    outputArrayStr += outputArray[j].name + " (" + outputArray[j].status.toLowerCase() + ")" + "<br/>";
-                                }
-                            }
-                            outputTdValue = $(document.createElement('td')).html(outputArrayStr);
-                        } else {
-                            outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
-                        }
-                        outputTr.append(outputTdKey);
-                        outputTr.append(outputTdValue);
-                        bookingDetails.append(outputTr);
-                    }
+					for (var key in outputData) {
+						if (outputData.hasOwnProperty(key)) {
+							$bookingDetailsTable
+								.append(
+									$(document.createElement('tr'))
+										.append($(document.createElement('td')).html(key))
+										.append($(document.createElement('td')).html(outputData[key]))
+								);
+						}
+					}
 
                     //Popover
-                    makePopover(
-                        booking,
-                        title = function() {
-                            if (timeslot.team === teamName) {
-                                return "<b>Your Booking</b>";
-                            } else {
-                                return "<b>Team Booking</b>";
-                            }
-                        },
-                        bookingDetails
-                    );
-                }
+                    makePopover($booking, timeslot.team === teamName?"<b>Your Booking</b>":"<b>Team Booking</b>", $bookingDetailsTable);
+                }				
                 
-                function appendCreateBookingPopover(bodyTd) {
-                    if (bodyTd.hasClass('legendBox')) return;
-                    //Initialize variables
-                    var termId = year + "," + semester;
-                    var dateToView = Date.parse(bodyTd.attr('value')).toString("dd MMM");
-                    var startTimeToView = Date.parse(bodyTd.attr('value')).toString("HH:mm");
-                    var endTimeToView = new Date(Date.parse(bodyTd.attr('value'))).addMinutes(scheduleData.duration).toString('HH:mm');
-                    
-                    //Additional details
-                    var timeslot = scheduleData.timeslots[bodyTd.attr('value')];
-                    var optionalAttendees = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput');
-                    
-                    //If booking was deleted, 
-                    if (timeslot.lastBookingWasRemoved) {
-                        var deletedDiv = $(document.createElement('div'));
-                        if (timeslot.lastBookingRejectReason) {
-                            deletedDiv.addClass('rejectedBooking');
-                            makeTooltip(bodyTd, 'Removed by ' + timeslot.lastBookingEditedBy);
-                        } else {
-                            deletedDiv.addClass('deletedBookingOnTimeslot');
-                            deletedDiv.addClass('icon-info-sign icon-red');
-                            makeTooltip(deletedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
-                        }
-                        bodyTd.append(deletedDiv);
-                    }
-
-                    //Create Booking outputTable
-                    var createBookingDetails = $(document.createElement('table'));
-                    createBookingDetails.attr('id', 'createTimeslotTable');
-                   
-                    var outputData = [
-                        ["Date", dateToView],
-                        ["Time", startTimeToView + " - " + endTimeToView],
-                        ["Milestone", milestone],
-                        ["Venue", timeslot.venue],
-                        ["TA", timeslot.TA],
-                        ["Optional", optionalAttendees]
-                    ];
-                    if (<%= activeRole.equals(Role.STUDENT) %>) {
-                        outputData.unshift(["Team", teamName]); //Add to top of table
-                    } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
-                        outputData.unshift(["Team", teamDropDownSelect.outerHTML()]); //Add to top of table
-                        for (var i = 0; i < outputData.length; i++) {
-                            if (outputData[i][0] === "Venue") { //Make Venue editable
-                                var input = $(document.createElement('input'));
-                                input.attr('id', 'updateFormVenue');
-                                input.attr('type', 'text');
-                                input.attr('placeholder', outputData[i][1]);
-                                input.addClass('updateFormVenue popoverInput');
-                                input.val(outputData[i][1]).change();
-                                outputData[i][1] = input;
-								break;
-                            }
-                        }
-                    }
+                function appendCreateBookingPopover($td) {
+                    if ($td.hasClass('legendBox')) return;
+                    var timeslot = scheduleData.timeslots[$td.attr('value')];
 					
-                    if (bodyTd.is('.unavailableTimeslot')) {
-                        var timeslots = scheduleData.timeslots;
-                        var unavailableTimeslotData = timeslots[bodyTd.attr('value')];
-                        outputData.push(["Unavailable", unavailableTimeslotData.unavailable]);
-						if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>){
-							//Add update button
-							var buttonUpdate = $(document.createElement('button')); //Add Update button
-							buttonUpdate.attr('id', 'updateTimeslotBtn');
-							buttonUpdate.css('float', 'right');
-							buttonUpdate.addClass('popoverBtn btn btn-info');
-							var iconUpdate = $(document.createElement('i'));
-							iconUpdate.addClass('icon-edit icon-white');
-							buttonUpdate.append(iconUpdate);
-							buttonUpdate.append("Save");
-							outputData.push(["", buttonUpdate.outerHTML()]);
-						}
-                        //TODO: Can create booking still? Add button here
-                    } else {
-                        var buttonCreate = $(document.createElement('button')); //Add Create button
-                        buttonCreate.attr('id', 'createBookingBtn');
-                        buttonCreate.addClass('btn btn-primary');
-                        var iconCreate = $(document.createElement('i'));
-                        iconCreate.addClass('icon-plus-sign icon-white');
-                        buttonCreate.append(iconCreate);
-                        buttonCreate.append("Book");
-                        var buttonUpdate = $(document.createElement('button')); //Add Update button
-                        buttonUpdate.attr('id', 'updateTimeslotBtn');
-						buttonUpdate.css('float', 'right');
-                        buttonUpdate.addClass('popoverBtn btn btn-info');
-                        var iconUpdate = $(document.createElement('i'));
-                        iconUpdate.addClass('icon-edit icon-white');
-                        buttonUpdate.append(iconUpdate);
-                        buttonUpdate.append("Save");
-						if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>){
-							outputData.push(["", buttonCreate.outerHTML() + buttonUpdate.outerHTML()]);
+                    var $createBookingTable = $(document.createElement('table'));
+                    $createBookingTable.attr('id', 'createTimeslotTable');
+					var outputData = {
+						Team: <%= activeRole.equals(Role.STUDENT) %>?teamName:<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>?$teamDropDownSelect.outerHTML():'',
+						Date: Date.parse($td.attr('value')).toString("dd MMM"),
+						Time: Date.parse($td.attr('value')).toString('HH:mm')+ " - " + Date.parse($td.attr('value')).addMinutes(scheduleData.duration).toString('HH:mm'),
+						Venue: timeslot.venue,
+						Milestone: milestone,
+						TA: timeslot.TA,
+						External: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+					};
+                   
+				   if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
+					   //Make fields editable for admin
+					   outputData.Venue = 
+							$(document.createElement('input'))
+								.attr('id', 'updateFormVenue')
+								.attr('type', 'text')
+								.attr('placeholder', outputData.Venue)
+								.addClass('updateFormVenue popoverInput')
+								.val(outputData.Venue).change();
+						if ($td.is('.unavailableTimeslot')) {
+							outputData[""] = 
+								$(document.createElement('button'))
+									.attr('id', 'updateTimeslotBtn')
+									.css('float', 'right')
+									.addClass('popoverBtn btn btn-info')
+									.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+									.append("Save")
+									.outerHTML();
 						} else {
-							outputData.push(["", buttonCreate]);
-						}                        
-                    }
-                    //Print data
-                    for (var i = 0; i < outputData.length; i++) {
-                        var outputTr = $(document.createElement('tr'));
-                        var outputTdKey = $(document.createElement('td')).html(outputData[i][0]);
-                        if (outputData[i][1] instanceof Array) {
-                            var outputList = "";
-                            for (var j = 0; j < outputData[i][1].length; j++) {
-                                outputList += outputData[i][1][j] + "<br/>";
-                            }
-                            outputData[i][1] = outputList;
-                        }
-                        var outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
-                        outputTr.append(outputTdKey);
-                        outputTr.append(outputTdValue);
-                        createBookingDetails.append(outputTr);
-                    }
+							outputData[""] = 
+								$(document.createElement('button'))
+									.attr('id', 'createBookingBtn')
+									.addClass('popoverBtn btn btn-primary')
+									.append($(document.createElement('i')).addClass('icon-plus-sign  icon-white'))
+									.append("Book")
+									.outerHTML()
+								+
+								$(document.createElement('button'))
+									.attr('id', 'updateTimeslotBtn')
+									.css('float', 'right')
+									.addClass('popoverBtn btn btn-info')
+									.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+									.append("Save")
+									.outerHTML();
+						}
+				   } else {
+					   //For students
+						outputData[""] = 
+							$(document.createElement('button'))
+								.attr('id', 'createBookingBtn')
+								.addClass('popoverBtn btn btn-primary')
+								.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+								.append("Book")
+								.outerHTML();
+						//TODO: Can create booking still? Add button here
+				   }
+					
+                    //Append all fields
+					for (var key in outputData) {
+						if (outputData.hasOwnProperty(key)) {
+							$createBookingTable
+								.append(
+									$(document.createElement('tr'))
+										.append($(document.createElement('td')).html(key))
+										.append($(document.createElement('td')).html(outputData[key]))
+								);
+						}
+					}
                     
-                    makePopover(
-                        bodyTd,
-                        title = function(){
-                            if (bodyTd.is('.unavailableTimeslot')) {
-                                return "Unavailable Timeslot";
-                            } else {
-                                return "Available Timeslot";
-                            }
-                        },
-                        createBookingDetails
-                    );
+					//Popover
+					makePopover($td, $td.is('.unavailableTimeslot')?"Unavailable Timeslot":"Available Timeslot", $createBookingTable);
                 }
                 
-                function appendChangeAvailabilityPopover(bodyTd) {
-                    if (bodyTd.hasClass('legendBox')) return;
-                    //Create Booking outputTable
-                    var changeAvailabailityDetails = $(document.createElement('table'));
-                    changeAvailabailityDetails.attr('id', 'createTimeslotTable');
-                    var outputData = [];
-                    if (bodyTd.is('.unavailableTimeslot')) {
-                        var buttonAvail = $(document.createElement('button'));
-                        buttonAvail.attr('id', 'availableTimeslotBtn');
-                        buttonAvail.addClass('btn btn-primary');
-                        var iconAvail = $(document.createElement('i'));
-                        iconAvail.addClass('icon-plus-sign icon-white');
-                        buttonAvail.append(iconAvail);
-                        buttonAvail.append("Available");
-                        outputData.push(["You Are", buttonAvail]);
-                    } else {
-                        var buttonUnavail = $(document.createElement('button'));
-                        buttonUnavail.attr('id', 'unavailableTimeslotBtn');
-                        buttonUnavail.addClass('btn btn-primary');
-                        var iconUnavail = $(document.createElement('i'));
-                        iconUnavail.addClass('icon-minus-sign icon-white');
-                        buttonUnavail.append(iconUnavail);
-                        buttonUnavail.append("Unavailable");
-                        outputData.push(["You Are", buttonUnavail]);
-                    }
-                    //Print data
-                    for (var i = 0; i < outputData.length; i++) {
-                        var outputTr = $(document.createElement('tr'));
-                        var outputTdKey = $(document.createElement('td')).html(outputData[i][0]);
-                        var outputTdValue = $(document.createElement('td')).html(outputData[i][1]);
-                        outputTr.append(outputTdKey);
-                        outputTr.append(outputTdValue);
-                        changeAvailabailityDetails.append(outputTr);
-                    }
+                function appendChangeAvailabilityPopover($td) {
+                    if ($td.hasClass('legendBox')) return;
+                    var $changeAvailabilityTable = $(document.createElement('table')).attr('id', 'createTimeslotTable');
+                    var outputData = {};
+					
+					outputData["You Are"] = function() {
+						if ($td.is('.unavailableTimeslot')) {
+							return $(document.createElement('button'))
+										.attr('id', 'availableTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+										.append("Available")
+										.outerHTML();
+						} else {
+							return $(document.createElement('button'))
+										.attr('id', 'unavailableTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('icon-minus-sign icon-white'))
+										.append("Unavailable")
+										.outerHTML();
+						}
+					};
+					
+                    //Append all fields
+					for (var key in outputData) {
+						if (outputData.hasOwnProperty(key)) {
+							$changeAvailabilityTable
+								.append(
+									$(document.createElement('tr'))
+										.append($(document.createElement('td')).html(key))
+										.append($(document.createElement('td')).html(outputData[key]))
+								);
+						}
+					}
                     
-                    makePopover(
-                        bodyTd,
-                        "Change Availabaility",
-                        changeAvailabailityDetails
-                    );
+					//Popover
+					makePopover($td, "Change Availability", $changeAvailabilityTable);
                 }
                 
                 //Function to refresh booking exists
                 function refreshScheduleData() {
                     var toReturn = null;
                     var bookingExists = 0;
-                    var existingTimeslot = null;
+                    var $existingTimeslot = null;
                     var teamsPendingBooking = null;
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
                         for (var key in scheduleData.timeslots) {
@@ -651,24 +554,22 @@
                                 var timeslot = scheduleData.timeslots[key];
                                 if (timeslot.team && timeslot.team === teamName) {
                                     bookingExists = 1;
-                                    existingTimeslot = $(document.createElement('div'));
-                                    existingTimeslot.attr('value', timeslot.datetime);
-                                    existingTimeslot.addClass('existingTimeslot');
+                                    $existingTimeslot = $(document.createElement('div'))
+										.attr('value', timeslot.datetime)
+										.addClass('existingTimeslot');
                                     break;
                                 }
                             }
                         }
-//                        console.log("Does booking exist? " + milestone + " " + teamName + " " + bookingExists);
-                        toReturn = {bookingExists:bookingExists, existingTimeslot: existingTimeslot};
+                        toReturn = {bookingExists:bookingExists, existingTimeslot: $existingTimeslot};
                     } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
                         teamsPendingBooking = new Array();
-                        teamDropDownSelect = $(document.createElement('select'));
-                        teamDropDownSelect.attr('name', 'team');
-                        teamDropDownSelect.attr('id', 'createTeamSelect');
-						teamDropDownSelect.addClass('popoverInput');
+                        $teamDropDownSelect = $(document.createElement('select'))
+							.attr('name', 'team')
+							.attr('id', 'createTeamSelect')
+							.addClass('popoverInput');
                         outerTeams: 
-                        for (var t = 0; t < teams.length; t++) {
-                            //Append only teams without bookings
+                        for (var t = 0; t < teams.length; t++) { //Append only teams without bookings
                             var adminTeamName = teams[t].teamName;
                             for (var key in scheduleData.timeslots) {
                                 if (scheduleData.timeslots.hasOwnProperty(key)) {
@@ -678,10 +579,11 @@
                                     }
                                 }
                             }
-                            var teamDropDownOption = $(document.createElement('option'));
-                            teamDropDownOption.attr('value', teams[t].teamId);
-                            teamDropDownOption.html(adminTeamName);
-                            teamDropDownSelect.append(teamDropDownOption);
+                            $teamDropDownSelect
+								.append($(document.createElement('option'))
+									.attr('value', teams[t].teamId)
+									.html(adminTeamName)
+								);
                             teamsPendingBooking.push(adminTeamName);
                         }
                         toReturn = {teamsPendingBooking:teamsPendingBooking};
@@ -697,12 +599,12 @@
                      ****************************/
 
                     //Removed clicked
-                    $(".timeslotCell").mouseleave(function() {
-                        $(this).removeClass("clickedCell");
+                    $('.timeslotCell').mouseleave(function() {
+                        $(this).removeClass('clickedCell');
                     });
                     
                     //Hide other popovers when others clicked
-                    $('body').off('click', '.bookedTimeslot');
+                    $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
                         self = $(this);
                         $('.booking').not(self).popover('hide');
@@ -712,9 +614,14 @@
                     });
 
                     //Popover for booked timeslot
-                    $('body').off('click', '.bookedTimeslot');
-                    $('body').on('click', '.bookedTimeslot, .bookedTimeslot > .booking', function(e) {
-                        self = (!$(this).is('.booking')) ? $(this).children('.booking') : $(this);
+                    $('body').off('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking');
+                    $('body').on('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking', function(e) {
+						if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
+							$(this).popover('show');
+							console.log('showing');
+							return false;
+						}
+						self = (!$(this).is('.booking')) ? $(this).children('.booking') : $(this);
                         if ($(e.target).parents('.popover').length) return false;
                         self.popover('show');
                         self.find('ul').remove();
@@ -722,11 +629,11 @@
                         return false;
                     });
                     
-                    //Popover for unbooked or unavailable timeslot
-                    $('body').off('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking');
-                    $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking, .unavailableTimeslot, .unavailableTimeslot > .booking', function(e) {
-                        if (e.target === this) {
-                            self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
+                    //Popover for unbooked timeslot
+                    $('body').off('click', '.unbookedTimeslot, .unbookedTimeslot > .booking');
+                    $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking', function(e) {
+						if (e.target === this) {
+							self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
                             var timeslot = scheduleData.timeslots[self.attr('value')];
                             var refreshData = refreshScheduleData();
                             if (<%= activeRole.equals(Role.STUDENT) %>) {
@@ -736,7 +643,7 @@
                                 }
                                 var teamTerm = "<% try {out.print(!team.getTerm().equals(activeTerm)?team.getTerm().getAcademicYear() + " " + team.getTerm().getSemester():"thisTerm");} catch (Exception e) {out.print("thisTerm");} %>";
                                 if (teamTerm !== "thisTerm") {
-                                    showNotification("WARNING", self, "You can only book for Term " + teamTerm);
+                                    showNotification("WARNING", self, "You can only book for " + teamTerm);
                                     return false;
                                 }
                                 if (timeslot.lastBookingRejectReason) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingRejectReason);
@@ -762,14 +669,22 @@
                         }
                         return false;
                     });
+					
+                    //Popover for unavailable timeslot
+                    $('body').off('click', '.unavailableTimeslot');
+                    $('body').on('click', '.unavailableTimeslot', function(e) {
+                        self = $(this);
+                        self.popover('show');
+                        return false;
+                    });
                     
                     /*****************************
                      POPOVER INTERACTION
                      ****************************/
 
                     //Close Booking Button
-                    $(".timeslotCell").off('click', '.close');
-                    $(".timeslotCell").on('click', '.close', function(e) {
+                    $('.timeslotCell').off('click', '.close');
+                    $('.timeslotCell').on('click', '.close', function(e) {
                         e.stopPropagation();
                         self.popover('hide');
                         self.trigger('mouseleave');
@@ -777,10 +692,10 @@
                     });
 
                     //Create Booking Button
-                    $(".timeslotCell").off('click', '#createBookingBtn');
-                    $(".timeslotCell").on('click', '#createBookingBtn', function(e) {
+                    $('.timeslotCell').off('click', '#createBookingBtn');
+                    $('.timeslotCell').on('click', '#createBookingBtn', function(e) {
                         //NOTE: self is a .timeslotCell here
-                        var attendees = $(".optionalAttendees").tokenInput('get');
+                        var attendees = $('.optionalAttendees').tokenInput('get');
                         var returnData = createBooking(self, attendees);
                         //REFRESH STATE OF scheduleData
                         self.popover('destroy');
@@ -794,7 +709,7 @@
                         bookingDiv.html(returnData.booking.team);
                         bookingDiv.css('display', 'none');
                         self.append(bookingDiv);
-                        showNotification("SUCCESS", self, null);
+                        showNotification('SUCCESS', self, null);
                         scheduleData.timeslots[self.attr('value')] = returnData.booking;
                         refreshScheduleData();
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
@@ -807,8 +722,8 @@
                     });
 
                     //Delete Booking Button
-                    $(".timeslotCell").off('click', '#deleteBookingBtn');
-                    $(".timeslotCell").on('click', '#deleteBookingBtn', function(e) {
+                    $('.timeslotCell').off('click', '#deleteBookingBtn');
+                    $('.timeslotCell').on('click', '#deleteBookingBtn', function(e) {
                         e.stopPropagation();
                         var timeslot = self.parents('.timeslotCell');
                         deleteBooking(timeslot);
@@ -838,8 +753,8 @@
                     });
                     
                     //Update Booking Button
-                    $(".timeslotCell").off('click', '#updateBookingBtn');
-                    $(".timeslotCell").on('click', '#updateBookingBtn', function(e) {
+                    $('.timeslotCell').off('click', '#updateBookingBtn');
+                    $('.timeslotCell').on('click', '#updateBookingBtn', function(e) {
                         e.stopPropagation();
                         var startDateVal = $('#updateFormDate').val();
                         var startTimeVal = $('#updateFormStartTime').val();
@@ -892,8 +807,8 @@
                     });
 					
                     //Update Timeslot Button
-                    $(".timeslotCell").off('click', '#updateTimeslotBtn');
-                    $(".timeslotCell").on('click', '#updateTimeslotBtn', function(e) {
+                    $('.timeslotCell').off('click', '#updateTimeslotBtn');
+                    $('.timeslotCell').on('click', '#updateTimeslotBtn', function(e) {
                         e.stopPropagation();
                         var newVenue = $('#updateFormVenue').val();
                         var $timeslot = self.closest('.timeslotCell');
@@ -911,27 +826,25 @@
 					
                     
                     //Set Available
-                    $(".timeslotCell").off('click', '#availableTimeslotBtn');
-                    $(".timeslotCell").on('click', '#availableTimeslotBtn', function(e) {
+                    $('.timeslotCell').off('click', '#availableTimeslotBtn');
+                    $('.timeslotCell').on('click', '#availableTimeslotBtn', function(e) {
                         e.stopPropagation();
                         changeAvailability(self, true);
                         self.addClass('existingTimeslot');
                         showNotification("WARNING", self, "Set as available");
                         self.popover('destroy');
-//                        console.log("New classes should be :" + self.attr('class'));
                         appendChangeAvailabilityPopover(self);
                         return false;
                     });
                     
                     //Set Unavailable
-                    $(".timeslotCell").off('click', '#unavailableTimeslotBtn');
-                    $(".timeslotCell").on('click', '#unavailableTimeslotBtn', function(e) {
+                    $('.timeslotCell').off('click', '#unavailableTimeslotBtn');
+                    $('.timeslotCell').on('click', '#unavailableTimeslotBtn', function(e) {
                         e.stopPropagation();
                         changeAvailability(self, false);
                         self.addClass('existingTimeslot');
                         showNotification("WARNING", self, "Set as unavailable");
                         self.popover('destroy');
-//                        console.log("New classes should be :" + self.attr('class'));
                         appendChangeAvailabilityPopover(self);
                         return false;
                     });
@@ -1230,11 +1143,11 @@
                         if (!response.exception) {
                             if (response.success) {
                                 if (!available) {
-                                    bodyTd.removeClass();
-                                    bodyTd.addClass("timeslotCell unavailableTimeslot");
+                                    bodyTd.removeClass('availableTimeslot');
+                                    bodyTd.addClass('unavailableTimeslot');
                                 } else {
-                                    bodyTd.removeClass();
-                                    bodyTd.addClass("timeslotCell unbookedTimeslot");
+                                    bodyTd.removeClass('unavailableTimeslot');
+                                    bodyTd.addClass("availableTimeslot");
                                 }
                             } else {
                                 var eid = btoa(response.message);
@@ -1316,33 +1229,24 @@
 													}
 												}
 												var timeslot = timeslots[datetime];
+												var $td = $(document.createElement('td')).addClass('timeslotCell');
 												if (timeslot) {
-													var id = timeslot.id;
-													var team = timeslot.team;
-													var isAvailable = timeslot.available;
-													var taId = timeslot.taId;
-													var duration = scheduleData.duration;
-													for (var t = 30; t < duration; t++) {
+													for (var t = 30; t < scheduleData.duration; t++) {
 														rowspanArr.push(Date.parse(datetime).addMinutes(t).toString("yyyy-MM-dd HH:mm:ss"));
 													}
-													$tdCollection.push(
-														$(document.createElement('td'))
-															.attr('id', 'timeslot_' + id)
-															.attr('align', 'center')
-															.attr('value', datetime)
-															.attr('rowspan', duration/30)
-															.addClass('timeslotCell')
-															.addClass(team?'bookedTimeslot':<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !isAvailable?'unavailableTimeslot':'unbookedTimeslot')
-															.addClass(<%= activeRole.equals(Role.TA) %> && taId !== undefined?loggedInTa === taId?'taChosenTimeslot':'otherTATimeslot':'')
-															.append(team?$(document.createElement('div')).addClass('booking pendingBooking').html(team):false)
-														);
+													$td
+														.attr('id', 'timeslot_' + timeslot.id)
+														.attr('align', 'center')
+														.attr('value', datetime)
+														.attr('rowspan', scheduleData.duration/30)
+														.addClass(timeslot.team?'bookedTimeslot':'unbookedTimeslot')
+														.addClass(<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !timeslot.available?'unavailableTimeslot':'')
+														.addClass(<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined?loggedInTa === timeslot.taId?'taChosenTimeslot':'otherTATimeslot':'')
+														.append(timeslot.team?$(document.createElement('div')).addClass('booking pendingBooking').html(timeslot.team):false);
 												} else {
-													$tdCollection.push(
-														$(document.createElement('td'))
-															.addClass('timeslotCell')
-															.addClass(!timeslot?'noTimeslot':'')
-													);
+													$td.addClass('noTimeslot');
 												}
+												$tdCollection.push($td);
 											}
 											return $tdCollection;
 										})
@@ -1357,8 +1261,7 @@
                     var dateArray = new Array();
                     startDate = Date.parse(startDate);
                     stopDate = Date.parse(stopDate);
-					var diffLong = Math.abs(stopDate.getTime() - startDate.getTime());
-					var diffDays = Math.ceil(diffLong / (1000 * 3600 * 24));
+					var diffDays = Math.ceil(Math.abs(stopDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
 					maxWeekView = diffDays%7 === 0?(diffDays/7) + 1:Math.ceil(diffDays/7);
                     if (weekNum !== null) {
                         startDate.addWeeks(weekNum);
