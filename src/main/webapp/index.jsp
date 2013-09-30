@@ -1399,17 +1399,17 @@
                     switch (action) {
                         case "SUCCESS":
                             if (!notificationMessage) opts.title = "Booked"; else opts.title = "Note";
-                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView;
                             opts.type = "success";
                             break;
                         case "ERROR":
                             if (!notificationMessage) opts.title = "Deleted"; else opts.title = "Rejected";
-                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView;
                             opts.type = "error";
                             break;
                         case "INFO":
                             if (!notificationMessage) opts.title = "Updated"; else opts.title = "Note";
-                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView + "<br/> Emails have been sent";
+                            if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView;
                             opts.type = "info";
                             break;
                         case "WARNING":
