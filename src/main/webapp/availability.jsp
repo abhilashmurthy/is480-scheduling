@@ -23,13 +23,17 @@
         <%@include file="header.jsp" %>
         <title>IS480 Scheduling System | Your Availability</title>
         <style type="text/css">
-            .timeslotsTable tr:first-child {
+            #timeslotsTable tr:first-child {
                 font-size: 16px !important;
                 height: 25px;
                 padding: 10px;
                 text-align: left;
                 /*border-bottom: 1px solid black;*/
             }
+			
+			#timeslotsTable {
+				margin-top: 30px;
+			}
             
             .legend td {
                 font-size: 16px !important;
@@ -357,97 +361,63 @@
                 /*
                  * METHOD TO MARK TIMESLOTS ON TABLE
                  */
-                function triggerTimeslot(e, duration) {
-                    if (!$(e).hasClass('markable')) return false;
-                    var col = $(e).parent().children().index(e);
-                    var tr = $(e).parent();
-                    var row = $(tr).parent().children().index(tr);
-                    var tbody = $(e).parents('.timeslotsTable').children('tbody');
-                    var slotSize = duration / 30;
-                    
-                    if ($(e).hasClass("chosen")) {
-                        //Section for a cell thats available
-                        //Checking if the cell clicked is the start of the chosen timeslot (Important!)
-                        if ($(e).children().index(".start-marker") !== -1) {
-                            $(e).removeClass("chosen");
-                            $(e).children().remove(".start-marker");
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).removeClass("chosen");
-                            }
-                        }
-
-                        //Add unavailable class
-                        for (i = 1; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            if ($(nextCell).hasClass("chosen")) {
-                                return;
-                            }
-                        }
-
-                        var numRows = $(tbody).children().length;
-                        //Checking if there are enough cells for the slot duration
-                        if ((row + slotSize) <= numRows) {
-                            $(e).addClass("unavailable");
-                            var marker = document.createElement("div");
-                            $(marker).addClass("start-marker");
-                            $(e).prepend(marker);
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).addClass("unavailable");
-                            }
-                        }
-
-                    } else {
-                        //Section for a cell thats available
-                        if ($(e).children().index(".start-marker") !== -1) {
-                            $(e).removeClass("unavailable");
-                            $(e).children().remove(".start-marker");
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).removeClass("unavailable");
-                            }
-                        }
-
-                        //Checking if there will be an overlap of timeslots
-                        //Abort if there is going to be an overlap
-                        for (i = 1; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            if ($(nextCell).hasClass("unavailable")) {
-                                return;
-                            }
-                        }
-
-                        var numRows = $(tbody).children().length;
-                        //Checking if there are enough cells for the slot duration
-                        if ((row + slotSize) <= numRows) {
-                            $(e).addClass("chosen");
-                            var marker = document.createElement("div");
-                            $(marker).addClass("start-marker");
-                            $(e).prepend(marker);
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).addClass("chosen");
-                            }
-                        }
-                    }
+				function triggerTimeslot($timeslotCell) {
+                    if (!$timeslotCell.hasClass('timeslotcell')) return false;
+					var slotSize = scheduleData.duration / 30;
+					if ($timeslotCell.hasClass('chosen')) {
+						//Unavaiable a timeslot
+						var $prevTr = $timeslotCell.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+								//Unselect this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									$nextTr.children().eq($timeslotCell.index()).removeClass('chosen');
+									$nextTr.children().eq($timeslotCell.index()).addClass('unavailable');
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					} else if ($timeslotCell.hasClass('unavailable')) {
+						//Available a timeslot
+						var $prevTr = $timeslotCell.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+								//Unselect this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									$nextTr.children().eq($timeslotCell.index()).removeClass('unavailable');
+									$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					} else {
+						//Select a timeslot
+						var $nextTr = $timeslotCell.closest('tr');
+						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
+						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
+						for (var i = 0; i < slotSize; i++) {
+							$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
+							$nextTr = $nextTr.next();
+						}
+					}
+					return false;
                 }
 
                 $('body').on('click', 'td.chosen , td.unavailable', function(e){
-                    triggerTimeslot(this, scheduleData.duration);
+                    triggerTimeslot($(this));
                 });
 
                 function populateTimeslotsTable(tableId, scheduleData) {
                     $(".timeslotcell").each(function(e) {
                         var self = $(this);
                         if (self.hasClass("markable")) {
-                            triggerTimeslot(this, scheduleData.duration);
+                            triggerTimeslot(self);
                         }
                     });
                     $(".teamExists").each(function(){
@@ -470,7 +440,7 @@
                         var self = $(this);
                         for (var i = 0; i < unavailableTimeslots.length; i++) {
                             if (self.attr('value') === unavailableTimeslots[i]) {
-                                triggerTimeslot(this, scheduleData.duration);
+                                triggerTimeslot(self);
                             }
                         }
                     });
