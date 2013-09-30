@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
+import manager.UserManager;
 import model.Team;
 import model.Term;
 import model.User;
@@ -105,43 +106,81 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			String[] nextLineUsers;
 			int lineNo = 0;
 			List<User> usersList = new ArrayList<User>();
+			boolean isCoordinator = false;
 			//Read one line at a time
 			logger.info("Parsing csv file for users");
 			while ((nextLineUsers = reader.readNext()) != null) {
 				lineNo++;
 				//Not reading the 1st line
 				if (lineNo != 1) {
-	//					for(String token : nextLine) {
-						if (nextLineUsers[1].equals("0")) {
-							//Creating student object
-							//Extracting the email address from between the brackets
-							Pattern pattern = Pattern.compile("<(.*?)@");
-							Matcher matcher = pattern.matcher(nextLineUsers[5]);
-							if (matcher.find()) {
-								Student student = new Student(nextLineUsers[0], matcher.group(1), null, term);
-								usersList.add(student);
-							} else {
-								//Incorrect email address
-	//								Student student = new Student(nextLine[0], null, null, term);
+					boolean userExists = false;
+					if (usersList.size() > 0) {
+						for (User userCreated: usersList) {
+							if (userCreated.getUsername().equalsIgnoreCase(nextLineUsers[2])) {
+								//Only if the duplicated user is a course coordinator allow multiple roles
+								//CC should be already be present in the db
+								User ccObj = UserManager.getCourseCoordinator(em);
+								//If its null, getting cc from the csv file
+								if (ccObj == null) {
+									for (User cc : usersList) {
+										if (cc.getRole().equals(Role.COURSE_COORDINATOR)) {
+											ccObj = new User(cc.getFullName(), cc.getUsername(), null, Role.COURSE_COORDINATOR, term);
+											break;
+										}
+									}
+								}
+								if (!ccObj.getUsername().equalsIgnoreCase(userCreated.getUsername())) {
+									userExists = true;
+									break;
+								} else {
+									if (!isCoordinator) {
+										//Creating course coordinator object
+										if (nextLineUsers[3].equalsIgnoreCase("Supervisor") || nextLineUsers[3].equalsIgnoreCase("Reviewer 1")
+												|| nextLineUsers[3].equalsIgnoreCase("Reviewer 2")) {
+											//Creating faculty object
+											Faculty faculty = new Faculty(nextLineUsers[1], nextLineUsers[2], null, term);
+											usersList.add(faculty);
+										} else {
+											User cc = new User(nextLineUsers[1], nextLineUsers[2], null, Role.COURSE_COORDINATOR, term);
+											usersList.add(cc);
+										}
+										//This variable is true after the course coordinator has been added twice
+										isCoordinator = true;
+										break;
+									} else {
+										//This will take place when multiple roles for cc have been added
+										userExists = true;
+										break;
+									}
+								}
 							}
-						} else if (nextLineUsers[1].equals("1")) {
-							//Creating faculty object
-							Faculty faculty = new Faculty(nextLineUsers[0], nextLineUsers[5], null, term);
-							usersList.add(faculty);
-						} else if (nextLineUsers[1].equals("2")) {
-							//Creating TA object
-							TA ta = new TA(nextLineUsers[0], nextLineUsers[5], null, term);
-							usersList.add(ta);
-						} else if (nextLineUsers[1].equals("3")) {
-							//Creating admin object
-							User admin = new User(nextLineUsers[0], nextLineUsers[5], null, Role.ADMINISTRATOR, term);
-							usersList.add(admin);
-						} else if (nextLineUsers[1].equals("4")) {
-							//Creating course coordinator object
-							User cc = new User(nextLineUsers[0], nextLineUsers[5], null, Role.COURSE_COORDINATOR, term);
-							usersList.add(cc);
 						}
-	//					}
+						if (userExists == true) {
+							continue;
+						}
+					}
+					if (nextLineUsers[3].equalsIgnoreCase("Student")) {
+						//Creating student object
+						Student student = new Student(nextLineUsers[1], nextLineUsers[2], null, term);
+						usersList.add(student);
+					} else if (nextLineUsers[3].equalsIgnoreCase("Supervisor") || nextLineUsers[3].equalsIgnoreCase("Reviewer 1")
+							|| nextLineUsers[3].equalsIgnoreCase("Reviewer 2")) {
+						//Creating faculty object
+						Faculty faculty = new Faculty(nextLineUsers[1], nextLineUsers[2], null, term);
+						usersList.add(faculty);
+					} else if (nextLineUsers[3].equalsIgnoreCase("TA")) {
+						//Creating TA object
+						TA ta = new TA(nextLineUsers[1], nextLineUsers[2], null, term);
+						usersList.add(ta);
+					} else if (nextLineUsers[3].equalsIgnoreCase("Course Coordinator")) {
+						//Creating course coordinator object
+						User cc = new User(nextLineUsers[1], nextLineUsers[2], null, Role.COURSE_COORDINATOR, term);
+						usersList.add(cc);
+					} else if (nextLineUsers[3].equalsIgnoreCase("Administrator")) {
+						//Creating administrator object
+						User admin = new User(nextLineUsers[1], nextLineUsers[2], null, Role.ADMINISTRATOR, term);
+						usersList.add(admin);
+					}
 				}
 			}
 			//Persisting the user objects
@@ -151,6 +190,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 
+			
 			//-------------------------Creating the teams---------------------------
 			reader = new CSVReader(new FileReader(csvFile));
 			List<Team> teamsList = new ArrayList<Team>();
@@ -162,12 +202,12 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				lineNo++;
 				//Not reading the 1st line
 				if (lineNo != 1) {
-					if (!(nextLineTeams[7].equalsIgnoreCase("-") && nextLineTeams[7].equalsIgnoreCase(""))) {
+					if (!nextLineTeams[0].equalsIgnoreCase("-") && !nextLineTeams[0].equalsIgnoreCase("")) {
 						//Checking whether there is already a team with the same name in the teams list 
 						boolean teamExists = false;
 						if (teamsList.size() > 0) {
 							for (Team teamCreated: teamsList) {
-								if (teamCreated.getTeamName().equalsIgnoreCase(nextLineTeams[7])) {
+								if (teamCreated.getTeamName().equalsIgnoreCase(nextLineTeams[0])) {
 									teamExists = true;
 									break;
 								}
@@ -178,7 +218,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 						}
 						//Creating new team object
 						Team team = new Team();
-						team.setTeamName(nextLineTeams[7]);
+						team.setTeamName(nextLineTeams[0]);
 						team.setTerm(term);
 						teamsList.add(team);
 					}
