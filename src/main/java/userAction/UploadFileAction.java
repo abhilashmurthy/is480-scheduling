@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import util.MiscUtil;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,7 +115,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 						if (nextLineUsers[1].equals("0")) {
 							//Creating student object
 							//Extracting the email address from between the brackets
-							Pattern pattern = Pattern.compile("<(.*?)>");
+							Pattern pattern = Pattern.compile("<(.*?)@");
 							Matcher matcher = pattern.matcher(nextLineUsers[5]);
 							if (matcher.find()) {
 								Student student = new Student(nextLineUsers[0], matcher.group(1), null, term);
@@ -190,6 +191,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			String nextLine[];
 			lineNo = 0;
 			logger.info("Parsing csv file to assign users to teams");
+			HashSet<Student> students = new HashSet<Student>();
 			//Read one line at a time
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
@@ -197,9 +199,35 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				if (lineNo != 1) {
 					if (!(nextLine[7].equalsIgnoreCase("-") && nextLine[7].equalsIgnoreCase(""))) {
 						for (Team team: teamsList) {
+							boolean teamFound = false;
+							//Getting the team object
 							if (nextLine[7].equalsIgnoreCase(team.getTeamName())) {
-//								team.s
+								teamFound = true;
+								//Getting the user objects for the team
+								for (User user: usersList) {
+									if (nextLine[0].equalsIgnoreCase(user.getFullName())) {
+										Student student = (Student) user;
+										students.add(student);
+									}
+									if (nextLine[2].equalsIgnoreCase(user.getFullName())) {
+										//Setting the supervisor for the team
+										Faculty faculty = (Faculty) user;
+										team.setSupervisor(faculty);
+									} 
+									if (nextLine[3].equalsIgnoreCase(user.getFullName())) {
+										//Setting the reviewer 1 for the team
+										Faculty faculty = (Faculty) user;
+										team.setReviewer1(faculty);
+									}
+									if (nextLine[4].equalsIgnoreCase(user.getFullName())) {
+										//Setting the reviewer 2 for the team
+										Faculty faculty = (Faculty) user;
+										team.setReviewer2(faculty);
+									} 
+								}
+								//Setting the students for the team
 							}
+							if (teamFound == true) { break; }
 						}
 					}
 				}
