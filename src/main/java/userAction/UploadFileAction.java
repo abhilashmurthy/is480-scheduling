@@ -7,7 +7,9 @@ package userAction;
 import au.com.bytecode.opencsv.CSVReader;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.Role;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -16,8 +18,17 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import util.MiscUtil;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
+import model.Team;
 import model.Term;
+import model.User;
+import model.role.Faculty;
+import model.role.Student;
+import model.role.TA;
 import org.apache.struts2.util.ServletContextAware;
 //import util.FilesUtil;
 /**
@@ -39,55 +50,186 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
     @Override
     public String execute() throws Exception {
 		EntityManager em = null;
-        try {
-            em = MiscUtil.getEntityManagerInstance();
-//			System.out.println("File Name is:" + getFileFileName());
-//			System.out.println("File ContentType is:" + getFileContentType());
-			
+		try {
+			em = MiscUtil.getEntityManagerInstance();
 			//Getting the Term
 			long termId = Long.parseLong(request.getParameter("termChosen"));
 			Term term = em.find(Term.class, termId);
-			String termName = term.getDisplayName();
+//			String termName = term.getDisplayName();
 			//Getting the file
 			File csvFile = getFile();
-			
-			// <-------------------Start Parsing the File ----------------------->
-			CSVReader reader = new CSVReader(new FileReader(csvFile));
-			
-			String[] nextLine;
-			int lineNo = 0;
-			//Read one line at a time
-			while ((nextLine = reader.readNext()) != null)
-			{
-				lineNo++;
-				//Not reading the 1st line
-				if (lineNo != 1) {
-					for(String token : nextLine) {
-						//Print all tokens
-						System.out.println(token);
-					}
-					break;
+			try {
+				logger.info("Extracting data from CSV File started");
+				em.getTransaction().begin();
+				csvUpload(csvFile, term, em);
+				em.getTransaction().commit();
+				logger.info("Extracting data from CSV completed");
+			} catch (Exception e) {
+				logger.error("CSV Parsing Error:");
+				logger.error(e.getMessage());
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+				em.getTransaction().rollback();
+			} finally {
+				if (em != null && em.getTransaction().isActive()) {
+					em.getTransaction().rollback();
+				}
+				if (em != null && em.isOpen()) {
+					em.close();
 				}
 			}
-		
-//			json.put("success", true);
-//			json.put("message", "File has been uploaded successfully!");
 		} catch (Exception e) {
-           logger.error("Exception caught: " + e.getMessage());
-            if (MiscUtil.DEV_MODE) {
-                for (StackTraceElement s : e.getStackTrace()) {
-                    logger.debug(s.toString());
-                }
-            }
-            json.put("exception", true);
-            json.put("message", "Error with UploadFileAction: Escalate to developers!");
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+//			json.put("exception", true);
+//			json.put("message", "Error with UploadFileAction: Escalate to developers!");
         } finally {
 			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
 		}
 		return SUCCESS;
-    } //end of execute function
+	}
+			
+	private static void csvUpload(File csvFile, Term term, EntityManager em) {
+		// <------------------------Start Parsing the File --------------------------->
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
 
+			//------------------------Creating user objects------------------------
+			String[] nextLineUsers;
+			int lineNo = 0;
+			List<User> usersList = new ArrayList<User>();
+			//Read one line at a time
+			logger.info("Parsing csv file for users");
+			while ((nextLineUsers = reader.readNext()) != null) {
+				lineNo++;
+				//Not reading the 1st line
+				if (lineNo != 1) {
+	//					for(String token : nextLine) {
+						if (nextLineUsers[1].equals("0")) {
+							//Creating student object
+							//Extracting the email address from between the brackets
+							Pattern pattern = Pattern.compile("<(.*?)>");
+							Matcher matcher = pattern.matcher(nextLineUsers[5]);
+							if (matcher.find()) {
+								Student student = new Student(nextLineUsers[0], matcher.group(1), null, term);
+								usersList.add(student);
+							} else {
+								//Incorrect email address
+	//								Student student = new Student(nextLine[0], null, null, term);
+							}
+						} else if (nextLineUsers[1].equals("1")) {
+							//Creating faculty object
+							Faculty faculty = new Faculty(nextLineUsers[0], nextLineUsers[5], null, term);
+							usersList.add(faculty);
+						} else if (nextLineUsers[1].equals("2")) {
+							//Creating TA object
+							TA ta = new TA(nextLineUsers[0], nextLineUsers[5], null, term);
+							usersList.add(ta);
+						} else if (nextLineUsers[1].equals("3")) {
+							//Creating admin object
+							User admin = new User(nextLineUsers[0], nextLineUsers[5], null, Role.ADMINISTRATOR, term);
+							usersList.add(admin);
+						} else if (nextLineUsers[1].equals("4")) {
+							//Creating course coordinator object
+							User cc = new User(nextLineUsers[0], nextLineUsers[5], null, Role.COURSE_COORDINATOR, term);
+							usersList.add(cc);
+						}
+	//					}
+				}
+			}
+			//Persisting the user objects
+			logger.info("Persisting users");
+			for (User userObj: usersList) {
+				em.persist(userObj);
+			}
+			reader.close();
+
+			//-------------------------Creating the teams---------------------------
+			reader = new CSVReader(new FileReader(csvFile));
+			List<Team> teamsList = new ArrayList<Team>();
+			String nextLineTeams[];
+			lineNo = 0;
+			//Read one line at a time
+			logger.info("Parsing csv file for teams");
+			while ((nextLineTeams = reader.readNext()) != null) {
+				lineNo++;
+				//Not reading the 1st line
+				if (lineNo != 1) {
+					if (!(nextLineTeams[7].equalsIgnoreCase("-") && nextLineTeams[7].equalsIgnoreCase(""))) {
+						//Checking whether there is already a team with the same name in the teams list 
+						boolean teamExists = false;
+						if (teamsList.size() > 0) {
+							for (Team teamCreated: teamsList) {
+								if (teamCreated.getTeamName().equalsIgnoreCase(nextLineTeams[7])) {
+									teamExists = true;
+									break;
+								}
+							}
+							if (teamExists == true) {
+								continue;
+							}
+						}
+						//Creating new team object
+						Team team = new Team();
+						team.setTeamName(nextLineTeams[7]);
+						team.setTerm(term);
+						teamsList.add(team);
+					}
+				}
+			}
+			reader.close();
+			
+			//-----------------------Assigning users to teams-------------------------
+			reader = new CSVReader(new FileReader(csvFile));
+			String nextLine[];
+			lineNo = 0;
+			logger.info("Parsing csv file to assign users to teams");
+			//Read one line at a time
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				//Not reading the 1st line
+				if (lineNo != 1) {
+					if (!(nextLine[7].equalsIgnoreCase("-") && nextLine[7].equalsIgnoreCase(""))) {
+						for (Team team: teamsList) {
+							if (nextLine[7].equalsIgnoreCase(team.getTeamName())) {
+//								team.s
+							}
+						}
+					}
+				}
+			}
+			//Persisting the team objects
+			logger.info("Persisting teams");
+//			for (Team team: ) {
+//				em.persist(userObj);
+//			}
+			reader.close();
+			
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+	} //end of csvUpload function
+	
+	
+	//Getter and Setter Methods
     public ArrayList<HashMap<String, Object>> getData() {
         return data;
     }
