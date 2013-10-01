@@ -724,6 +724,10 @@
                     //Delete Booking Button
                     $('.timeslotCell').off('click', '#deleteBookingBtn');
                     $('.timeslotCell').on('click', '#deleteBookingBtn', function(e) {
+						var confirmDelete = confirm("Are you sure you want to delete this booking?");
+						if (!confirmDelete) { //User cancels delete operation
+							return false;
+						}
                         e.stopPropagation();
                         var timeslot = self.parents('.timeslotCell');
                         deleteBooking(timeslot);
