@@ -313,10 +313,7 @@
                 }
                 
                 function appendViewBookingPopover($td) {
-                    var timeslot = scheduleData.timeslots[$td.attr('value')];
-					var $booking = $td.children('.booking');
-                    if ($booking) {$booking.addClass(timeslot.status.toLowerCase() + 'Booking');}
-					
+                    var timeslot = scheduleData.timeslots[$td.attr('value')];					
                     var $bookingDetailsTable = $(document.createElement('table'));
                     $bookingDetailsTable.attr('id', 'viewTimeslotTable');
 					var outputData = {
@@ -426,7 +423,7 @@
 					}
 
                     //Popover
-                    makePopover($booking, timeslot.team === teamName?"<b>Your Booking</b>":"<b>Team Booking</b>", $bookingDetailsTable);
+                    makePopover($td.children('.booking'), timeslot.team === teamName?"<b>Your Booking</b>":"<b>Team Booking</b>", $bookingDetailsTable);
                 }				
                 
                 function appendCreateBookingPopover($td) {
@@ -612,31 +609,32 @@
                     //Hide other popovers when others clicked
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
-                        self = $(this);
-                        $('.booking').not(self).popover('hide');
-                        $('.timeslotCell').not(self).popover('hide');
-                        $.pnotify_remove_all();
+						var $this = $(this).children('.booking').length?$(this).children('.booking'):$(this);
+						$('.timeslotCell, .booking').not($this).popover('hide');
+						$.pnotify_remove_all();
                         return false;
                     });
 
                     //Popover for booked timeslot
                     $('body').off('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking');
                     $('body').on('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking', function(e) {
-						if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
-							$(this).popover('show');
-							return false;
+						if (e.target === this) {
+							if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
+								$(this).popover('show');
+								return false;
+							}
+							self = ($(this).is('.booking')) ? $(this) : $(this).children('.booking');
+							self.popover('show');
+							console.log('showing ' + self.attr('class'));
+							self.find('ul').remove();
+							appendTokenInput(self); //Optional attendees
 						}
-						self = (!$(this).is('.booking')) ? $(this).children('.booking') : $(this);
-                        if ($(e.target).parents('.popover').length) return false;
-                        self.popover('show');
-                        self.find('ul').remove();
-                        appendTokenInput(self); //Optional attendees
                         return false;
                     });
                     
                     //Popover for unbooked timeslot
-                    $('body').off('click', '.unbookedTimeslot:not(.unavailableTimeslot), .unbookedTimeslot > .booking');
-                    $('body').on('click', '.unbookedTimeslot:not(.unavailableTimeslot), .unbookedTimeslot > .booking', function(e) {
+                    $('body').off('click', '.unbookedTimeslot:not(.unavailableTimeslot)');
+                    $('body').on('click', '.unbookedTimeslot:not(.unavailableTimeslot)', function(e) {
 						if (e.target === this) {
 							self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
                             var timeslot = scheduleData.timeslots[self.attr('value')];
@@ -1290,6 +1288,7 @@
 														.append(timeslot.team?
 															$(document.createElement('div'))
 																.addClass('booking pendingBooking')
+																.addClass(timeslot.status.toLowerCase() + 'Booking')
 																.addClass(
 																	(<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam)
 																	|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)

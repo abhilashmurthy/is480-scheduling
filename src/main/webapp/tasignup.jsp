@@ -168,7 +168,6 @@
                 var milestones = new Array();
 
                 loadMilestones();
-                loadUnavailableTimeslots();
                 loadSelectDropdown();
                 
                 function loadMilestones() {
@@ -177,12 +176,6 @@
                         milestones.push(milestonesData.milestones[i].name);
                     }
                 };
-
-                function loadUnavailableTimeslots() {
-                    <s:iterator value="unavailableTimeslotIds">
-                    unavailableTimeslots.push("timeslot_<s:property/>");
-                    </s:iterator>
-                }
                 
                 function loadSelectDropdown() {
                     for (var i = 0; i < milestones.length; i++) {
@@ -207,6 +200,7 @@
                     var tableId = "timeslotsTable";
                     var table = $("#" + tableId);
                     makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeString"));
+					convertScheduleData();
                     populateTimeslotsTable(tableId, scheduleData);
                     populateUnavailableTimeslots(tableId, scheduleData);
                 }
@@ -254,6 +248,17 @@
                     var scheduleDataDates = datesSet.values().sort();
                     return scheduleDataDates;
                 }
+				
+                function convertScheduleData() {
+                    var timeslots = scheduleData.timeslots;
+                    var newTimeslots = {};
+                    for (var i = 0; i < timeslots.length; i++) {
+                        var timeslot = timeslots[i];
+                        var key = timeslot.id;
+                        newTimeslots[key] = timeslot;
+                    }
+                    scheduleData["timeslots"] = newTimeslots;
+                }
 
                 function makeTimeslotTable(tableId, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
@@ -298,17 +303,8 @@
                             var datetimeString = date + " " + timesArray[i] + ":00";
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                             if (timeslot) {
-                                td.attr("value", "timeslot_" + timeslot.id);
-                                if (timeslot.hasOwnProperty("taId")) { //Timeslot has been chosen by some TA
-									if (timeslot.taId === loggedInTaId) { //Slot chosen by logged in TA
-										td.addClass("markable");
-										td.addClass("unavailable");
-									} else { //Slot chosen by someone else
-										td.addClass("teamExists");
-									}
-								} else { //Timeslot is free for TA to choose
-									td.addClass("markable");
-								}
+								td.addClass("markable");
+								td.attr("value", "timeslot_" + timeslot.id);
                             }
                             tr.append(td);
                         }
@@ -322,114 +318,67 @@
                 /*
                  * METHOD TO MARK TIMESLOTS ON TABLE
                  */
-                function triggerTimeslot(e, duration) {
-                    if (!$(e).hasClass('markable')) return false;
-                    var col = $(e).parent().children().index(e);
-                    var tr = $(e).parent();
-                    var row = $(tr).parent().children().index(tr);
-                    var tbody = $(e).parents('.timeslotsTable').children('tbody');
-                    var slotSize = duration / 30;
-                    
-                    if ($(e).hasClass("chosen")) {
-                        //Section for a cell thats available
-                        //Checking if the cell clicked is the start of the chosen timeslot (Important!)
-                        if ($(e).children().index(".start-marker") !== -1) {
-                            $(e).removeClass("chosen");
-                            $(e).children().remove();
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).removeClass("chosen");
-                            }
-                        }
-
-                        //Add unavailable class
-                        for (i = 1; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            if ($(nextCell).hasClass("chosen")) {
-                                return;
-                            }
-                        }
-
-                        var numRows = $(tbody).children().length;
-                        //Checking if there are enough cells for the slot duration
-                        if ((row + slotSize) <= numRows) {
-                            $(e).addClass("unavailable");
-                            var marker = document.createElement("div");
-                            $(marker).addClass("start-marker");
-                            $(e).append(marker);
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).addClass("unavailable");
-                            }
-                        }
-
-                    } else {
-                        //Section for a cell thats available
-                        if ($(e).children().index(".start-marker") !== -1) {
-                            $(e).removeClass("unavailable");
-                            $(e).children().remove();
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).removeClass("unavailable");
-                            }
-                        }
-
-                        //Checking if there will be an overlap of timeslots
-                        //Abort if there is going to be an overlap
-                        for (i = 1; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            if ($(nextCell).hasClass("unavailable")) {
-                                return;
-                            }
-                        }
-
-                        var numRows = $(tbody).children().length;
-                        //Checking if there are enough cells for the slot duration
-                        if ((row + slotSize) <= numRows) {
-                            $(e).addClass("chosen");
-                            var marker = document.createElement("div");
-                            $(marker).addClass("start-marker");
-                            $(e).append(marker);
-                            for (i = 1; i < slotSize; i++) {
-                                var nextRow = $(tbody).children().get(row + i);
-                                var nextCell = $(nextRow).children().get(col);
-                                $(nextCell).addClass("chosen");
-                            }
-                        }
-                    }
+                function triggerTimeslot($timeslotCell) {
+                    if (!$timeslotCell.hasClass('timeslotcell')) return false;
+					var slotSize = scheduleData.duration / 30;
+					if ($timeslotCell.hasClass('chosen')) {
+						//Unavaiable a timeslot
+						var $prevTr = $timeslotCell.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+								//Unselect this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									$nextTr.children().eq($timeslotCell.index()).removeClass('chosen');
+									$nextTr.children().eq($timeslotCell.index()).addClass('unavailable');
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					} else if ($timeslotCell.hasClass('unavailable')) {
+						//Available a timeslot
+						var $prevTr = $timeslotCell.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+								//Unselect this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									$nextTr.children().eq($timeslotCell.index()).removeClass('unavailable');
+									$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					} else {
+						//Select a timeslot
+						var $nextTr = $timeslotCell.closest('tr');
+						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
+						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
+						for (var i = 0; i < slotSize; i++) {
+							$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
+							$nextTr = $nextTr.next();
+						}
+					}
+					return false;
                 }
 
                 $('body').on('click', 'td.chosen , td.unavailable', function(e){
-                    triggerTimeslot(e.target, scheduleData.duration);
+                    triggerTimeslot($(this));
                 });
 
                 function populateTimeslotsTable(tableId, scheduleData) {
                     $(".timeslotcell").each(function(e) {
                         var self = $(this);
                         if (self.hasClass("markable")) {
-                            triggerTimeslot(this, scheduleData.duration);
+                            triggerTimeslot(self);
                         }
-                    });
-					$(".unavailable").each(function(e) {
-                        triggerTimeslot(this, scheduleData.duration);
-                    });
-                    $(".teamExists").each(function(){
-                        var tr = $(this).parent();
-                        var tbody = $(this).parents("tbody");
-                        var row = tr.parent().children().index(tr);
-                        var nextRow = $(tbody).children().get(row + i);
-                        var slotSize = scheduleData.duration / 30;
-                        var col = $(this).parent().children().index(this);
-                        for (var i = 0; i < slotSize; i++) {
-                            var nextRow = $(tbody).children().get(row + i);
-                            var nextCell = $(nextRow).children().get(col);
-                            $(nextCell).addClass('teamExists');
-                        }
+						if (self.attr('value') && scheduleData.timeslots[self.attr('value').split("_")[1]].taId === loggedInTaId) {
+							triggerTimeslot(self);
+						}
                     });
                 }
 
@@ -438,7 +387,8 @@
                         var self = $(this);
                         for (var i = 0; i < unavailableTimeslots.length; i++) {
                             if (self.attr('value') === unavailableTimeslots[i]) {
-                                triggerTimeslot(this, scheduleData.duration);
+								console.log('triggering ' + self.attr('value'));
+                                triggerTimeslot(self);
                             }
                         }
                     });
