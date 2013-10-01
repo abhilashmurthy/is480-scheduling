@@ -31,7 +31,6 @@ import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
 import org.apache.struts2.util.ServletContextAware;
-//import util.FilesUtil;
 /**
  *
  * @author Prakhar
@@ -62,9 +61,9 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			File csvFile = getFile();
 			try {
 				logger.info("Extracting data from CSV File started");
-				em.getTransaction().begin();
+//				em.getTransaction().begin();
 				csvUpload(csvFile, em);
-				em.getTransaction().commit();
+//				em.getTransaction().commit();
 				logger.info("Extracting data from CSV completed");
 			} catch (Exception e) {
 				logger.error("CSV Parsing Error:");
@@ -95,13 +94,13 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			if (em != null && em.isOpen()) em.close();
 		}
 		return SUCCESS;
-	}
+	} //end of execute function
 			
 	private static void csvUpload(File csvFile, EntityManager em) {
-		// <------------------------Start Parsing the File --------------------------->
 		try {
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
 
+			//<--------------------Validation checks for the csv file---------------------->
 			//Getting the term and checking whether all term names are the same
 			logger.info("Parsing csv file for term");
 			int lineNo = 0;
@@ -130,11 +129,40 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 			
-//			private static void createUsers(File file, Term term, EntityManager em) 
+			
+			// <------------------------Start Parsing the File to populate DB--------------------------->
+			//1st Part: Creating unique user objects (Except for CC)
+			List<User> usersList = createUsers(csvFile, term, em);
+			
+			//2nd Part: Creating unique team objects
+			List<Team> teamsList = createTeams(csvFile, term, em);
+			
+			//3rd Part: Assigning users (Students & Faculty) to the teams
+			assignUsersToTeams(csvFile, usersList, teamsList, em);
+			
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+	} //end of csvUpload function
+	
+	private static List<User> createUsers(File csvFile, Term term, EntityManager em) {
+		try {
 			//------------------------Creating user objects------------------------
-			reader = new CSVReader(new FileReader(csvFile));
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
 			String[] nextLineUsers;
-			lineNo = 0;
+			int lineNo = 0;
 			List<User> usersList = new ArrayList<User>();
 			boolean isCoordinator = false;
 			boolean ccHasBeenAdded = false;
@@ -227,23 +255,33 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			for (User userObj: usersList) {
 //				em.persist(userObj);
 //			}
-			//Making a students list and a faculty list from the users list
-			List<Student> studentsList = new ArrayList<Student>();
-			List<Faculty> facultyList = new ArrayList<Faculty>();
-			for (User user: usersList) {
-				if (user.getRole() == Role.STUDENT) {
-					studentsList.add((Student)user);
-				} else if (user.getRole() == Role.FACULTY) {
-					facultyList.add((Faculty)user);
-				}
-			}
 			reader.close();
-			
+			return usersList;
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return null;
+	}
+	
+	private static List<Team> createTeams(File csvFile, Term term, EntityManager em) {
+		try {
 			//-------------------------Creating the teams---------------------------
-			reader = new CSVReader(new FileReader(csvFile));
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
 			List<Team> teamsList = new ArrayList<Team>();
 			String nextLineTeams[];
-			lineNo = 0;
+			int lineNo = 0;
 			//Read one line at a time
 			logger.info("Parsing csv file for teams");
 			while ((nextLineTeams = reader.readNext()) != null) {
@@ -273,11 +311,41 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				}
 			}
 			reader.close();
-			
+			return teamsList;
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return null;
+	}
+		
+	private static void assignUsersToTeams(File csvFile, List<User> usersList, List<Team> teamsList, EntityManager em) { 
+		try {
 			//-----------------------Assigning users to teams-------------------------
-			reader = new CSVReader(new FileReader(csvFile));
+			//Making a students list and a faculty list from the users list
+			List<Student> studentsList = new ArrayList<Student>();
+			List<Faculty> facultyList = new ArrayList<Faculty>();
+			for (User user: usersList) {
+				if (user.getRole() == Role.STUDENT) {
+					studentsList.add((Student)user);
+				} else if (user.getRole() == Role.FACULTY) {
+					facultyList.add((Faculty)user);
+				}
+			}
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
 			String nextLine[];
-			lineNo = 0;
+			int lineNo = 0;
 			logger.info("Parsing csv file to assign users to teams");
 			HashSet<Student> students = new HashSet<Student>();
 			//Read one line at a time
@@ -348,8 +416,12 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 					}
 				}
 			}
+			reader.close();
 			//Persisting the team objects
-			logger.info("Persisting teams");
+//			logger.info("Persisting teams");
+//			for (Team teamObj: teamsList) {
+//				em.persist(teamObj);
+//			}
 			for (Team team: teamsList) {
 				System.out.println(team.getTeamName() + ":");
 				HashSet<Student> members = (HashSet<Student>) team.getMembers();
@@ -361,8 +433,6 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				System.out.println("Reviewer 2:" + team.getReviewer2().getFullName());
 				System.out.println();
 			}
-			reader.close();
-			
 		} catch (FileNotFoundException e) {
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -378,8 +448,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		}
-	} //end of csvUpload function
-	
+	}
 	
 	//Getter and Setter Methods
     public ArrayList<HashMap<String, Object>> getData() {
