@@ -29,7 +29,7 @@
 			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
 			<%--<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">--%>
 			<div style="float: left; margin-right: 50px;">
-			<table class="table table-hover" style="width:auto">
+<!--			<table class="table table-hover" style="width:auto">
 				<thead>
 					<tr><th>Select Term</th></tr>
 				</thead>
@@ -37,19 +37,19 @@
 					<tr>
 						<td>
 						<select id="termChosen" name="termChosen">
-							<s:iterator value="dataList">
+							<%--<s:iterator value="dataList">
 								<option value="<s:property value="termId"/>">
 									<s:property value="termName"/>
 								</option>
-							</s:iterator>
+							</s:iterator>--%>
 						</select>
 						</td>
 					</tr>
 				</tbody>
 			</table>
-			</div>
+			</div>-->
 			
-			<div style="float:left;">
+			<!--<div style="float:left;">-->
 				<table class="table table-hover">
 				<thead>
 					<tr><th>Upload File (.csv)</th></tr>
@@ -65,12 +65,19 @@
 				</table>
 			</div>
 			
-			<div style="clear: both;">
-				<br/>
-				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Uploading..." 
-					style="margin-bottom: 20px;">Upload</button>
-					<!--<input type="submit" id="submitFormBtn" value="Save"/>-->
-					<%--<s:submit value="Upload"></s:submit>--%>
+			<!--<div style="clear: both;">-->
+			<div style="float:left;">
+				<br/><br/>
+				<table class>
+					<tbody>
+					<td>
+						<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Uploading..." 
+							style="margin-bottom: 20px;">Upload</button>
+							<!--<input type="submit" id="submitFormBtn" value="Save"/>-->
+							<%--<s:submit value="Upload"></s:submit>--%>
+					</td>
+					</tbody>
+				</table>
 			</div>
 			</form>
 			<%--</s:form>--%>
@@ -80,6 +87,16 @@
 		<script type="text/javascript" src="js/plugins/jquery.ajaxfileupload.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
+				//Getting value from upload file action class and displaying success/error message accordingly
+//				var result = '<s:property value="msg"/>';
+//				alert(result);
+//				if (result !== null && result !== "") {
+//					if (result.substring(0,5).equalsIgnoreCase("Wrong") || result.substring(0,9).equalsIgnoreCase("Incorrect")) {
+//						showNotification("ERROR", result);
+//					} else if (result.substring(0,7).equalsIgnoreCase("Success")) {
+//						showNotification("SUCCESS", result);
+//					}
+//				}
 			});
 			
 			//To check whether the file selected has correct extension or not
@@ -100,7 +117,7 @@
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
 //			function validate(saveButton) {
-//				$(this).button('loading');
+				$(this).button('loading');
 //				saveButton.button('loading');
 				
 				var file = $('#fileUploaded').val();
