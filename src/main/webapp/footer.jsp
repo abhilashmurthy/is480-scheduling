@@ -20,3 +20,5 @@
 <script type="text/javascript" src="js/plugins/bootstrap-formhelpers-phone.js"></script>
 <!-- Bootstrap Switch -->
 <script type="text/javascript" src="js/plugins/bootstrap-switch.js"></script>
+<!-- Bootbox -->
+<script type="text/javascript" src="js/plugins/bootbox.min.js"></script>

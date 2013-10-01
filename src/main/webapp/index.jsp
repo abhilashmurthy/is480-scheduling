@@ -737,7 +737,7 @@
                         var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
                         if ($deletedDiv) $deletedDiv.remove();
                         var bookingDiv = $(document.createElement('div'));
-                        bookingDiv.addClass('booking pendingBooking');
+                        bookingDiv.addClass('booking pendingBooking myTeamBooking');
                         bookingDiv.html(returnData.booking.team);
                         bookingDiv.css('display', 'none');
                         self.append(bookingDiv);
@@ -756,35 +756,39 @@
                     //Delete Booking Button
                     $('.timeslotCell').off('click', '#deleteBookingBtn');
                     $('.timeslotCell').on('click', '#deleteBookingBtn', function(e) {
-						var confirmDelete = confirm("Are you sure you want to delete this booking?");
-						if (!confirmDelete) { //User cancels delete operation
-							return false;
-						}
-                        e.stopPropagation();
-                        var timeslot = self.parents('.timeslotCell');
-                        deleteBooking(timeslot);
-                        showNotification("ERROR", timeslot, null);
-                        timeslot.removeClass();
-                        timeslot.addClass("timeslotCell unbookedTimeslot");
-                        timeslot.popover('destroy');
-                        delete scheduleData.timeslots[timeslot.attr('value')];
-                        scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
-                        if (<%= activeRole.equals(Role.STUDENT)%>) {
-                            self.effect('clip', 'slow', function(){
-                                self.remove();
-                                var deletedDiv = $(document.createElement('div'));
-                                deletedDiv.addClass('deletedBookingOnTimeslot');
-                                deletedDiv.addClass('icon-info-sign');
-                                makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
-                                timeslot.append(deletedDiv);
-                            });
-                            appendCreateBookingPopover(timeslot);
-                        } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                            self.effect('clip', 'slow', function(){
-                                self.remove();
-                            });
-                            appendPopovers();
-                        }
+						e.stopPropagation();
+						bootbox.confirm({
+							title: "Delete Booking",
+							message: "Are you sure?",
+							callback: function(result) {
+								if (result) {
+									var timeslot = self.parents('.timeslotCell');
+									deleteBooking(timeslot);
+									setTimeout(function(){showNotification("ERROR", timeslot, null);},500);
+									timeslot.removeClass();
+									timeslot.addClass("timeslotCell unbookedTimeslot");
+									timeslot.popover('destroy');
+									delete scheduleData.timeslots[timeslot.attr('value')];
+									scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
+									if (<%= activeRole.equals(Role.STUDENT)%>) {
+										self.effect('clip', 'slow', function(){
+											self.remove();
+											var deletedDiv = $(document.createElement('div'))
+												.addClass('deletedBookingOnTimeslot')
+												.addClass('icon-info-sign');
+											makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
+											timeslot.append(deletedDiv);
+										});
+										appendCreateBookingPopover(timeslot);
+									} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+										self.effect('clip', 'slow', function(){
+											self.remove();
+										});
+										appendPopovers();
+									}
+								}
+							}
+						});                    
                         return false;
                     });
                     
@@ -1287,7 +1291,22 @@
 																	|| (<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined && loggedInTa === timeslot.taId)
 																	?'myTeamBooking':false)
 																.html(timeslot.team)
-														:false);
+														:false)
+														.append(timeslot.lastBookingWasRemoved?
+															function(){
+																var $removedDiv = $(document.createElement('div'));
+																if (timeslot.lastBookingRejectReason) {
+																	$removedDiv.addClass('rejectedBooking');
+																	makeTooltip($td, 'Removed by ' + timeslot.lastBookingEditedBy);
+																} else {
+																	$removedDiv.addClass('deletedBookingOnTimeslot').addClass('icon-info-sign');
+																	makeTooltip($removedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
+																}
+																return $removedDiv;
+															}
+															:false
+														)
+														;
 												} else {
 													$td.addClass('noTimeslot');
 												}
@@ -1457,6 +1476,7 @@
                 container.tooltip({
                     container: container,
                     html: true,
+					trigger: 'hover',
                     title: title,
                     placement: function(){
                         if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 7) {
