@@ -101,33 +101,45 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
 
 			//<--------------------Validation checks for the csv file---------------------->
-			//Getting the term and checking whether all term names are the same
-			logger.info("Parsing csv file for term");
-			int lineNo = 0;
-			String[] nextLineTerm;
-			String displayName = "";
-			boolean termsInvalid = false;
-			while ((nextLineTerm = reader.readNext()) != null) {
-				lineNo++;
-				if (lineNo != 1) {
-					if (lineNo == 2) {
-						displayName = nextLineTerm[0] + " " + nextLineTerm[1];
-					} else {
-						String name = nextLineTerm[0] + " " + nextLineTerm[1];
-						if (!name.equalsIgnoreCase(displayName)) {
-							termsInvalid = true;
-							break;
-						}
-					}
-				}
+			//1. Validate that every user has a username or a "-"
+			logger.info("Validating usernames");
+			boolean errorInUsername = validateUsernames(csvFile);
+			if (errorInUsername) {
+				System.out.println("Error with Usernames! If a username doesnt exist, please put a '-' symbol");
 			}
+			
+			//2. Validate roles of each user
+			logger.info("Validating user roles");
+			boolean errorInRole = validateRoles(csvFile);
+			if (errorInRole) {
+				System.out.println("Error with User Roles! Role can only be Administrator, Course Coordinator, " +
+						"TA, Student, Supervisor, Reviewer 1, Reviewer 2");
+			}
+			
+			//3. Validate for team names
+			logger.info("Validating team names");
+			boolean errorInTeamName = validateTeamNames(csvFile);
+			if (errorInTeamName) {
+				System.out.println("Error with Team Name! For Administrator, Course Coordinator and TA, please"
+						+ " put a '-'. For other roles, put the team name");
+			}
+			
+			//4. Validate that Admin, CC and TA's are at the start of the file
+			logger.info("Validating order of roles (Admin, cc and TA)");
+			boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
+			if (errorInOrderOfRoles) {
+				System.out.println("Error with the order of roles! Administrator, Course Coordinator, TA's "
+						+ "should be placed first in the file");
+			} 			
+			
+			//5. Validate for term names (should be the same throughout the file)
+			logger.info("Validating term names");
+			String displayName = validateTermNames(csvFile);
+			if (displayName == null) {
+				System.out.println("Error with Term Names! The Academic Year and Semester should be same for all entries");
+			} 			
 			Term term = null;
-			if (termsInvalid == true) {
-				System.out.println("Error: Term names are invalid!");
-			} else {
-				term = TermManager.getTermByDisplayName(em, displayName);
-			}
-			reader.close();
+			term = TermManager.getTermByDisplayName(em, displayName);
 			
 			
 			// <------------------------Start Parsing the File to populate DB--------------------------->
@@ -449,6 +461,228 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 		}
 	}
+	
+	
+	//Validating usernames
+	private static boolean validateUsernames(File csvFile) {
+		boolean errorInUsername = false;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
+			int lineNo = 0;
+			String[] nextLine;
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (!(nextLine[4].length() > 0)) {
+						errorInUsername = true;
+						return errorInUsername;
+					}
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return errorInUsername;
+	}
+	
+	
+	//Validating user roles
+	private static boolean validateRoles(File csvFile) {
+		boolean errorInRole = false;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
+			int lineNo = 0;
+			String[] nextLine;
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					//Provided there is a username
+					if (nextLine[4].length() > 0) {
+						if (!nextLine[5].equalsIgnoreCase("Administrator") && !nextLine[5].equalsIgnoreCase("Course Coordinator")
+							&& !nextLine[5].equalsIgnoreCase("TA") && !nextLine[5].equalsIgnoreCase("Student")
+							&& !nextLine[5].equalsIgnoreCase("Supervisor") && !nextLine[5].equalsIgnoreCase("Reviewer 1") 
+							&& !nextLine[5].equalsIgnoreCase("Reviewer 2")) {
+								errorInRole = true;
+								return errorInRole;
+						}
+					}
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return errorInRole;
+	}
+	
+	//Validating team names
+	private static boolean validateTeamNames(File csvFile) {
+		boolean errorInTeamName = false;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
+			int lineNo = 0;
+			String[] nextLine;
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (nextLine[5].equalsIgnoreCase("Administrator") || nextLine[5].equalsIgnoreCase("Course Coordinator") 
+							|| nextLine[5].equalsIgnoreCase("TA")) {
+						if (!nextLine[2].equalsIgnoreCase("-")) {
+							errorInTeamName = true;
+							return errorInTeamName;
+						}
+					} else {
+						if (nextLine[2].equalsIgnoreCase("") || nextLine[2].equalsIgnoreCase("-")) {
+							errorInTeamName = true;
+							return errorInTeamName;
+						}
+					}
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return errorInTeamName;
+	}
+	
+	//Validating order of roles
+	private static boolean validateOrderOfRoles(File csvFile) {
+		boolean errorInOrderOfRoles = false;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
+			int lineNo = 0;
+			String[] nextLine;
+			int adminCount = 0, ccCount = 0, taCount = 0;
+			//Getting the total number of admin, cc and ta's
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (nextLine[5].equalsIgnoreCase("Administrator")) {
+						adminCount++;
+					} else if (nextLine[5].equalsIgnoreCase("Course Coordinator")) {
+						ccCount++;
+					} else if (nextLine[5].equalsIgnoreCase("TA")) {
+						taCount++;
+					}
+				}
+			}
+			reader.close();
+			
+			//Now validating order of roles
+			reader = new CSVReader(new FileReader(csvFile));
+			int tillLineNo = adminCount + ccCount + taCount;
+			lineNo = 0;
+			int i = 0;
+			while (((nextLine = reader.readNext()) != null) && (i < tillLineNo)) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (!nextLine[5].equalsIgnoreCase("Administrator") && !nextLine[5].equalsIgnoreCase("Course Coordinator")
+						&& !nextLine[5].equalsIgnoreCase("TA")) {
+						errorInOrderOfRoles = true;
+						return errorInOrderOfRoles;
+					}
+					i++;
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return errorInOrderOfRoles;
+	}
+	
+	//Validating term names
+	private static String validateTermNames(File csvFile) {
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
+			int lineNo = 0;
+			String[] nextLineTerm;
+			String displayName = "";
+			boolean termInvalid = false;
+			while ((nextLineTerm = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (lineNo == 2) {
+						displayName = nextLineTerm[0] + " " + nextLineTerm[1];
+					} else {
+						String name = nextLineTerm[0] + " " + nextLineTerm[1];
+						if (!name.equalsIgnoreCase(displayName)) {
+							termInvalid = true;
+							return null;
+						}
+					}
+				}
+			}
+			return displayName;
+		} catch (FileNotFoundException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return null;
+	}
+	
+	
 	
 	//Getter and Setter Methods
     public ArrayList<HashMap<String, Object>> getData() {
