@@ -78,17 +78,21 @@
             <table class="legend">
                 <tr>
                     <!-- <td style="width:50px"><b>Legend:</b></td>-->
+					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA)) {%>
                     <td class="legendBox myTeamBooking" style="text-align: center; font-size: 16px; font-weight: bold; border:1px solid #1E647C; width:17px;">T</td><td>&nbsp;My Team</td> 
 					<td style="width:15px"></td>
+					<% } %>
                     <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
                     <td style="width:15px"></td>
                     <td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
                     <td style="width:15px"></td>
                     <td class="legendBox approvedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
                     <td style="width:15px"></td>
+					<% if (activeRole.equals(Role.STUDENT)) {%>
                     <td class="legendBox rejectedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
                     <td style="width:15px"></td>
-					<% if (!activeRole.equals(Role.TA)) {%>
+					<% } %>
+					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
 					<% } else if (activeRole.equals(Role.TA)) { %>
 					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Your video signup</td>
@@ -737,7 +741,8 @@
                         var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
                         if ($deletedDiv) $deletedDiv.remove();
                         var bookingDiv = $(document.createElement('div'));
-                        bookingDiv.addClass('booking pendingBooking myTeamBooking');
+                        bookingDiv.addClass('booking pendingBooking');
+						bookingDiv.addClass(<%= activeRole.equals(Role.STUDENT) %>?'myTeamBooking':false);
                         bookingDiv.html(returnData.booking.team);
                         bookingDiv.css('display', 'none');
                         self.append(bookingDiv);
