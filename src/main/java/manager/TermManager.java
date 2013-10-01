@@ -94,4 +94,18 @@ public class TermManager {
 		return null;
 	}
 	
+	public static Term getTermByDisplayName (EntityManager em, String displayName) {
+		logger.trace("Getting term by display name");
+		Term term = null;
+		try {
+			Query q = em.createQuery("SELECT t FROM Term t WHERE t.displayName = :displayName", Term.class);
+			q.setParameter("displayName", displayName);
+			term = (Term) q.getSingleResult();
+			return term;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return null;
+	}
+	
 }
