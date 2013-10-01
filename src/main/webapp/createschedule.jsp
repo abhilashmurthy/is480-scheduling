@@ -320,7 +320,9 @@
 				
 				//Term name availability check
 				$("#semesterInput").on('keyup', function(){
+					var $this = $(this);
 					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('icon-refresh icon-spin'));
+					setTimeout(function(){$this.trigger('change');}, 500);
 					return false;
 				});
 				
@@ -444,8 +446,6 @@
 											.attr('value', '09:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
-													minTime: '00:00',
-													maxTime: '11:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
@@ -466,9 +466,8 @@
 											.attr('name', milestone.name.toLowerCase() + "DayEndTime")
 											.attr('value', '19:00')
 											.addClass('scheduleDayTimeSelect timepicker')
+											.css('float', 'right')
 											.timepicker({
-													minTime: '12:00',
-													maxTime: '23:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
@@ -618,10 +617,12 @@
 					if (thisPoint === "start") {
 						//Reset end point timepicker
 						var $endPoint = $("#milestoneDayEnd_" + milestone);
+						if ($endPoint.timepicker('getTime') <= Date.parse(selectedTime)) $endPoint.timepicker('setTime', Date.parse(selectedTime).addHours(2));
 						$endPoint.timepicker('option', 'minTime', Date.parse(selectedTime).addHours(2).toString('HH:mm'));
 					} else {
 						//Reset start point timepicker
 						var $startPoint = $("#milestoneDayStart_" + milestone);
+						if ($startPoint.timepicker('getTime') >= Date.parse(selectedTime)) $startPoint.timepicker('setTime', Date.parse(selectedTime).addHours(-2));
 						$startPoint.timepicker('option', 'maxTime', Date.parse(selectedTime).addHours(-2).toString('HH:mm'));
 					}
 				}
@@ -636,7 +637,7 @@
 					var year = $("#yearSpinnerInput").spinner('value');
 					var term = $("#semesterInput").val();
 					if (year === null || term === null || !term.length) {
-						showNotification("WARNING", "Please enter a year and semester name");
+						showNotification("WARNING", "Please enter a semester name");
 						$("#createScheduleSubmitBtn").button('reset');
 						return false;
 					}

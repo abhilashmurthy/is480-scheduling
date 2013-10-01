@@ -78,6 +78,8 @@
             <table class="legend">
                 <tr>
                     <!-- <td style="width:50px"><b>Legend:</b></td>-->
+                    <td class="legendBox myTeamBooking" style="text-align: center; font-size: 16px; font-weight: bold; border:1px solid #1E647C; width:17px;">T</td><td>&nbsp;My Team</td> 
+					<td style="width:15px"></td>
                     <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
                     <td style="width:15px"></td>
                     <td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
@@ -165,32 +167,33 @@
 					milestones.sort(compare);
 					var setAsActive = true;
                     for (var i = 0; i < milestones.length; i++) {
-                        var milestone = milestones[i];
-						if (!milestone.bookable) continue;
+                        var thisMilestone = milestones[i];
+						if (!thisMilestone.bookable) continue;
 						$('ul#milestoneTab') //Add the milestone tab
 							.append(
 								$(document.createElement('li'))
 									.addClass(setAsActive?'active':'')
 									.append(
 										$(document.createElement('a'))
-											.attr('id', milestone.name.toLowerCase())
-											.attr('href', '#' + milestone.name.toLowerCase())
+											.attr('id', thisMilestone.name.toLowerCase())
+											.attr('href', '#' + thisMilestone.name.toLowerCase())
 											.attr('data-toggle', 'tab')
-											.html(milestone.name)
+											.html(thisMilestone.name)
 									)
 							);
 						$('div#milestoneTabContent') //Add the milestone table
 							.append(
 								$(document.createElement('div'))
-									.attr('id', milestone.name.toLowerCase() + "Content")
+									.attr('id', thisMilestone.name.toLowerCase() + "Content")
 									.addClass('tab-pane fade')
 									.addClass(setAsActive?'active in':'')
 									.append(
 										$(document.createElement('table'))
-											.attr('id', milestone.name.toLowerCase() + "ScheduleTable")
+											.attr('id', thisMilestone.name.toLowerCase() + "ScheduleTable")
 											.addClass('scheduleTable table-condensed table-hover table-bordered')
 									)
 							);
+						milestone = setAsActive?thisMilestone.name.toUpperCase():milestone;
 						setAsActive = false;
                     }
                 }
@@ -447,34 +450,32 @@
 								.attr('placeholder', outputData.Venue)
 								.addClass('updateFormVenue popoverInput')
 								.val(outputData.Venue).change();
-						if ($td.is('.unavailableTimeslot')) {
-							outputData[""] = 
-								$(document.createElement('button'))
-									.attr('id', 'updateTimeslotBtn')
-									.css('float', 'right')
-									.addClass('popoverBtn btn btn-info')
-									.append($(document.createElement('i')).addClass('icon-edit icon-white'))
-									.append("Save")
-									.outerHTML();
-						} else {
-							outputData[""] = 
-								$(document.createElement('button'))
-									.attr('id', 'createBookingBtn')
-									.addClass('popoverBtn btn btn-primary')
-									.append($(document.createElement('i')).addClass('icon-plus-sign  icon-white'))
-									.append("Book")
-									.outerHTML()
-								+
-								$(document.createElement('button'))
-									.attr('id', 'updateTimeslotBtn')
-									.css('float', 'right')
-									.addClass('popoverBtn btn btn-info')
-									.append($(document.createElement('i')).addClass('icon-edit icon-white'))
-									.append("Save")
-									.outerHTML();
-						}
+						outputData[""] = 
+							$(document.createElement('button'))
+								.attr('id', 'createBookingBtn')
+								.addClass('popoverBtn btn btn-primary')
+								.append($(document.createElement('i')).addClass('icon-plus-sign  icon-white'))
+								.append("Book")
+								.outerHTML()
+							+
+							$(document.createElement('button'))
+								.attr('id', 'updateTimeslotBtn')
+								.css('float', 'right')
+								.addClass('popoverBtn btn btn-info')
+								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append("Save")
+								.outerHTML();
 				   } else {
 					   //For students
+					   if ($td.is('.unavailableTimeslot')) {
+						   outputData["Unavailable"] = function() {
+							   var unavailableList = '';
+							   for (var i = 0; i < timeslot.unavailable.length; i++) {
+								   unavailableList += timeslot.unavailable[i] + "<br/>"
+							   }
+							   return unavailableList;
+						   };
+					   } else {
 						outputData[""] = 
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
@@ -482,7 +483,8 @@
 								.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
 								.append("Book")
 								.outerHTML();
-						//TODO: Can create booking still? Add button here
+							//TODO: Can create booking still? Add button here
+					   }	
 				   }
 					
                     //Append all fields
@@ -618,7 +620,6 @@
                     $('body').on('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking', function(e) {
 						if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
 							$(this).popover('show');
-							console.log('showing');
 							return false;
 						}
 						self = (!$(this).is('.booking')) ? $(this).children('.booking') : $(this);
@@ -630,8 +631,8 @@
                     });
                     
                     //Popover for unbooked timeslot
-                    $('body').off('click', '.unbookedTimeslot, .unbookedTimeslot > .booking');
-                    $('body').on('click', '.unbookedTimeslot, .unbookedTimeslot > .booking', function(e) {
+                    $('body').off('click', '.unbookedTimeslot:not(.unavailableTimeslot), .unbookedTimeslot > .booking');
+                    $('body').on('click', '.unbookedTimeslot:not(.unavailableTimeslot), .unbookedTimeslot > .booking', function(e) {
 						if (e.target === this) {
 							self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
                             var timeslot = scheduleData.timeslots[self.attr('value')];
@@ -661,7 +662,7 @@
                                     return false;
                                 }
                             }
-                            console.log(".unbookedTimeslot clicked.");
+//                            console.log(".unbookedTimeslot clicked.");
                             self.tooltip('hide');
                             self.popover('show');
                             self.find('ul').remove(); //Remove all old tokenInputs
@@ -673,8 +674,39 @@
                     //Popover for unavailable timeslot
                     $('body').off('click', '.unavailableTimeslot');
                     $('body').on('click', '.unavailableTimeslot', function(e) {
-                        self = $(this);
-                        self.popover('show');
+						if (e.target === this) {
+							var timeslot = scheduleData.timeslots[self.attr('value')];
+							self = $(this);
+							var refreshData = refreshScheduleData();
+							if (<%= activeRole.equals(Role.STUDENT) %>) {
+								if (refreshData.bookingExists !== 0) {
+									showNotification("WARNING", refreshData.existingTimeslot, "You already have a booking!");
+									return false;
+								}
+								var teamTerm = "<% try {out.print(!team.getTerm().equals(activeTerm)?team.getTerm().getAcademicYear() + " " + team.getTerm().getSemester():"thisTerm");} catch (Exception e) {out.print("thisTerm");} %>";
+								if (teamTerm !== "thisTerm") {
+									showNotification("WARNING", self, "You can only book for " + teamTerm);
+									return false;
+								}
+								if (timeslot.lastBookingRejectReason) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingRejectReason);
+							}
+							if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+								//Make a dropdown of all teams that have not booked yet if user is admin
+								if (teams.length === 0) {
+									createBookingOutputForAdmin = "There are no teams for this term";
+								} else if (refreshData.teamsPendingBooking.length === 0) {
+									createBookingOutputForAdmin = "All teams have bookings!";
+								}
+								if (createBookingOutputForAdmin) {
+									showNotification("WARNING", self, createBookingOutputForAdmin);
+									createBookingOutputForAdmin = null;
+									return false;
+								}
+							}
+							self.popover('show');
+							self.find('ul').remove();
+							appendTokenInput(self); //Optional attendees
+						}
                         return false;
                     });
                     
@@ -1242,7 +1274,16 @@
 														.addClass(timeslot.team?'bookedTimeslot':'unbookedTimeslot')
 														.addClass(<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !timeslot.available?'unavailableTimeslot':'')
 														.addClass(<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined?loggedInTa === timeslot.taId?'taChosenTimeslot':'otherTATimeslot':'')
-														.append(timeslot.team?$(document.createElement('div')).addClass('booking pendingBooking').html(timeslot.team):false);
+														.append(timeslot.team?
+															$(document.createElement('div'))
+																.addClass('booking pendingBooking')
+																.addClass(
+																	(<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam)
+																	|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)
+																	|| (<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined && loggedInTa === timeslot.taId)
+																	?'myTeamBooking':false)
+																.html(timeslot.team)
+														:false);
 												} else {
 													$td.addClass('noTimeslot');
 												}
@@ -1356,7 +1397,7 @@
                     if (timeslot) {
                         //View Booking Data
                         opts["prePopulate"] = timeslot.optionals;
-                        if (<%= activeRole.equals(Role.FACULTY) %> || (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName)) {
+                        if (<%= activeRole.equals(Role.FACULTY) %> || (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName) || booking.is('.unavailableTimeslot')) {
                             opts["disabled"] = true;
                         }
                     }
@@ -1398,7 +1439,7 @@
 //                    },
                     content: content,
                     placement: function(){
-                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 9) {
+                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 7) {
                             return 'left';
                         } else {
                             return 'right';
@@ -1414,7 +1455,7 @@
                     html: true,
                     title: title,
                     placement: function(){
-                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 9) {
+                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 7) {
                             return 'left';
                         } else {
                             return 'right';

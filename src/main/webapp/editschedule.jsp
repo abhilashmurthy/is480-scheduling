@@ -381,11 +381,8 @@
 											.attr('type', 'text')
 											.attr('id', "milestoneDayStart_" + schedule.milestoneName.toLowerCase())
 											.attr('name', schedule.milestoneName + "DayStartTime")
-											.attr('value', '09:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
-													minTime: '00:00',
-													maxTime: '11:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
@@ -405,11 +402,9 @@
 											.attr('type', 'text')
 											.attr('id', "milestoneDayEnd_" + schedule.milestoneName.toLowerCase())
 											.attr('name', schedule.milestoneName.toLowerCase() + "DayEndTime")
-											.attr('value', '19:00')
 											.addClass('scheduleDayTimeSelect timepicker')
+											.css('float', 'right')
 											.timepicker({
-													minTime: '12:00',
-													maxTime: '23:00',
 													step: 60,
 													forceRoundTime: true,
 													timeFormat: 'H:i',
@@ -461,7 +456,9 @@
 				
 				//Term name availability check
 				$("#semesterInput").on('keyup', function(){
+					var $this = $(this);
 					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('icon-refresh icon-spin'));
+					setTimeout(function(){$this.trigger('change');}, 500);
 					return false;
 				});
 				
@@ -557,10 +554,12 @@
 					if (thisPoint === "start") {
 						//Reset end point timepicker
 						var $endPoint = $("#milestoneDayEnd_" + milestone);
+						if ($endPoint.timepicker('getTime') <= Date.parse(selectedTime)) $endPoint.timepicker('setTime', Date.parse(selectedTime).addHours(2));
 						$endPoint.timepicker('option', 'minTime', Date.parse(selectedTime).addHours(2).toString('HH:mm'));
 					} else {
 						//Reset start point timepicker
 						var $startPoint = $("#milestoneDayStart_" + milestone);
+						if ($startPoint.timepicker('getTime') >= Date.parse(selectedTime)) $startPoint.timepicker('setTime', Date.parse(selectedTime).addHours(-2));
 						$startPoint.timepicker('option', 'maxTime', Date.parse(selectedTime).addHours(-2).toString('HH:mm'));
 					}
 				}
@@ -575,7 +574,7 @@
 					var year = activeAcademicYearStr;
 					var term = $("#semesterInput").val();
 					if (year === null || term === null || !term.length) {
-						showNotification("WARNING", "Please enter a year and semester name");
+						showNotification("WARNING", "Please enter a semester name");
 						$("#editScheduleSubmitBtn").button('reset');
 						return false;
 					}

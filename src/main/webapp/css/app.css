@@ -456,3 +456,7 @@ input, button, select, textarea {
 	border: 1px solid black;
 	max-width: 20px;
 }
+
+.myTeamBooking {
+	color: #941992
+}
