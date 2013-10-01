@@ -609,8 +609,8 @@
                     //Hide other popovers when others clicked
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
-						var $this = $(this).children('.booking').length?$(this).children('.booking'):$(this);
-						$('.timeslotCell, .booking').not($this).popover('hide');
+						self = <%= activeRole.equals(Role.FACULTY) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
+						$('.timeslotCell, .booking').not(self).popover('hide');
 						$.pnotify_remove_all();
                         return false;
                     });
