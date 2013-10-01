@@ -19,11 +19,9 @@ import javax.persistence.EntityManager;
 import util.MiscUtil;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
+import manager.TermManager;
 import manager.UserManager;
 import model.Team;
 import model.Term;
@@ -54,16 +52,17 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 		EntityManager em = null;
 		try {
 			em = MiscUtil.getEntityManagerInstance();
-			//Getting the Term
-			long termId = Long.parseLong(request.getParameter("termChosen"));
-			Term term = em.find(Term.class, termId);
-//			String termName = term.getDisplayName();
+			
+//			Getting the Term
+//			long termId = Long.parseLong(request.getParameter("termChosen"));
+//			Term term = em.find(Term.class, termId);
+			
 			//Getting the file
 			File csvFile = getFile();
 			try {
 				logger.info("Extracting data from CSV File started");
 				em.getTransaction().begin();
-				csvUpload(csvFile, term, em);
+				csvUpload(csvFile, em);
 				em.getTransaction().commit();
 				logger.info("Extracting data from CSV completed");
 			} catch (Exception e) {
@@ -97,99 +96,140 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 		return SUCCESS;
 	}
 			
-	private static void csvUpload(File csvFile, Term term, EntityManager em) {
+	private static void csvUpload(File csvFile, EntityManager em) {
 		// <------------------------Start Parsing the File --------------------------->
 		try {
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
 
-			//------------------------Creating user objects------------------------
-			String[] nextLineUsers;
+			//Getting the term and checking whether all term names are the same
+			logger.info("Parsing csv file for term");
 			int lineNo = 0;
+			String[] nextLineTerm;
+			String displayName = "";
+			boolean termsInvalid = false;
+			while ((nextLineTerm = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (lineNo == 2) {
+						displayName = nextLineTerm[0] + " " + nextLineTerm[1];
+					} else {
+						String name = nextLineTerm[0] + " " + nextLineTerm[1];
+						if (!name.equalsIgnoreCase(displayName)) {
+							termsInvalid = true;
+							break;
+						}
+					}
+				}
+			}
+			Term term = null;
+			if (termsInvalid == true) {
+				System.out.println("Error: Term names are invalid!");
+			} else {
+				term = TermManager.getTermByDisplayName(em, displayName);
+			}
+			reader.close();
+			
+			
+			//------------------------Creating user objects------------------------
+			reader = new CSVReader(new FileReader(csvFile));
+			String[] nextLineUsers;
+			lineNo = 0;
 			List<User> usersList = new ArrayList<User>();
 			boolean isCoordinator = false;
+			boolean ccHasBeenAdded = false;
 			//Read one line at a time
 			logger.info("Parsing csv file for users");
 			while ((nextLineUsers = reader.readNext()) != null) {
 				lineNo++;
 				//Not reading the 1st line
 				if (lineNo != 1) {
-					boolean userExists = false;
-					if (usersList.size() > 0) {
-						for (User userCreated: usersList) {
-							if (userCreated.getUsername().equalsIgnoreCase(nextLineUsers[2])) {
-								//Only if the duplicated user is a course coordinator allow multiple roles
-								//CC should be already be present in the db
-								User ccObj = UserManager.getCourseCoordinator(em);
-								//If its null, getting cc from the csv file
-								if (ccObj == null) {
-									for (User cc : usersList) {
-										if (cc.getRole().equals(Role.COURSE_COORDINATOR)) {
-											ccObj = new User(cc.getFullName(), cc.getUsername(), null, Role.COURSE_COORDINATOR, term);
+					//If there is no user or no team assigned to the user skip the user
+					if (!nextLineUsers[4].equalsIgnoreCase("") && !nextLineUsers[4].equalsIgnoreCase("-")) {
+						boolean userExists = false;
+						if (usersList.size() > 0) {
+							for (User userCreated: usersList) {
+								if (userCreated.getUsername().equalsIgnoreCase(nextLineUsers[4])) {
+									//Only a user who is a course coordinator can also be a faculty
+									User ccObj = UserManager.getCourseCoordinator(em);
+									//If cc doesnt exist in db, getting cc from the csv file
+									if (ccObj == null) {
+										for (User cc : usersList) {
+											if (cc.getRole().equals(Role.COURSE_COORDINATOR)) {
+												ccObj = new User(cc.getUsername(), cc.getFullName(), null, Role.COURSE_COORDINATOR, term);
+												break;
+											}
+										}
+									}
+									if (!ccObj.getUsername().equalsIgnoreCase(userCreated.getUsername())) {
+										userExists = true;
+										break;
+									} else {
+										if (!isCoordinator) {
+											//Creating course coordinator object
+											if (nextLineUsers[5].equalsIgnoreCase("Supervisor") || nextLineUsers[5].equalsIgnoreCase("Reviewer 1")
+													|| nextLineUsers[5].equalsIgnoreCase("Reviewer 2")) {
+												//Creating faculty object
+												Faculty faculty = new Faculty(nextLineUsers[4], nextLineUsers[3], null, term);
+												usersList.add(faculty);
+											} else {
+												//When user as faculty has been added first and then user as cc is added
+												//First check whether user as cc has already been added or not
+												if (ccHasBeenAdded == false) {
+													User cc = new User(nextLineUsers[4], nextLineUsers[3], null, Role.COURSE_COORDINATOR, term);
+													usersList.add(cc);
+												}
+											}
+											//This variable is true after the course coordinator has been added twice
+											userExists = true;
+											isCoordinator = true;
+											break;
+										} else {
+											//This will take place when a user has been added twice as cc and faculty
+											userExists = true;
 											break;
 										}
 									}
 								}
-								if (!ccObj.getUsername().equalsIgnoreCase(userCreated.getUsername())) {
-									userExists = true;
-									break;
-								} else {
-									if (!isCoordinator) {
-										//Creating course coordinator object
-										if (nextLineUsers[3].equalsIgnoreCase("Supervisor") || nextLineUsers[3].equalsIgnoreCase("Reviewer 1")
-												|| nextLineUsers[3].equalsIgnoreCase("Reviewer 2")) {
-											//Creating faculty object
-											Faculty faculty = new Faculty(nextLineUsers[1], nextLineUsers[2], null, term);
-											usersList.add(faculty);
-										} else {
-											User cc = new User(nextLineUsers[1], nextLineUsers[2], null, Role.COURSE_COORDINATOR, term);
-											usersList.add(cc);
-										}
-										//This variable is true after the course coordinator has been added twice
-										isCoordinator = true;
-										break;
-									} else {
-										//This will take place when multiple roles for cc have been added
-										userExists = true;
-										break;
-									}
-								}
+							}
+							if (userExists == true) {
+								continue;
 							}
 						}
-						if (userExists == true) {
-							continue;
+						if (nextLineUsers[5].equalsIgnoreCase("Student")) {
+							//Creating student object
+							Student student = new Student(nextLineUsers[4], nextLineUsers[3], null, term);
+							usersList.add(student);
+						} else if (nextLineUsers[5].equalsIgnoreCase("Supervisor") || nextLineUsers[5].equalsIgnoreCase("Reviewer 1")
+								|| nextLineUsers[5].equalsIgnoreCase("Reviewer 2")) {
+							//Creating faculty object
+							Faculty faculty = new Faculty(nextLineUsers[4], nextLineUsers[3], null, term);
+							usersList.add(faculty);
+						} else if (nextLineUsers[5].equalsIgnoreCase("TA")) {
+							//Creating TA object
+							TA ta = new TA(nextLineUsers[4], nextLineUsers[3], null, term);
+							usersList.add(ta);
+						} else if (nextLineUsers[5].equalsIgnoreCase("Course Coordinator")) {
+							//Creating course coordinator object
+							User cc = new User(nextLineUsers[4], nextLineUsers[3], null, Role.COURSE_COORDINATOR, term);
+							usersList.add(cc);
+							ccHasBeenAdded = true;
+						} else if (nextLineUsers[5].equalsIgnoreCase("Administrator")) {
+							//Creating administrator object
+							User admin = new User(nextLineUsers[4], nextLineUsers[3], null, Role.ADMINISTRATOR, term);
+							usersList.add(admin);
 						}
-					}
-					if (nextLineUsers[3].equalsIgnoreCase("Student")) {
-						//Creating student object
-						Student student = new Student(nextLineUsers[1], nextLineUsers[2], null, term);
-						usersList.add(student);
-					} else if (nextLineUsers[3].equalsIgnoreCase("Supervisor") || nextLineUsers[3].equalsIgnoreCase("Reviewer 1")
-							|| nextLineUsers[3].equalsIgnoreCase("Reviewer 2")) {
-						//Creating faculty object
-						Faculty faculty = new Faculty(nextLineUsers[1], nextLineUsers[2], null, term);
-						usersList.add(faculty);
-					} else if (nextLineUsers[3].equalsIgnoreCase("TA")) {
-						//Creating TA object
-						TA ta = new TA(nextLineUsers[1], nextLineUsers[2], null, term);
-						usersList.add(ta);
-					} else if (nextLineUsers[3].equalsIgnoreCase("Course Coordinator")) {
-						//Creating course coordinator object
-						User cc = new User(nextLineUsers[1], nextLineUsers[2], null, Role.COURSE_COORDINATOR, term);
-						usersList.add(cc);
-					} else if (nextLineUsers[3].equalsIgnoreCase("Administrator")) {
-						//Creating administrator object
-						User admin = new User(nextLineUsers[1], nextLineUsers[2], null, Role.ADMINISTRATOR, term);
-						usersList.add(admin);
 					}
 				}
 			}
 			//Persisting the user objects
-			logger.info("Persisting users");
-			for (User userObj: usersList) {
-				em.persist(userObj);
-			}
+//			logger.info("Persisting users");
+//			for (User userObj: usersList) {
+//				em.persist(userObj);
+//			}
 			reader.close();
-
+			for (User userObj: usersList) {
+				System.out.println(userObj.getFullName());
+			}
 			
 			//-------------------------Creating the teams---------------------------
 			reader = new CSVReader(new FileReader(csvFile));
@@ -202,12 +242,12 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				lineNo++;
 				//Not reading the 1st line
 				if (lineNo != 1) {
-					if (!nextLineTeams[0].equalsIgnoreCase("-") && !nextLineTeams[0].equalsIgnoreCase("")) {
+					if (!nextLineTeams[2].equalsIgnoreCase("-") && !nextLineTeams[2].equalsIgnoreCase("")) {
 						//Checking whether there is already a team with the same name in the teams list 
 						boolean teamExists = false;
 						if (teamsList.size() > 0) {
 							for (Team teamCreated: teamsList) {
-								if (teamCreated.getTeamName().equalsIgnoreCase(nextLineTeams[0])) {
+								if (teamCreated.getTeamName().equalsIgnoreCase(nextLineTeams[2])) {
 									teamExists = true;
 									break;
 								}
@@ -218,66 +258,69 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 						}
 						//Creating new team object
 						Team team = new Team();
-						team.setTeamName(nextLineTeams[0]);
+						team.setTeamName(nextLineTeams[2]);
 						team.setTerm(term);
 						teamsList.add(team);
 					}
 				}
 			}
 			reader.close();
+			for (Team teamObj : teamsList) {
+				System.out.println(teamObj.getTeamName());
+			}
 			
 			//-----------------------Assigning users to teams-------------------------
-			reader = new CSVReader(new FileReader(csvFile));
-			String nextLine[];
-			lineNo = 0;
-			logger.info("Parsing csv file to assign users to teams");
-			HashSet<Student> students = new HashSet<Student>();
-			//Read one line at a time
-			while ((nextLine = reader.readNext()) != null) {
-				lineNo++;
-				//Not reading the 1st line
-				if (lineNo != 1) {
-					if (!(nextLine[7].equalsIgnoreCase("-") && nextLine[7].equalsIgnoreCase(""))) {
-						for (Team team: teamsList) {
-							boolean teamFound = false;
-							//Getting the team object
-							if (nextLine[7].equalsIgnoreCase(team.getTeamName())) {
-								teamFound = true;
-								//Getting the user objects for the team
-								for (User user: usersList) {
-									if (nextLine[0].equalsIgnoreCase(user.getFullName())) {
-										Student student = (Student) user;
-										students.add(student);
-									}
-									if (nextLine[2].equalsIgnoreCase(user.getFullName())) {
-										//Setting the supervisor for the team
-										Faculty faculty = (Faculty) user;
-										team.setSupervisor(faculty);
-									} 
-									if (nextLine[3].equalsIgnoreCase(user.getFullName())) {
-										//Setting the reviewer 1 for the team
-										Faculty faculty = (Faculty) user;
-										team.setReviewer1(faculty);
-									}
-									if (nextLine[4].equalsIgnoreCase(user.getFullName())) {
-										//Setting the reviewer 2 for the team
-										Faculty faculty = (Faculty) user;
-										team.setReviewer2(faculty);
-									} 
-								}
-								//Setting the students for the team
-							}
-							if (teamFound == true) { break; }
-						}
-					}
-				}
-			}
-			//Persisting the team objects
-			logger.info("Persisting teams");
-//			for (Team team: ) {
-//				em.persist(userObj);
+//			reader = new CSVReader(new FileReader(csvFile));
+//			String nextLine[];
+//			lineNo = 0;
+//			logger.info("Parsing csv file to assign users to teams");
+//			HashSet<Student> students = new HashSet<Student>();
+//			//Read one line at a time
+//			while ((nextLine = reader.readNext()) != null) {
+//				lineNo++;
+//				//Not reading the 1st line
+//				if (lineNo != 1) {
+//					if (!(nextLine[7].equalsIgnoreCase("-") && nextLine[7].equalsIgnoreCase(""))) {
+//						for (Team team: teamsList) {
+//							boolean teamFound = false;
+//							//Getting the team object
+//							if (nextLine[7].equalsIgnoreCase(team.getTeamName())) {
+//								teamFound = true;
+//								//Getting the user objects for the team
+//								for (User user: usersList) {
+//									if (nextLine[0].equalsIgnoreCase(user.getFullName())) {
+//										Student student = (Student) user;
+//										students.add(student);
+//									}
+//									if (nextLine[2].equalsIgnoreCase(user.getFullName())) {
+//										//Setting the supervisor for the team
+//										Faculty faculty = (Faculty) user;
+//										team.setSupervisor(faculty);
+//									} 
+//									if (nextLine[3].equalsIgnoreCase(user.getFullName())) {
+//										//Setting the reviewer 1 for the team
+//										Faculty faculty = (Faculty) user;
+//										team.setReviewer1(faculty);
+//									}
+//									if (nextLine[4].equalsIgnoreCase(user.getFullName())) {
+//										//Setting the reviewer 2 for the team
+//										Faculty faculty = (Faculty) user;
+//										team.setReviewer2(faculty);
+//									} 
+//								}
+//								//Setting the students for the team
+//							}
+//							if (teamFound == true) { break; }
+//						}
+//					}
+//				}
 //			}
-			reader.close();
+//			//Persisting the team objects
+//			logger.info("Persisting teams");
+////			for (Team team: ) {
+////				em.persist(userObj);
+////			}
+//			reader.close();
 			
 		} catch (FileNotFoundException e) {
 			logger.error("Exception caught: " + e.getMessage());
