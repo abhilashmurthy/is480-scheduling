@@ -107,8 +107,8 @@ public class UserManager {
         User user = null;
         try {
             em.getTransaction().begin();
-            Query q = em.createQuery("select o from User o where o.role = :role")
-                    .setParameter("role", Role.COURSE_COORDINATOR);
+            Query q = em.createQuery("select o from User o where o.role = :role", User.class);
+			q.setParameter("role", Role.COURSE_COORDINATOR);
             user = (User) q.getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {

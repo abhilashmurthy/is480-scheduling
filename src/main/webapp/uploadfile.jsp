@@ -87,6 +87,16 @@
 		<script type="text/javascript" src="js/plugins/jquery.ajaxfileupload.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
+				//Getting value from upload file action class and displaying success/error message accordingly
+//				var result = '<s:property value="msg"/>';
+//				alert(result);
+//				if (result !== null && result !== "") {
+//					if (result.substring(0,5).equalsIgnoreCase("Wrong") || result.substring(0,9).equalsIgnoreCase("Incorrect")) {
+//						showNotification("ERROR", result);
+//					} else if (result.substring(0,7).equalsIgnoreCase("Success")) {
+//						showNotification("SUCCESS", result);
+//					}
+//				}
 			});
 			
 			//To check whether the file selected has correct extension or not
