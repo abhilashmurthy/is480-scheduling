@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import util.MiscUtil;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import javax.servlet.ServletContext;
 import manager.TermManager;
@@ -129,7 +130,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 			
-			
+//			private static void createUsers(File file, Term term, EntityManager em) 
 			//------------------------Creating user objects------------------------
 			reader = new CSVReader(new FileReader(csvFile));
 			String[] nextLineUsers;
@@ -226,10 +227,17 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			for (User userObj: usersList) {
 //				em.persist(userObj);
 //			}
-			reader.close();
-			for (User userObj: usersList) {
-				System.out.println(userObj.getFullName());
+			//Making a students list and a faculty list from the users list
+			List<Student> studentsList = new ArrayList<Student>();
+			List<Faculty> facultyList = new ArrayList<Faculty>();
+			for (User user: usersList) {
+				if (user.getRole() == Role.STUDENT) {
+					studentsList.add((Student)user);
+				} else if (user.getRole() == Role.FACULTY) {
+					facultyList.add((Faculty)user);
+				}
 			}
+			reader.close();
 			
 			//-------------------------Creating the teams---------------------------
 			reader = new CSVReader(new FileReader(csvFile));
@@ -265,62 +273,95 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				}
 			}
 			reader.close();
-			for (Team teamObj : teamsList) {
-				System.out.println(teamObj.getTeamName());
-			}
 			
 			//-----------------------Assigning users to teams-------------------------
-//			reader = new CSVReader(new FileReader(csvFile));
-//			String nextLine[];
-//			lineNo = 0;
-//			logger.info("Parsing csv file to assign users to teams");
-//			HashSet<Student> students = new HashSet<Student>();
-//			//Read one line at a time
-//			while ((nextLine = reader.readNext()) != null) {
-//				lineNo++;
-//				//Not reading the 1st line
-//				if (lineNo != 1) {
-//					if (!(nextLine[7].equalsIgnoreCase("-") && nextLine[7].equalsIgnoreCase(""))) {
-//						for (Team team: teamsList) {
-//							boolean teamFound = false;
-//							//Getting the team object
-//							if (nextLine[7].equalsIgnoreCase(team.getTeamName())) {
-//								teamFound = true;
-//								//Getting the user objects for the team
-//								for (User user: usersList) {
-//									if (nextLine[0].equalsIgnoreCase(user.getFullName())) {
-//										Student student = (Student) user;
-//										students.add(student);
-//									}
-//									if (nextLine[2].equalsIgnoreCase(user.getFullName())) {
-//										//Setting the supervisor for the team
-//										Faculty faculty = (Faculty) user;
-//										team.setSupervisor(faculty);
-//									} 
-//									if (nextLine[3].equalsIgnoreCase(user.getFullName())) {
-//										//Setting the reviewer 1 for the team
-//										Faculty faculty = (Faculty) user;
-//										team.setReviewer1(faculty);
-//									}
-//									if (nextLine[4].equalsIgnoreCase(user.getFullName())) {
-//										//Setting the reviewer 2 for the team
-//										Faculty faculty = (Faculty) user;
-//										team.setReviewer2(faculty);
-//									} 
-//								}
-//								//Setting the students for the team
-//							}
-//							if (teamFound == true) { break; }
-//						}
-//					}
-//				}
-//			}
-//			//Persisting the team objects
-//			logger.info("Persisting teams");
-////			for (Team team: ) {
-////				em.persist(userObj);
-////			}
-//			reader.close();
+			reader = new CSVReader(new FileReader(csvFile));
+			String nextLine[];
+			lineNo = 0;
+			logger.info("Parsing csv file to assign users to teams");
+			HashSet<Student> students = new HashSet<Student>();
+			//Read one line at a time
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				//Not reading the 1st line
+				if (lineNo != 1) {
+					if (!nextLine[2].equalsIgnoreCase("-") && !nextLine[2].equalsIgnoreCase("")) {
+						for (Team team: teamsList) {
+							//Getting the team object
+							if (nextLine[2].equalsIgnoreCase(team.getTeamName())) {
+								//Getting the user objects for the team
+								if (nextLine[5].equalsIgnoreCase("Student")) {
+									for (Student student: studentsList) {
+										//Adding all the students for a team in a hash set
+										if (nextLine[4].equalsIgnoreCase(student.getUsername())) {
+											students.add(student);
+											break;
+										}
+									}
+								} else if (nextLine[5].equalsIgnoreCase("Supervisor")) {
+									//Setting the supervisor for the team
+									for (Faculty faculty: facultyList) {
+										if (nextLine[4].equalsIgnoreCase(faculty.getUsername())) {
+											team.setSupervisor(faculty);
+											break;
+										}
+									}
+									//After setting the supervisor, we can set the students 
+									if (students.size() > 0) {
+										team.setMembers(students);
+										//Clearing the list of students
+										students.clear();
+									}
+								} else if (nextLine[5].equalsIgnoreCase("Reviewer 1") || nextLine[5].equalsIgnoreCase("R1")) {
+									//Setting the reviewer 1 for the team
+									for (Faculty faculty: facultyList) {
+										if (nextLine[4].equalsIgnoreCase(faculty.getUsername())) {
+											team.setReviewer1(faculty);
+											break;
+										}
+									}
+									//After setting R1, we can set the students 
+									if (students.size() > 0) {
+										team.setMembers((HashSet<Student>)students);
+										//Clearing the list of students
+										students.clear();
+									}
+								} else if (nextLine[5].equalsIgnoreCase("Reviewer 2") || nextLine[5].equalsIgnoreCase("R2")) {
+									//Setting the reviewer 2 for the team
+									for (Faculty faculty: facultyList) {
+										if (nextLine[4].equalsIgnoreCase(faculty.getUsername())) {
+											team.setReviewer2(faculty);
+											break;
+										}
+									}
+									//After setting R2, we can set the students 
+									if (students.size() > 0) {
+										team.setMembers((HashSet<Student>)students);
+										//Clearing the list of students
+										students.clear();
+									}
+								}
+								break;
+								//Setting the students for the team
+							}
+						}
+					}
+				}
+			}
+			//Persisting the team objects
+			logger.info("Persisting teams");
+			for (Team team: teamsList) {
+				System.out.println(team.getTeamName() + ":");
+				HashSet<Student> members = (HashSet<Student>) team.getMembers();
+				for (Student stu: members) {
+					System.out.println(stu.getFullName());
+				}
+				System.out.println("Supervisor:" + team.getSupervisor().getFullName());
+				System.out.println("Reviewer 1:" + team.getReviewer1().getFullName());
+				System.out.println("Reviewer 2:" + team.getReviewer2().getFullName());
+				System.out.println();
+			}
+			reader.close();
 			
 		} catch (FileNotFoundException e) {
 			logger.error("Exception caught: " + e.getMessage());
