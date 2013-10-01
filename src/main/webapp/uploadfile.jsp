@@ -29,7 +29,7 @@
 			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
 			<%--<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">--%>
 			<div style="float: left; margin-right: 50px;">
-			<table class="table table-hover" style="width:auto">
+<!--			<table class="table table-hover" style="width:auto">
 				<thead>
 					<tr><th>Select Term</th></tr>
 				</thead>
@@ -37,19 +37,19 @@
 					<tr>
 						<td>
 						<select id="termChosen" name="termChosen">
-							<s:iterator value="dataList">
+							<%--<s:iterator value="dataList">
 								<option value="<s:property value="termId"/>">
 									<s:property value="termName"/>
 								</option>
-							</s:iterator>
+							</s:iterator>--%>
 						</select>
 						</td>
 					</tr>
 				</tbody>
 			</table>
-			</div>
+			</div>-->
 			
-			<div style="float:left;">
+			<!--<div style="float:left;">-->
 				<table class="table table-hover">
 				<thead>
 					<tr><th>Upload File (.csv)</th></tr>
@@ -65,12 +65,19 @@
 				</table>
 			</div>
 			
-			<div style="clear: both;">
-				<br/>
-				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Uploading..." 
-					style="margin-bottom: 20px;">Upload</button>
-					<!--<input type="submit" id="submitFormBtn" value="Save"/>-->
-					<%--<s:submit value="Upload"></s:submit>--%>
+			<!--<div style="clear: both;">-->
+			<div style="float:left;">
+				<br/><br/>
+				<table class>
+					<tbody>
+					<td>
+						<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Uploading..." 
+							style="margin-bottom: 20px;">Upload</button>
+							<!--<input type="submit" id="submitFormBtn" value="Save"/>-->
+							<%--<s:submit value="Upload"></s:submit>--%>
+					</td>
+					</tbody>
+				</table>
 			</div>
 			</form>
 			<%--</s:form>--%>
@@ -100,7 +107,7 @@
 			//Submit changes to backend
 			$('#submitFormBtn').click(function() {
 //			function validate(saveButton) {
-//				$(this).button('loading');
+				$(this).button('loading');
 //				saveButton.button('loading');
 				
 				var file = $('#fileUploaded').val();
