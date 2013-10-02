@@ -29,27 +29,28 @@
 			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
 			<%--<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">--%>
 			<div style="float: left; margin-right: 50px;">
-<!--			<table class="table table-hover" style="width:auto">
+			<table class="table table-hover" style="width:auto">
 				<thead>
 					<tr><th>Select Term</th></tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td>
-						<select id="termChosen" name="termChosen">
-							<%--<s:iterator value="dataList">
+						<select id="termChosen" name="termChosen" onchange="updateActiveTerm();">
+							<option value=""></option>
+							<s:iterator value="dataList">
 								<option value="<s:property value="termId"/>">
 									<s:property value="termName"/>
 								</option>
-							</s:iterator>--%>
+							</s:iterator>
 						</select>
 						</td>
 					</tr>
 				</tbody>
 			</table>
-			</div>-->
+			</div>
 			
-			<!--<div style="float:left;">-->
+			<div style="float:left; margin-right: 50px;">
 				<table class="table table-hover">
 				<thead>
 					<tr><th>Upload File (.csv)</th></tr>
@@ -65,8 +66,7 @@
 				</table>
 			</div>
 			
-			<!--<div style="clear: both;">-->
-			<div style="float:left;">
+			<div style="float: left;">
 				<br/><br/>
 				<table class>
 					<tbody>
@@ -80,6 +80,7 @@
 				</table>
 			</div>
 			</form>
+			<br/><br/><br/><br/>
 			<%--</s:form>--%>
         </div>
 		
@@ -181,29 +182,34 @@
 //				   },
 //				   'onCancel': function() {
 //					 console.log('no file selected');
-//				   }
+//				 
 //				});
 //				alert(JSON.stringify(fileJson));
-//				$.ajax({
-//					type: 'POST',
-//					async: false,
-//					url: 'uploadFileToBackend',
-//					data: {jsonData: JSON.stringify(fileJson)}	
-//				}).done(function(response) {
+			});
+			
+			function updateActiveTerm() {
+				var termId = $("#termChosen").val();
+				var termData = {};
+				termData['termId'] = termId;
+				$.ajax({
+					type: 'POST',
+					async: false,
+					url: 'updateActiveTermCSV',
+					data: {jsonData: JSON.stringify(termData)}	
+				}).done(function(response) {
 //					$("#submitFormBtn").button('reset');
-//					console.log(response);
+					console.log(response);
 //					if (response.success) {
 //						showNotification("SUCCESS", response.message);
 //					} else {
 //						showNotification("ERROR", response.message);
 //					}
-//				}).fail(function(response) {
+				}).fail(function(response) {
 //					$("#submitFormBtn").button('reset');
-//					console.log(response);
-//					showNotification("WARNING", "Oops. Something went wrong. Please try again!");
-//				});
-			});
-//			}
+					console.log(response);
+					showNotification("WARNING", "Oops. Something went wrong. Please select the term again!");
+				});
+			}
 
 			//Notification-------------
 			function showNotification(action, notificationMessage) {

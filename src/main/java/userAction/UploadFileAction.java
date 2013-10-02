@@ -81,8 +81,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				logger.info("Validating user roles");
 				boolean errorInRole = validateRoles(csvFile);
 				if (errorInRole) {
-					msg = "Wrong User Roles! Role can only be Administrator, Course Coordinator, " +
-							"TA, Student, Supervisor, Reviewer 1, Reviewer 2";
+					msg = "Wrong User Roles! Role can only be - TA, Student, Supervisor, Reviewer 1, Reviewer 2";
 					logger.error("Error with user roles in csv upload");
 					return SUCCESS;
 				}
@@ -91,39 +90,39 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				logger.info("Validating team names");
 				boolean errorInTeamName = validateTeamNames(csvFile);
 				if (errorInTeamName) {
-					msg = "Wrong Team Name! For Administrator, Course Coordinator and TA, please"
-							+ " put a '-'. For other roles, put the team name";
+					msg = "Wrong Team Name! For TA, please put a '-'. For other roles, put the team name";
 					logger.error("Error with team names in csv upload");
 					return SUCCESS;
 				}
 
-				//4. Validate that Admin, CC and TA's are at the start of the file
-				logger.info("Validating order of roles (Admin, cc and TA)");
+				//4. Validate that TA's are at the start of the file
+				logger.info("Validating order of roles for TA)");
 				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
 				if (errorInOrderOfRoles) {
-					msg = "Wrong order of roles! Administrator, Course Coordinator, TA's "
-							+ "should be placed first in the file";
+					msg = "Wrong order of roles! TA's should be placed first in the file";
 					logger.error("Error with order of roles in csv upload");
 					return SUCCESS;
 				} 			
 
 				//5. Validate for term names (should be the same throughout the file)
-				logger.info("Validating term names");
-				String displayName = validateTermNames(csvFile);
-				if (displayName == null) {
-					msg = "Wrong Term Names! The Academic Year and Semester should be same for all entries";
-					logger.error("Error with term names in csv upload");
-					return SUCCESS;
-				} 	
-				//e.g. If display name is 2013-2014 Term 1
-				if (displayName.length() == 16) {
-					String firstHalf = displayName.substring(0, 5);
-					String secondHalf = displayName.substring(7, 16);
-					displayName = firstHalf + secondHalf;
-				}
-				Term term = null;
-				term = TermManager.getTermByDisplayName(em, displayName);
-
+//				logger.info("Validating term names");
+//				String displayName = validateTermNames(csvFile);
+//				if (displayName == null) {
+//					msg = "Wrong Term Names! The Academic Year and Semester should be same for all entries";
+//					logger.error("Error with term names in csv upload");
+//					return SUCCESS;
+//				} 	
+//				//e.g. If display name is 2013-2014 Term 1
+//				if (displayName.length() == 16) {
+//					String firstHalf = displayName.substring(0, 5);
+//					String secondHalf = displayName.substring(7, 16);
+//					displayName = firstHalf + secondHalf;
+//				}
+//				Term term = null;
+//				term = TermManager.getTermByDisplayName(em, displayName);
+				
+				//Getting the term from the session
+				Term term = (Term) request.getSession().getAttribute("currentActiveTerm");
 
 				// <------------------------Start Parsing the File to populate DB--------------------------->
 				em.getTransaction().begin();
@@ -132,7 +131,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				List<User> usersList = createUsers(csvFile, term, em);
 				//If error
 				if (usersList == null) {
-					msg = "Error with Upload File (Create Users): Escalate to Developers";
+					msg = "Error with Upload File (Create Users): Escalate to developers!";
 					logger.error("Error with Upload File (Create Users)");
 					request.setAttribute("error", msg);
 					return ERROR;
@@ -142,7 +141,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				List<Team> teamsList = createTeams(csvFile, term, em);
 				//If error
 				if (teamsList == null) {
-					msg = "Error with Upload File (Create Teams): Escalate to Developers";
+					msg = "Error with Upload File (Create Teams): Escalate to developers!";
 					logger.error("Error with Upload File (Create Teams)");
 					request.setAttribute("error", msg);
 					return ERROR;
@@ -151,7 +150,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				//3rd Part: Assigning users (Students & Faculty) to the teams
 				boolean result = assignUsersToTeams(csvFile, usersList, teamsList, em);
 				if (!result) {
-					msg = "Error with Upload File (Assigning Users to Teams): Escalate to Developers";
+					msg = "Error with Upload File (Assigning Users to Teams): Escalate to developers!";
 					logger.error("Error with Upload File (Assigning Users to Teams)");
 					request.setAttribute("error", msg);
 					return ERROR;
@@ -582,8 +581,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				if (lineNo != 1) {
 					//Provided there is a username
 					if (nextLine[4].length() > 0) {
-						if (!nextLine[5].equalsIgnoreCase("Administrator") && !nextLine[5].equalsIgnoreCase("Course Coordinator")
-							&& !nextLine[5].equalsIgnoreCase("TA") && !nextLine[5].equalsIgnoreCase("Student")
+						if (!nextLine[5].equalsIgnoreCase("TA") && !nextLine[5].equalsIgnoreCase("Student")
 							&& !nextLine[5].equalsIgnoreCase("Supervisor") && !nextLine[5].equalsIgnoreCase("Reviewer 1") 
 							&& !nextLine[5].equalsIgnoreCase("Reviewer 2")) {
 								errorInRole = true;
@@ -628,8 +626,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
 				if (lineNo != 1) {
-					if (nextLine[5].equalsIgnoreCase("Administrator") || nextLine[5].equalsIgnoreCase("Course Coordinator") 
-							|| nextLine[5].equalsIgnoreCase("TA")) {
+					if (nextLine[5].equalsIgnoreCase("TA")) {
 						if (!nextLine[2].equalsIgnoreCase("-")) {
 							errorInTeamName = true;
 							return errorInTeamName;
@@ -675,16 +672,12 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
 			int lineNo = 0;
 			String[] nextLine;
-			int adminCount = 0, ccCount = 0, taCount = 0;
+			int taCount = 0;
 			//Getting the total number of admin, cc and ta's
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
 				if (lineNo != 1) {
-					if (nextLine[5].equalsIgnoreCase("Administrator")) {
-						adminCount++;
-					} else if (nextLine[5].equalsIgnoreCase("Course Coordinator")) {
-						ccCount++;
-					} else if (nextLine[5].equalsIgnoreCase("TA")) {
+					if (nextLine[5].equalsIgnoreCase("TA")) {
 						taCount++;
 					}
 				}
@@ -693,10 +686,9 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			
 			//Now validating order of roles
 			reader = new CSVReader(new FileReader(csvFile));
-			int tillLineNo = adminCount + ccCount + taCount;
 			lineNo = 0;
 			int i = 0;
-			while (((nextLine = reader.readNext()) != null) && (i < tillLineNo)) {
+			while (((nextLine = reader.readNext()) != null) && (i < taCount)) {
 				lineNo++;
 				if (lineNo != 1) {
 					if (!nextLine[5].equalsIgnoreCase("Administrator") && !nextLine[5].equalsIgnoreCase("Course Coordinator")
