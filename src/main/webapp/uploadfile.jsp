@@ -50,7 +50,7 @@
 			</table>
 			</div>
 			
-			<div style="float:left; margin-right: 50px;">
+			<div style="float:left; margin-right: 40px;">
 				<table class="table table-hover">
 				<thead>
 					<tr><th>Upload File (.csv)</th></tr>
@@ -80,7 +80,20 @@
 				</table>
 			</div>
 			</form>
-			<br/><br/><br/><br/>
+					
+			<div class="well well-small" style="float:right">
+				<h5>Note</h5>
+				<ul style='font-size: 13px'>
+					<li>Only a single-tabbed CSV file can be uploaded</li>
+					<li>Please do not use this feature to overwrite existing data</li>
+					<li>Please ensure the file contains data for 1 semester only </li>
+					<li>Please do not include Administrator and Course Coordinator in the file</li>
+					<li>Please ensure TA information is at the start of the file</li>
+					<li>Please ensure every Team has a name</li>
+					<li>Please ensure every Student has a username</li>
+					<li>Please put "-" where Supervisor/Reviewer 1/Reviewer 2 has not been <br/>assigned to a team</li>
+				</ul>
+			</div>
 			<%--</s:form>--%>
         </div>
 		
@@ -116,8 +129,10 @@
 			}
 			
 			//Submit changes to backend
-			$('#submitFormBtn').click(function() {
+			$('#submitFormBtn').click(function(e) {
 //			function validate(saveButton) {
+//				e.stopPropagation();
+				e.preventDefault();
 				$(this).button('loading');
 //				saveButton.button('loading');
 				
@@ -163,6 +178,14 @@
 					return false;
 				}
 				
+//				var termText = $("#termChosen option:selected").html();
+//				var a = bootbox.confirm({
+//					message: "Are you sure you want to upload <b>" + $('#fileUploaded').val() + "</b> for <b>" + termText + "</b>?",
+//				});
+//				if (!a) {
+//					$("#submitFormBtn").button('reset');
+//					return false;
+//				}
 				return true;
 //				var fileJson = {};
 //				fileJson['termId'] = termSelected;
