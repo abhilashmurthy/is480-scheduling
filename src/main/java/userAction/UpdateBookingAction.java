@@ -32,7 +32,9 @@ import model.Schedule;
 import model.Timeslot;
 import model.User;
 import model.role.Student;
+import notification.email.EditBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.hibernate.Hibernate;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +60,8 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
             //convert the chosen ID into long and get the corresponding Timeslot object
             em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
+			
+			em.getTransaction().begin();
 
             //Checking whether the user setting optional attendees is student, admin or cc
             User user = (User) session.getAttribute("user");
@@ -243,7 +247,6 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     map.put("startDate", viewDateFormat.format(new Date(newTimeslot.getStartTime().getTime())));
 
                     //Begin database changes
-                    em.getTransaction().begin();
                     em.persist(newTimeslot);
                     em.persist(oldTimeslot);
                 }
@@ -251,8 +254,17 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 booking.setLastEditedBy(user.getFullName());
                 booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
                 
-                if (!em.getTransaction().isActive()) em.getTransaction().begin();
                 em.persist(booking);
+				
+				//Forcing initialization for sending email
+				Hibernate.initialize(booking.getTeam().getMembers());
+				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				
+				logger.info("Team Members initialized: " + Boolean.toString(Hibernate.isInitialized(booking.getTeam().getMembers())));
+				
+				//Sending email update
+				EditBookingEmail email = new EditBookingEmail(booking, user);
+				email.sendEmail();
                 em.getTransaction().commit();
                 
                 json.put("booking", map);
