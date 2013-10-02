@@ -25,6 +25,8 @@ public class EditBookingEmail extends EmailTemplate {
 	
 	public EditBookingEmail(Booking b, User editor) {
 		super("edited_booking.html");
+		this.b = b;
+		this.editor = editor;
 	}
 
 	@Override
