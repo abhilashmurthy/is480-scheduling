@@ -78,17 +78,21 @@
             <table class="legend">
                 <tr>
                     <!-- <td style="width:50px"><b>Legend:</b></td>-->
+					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA)) {%>
                     <td class="legendBox myTeamBooking" style="text-align: center; font-size: 16px; font-weight: bold; border:1px solid #1E647C; width:17px;">T</td><td>&nbsp;My Team</td> 
 					<td style="width:15px"></td>
+					<% } %>
                     <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
                     <td style="width:15px"></td>
                     <td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
                     <td style="width:15px"></td>
                     <td class="legendBox approvedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
                     <td style="width:15px"></td>
+					<% if (activeRole.equals(Role.STUDENT)) {%>
                     <td class="legendBox rejectedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Rejected</td> 
                     <td style="width:15px"></td>
-					<% if (!activeRole.equals(Role.TA)) {%>
+					<% } %>
+					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
 					<% } else if (activeRole.equals(Role.TA)) { %>
 					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Your video signup</td>
@@ -309,10 +313,7 @@
                 }
                 
                 function appendViewBookingPopover($td) {
-                    var timeslot = scheduleData.timeslots[$td.attr('value')];
-					var $booking = $td.children('.booking');
-                    if ($booking) {$booking.addClass(timeslot.status.toLowerCase() + 'Booking');}
-					
+                    var timeslot = scheduleData.timeslots[$td.attr('value')];					
                     var $bookingDetailsTable = $(document.createElement('table'));
                     $bookingDetailsTable.attr('id', 'viewTimeslotTable');
 					var outputData = {
@@ -422,7 +423,7 @@
 					}
 
                     //Popover
-                    makePopover($booking, timeslot.team === teamName?"<b>Your Booking</b>":"<b>Team Booking</b>", $bookingDetailsTable);
+                    makePopover($td.children('.booking'), timeslot.team === teamName?"<b>Your Booking</b>":"<b>Team Booking</b>", $bookingDetailsTable);
                 }				
                 
                 function appendCreateBookingPopover($td) {
@@ -608,31 +609,32 @@
                     //Hide other popovers when others clicked
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
-                        self = $(this);
-                        $('.booking').not(self).popover('hide');
-                        $('.timeslotCell').not(self).popover('hide');
-                        $.pnotify_remove_all();
+						self = <%= activeRole.equals(Role.FACULTY) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
+						$('.timeslotCell, .booking').not(self).popover('hide');
+						$.pnotify_remove_all();
                         return false;
                     });
 
                     //Popover for booked timeslot
                     $('body').off('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking');
                     $('body').on('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking', function(e) {
-						if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
-							$(this).popover('show');
-							return false;
+						if (e.target === this) {
+							if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
+								$(this).popover('show');
+								return false;
+							}
+							self = ($(this).is('.booking')) ? $(this) : $(this).children('.booking');
+							self.popover('show');
+							console.log('showing ' + self.attr('class'));
+							self.find('ul').remove();
+							appendTokenInput(self); //Optional attendees
 						}
-						self = (!$(this).is('.booking')) ? $(this).children('.booking') : $(this);
-                        if ($(e.target).parents('.popover').length) return false;
-                        self.popover('show');
-                        self.find('ul').remove();
-                        appendTokenInput(self); //Optional attendees
                         return false;
                     });
                     
                     //Popover for unbooked timeslot
-                    $('body').off('click', '.unbookedTimeslot:not(.unavailableTimeslot), .unbookedTimeslot > .booking');
-                    $('body').on('click', '.unbookedTimeslot:not(.unavailableTimeslot), .unbookedTimeslot > .booking', function(e) {
+                    $('body').off('click', '.unbookedTimeslot:not(.unavailableTimeslot)');
+                    $('body').on('click', '.unbookedTimeslot:not(.unavailableTimeslot)', function(e) {
 						if (e.target === this) {
 							self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
                             var timeslot = scheduleData.timeslots[self.attr('value')];
@@ -737,7 +739,8 @@
                         var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
                         if ($deletedDiv) $deletedDiv.remove();
                         var bookingDiv = $(document.createElement('div'));
-                        bookingDiv.addClass('booking pendingBooking myTeamBooking');
+                        bookingDiv.addClass('booking pendingBooking');
+						bookingDiv.addClass(<%= activeRole.equals(Role.STUDENT) %>?'myTeamBooking':false);
                         bookingDiv.html(returnData.booking.team);
                         bookingDiv.css('display', 'none');
                         self.append(bookingDiv);
@@ -1285,6 +1288,7 @@
 														.append(timeslot.team?
 															$(document.createElement('div'))
 																.addClass('booking pendingBooking')
+																.addClass(timeslot.status.toLowerCase() + 'Booking')
 																.addClass(
 																	(<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam)
 																	|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)
