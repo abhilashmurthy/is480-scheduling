@@ -104,18 +104,9 @@ public class UserManager {
 
     public static User getCourseCoordinator(EntityManager em) {
         logger.trace("Getting Course Coordinator");
-        User user = null;
-        try {
-            em.getTransaction().begin();
-            Query q = em.createQuery("select o from User o where o.role = :role", User.class);
-			q.setParameter("role", Role.COURSE_COORDINATOR);
-            user = (User) q.getSingleResult();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("Database Operation Error");
-            em.getTransaction().rollback();
-        }
-        return user;
+		Query q = em.createQuery("select o from User o where o.role = :role", User.class);
+		q.setParameter("role", Role.COURSE_COORDINATOR);
+		return (User) q.getSingleResult();
     }
 
     public static <T extends User> T getUser(long id, Class<T> type) {

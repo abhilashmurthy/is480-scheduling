@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import manager.TermManager;
@@ -61,118 +62,104 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				em = MiscUtil.getEntityManagerInstance();
 				//Getting the file
 				File csvFile = getFile();
-				try {
-					logger.info("Extracting data from CSV File started");
-					
-					CSVReader reader = new CSVReader(new FileReader(csvFile));
 
-					//<--------------------Validation checks for the csv file---------------------->
-					//1. Validate that every user has a username or a "-"
-					logger.info("Validating usernames");
-					boolean errorInUsername = validateUsernames(csvFile);
-					if (errorInUsername) {
-						msg = "Wrong Usernames! If a username doesnt exist, please put a '-' symbol";
-						logger.error("Error with usernames in csv upload");
-						return SUCCESS;
-					}
+				logger.info("Extracting data from CSV File started");
 
-					//2. Validate roles of each user
-					logger.info("Validating user roles");
-					boolean errorInRole = validateRoles(csvFile);
-					if (errorInRole) {
-						msg = "Wrong User Roles! Role can only be Administrator, Course Coordinator, " +
-								"TA, Student, Supervisor, Reviewer 1, Reviewer 2";
-						logger.error("Error with user roles in csv upload");
-						return SUCCESS;
-					}
+				CSVReader reader = new CSVReader(new FileReader(csvFile));
 
-					//3. Validate for team names
-					logger.info("Validating team names");
-					boolean errorInTeamName = validateTeamNames(csvFile);
-					if (errorInTeamName) {
-						msg = "Wrong Team Name! For Administrator, Course Coordinator and TA, please"
-								+ " put a '-'. For other roles, put the team name";
-						logger.error("Error with team names in csv upload");
-						return SUCCESS;
-					}
-
-					//4. Validate that Admin, CC and TA's are at the start of the file
-					logger.info("Validating order of roles (Admin, cc and TA)");
-					boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
-					if (errorInOrderOfRoles) {
-						msg = "Wrong order of roles! Administrator, Course Coordinator, TA's "
-								+ "should be placed first in the file";
-						logger.error("Error with order of roles in csv upload");
-						return SUCCESS;
-					} 			
-
-					//5. Validate for term names (should be the same throughout the file)
-					logger.info("Validating term names");
-					String displayName = validateTermNames(csvFile);
-					if (displayName == null) {
-						msg = "Wrong Term Names! The Academic Year and Semester should be same for all entries";
-						logger.error("Error with term names in csv upload");
-						return SUCCESS;
-					} 	
-					//e.g. If display name is 2013-2014 Term 1
-					if (displayName.length() == 16) {
-						String firstHalf = displayName.substring(0, 5);
-						String secondHalf = displayName.substring(7, 16);
-						displayName = firstHalf + secondHalf;
-					}
-					Term term = null;
-					term = TermManager.getTermByDisplayName(em, displayName);
-
-
-					// <------------------------Start Parsing the File to populate DB--------------------------->
-					em.getTransaction().begin();
-					
-					//1st Part: Creating unique user objects (Except for CC)
-					List<User> usersList = createUsers(csvFile, term, em);
-					//If error
-					if (usersList == null) {
-						msg = "Error with Upload File (Create Users): Escalate to Developers";
-						logger.error("Error with Upload File (Create Users)");
-						request.setAttribute("error", msg);
-						return ERROR;
-					}
-
-					//2nd Part: Creating unique team objects
-					List<Team> teamsList = createTeams(csvFile, term, em);
-					//If error
-					if (teamsList == null) {
-						msg = "Error with Upload File (Create Teams): Escalate to Developers";
-						logger.error("Error with Upload File (Create Teams)");
-						request.setAttribute("error", msg);
-						return ERROR;
-					}
-
-					//3rd Part: Assigning users (Students & Faculty) to the teams
-					boolean result = assignUsersToTeams(csvFile, usersList, teamsList, em);
-					if (!result) {
-						msg = "Error with Upload File (Assigning Users to Teams): Escalate to Developers";
-						logger.error("Error with Upload File (Assigning Users to Teams)");
-						request.setAttribute("error", msg);
-						return ERROR;
-					}
-
-					em.getTransaction().commit();
-					logger.info("Extracting data from CSV completed");
-				} catch (Exception e) {
-					logger.error("CSV Parsing Error:");
-					logger.error(e.getMessage());
-					for (StackTraceElement s : e.getStackTrace()) {
-						logger.debug(s.toString());
-					}
-					em.getTransaction().rollback();
-				} finally {
-					if (em != null && em.getTransaction().isActive()) {
-						em.getTransaction().rollback();
-					}
-					if (em != null && em.isOpen()) {
-						em.close();
-					}
+				//<--------------------Validation checks for the csv file---------------------->
+				//1. Validate that every user has a username or a "-"
+				logger.info("Validating usernames");
+				boolean errorInUsername = validateUsernames(csvFile);
+				if (errorInUsername) {
+					msg = "Wrong Usernames! If a username doesnt exist, please put a '-' symbol";
+					logger.error("Error with usernames in csv upload");
+					return SUCCESS;
 				}
+
+				//2. Validate roles of each user
+				logger.info("Validating user roles");
+				boolean errorInRole = validateRoles(csvFile);
+				if (errorInRole) {
+					msg = "Wrong User Roles! Role can only be Administrator, Course Coordinator, " +
+							"TA, Student, Supervisor, Reviewer 1, Reviewer 2";
+					logger.error("Error with user roles in csv upload");
+					return SUCCESS;
+				}
+
+				//3. Validate for team names
+				logger.info("Validating team names");
+				boolean errorInTeamName = validateTeamNames(csvFile);
+				if (errorInTeamName) {
+					msg = "Wrong Team Name! For Administrator, Course Coordinator and TA, please"
+							+ " put a '-'. For other roles, put the team name";
+					logger.error("Error with team names in csv upload");
+					return SUCCESS;
+				}
+
+				//4. Validate that Admin, CC and TA's are at the start of the file
+				logger.info("Validating order of roles (Admin, cc and TA)");
+				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
+				if (errorInOrderOfRoles) {
+					msg = "Wrong order of roles! Administrator, Course Coordinator, TA's "
+							+ "should be placed first in the file";
+					logger.error("Error with order of roles in csv upload");
+					return SUCCESS;
+				} 			
+
+				//5. Validate for term names (should be the same throughout the file)
+				logger.info("Validating term names");
+				String displayName = validateTermNames(csvFile);
+				if (displayName == null) {
+					msg = "Wrong Term Names! The Academic Year and Semester should be same for all entries";
+					logger.error("Error with term names in csv upload");
+					return SUCCESS;
+				} 	
+				//e.g. If display name is 2013-2014 Term 1
+				if (displayName.length() == 16) {
+					String firstHalf = displayName.substring(0, 5);
+					String secondHalf = displayName.substring(7, 16);
+					displayName = firstHalf + secondHalf;
+				}
+				Term term = null;
+				term = TermManager.getTermByDisplayName(em, displayName);
+
+
+				// <------------------------Start Parsing the File to populate DB--------------------------->
+				em.getTransaction().begin();
+
+				//1st Part: Creating unique user objects (Except for CC)
+				List<User> usersList = createUsers(csvFile, term, em);
+				//If error
+				if (usersList == null) {
+					msg = "Error with Upload File (Create Users): Escalate to Developers";
+					logger.error("Error with Upload File (Create Users)");
+					request.setAttribute("error", msg);
+					return ERROR;
+				}
+
+				//2nd Part: Creating unique team objects
+				List<Team> teamsList = createTeams(csvFile, term, em);
+				//If error
+				if (teamsList == null) {
+					msg = "Error with Upload File (Create Teams): Escalate to Developers";
+					logger.error("Error with Upload File (Create Teams)");
+					request.setAttribute("error", msg);
+					return ERROR;
+				}
+
+				//3rd Part: Assigning users (Students & Faculty) to the teams
+				boolean result = assignUsersToTeams(csvFile, usersList, teamsList, em);
+				if (!result) {
+					msg = "Error with Upload File (Assigning Users to Teams): Escalate to Developers";
+					logger.error("Error with Upload File (Assigning Users to Teams)");
+					request.setAttribute("error", msg);
+					return ERROR;
+				}
+
+				EntityTransaction tr = em.getTransaction();
+				tr.commit();
+				logger.info("Extracting data from CSV completed");
 				msg = "Success! File has been uploaded!";
 				return SUCCESS;
 			} else {
@@ -497,10 +484,10 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 			//Persisting the team objects
-//			logger.info("Persisting teams");
-//			for (Team teamObj: teamsList) {
-//				em.persist(teamObj);
-//			}
+			logger.info("Persisting teams");
+			for (Team teamObj: teamsList) {
+				em.persist(teamObj);
+			}
 			for (Team team: teamsList) {
 				System.out.println(team.getTeamName() + ":");
 				HashSet<Student> members = (HashSet<Student>) team.getMembers();
