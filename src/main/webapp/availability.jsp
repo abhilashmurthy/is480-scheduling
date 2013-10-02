@@ -129,7 +129,7 @@
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
-                <h3>Your Availability</h3>
+                <h3>My Availability</h3>
                 <div id="timeslotsTableSection">
                     <table>
                         <tr>

@@ -78,7 +78,7 @@
 						<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Bookings</b></a></li>
-						<li id="bookingHistory"><a href="yourAvailability" class="navbar-title"><b>Your Availability</b></a></li>
+						<li id="bookingHistory"><a href="yourAvailability" class="navbar-title"><b>My Availability</b></a></li>
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.STUDENT)) { %>
 <!--						<li class="dropdown">
