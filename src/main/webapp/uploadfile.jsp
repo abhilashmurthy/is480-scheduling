@@ -84,14 +84,16 @@
 			<div class="well well-small" style="float:right">
 				<h5>Note</h5>
 				<ul style='font-size: 13px'>
-					<li>Only a single-tabbed CSV file can be uploaded</li>
+					<li>Please ensure that you have created a new schedule before uploading </li>
+					<li>Please upload a single-tabbed CSV file only</li>
 					<li>Please do not use this feature to overwrite existing data</li>
 					<li>Please ensure the file contains data for 1 semester only </li>
 					<li>Please do not include Administrator and Course Coordinator in the file</li>
 					<li>Please ensure TA information is at the start of the file</li>
+					<li>Please ensure that for every team - Students are listed first followed <br/>by Supervisor and Reviewers</li>
 					<li>Please ensure every Team has a name</li>
 					<li>Please ensure every Student has a username</li>
-					<li>Please put "-" where Supervisor/Reviewer 1/Reviewer 2 has not been <br/>assigned to a team</li>
+					<li>Please put "-" where Supervisor/Reviewer 1/Reviewer 2 have not been <br/>assigned to a team</li>
 				</ul>
 			</div>
 			<%--</s:form>--%>
@@ -100,18 +102,27 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="js/plugins/jquery.ajaxfileupload.js"></script>
 		<script type="text/javascript">
-			$(document).ready(function(){
-				//Getting value from upload file action class and displaying success/error message accordingly
-//				var result = '<s:property value="msg"/>';
-//				alert(result);
-//				if (result !== null && result !== "") {
-//					if (result.substring(0,5).equalsIgnoreCase("Wrong") || result.substring(0,9).equalsIgnoreCase("Incorrect")) {
-//						showNotification("ERROR", result);
-//					} else if (result.substring(0,7).equalsIgnoreCase("Success")) {
-//						showNotification("SUCCESS", result);
-//					}
-//				}
-			});
+//			$(document).ready(function(){
+		uploadFileLoad = function () {
+			//Reset upload button status
+			$("#submitFormBtn").button('reset');
+			
+			//Disable Pines Notify Settings
+			$.pnotify.defaults.history = false;
+			$.pnotify.defaults.delay = 3000;
+
+//			Getting value from upload file action class and displaying success/error message accordingly
+			var result = '<%= session.getAttribute("csvMsg") %>';
+			if (result !== null && result !== "") {
+				if (result.substring(0,5) === ("Wrong") || result.substring(0,9) === ("Incorrect")) {
+					showNotification("ERROR", result);
+				} else if (result.substring(0,7) === ('Success')) {
+					showNotification("SUCCESS", result);
+				}
+			}
+			//Resetting the session object
+			'<% session.setAttribute("csvMsg", ""); %>';
+			
 			
 			//To check whether the file selected has correct extension or not
 			function checkFile(sender) {
@@ -132,7 +143,7 @@
 			$('#submitFormBtn').click(function(e) {
 //			function validate(saveButton) {
 //				e.stopPropagation();
-				e.preventDefault();
+//				e.preventDefault();
 				$(this).button('loading');
 //				saveButton.button('loading');
 				
@@ -275,6 +286,9 @@
 				}
 				$.pnotify(opts);
 			}
+			};
+			
+			addLoadEvent(uploadFileLoad());
 		</script>
     </body>
 </html>

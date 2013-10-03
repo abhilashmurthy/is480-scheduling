@@ -71,7 +71,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				logger.info("Validating usernames");
 				boolean errorInUsername = validateUsernames(csvFile);
 				if (errorInUsername) {
-					msg = "Wrong Usernames! If a username doesnt exist, please put a '-' symbol";
+					session.setAttribute("csvMsg", "Wrong Usernames! If a username doesnt exist, please put a '-' symbol");
 					logger.error("Error with usernames in csv upload");
 					return SUCCESS;
 				}
@@ -80,7 +80,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				logger.info("Validating user roles");
 				boolean errorInRole = validateRoles(csvFile);
 				if (errorInRole) {
-					msg = "Wrong User Roles! Role can only be - TA, Student, Supervisor, Reviewer 1, Reviewer 2";
+					session.setAttribute("csvMsg", "Wrong User Roles! Role can only be - TA, Student, Supervisor, Reviewer 1, Reviewer 2");
 					logger.error("Error with user roles in csv upload");
 					return SUCCESS;
 				}
@@ -89,7 +89,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				logger.info("Validating team names");
 				boolean errorInTeamName = validateTeamNames(csvFile);
 				if (errorInTeamName) {
-					msg = "Wrong Team Name! For TA, please put a '-'. For other roles, put the team name";
+					session.setAttribute("csvMsg", "Wrong Team Name! For TA, please put a '-'. For other roles, put the team name");
 					logger.error("Error with team names in csv upload");
 					return SUCCESS;
 				}
@@ -98,7 +98,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				logger.info("Validating order of roles for TA");
 				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
 				if (errorInOrderOfRoles) {
-					msg = "Wrong order of roles! TA's should be placed first in the file";
+					session.setAttribute("csvMsg", "Wrong order of roles! TA's should be placed first in the file");
 					logger.error("Error with order of roles in csv upload");
 					return SUCCESS;
 				} 			
@@ -121,14 +121,9 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //				term = TermManager.getTermByDisplayName(em, displayName);
 				
 				//Getting the term from the session
-				Term term = (Term) session.getAttribute("currentActiveTerm");
-//				List<Milestone> milestones = MilestoneManager.findByTerm(em, term);
-//				//Converting list to set
-//				Set<Milestone> setOfMilestones = new HashSet<Milestone>();
-//				for (Milestone milestone: milestones) {
-//					setOfMilestones.add(milestone);
-//				}
-//				term.setMilestones(setOfMilestones);
+				Term tempterm = (Term) session.getAttribute("currentActiveTerm");
+				//Getting the term object again from the db (To cater to Detached Entity error)
+				Term term = em.find(Term.class, tempterm.getId());
 				
 				// <------------------------Start Parsing the File to populate DB--------------------------->
 				em.getTransaction().begin();
@@ -165,7 +160,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				EntityTransaction tr = em.getTransaction();
 				tr.commit();
 				logger.info("Extracting data from CSV completed");
-				msg = "Success! File has been uploaded!";
+				session.setAttribute("csvMsg", "Success! File has been uploaded!");
 				return SUCCESS;
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
