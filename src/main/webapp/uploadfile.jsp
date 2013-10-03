@@ -125,7 +125,7 @@
 				}
 			}
 			//Resetting the session object
-			'<% session.setAttribute("csvMsg", ""); %>';
+			'<% session.removeAttribute("csvMsg"); %>';
 			
 			
 			//To check whether the file selected has correct extension or not
