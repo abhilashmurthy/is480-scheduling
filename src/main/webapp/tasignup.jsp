@@ -82,6 +82,22 @@
                 left: 70%;
                 top: 12%;
             }
+			
+			.glow-top {
+				border-top: 1px solid #fff966 !important;
+				border-radius: 5px 5px 0px 0px; 
+				box-shadow: inset 0  16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
+			}
+			.glow-sides {
+				border-left: 1px solid #fff966 !important;
+				border-right: 1px solid #fff966 !important;
+				box-shadow: inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966;
+			}
+			.glow-bottom {
+				border-bottom: 1px solid #fff966 !important;
+				border-radius: 0px 0px 5px 5px; 
+				box-shadow: inset 0 -16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
+			}
 
         </style>
     </head>
@@ -131,7 +147,7 @@
                         <tr>
                             <td></td>
                             <td>
-                                <table id="timeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped"></table>
+                                <table class="timeslotsTable table-condensed table-hover table-bordered table-striped"></table>
                             </td>
                         </tr>
                     </table>
@@ -197,12 +213,12 @@
                 $("#milestoneTimeslotsSelect").val(milestones[0]).change(); //Select first milestone
 
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
-                    var tableId = "timeslotsTable";
-                    var table = $("#" + tableId);
-                    makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeString"));
+                    var tableClass = "timeslotsTable";
+                    var table = $("." + tableClass);
+                    makeTimeslotTable(tableClass, scheduleData, getDistinctDates(scheduleData, "typeString"));
 					convertScheduleData();
-                    populateTimeslotsTable(tableId, scheduleData);
-                    populateUnavailableTimeslots(tableId, scheduleData);
+                    populateTimeslotsTable(tableClass, scheduleData);
+                    populateUnavailableTimeslots(tableClass, scheduleData);
                 }
 
                 function getScheduleData(milestone, year, semester) {
@@ -260,7 +276,7 @@
                     scheduleData["timeslots"] = newTimeslots;
                 }
 
-                function makeTimeslotTable(tableId, scheduleData, dateArray) {
+                function makeTimeslotTable(tableClass, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
                     var minTime = 9;
                     var maxTime = 19;
@@ -274,7 +290,7 @@
                         thead.append(th);
                     }
                     //Inserting constructed table header into table
-                    $("#" + tableId).append(thead);
+                    $("." + tableClass).append(thead);
 
                     //Creating table body with times and empty cells
 //                    var tbody = $(document.createElement("tbody"));
@@ -308,11 +324,11 @@
                             }
                             tr.append(td);
                         }
-                        $("#" + tableId).append(tr);
+                        $("." + tableClass).append(tr);
                     }
 
                     //Inserting constructed table body into table
-//                    $("#" + tableId).append(tbody);
+//                    $("#" + tableClass).append(tbody);
                 }
 
                 /*
@@ -365,32 +381,76 @@
 					}
 					return false;
                 }
+				
+				//Hover glow effect
+                $('body').on('mouseenter', '.timeslotsTable tr:not(:has(table, th)) td:not(:first-child)', function(e) {
+					var $td = $(this);
+					var slotSize = scheduleData.duration / 30;
+					if ($td.hasClass('chosen') || $td.hasClass('unavailable')) {
+						//If hovering over a chosen timeslot
+						var $prevTr = $td.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($td.index()).children('div.start-marker').length) {
+								//Highlight this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									if (j === 0) {
+										$nextTr.children().eq($td.index()).addClass('glow-top');
+									}
+									$nextTr.children().eq($td.index()).addClass('glow-sides');
+									if (j === slotSize - 1) {
+										$nextTr.children().eq($td.index()).addClass('glow-bottom');
+									}
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					}
+					return false;
+                });
+                $('body').on('mouseleave', '.timeslotsTable td', function(e) {
+					var $td = $(this);
+					var slotSize = scheduleData.duration / 30;
+					if ($td.hasClass('glow-sides')) {
+						var $prevTr = $td.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($td.index()).hasClass('glow-top')) {
+								//Highlight this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									$nextTr.children().eq($td.index()).removeClass('glow-top glow-bottom glow-sides');
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					}
+                    return false;
+                });
+				
 
                 $('body').on('click', 'td.chosen , td.unavailable', function(e){
                     triggerTimeslot($(this));
                 });
 
-                function populateTimeslotsTable(tableId, scheduleData) {
+                function populateTimeslotsTable(tableClass, scheduleData) {
                     $(".timeslotcell").each(function(e) {
                         var self = $(this);
                         if (self.hasClass("markable")) {
                             triggerTimeslot(self);
                         }
-						if (self.attr('value') && scheduleData.timeslots[self.attr('value').split("_")[1]].taId === loggedInTaId) {
-							triggerTimeslot(self);
-						}
                     });
                 }
 
-                function populateUnavailableTimeslots(tableId, scheduleData) {
+                function populateUnavailableTimeslots(tableClass, scheduleData) {
                     $(".timeslotcell").each(function() {
                         var self = $(this);
-                        for (var i = 0; i < unavailableTimeslots.length; i++) {
-                            if (self.attr('value') === unavailableTimeslots[i]) {
-								console.log('triggering ' + self.attr('value'));
-                                triggerTimeslot(self);
-                            }
-                        }
+						if (self.attr('value') && scheduleData.timeslots[self.attr('value').split("_")[1]].taId === loggedInTaId) {
+							triggerTimeslot(self);
+						}
                     });
                 }
 
@@ -417,7 +477,7 @@
 					var timeslotsData = {};
                     var timeslot_data = new Array();
 
-                    var allTimeslots = $("td.unavailable > div.start-marker", "#timeslotsTable").get();
+                    var allTimeslots = $("td.unavailable > div.start-marker", ".timeslotsTable").get();
                     for (var i = 0; i < allTimeslots.length; i++) {
                         var obj = allTimeslots[i];
 						var timeslotId = parseInt(($(obj).parent().attr("value").split("_"))[1]);
@@ -428,13 +488,10 @@
 					timeslotsData["scheduleId"] = scheduleData.id;
                     
                     $.ajax({
-                        
                         type: 'POST',
                         url: 'taSignupJson',
                         data: {jsonData: JSON.stringify(timeslotsData)},
                         dataType: 'json'
-                        
-                        
                     }).done(function(response) {
                         if (!response.exception) {
                             if (response.success) {
