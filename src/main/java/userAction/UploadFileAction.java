@@ -104,13 +104,13 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				}
 
 				//5. Validate that TA's are at the start of the file
-				logger.info("Validating order of roles for TA");
-				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
-				if (errorInOrderOfRoles) {
-					session.setAttribute("csvMsg", "Wrong order of roles! TA's should be placed first in the file");
-					logger.error("Error with order of roles in csv upload");
-					return SUCCESS;
-				} 			
+//				logger.info("Validating order of roles for TA");
+//				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
+//				if (errorInOrderOfRoles) {
+//					session.setAttribute("csvMsg", "Wrong order of roles! TA's should be placed first in the file");
+//					logger.error("Error with order of roles in csv upload");
+//					return SUCCESS;
+//				} 			
 
 				//5. Validate for term names (should be the same throughout the file)
 //				logger.info("Validating term names");
@@ -743,67 +743,67 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating order of roles
-	private static boolean validateOrderOfRoles(File csvFile) {
-		boolean errorInOrderOfRoles = false;
-		try {
-			CSVReader reader = new CSVReader(new FileReader(csvFile));
-			int lineNo = 0;
-			String[] nextLine;
-			int taCount = 0;
-			//Getting the total number of admin, cc and ta's
-			while ((nextLine = reader.readNext()) != null) {
-				lineNo++;
-				if (lineNo != 1) {
-					if (nextLine[3].equalsIgnoreCase("TA")) {
-						taCount++;
-					}
-				}
-			}
-			reader.close();
-			
-			//Now validating order of roles
-			reader = new CSVReader(new FileReader(csvFile));
-			lineNo = 0;
-			int i = 0;
-			while (((nextLine = reader.readNext()) != null) && (i < taCount)) {
-				lineNo++;
-				if (lineNo != 1) {
-					if (!nextLine[3].equalsIgnoreCase("Administrator") && !nextLine[3].equalsIgnoreCase("Course Coordinator")
-						&& !nextLine[3].equalsIgnoreCase("TA")) {
-						errorInOrderOfRoles = true;
-						return errorInOrderOfRoles;
-					}
-					i++;
-				}
-			}
-			reader.close();
-		} catch (FileNotFoundException e) {
-			errorInOrderOfRoles = true;
-			logger.error("Exception caught: " + e.getMessage());
-			if (MiscUtil.DEV_MODE) {
-			   for (StackTraceElement s : e.getStackTrace()) {
-				   logger.debug(s.toString());
-			   }
-			}
-		} catch (IOException e) {
-			errorInOrderOfRoles = true;
-			logger.error("Exception caught: " + e.getMessage());
-			if (MiscUtil.DEV_MODE) {
-			   for (StackTraceElement s : e.getStackTrace()) {
-				   logger.debug(s.toString());
-			   }
-			}
-		} catch (Exception e) {
-			errorInOrderOfRoles = true;
-			logger.error("Exception caught: " + e.getMessage());
-			if (MiscUtil.DEV_MODE) {
-			   for (StackTraceElement s : e.getStackTrace()) {
-				   logger.debug(s.toString());
-			   }
-			}
-		}
-		return errorInOrderOfRoles;
-	}
+//	private static boolean validateOrderOfRoles(File csvFile) {
+//		boolean errorInOrderOfRoles = false;
+//		try {
+//			CSVReader reader = new CSVReader(new FileReader(csvFile));
+//			int lineNo = 0;
+//			String[] nextLine;
+//			int taCount = 0;
+//			//Getting the total number of admin, cc and ta's
+//			while ((nextLine = reader.readNext()) != null) {
+//				lineNo++;
+//				if (lineNo != 1) {
+//					if (nextLine[3].equalsIgnoreCase("TA")) {
+//						taCount++;
+//					}
+//				}
+//			}
+//			reader.close();
+//			
+//			//Now validating order of roles
+//			reader = new CSVReader(new FileReader(csvFile));
+//			lineNo = 0;
+//			int i = 0;
+//			while (((nextLine = reader.readNext()) != null) && (i < taCount)) {
+//				lineNo++;
+//				if (lineNo != 1) {
+//					if (!nextLine[3].equalsIgnoreCase("Administrator") && !nextLine[3].equalsIgnoreCase("Course Coordinator")
+//						&& !nextLine[3].equalsIgnoreCase("TA")) {
+//						errorInOrderOfRoles = true;
+//						return errorInOrderOfRoles;
+//					}
+//					i++;
+//				}
+//			}
+//			reader.close();
+//		} catch (FileNotFoundException e) {
+//			errorInOrderOfRoles = true;
+//			logger.error("Exception caught: " + e.getMessage());
+//			if (MiscUtil.DEV_MODE) {
+//			   for (StackTraceElement s : e.getStackTrace()) {
+//				   logger.debug(s.toString());
+//			   }
+//			}
+//		} catch (IOException e) {
+//			errorInOrderOfRoles = true;
+//			logger.error("Exception caught: " + e.getMessage());
+//			if (MiscUtil.DEV_MODE) {
+//			   for (StackTraceElement s : e.getStackTrace()) {
+//				   logger.debug(s.toString());
+//			   }
+//			}
+//		} catch (Exception e) {
+//			errorInOrderOfRoles = true;
+//			logger.error("Exception caught: " + e.getMessage());
+//			if (MiscUtil.DEV_MODE) {
+//			   for (StackTraceElement s : e.getStackTrace()) {
+//				   logger.debug(s.toString());
+//			   }
+//			}
+//		}
+//		return errorInOrderOfRoles;
+//	}
 	
 	//Validating term names
 //	private static String validateTermNames(File csvFile) {

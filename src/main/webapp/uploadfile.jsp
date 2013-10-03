@@ -93,7 +93,6 @@
 					<li>Please do not use this feature to overwrite existing data</li>
 					<li>Please ensure the file contains data for 1 semester only </li>
 					<li>Please do not include Administrator and Course Coordinator in the file</li>
-					<li>Please ensure TA information is at the start of the file</li>
 					<li>Please ensure that for every team - Students are listed first followed <br/>by Supervisor and Reviewers</li>
 					<li>Please ensure every Team has a name</li>
 					<li>Please ensure every Student has a username</li>
