@@ -84,6 +84,10 @@
 			<div class="well well-small" style="float:right">
 				<h5>Note</h5>
 				<ul style='font-size: 13px'>
+					<li>Download Sample CSV File:
+						<a href="SampleCSVFile/is480SampleFileUpload.csv" target="_blank">
+						Sample File</a>
+					</li>
 					<li>Please ensure that you have created a new schedule before uploading </li>
 					<li>Please upload a single-tabbed CSV file only</li>
 					<li>Please do not use this feature to overwrite existing data</li>
