@@ -36,7 +36,7 @@
 				<tbody>
 					<tr>
 						<td>
-						<select id="termChosen" name="termChosen" onchange="updateActiveTerm();">
+						<select id="termChosen" name="termChosen">
 							<option value=""></option>
 							<s:iterator value="dataList">
 								<option value="<s:property value="termId"/>">
@@ -221,7 +221,8 @@
 //				alert(JSON.stringify(fileJson));
 			});
 			
-			function updateActiveTerm() {
+			$('#termChosen').on('change', function() {
+				alert("haha");
 				var termId = $("#termChosen").val();
 				var termData = {};
 				termData['termId'] = termId;
@@ -243,7 +244,7 @@
 					console.log(response);
 					showNotification("WARNING", "Oops. Something went wrong. Please select the term again!");
 				});
-			}
+			});
 
 			//Notification-------------
 			function showNotification(action, notificationMessage) {
