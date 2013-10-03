@@ -925,8 +925,9 @@
                 
                 $('body').on('click', '.timeslotcell', function(e) {
 					if (selectedSchedule.isCreated) return false; //If created already, disable timeslot selection
-                    console.log("clicked timeslotcell");
                     triggerTimeslot($(this));
+					$(this).trigger('mouseleave');
+					$(this).trigger('mouseenter');
                     return false;
                 });
 				

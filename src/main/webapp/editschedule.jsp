@@ -819,6 +819,8 @@
                 $('body').on('click', '.timeslotcell', function(e) {
 					if ($(this).is('.teamExists')) return false;
                     triggerTimeslot($(this));
+					$(this).trigger('mouseleave');
+					$(this).trigger('mouseenter');
                     return false;
                 });
 				
