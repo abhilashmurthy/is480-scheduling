@@ -222,7 +222,6 @@
 			});
 			
 			$('#termChosen').on('change', function() {
-				alert("haha");
 				var termId = $("#termChosen").val();
 				var termData = {};
 				termData['termId'] = termId;
