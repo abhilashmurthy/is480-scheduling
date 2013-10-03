@@ -146,6 +146,21 @@
 				margin-bottom: 0 !important;
             }
 			
+			.glow-top {
+				border-top: 1px solid #fff966 !important;
+				box-shadow: inset 0  16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
+				
+			}
+			.glow-sides {
+				border-left: 1px solid #fff966 !important;
+				border-right: 1px solid #fff966 !important;
+				box-shadow: inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966;
+			}
+			.glow-bottom {
+				border-bottom: 1px solid #fff966 !important;
+				box-shadow: inset 0 -16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
+			}
+			
         </style>
     </head>
     <body>
@@ -912,6 +927,75 @@
 					if (selectedSchedule.isCreated) return false; //If created already, disable timeslot selection
                     console.log("clicked timeslotcell");
                     triggerTimeslot($(this));
+                    return false;
+                });
+				
+				//Hover glow effect
+                $('body').on('mouseenter', '.timeslotsTable tr:not(:has(table, th)) td:not(:first-child)', function(e) {
+					var $td = $(this);
+					var slotSize = selectedSchedule.duration / 30;
+					if ($td.hasClass('chosen')) {
+						//If hovering over a chosen timeslot
+						var $prevTr = $td.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($td.index()).children('div.start-marker').length) {
+								//Highlight this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									if (j === 0) {
+										$nextTr.children().eq($td.index()).addClass('glow-top');
+									}
+									$nextTr.children().eq($td.index()).addClass('glow-sides');
+									if (j === slotSize - 1) {
+										$nextTr.children().eq($td.index()).addClass('glow-bottom');
+									}
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					} else {
+						//If hovering over an empty timeslot
+						var $nextTr = $td.closest('tr');
+						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false;
+						for (var j = 0; j < slotSize; j++) {
+							if ($nextTr.children().eq($td.index()).hasClass('teamExists')) return false; //Invalid timeslot
+							$nextTr = $nextTr.next();
+						}
+						$nextTr = $td.closest('tr');
+						for (var i = 0; i < slotSize; i++) {
+							if (i === 0) {
+								$nextTr.children().eq($td.index()).addClass('glow-top');
+							}
+							$nextTr.children().eq($td.index()).addClass('glow-sides');
+							if (i === slotSize - 1) {
+								$nextTr.children().eq($td.index()).addClass('glow-bottom');
+							}
+							$nextTr = $nextTr.next();
+						}
+					}
+					return false;
+                });
+                $('body').on('mouseleave', '.timeslotsTable td', function(e) {
+					var $td = $(this);
+					console.log('leaving');
+					var slotSize = selectedSchedule.duration / 30;
+					if ($td.hasClass('glow-sides')) {
+						var $prevTr = $td.closest('tr');
+						for (var i = slotSize; i > 0; i--) {
+							if ($prevTr.children().eq($td.index()).hasClass('glow-top')) {
+								//Highlight this timeslot
+								var $nextTr = $prevTr;
+								for (var j = 0; j < slotSize; j++) {
+									$nextTr.children().eq($td.index()).removeClass('glow-top glow-bottom glow-sides');
+									$nextTr = $nextTr.next();
+								}
+								break;
+							}
+							$prevTr = $prevTr.prev();
+						}
+					}
                     return false;
                 });
                 

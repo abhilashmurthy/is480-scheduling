@@ -15,7 +15,7 @@
 <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 <link href="css/bootstrap-switch.css" rel="stylesheet">
 <!-- CSS specific to Fuel UX -->
-<link href="//fuelcdn.com/fuelux/2.3/css/fuelux.css" rel="stylesheet" />
+<link href="css/fuelux.css" rel="stylesheet" />
 
 <!-- Google Fonts -->
 <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
