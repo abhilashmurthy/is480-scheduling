@@ -6,8 +6,11 @@ package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -78,6 +81,14 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
                 faculty.setUnavailableTimeslots(availability);
                 em.persist(faculty);
                 em.getTransaction().commit();
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				
+				List<String> unavailableTimeslots = new ArrayList<String>();
+				for (Timeslot t : availability) {
+					unavailableTimeslots.add("timeslot_" + t.getId());
+				}
+				json.put("unavailableTimeslots", unavailableTimeslots);
 
                 //Reloading the user object in the session
                 request.getSession().setAttribute("user", faculty);

@@ -148,8 +148,8 @@
 			
 			.glow-top {
 				border-top: 1px solid #fff966 !important;
+				border-radius: 5px 5px 0px 0px; 
 				box-shadow: inset 0  16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
-				
 			}
 			.glow-sides {
 				border-left: 1px solid #fff966 !important;
@@ -158,6 +158,7 @@
 			}
 			.glow-bottom {
 				border-bottom: 1px solid #fff966 !important;
+				border-radius: 0px 0px 5px 5px; 
 				box-shadow: inset 0 -16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
 			}
 			
