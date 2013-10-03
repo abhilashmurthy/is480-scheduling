@@ -26,7 +26,7 @@
 		 
         <div class="container">
 			<h3>CSV Upload</h3>
-			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
+			<form id="uploadForm" enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
 			<%--<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">--%>
 			<div style="float: left; margin-right: 50px;">
 			<table class="table table-hover" style="width:auto">
@@ -58,7 +58,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="file" id="fileUploaded" name="file" onchange="checkFile(this);" />
+							<input type="file" id="fileUploaded" name="file" />
 							<%--<s:file name="file" onchange="checkFile(this);"></s:file>--%>
 						</td>
 					</tr>
@@ -129,19 +129,19 @@
 			
 			
 			//To check whether the file selected has correct extension or not
-			function checkFile(sender) {
-//				var validExts = new Array(".xlsx", ".xls", ".csv");
-				var validExts = new Array(".csv");
-				var fileExt = sender.value;
-				fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
-				if (validExts.indexOf(fileExt) < 0) {
-					showNotification("ERROR", "Invalid file selected! File should be " +
-						   validExts.toString() + " type!");
-					return false;
-				} else {
-					return true;
-				}
-			}
+//			function checkFile(sender) {
+////				var validExts = new Array(".xlsx", ".xls", ".csv");
+//				var validExts = new Array(".csv");
+//				var fileExt = sender.value;
+//				fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+//				if (validExts.indexOf(fileExt) < 0) {
+//					showNotification("ERROR", "Invalid file selected! File should be " +
+//						   validExts.toString() + " type!");
+//					return false;
+//				} else {
+//					return true;
+//				}
+//			}
 			
 			//Submit changes to backend
 			$('#submitFormBtn').click(function(e) {
@@ -193,15 +193,19 @@
 					return false;
 				}
 				
-//				var termText = $("#termChosen option:selected").html();
-//				var a = bootbox.confirm({
-//					message: "Are you sure you want to upload <b>" + $('#fileUploaded').val() + "</b> for <b>" + termText + "</b>?",
-//				});
-//				if (!a) {
-//					$("#submitFormBtn").button('reset');
-//					return false;
-//				}
-				return true;
+				var termText = $("#termChosen option:selected").html();
+				var a = bootbox.confirm({
+					message: "Are you sure you want to upload <b>" + $('#fileUploaded').val() + "</b> for <b>" + termText + "</b>?",
+					callback: function(result) {
+						if (!result) {
+							$("#submitFormBtn").button('reset');
+						} else {
+							$("#uploadForm").trigger('submit');
+						}
+					}
+				});
+				
+				return false;
 //				var fileJson = {};
 //				fileJson['termId'] = termSelected;
 //				fileJson['fileUploaded'] = file;
