@@ -28,6 +28,8 @@ import model.User;
 import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -823,7 +825,24 @@ public class DBInitUtil {
 		
 		Settings manageNotifications = new Settings();
 		manageNotifications.setName("manageNotifications");
-		manageNotifications.setValue("[{email[status:frequency],On,2,}{sms[status:frequency],On,24,}]");
+		
+		JSONArray notificationArray = new JSONArray();
+
+		JSONObject email = new JSONObject();
+		JSONObject sms = new JSONObject();
+		
+		email.put("emailStatus","On");
+		email.put("emailFrequency","1");
+		notificationArray.put(0,email);
+
+
+		sms.put("smsStatus","On");
+		sms.put("smsFrequency","24");
+		notificationArray.put(1,sms);
+			
+		manageNotifications.setValue(notificationArray.toString());
+		
+		
         //Persistence
         em.persist(activeTerms);
         em.persist(defaultTerm);

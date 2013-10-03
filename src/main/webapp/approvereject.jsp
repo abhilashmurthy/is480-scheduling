@@ -86,7 +86,7 @@
 									</td>
 									<td>
 										<button type="button" class="btn btn-success" id="approve" value="<s:property value="bookingId"/>" 
-												name="approve" onClick="approveBooking(this);">
+												name="approve" onclick="approveBooking(this);">
 											Approve
 										</button>
 										<span class="button-divider">
@@ -147,24 +147,24 @@
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 		<script type="text/javascript">
-
 		function approveBooking(e) {
 			//Disabling all buttons on page to avoid multiple clicking
 			$('button[type=button]').attr('disabled', true);
-			
+
 			var bookingId =  $(e).val();
 			console.log(bookingId);
 			var id = $(e).attr("id");
 			console.log(id);
-			
+
 			var bookingArray = {};
 			if (id === 'approve') {
 				bookingArray['bookingId'] = bookingId;
 				bookingArray['status'] = "approve";
 			} 			
 			submitBookingData(bookingArray);
+			return false;
 		}
-		
+
 		//AJAX call
 		function submitBookingData(bookingArray) {
 //			alert(JSON.stringify(bookingArray));
@@ -181,7 +181,7 @@
 						   showNotification("ERROR", response.message);
 					   }
 //					   window.location.reload(true);
-					   timedRefresh(2000);
+					   timedRefresh(2500);
 //					   $('button[type=button]').attr('disabled', false);
 				   } else {
 					   var eid = btoa(response.message);
@@ -194,13 +194,13 @@
 				});
 				return false;
 		}
-		
+
 		function rejectBooking(e) {
 			//Disabling all buttons on page to avoid multiple clicking
 			$('#rejectionModal').modal({
 				keyboard: true
 			});
-			
+
 			$('#rejectionModal').on('shown', function () {
 				$('#rejectionText').focus();
 			});
@@ -208,7 +208,7 @@
 			var bookingId =  $(e).val();
 //			$('#bookingIdValue').val(bookingId);
 			var id = $(e).attr("id");
-		
+
 			$('#rejectionTextSubmit').click(function(){
 				if ($('#rejectionText').val() === "") {
 				  //$('#rejectionText').next('.help-inline').show();
@@ -220,13 +220,15 @@
 					bookingArray['bookingId'] = bookingId;
 					bookingArray['status'] = "reject";
 					bookingArray['rejectReason'] = $('#rejectionText').val();
+					$('#rejectionModal').modal('hide');
 					//return true;
 	//					alert(JSON.stringify(bookingArray));	
 					submitBookingData(bookingArray);
 				}
+				return false;
 			});
 		}  //end of reject
-		 
+
 		//Deleting the data in the modal once it is hidden
 		$('#rejectionModal').on('hidden', function() {
 //			console.log("hidden");
@@ -235,11 +237,11 @@
 //			$("#errorMsg").hide();
 			location.reload(true);
 		});
-		
+
 		function timedRefresh(timeoutPeriod) {
 			setTimeout("location.reload(true);", timeoutPeriod);
 		}
-			
+
 		//For data tables
 		$(document).ready(function(){
 			$('#approveRejectTable').dataTable({
@@ -256,14 +258,14 @@
 				//To prevent highlighing of sorted column
 				"bSortClasses": false
 			});
-			
+
 			$('.dataTables_filter input').attr("placeholder", "e.g. Acceptance");
 			$('.dataTables_filter input').attr("title", "Search any keyword in the table below");
 			$('.dataTables_filter input').on('mouseenter', function(){
 				$(this).tooltip('show');
 			});
 		});
-		
+
 		//Notification-------------
 		function showNotification(action, notificationMessage) {
 			var opts = {
@@ -314,7 +316,7 @@
 //				}
 //			}
 //		}
-		
+
 		//To validate the form (Make sure all checkboxes have been checked
 //		function valthisform() {
 //			var checkboxs=document.getElementsByName("approveRejectArray");
@@ -330,7 +332,7 @@
 //			}
 //			return true;
 //		}
-		
+
 //		jQuery(document).ready(function(){
 //			if(document.getElementById('approveRejectArray') === null) {
 //				 document.getElementById("approveButton").style.visibility = "hidden";
@@ -340,7 +342,7 @@
 //				document.getElementById("rejectButton").style.visibility = "visible";
 //			}
 //		});
-		
+
 		//Disabling buttons when checkboxes are unchecked and vice-versa
 //		$(document).ready(function (){
 //			$('#approveButton').attr('disabled','disabled');

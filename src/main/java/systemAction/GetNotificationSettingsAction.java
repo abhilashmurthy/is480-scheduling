@@ -13,8 +13,11 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
+import model.Settings;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -42,15 +45,43 @@ public class GetNotificationSettingsAction extends ActionSupport implements Serv
 			if (user.getRole().equals(Role.ADMINISTRATOR) || user.getRole().equals(Role.COURSE_COORDINATOR)) {
 
 				//Getting the email settings value
-				String settingsList = SettingsManager.getNotificationSettings(em);
-				String[] setArr = settingsList.split(",");
+				Settings notificationSettings = SettingsManager.getNotificationSettings(em);
+				
+				JSONArray notificationArray = new JSONArray(notificationSettings.getValue());
+				//String[] setArr = settingsList.split(",");
 				
 				HashMap<String, Object> map = new HashMap<String, Object>();
+				
+				//loop through the milestonArray
+				for (int i = 0; i < notificationArray.length(); i++) {
+					
+					JSONObject obj = notificationArray.getJSONObject(i);
+					
+					if(i==0){
+						String getEmailStatus = obj.getString("emailStatus");
+						int emailFrequency = obj.getInt("emailFrequency");
+						
+						map.put("emailStatus",getEmailStatus);
+						map.put("emailFrequency",emailFrequency);
+						
+						
+					}else{
+						String smsEmailStatus = obj.getString("smsStatus");
+						int smsFrequency = obj.getInt("smsFrequency");
+						
+						map.put("smsStatus",smsEmailStatus);
+						map.put("smsFrequency",smsFrequency);
+						
+					}
 
-				map.put("emailStatus",setArr[1]);
+				}
+				
+				
+
+				/*map.put("emailStatus",setArr[1]);
 				map.put("emailFrequency",setArr[2]);
 				map.put("smsStatus",setArr[4]);
-				map.put("smsFrequency",setArr[5]);
+				map.put("smsFrequency",setArr[5]);*/
 				data.add(map);
 			} else {
 				//Incorrect user role
