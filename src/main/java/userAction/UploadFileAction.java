@@ -64,10 +64,19 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 
 				logger.info("Extracting data from CSV File started");
 
-				CSVReader reader = new CSVReader(new FileReader(csvFile));
+//				CSVReader reader = new CSVReader(new FileReader(csvFile));
 
 				//<--------------------Validation checks for the csv file---------------------->
-				//1. Validate that every user has a username or a "-"
+				//1. Validate that there are no empty cells in the csv file for the 4 columns
+				logger.info("Validating for empty cells in the relevant part of the csv file");
+				boolean errorWithEmptyCells = validateEmptyCells(csvFile);
+				if (errorWithEmptyCells) {
+					session.setAttribute("csvMsg", "Wrong Structure! There are blank cells in the csv file!");
+					logger.error("Error due to blank cells in csv file");
+					return SUCCESS;
+				}
+				
+				//2. Validate that every user has a username or a "-"
 				logger.info("Validating usernames");
 				boolean errorInUsername = validateUsernames(csvFile);
 				if (errorInUsername) {
@@ -76,7 +85,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 					return SUCCESS;
 				}
 
-				//2. Validate roles of each user
+				//3. Validate roles of each user
 				logger.info("Validating user roles");
 				boolean errorInRole = validateRoles(csvFile);
 				if (errorInRole) {
@@ -85,7 +94,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 					return SUCCESS;
 				}
 
-				//3. Validate for team names
+				//4. Validate for team names
 				logger.info("Validating team names");
 				boolean errorInTeamName = validateTeamNames(csvFile);
 				if (errorInTeamName) {
@@ -94,14 +103,14 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 					return SUCCESS;
 				}
 
-				//4. Validate that TA's are at the start of the file
-				logger.info("Validating order of roles for TA");
-				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
-				if (errorInOrderOfRoles) {
-					session.setAttribute("csvMsg", "Wrong order of roles! TA's should be placed first in the file");
-					logger.error("Error with order of roles in csv upload");
-					return SUCCESS;
-				} 			
+				//5. Validate that TA's are at the start of the file
+//				logger.info("Validating order of roles for TA");
+//				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
+//				if (errorInOrderOfRoles) {
+//					session.setAttribute("csvMsg", "Wrong order of roles! TA's should be placed first in the file");
+//					logger.error("Error with order of roles in csv upload");
+//					return SUCCESS;
+//				} 			
 
 				//5. Validate for term names (should be the same throughout the file)
 //				logger.info("Validating term names");
@@ -538,6 +547,53 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 		return null;
 	}
 	
+	//Validating for empty cells in the csv file
+	private static boolean validateEmptyCells(File csvFile) {
+		boolean errorWithEmptyCells = false;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
+			int lineNo = 0;
+			String[] nextLine;
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (!(nextLine[0].length() > 0) || !(nextLine[1].length() > 0) || !(nextLine[2].length() > 0) 
+						|| !(nextLine[3].length() > 0)) {
+						errorWithEmptyCells = true;
+						return errorWithEmptyCells;
+					} 
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			errorWithEmptyCells = true;
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			errorWithEmptyCells = true;
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (Exception e) {
+			errorWithEmptyCells = true;
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return errorWithEmptyCells;
+	}
+	
+	
 	//Validating usernames
 	private static boolean validateUsernames(File csvFile) {
 		boolean errorInUsername = false;
@@ -556,6 +612,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			errorInUsername = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -563,6 +620,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			errorInUsername = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -570,6 +628,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			errorInUsername = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -604,6 +663,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			errorInRole = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -611,6 +671,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			errorInRole = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -618,6 +679,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			errorInRole = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -653,6 +715,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			errorInTeamName = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -660,6 +723,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			errorInTeamName = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -667,6 +731,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			errorInTeamName = true;
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -678,64 +743,67 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating order of roles
-	private static boolean validateOrderOfRoles(File csvFile) {
-		boolean errorInOrderOfRoles = false;
-		try {
-			CSVReader reader = new CSVReader(new FileReader(csvFile));
-			int lineNo = 0;
-			String[] nextLine;
-			int taCount = 0;
-			//Getting the total number of admin, cc and ta's
-			while ((nextLine = reader.readNext()) != null) {
-				lineNo++;
-				if (lineNo != 1) {
-					if (nextLine[3].equalsIgnoreCase("TA")) {
-						taCount++;
-					}
-				}
-			}
-			reader.close();
-			
-			//Now validating order of roles
-			reader = new CSVReader(new FileReader(csvFile));
-			lineNo = 0;
-			int i = 0;
-			while (((nextLine = reader.readNext()) != null) && (i < taCount)) {
-				lineNo++;
-				if (lineNo != 1) {
-					if (!nextLine[3].equalsIgnoreCase("Administrator") && !nextLine[3].equalsIgnoreCase("Course Coordinator")
-						&& !nextLine[3].equalsIgnoreCase("TA")) {
-						errorInOrderOfRoles = true;
-						return errorInOrderOfRoles;
-					}
-					i++;
-				}
-			}
-			reader.close();
-		} catch (FileNotFoundException e) {
-			logger.error("Exception caught: " + e.getMessage());
-			if (MiscUtil.DEV_MODE) {
-			   for (StackTraceElement s : e.getStackTrace()) {
-				   logger.debug(s.toString());
-			   }
-			}
-		} catch (IOException e) {
-			logger.error("Exception caught: " + e.getMessage());
-			if (MiscUtil.DEV_MODE) {
-			   for (StackTraceElement s : e.getStackTrace()) {
-				   logger.debug(s.toString());
-			   }
-			}
-		} catch (Exception e) {
-			logger.error("Exception caught: " + e.getMessage());
-			if (MiscUtil.DEV_MODE) {
-			   for (StackTraceElement s : e.getStackTrace()) {
-				   logger.debug(s.toString());
-			   }
-			}
-		}
-		return errorInOrderOfRoles;
-	}
+//	private static boolean validateOrderOfRoles(File csvFile) {
+//		boolean errorInOrderOfRoles = false;
+//		try {
+//			CSVReader reader = new CSVReader(new FileReader(csvFile));
+//			int lineNo = 0;
+//			String[] nextLine;
+//			int taCount = 0;
+//			//Getting the total number of admin, cc and ta's
+//			while ((nextLine = reader.readNext()) != null) {
+//				lineNo++;
+//				if (lineNo != 1) {
+//					if (nextLine[3].equalsIgnoreCase("TA")) {
+//						taCount++;
+//					}
+//				}
+//			}
+//			reader.close();
+//			
+//			//Now validating order of roles
+//			reader = new CSVReader(new FileReader(csvFile));
+//			lineNo = 0;
+//			int i = 0;
+//			while (((nextLine = reader.readNext()) != null) && (i < taCount)) {
+//				lineNo++;
+//				if (lineNo != 1) {
+//					if (!nextLine[3].equalsIgnoreCase("Administrator") && !nextLine[3].equalsIgnoreCase("Course Coordinator")
+//						&& !nextLine[3].equalsIgnoreCase("TA")) {
+//						errorInOrderOfRoles = true;
+//						return errorInOrderOfRoles;
+//					}
+//					i++;
+//				}
+//			}
+//			reader.close();
+//		} catch (FileNotFoundException e) {
+//			errorInOrderOfRoles = true;
+//			logger.error("Exception caught: " + e.getMessage());
+//			if (MiscUtil.DEV_MODE) {
+//			   for (StackTraceElement s : e.getStackTrace()) {
+//				   logger.debug(s.toString());
+//			   }
+//			}
+//		} catch (IOException e) {
+//			errorInOrderOfRoles = true;
+//			logger.error("Exception caught: " + e.getMessage());
+//			if (MiscUtil.DEV_MODE) {
+//			   for (StackTraceElement s : e.getStackTrace()) {
+//				   logger.debug(s.toString());
+//			   }
+//			}
+//		} catch (Exception e) {
+//			errorInOrderOfRoles = true;
+//			logger.error("Exception caught: " + e.getMessage());
+//			if (MiscUtil.DEV_MODE) {
+//			   for (StackTraceElement s : e.getStackTrace()) {
+//				   logger.debug(s.toString());
+//			   }
+//			}
+//		}
+//		return errorInOrderOfRoles;
+//	}
 	
 	//Validating term names
 //	private static String validateTermNames(File csvFile) {

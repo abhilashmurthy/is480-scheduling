@@ -26,7 +26,7 @@
 		 
         <div class="container">
 			<h3>CSV Upload</h3>
-			<form enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
+			<form id="uploadForm" enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
 			<%--<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">--%>
 			<div style="float: left; margin-right: 50px;">
 			<table class="table table-hover" style="width:auto">
@@ -58,7 +58,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="file" id="fileUploaded" name="file" onchange="checkFile(this);" />
+							<input type="file" id="fileUploaded" name="file" />
 							<%--<s:file name="file" onchange="checkFile(this);"></s:file>--%>
 						</td>
 					</tr>
@@ -84,12 +84,15 @@
 			<div class="well well-small" style="float:right">
 				<h5>Note</h5>
 				<ul style='font-size: 13px'>
+					<li>Download Sample CSV File:
+						<a href="SampleCSVFile/is480SampleFileUpload.csv" target="_blank">
+						Sample File</a>
+					</li>
 					<li>Please ensure that you have created a new schedule before uploading </li>
 					<li>Please upload a single-tabbed CSV file only</li>
 					<li>Please do not use this feature to overwrite existing data</li>
 					<li>Please ensure the file contains data for 1 semester only </li>
 					<li>Please do not include Administrator and Course Coordinator in the file</li>
-					<li>Please ensure TA information is at the start of the file</li>
 					<li>Please ensure that for every team - Students are listed first followed <br/>by Supervisor and Reviewers</li>
 					<li>Please ensure every Team has a name</li>
 					<li>Please ensure every Student has a username</li>
@@ -121,23 +124,23 @@
 				}
 			}
 			//Resetting the session object
-			'<% session.setAttribute("csvMsg", ""); %>';
+			'<% session.removeAttribute("csvMsg"); %>';
 			
 			
 			//To check whether the file selected has correct extension or not
-			function checkFile(sender) {
-//				var validExts = new Array(".xlsx", ".xls", ".csv");
-				var validExts = new Array(".csv");
-				var fileExt = sender.value;
-				fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
-				if (validExts.indexOf(fileExt) < 0) {
-					showNotification("ERROR", "Invalid file selected! File should be " +
-						   validExts.toString() + " type!");
-					return false;
-				} else {
-					return true;
-				}
-			}
+//			function checkFile(sender) {
+////				var validExts = new Array(".xlsx", ".xls", ".csv");
+//				var validExts = new Array(".csv");
+//				var fileExt = sender.value;
+//				fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+//				if (validExts.indexOf(fileExt) < 0) {
+//					showNotification("ERROR", "Invalid file selected! File should be " +
+//						   validExts.toString() + " type!");
+//					return false;
+//				} else {
+//					return true;
+//				}
+//			}
 			
 			//Submit changes to backend
 			$('#submitFormBtn').click(function(e) {
@@ -189,15 +192,19 @@
 					return false;
 				}
 				
-//				var termText = $("#termChosen option:selected").html();
-//				var a = bootbox.confirm({
-//					message: "Are you sure you want to upload <b>" + $('#fileUploaded').val() + "</b> for <b>" + termText + "</b>?",
-//				});
-//				if (!a) {
-//					$("#submitFormBtn").button('reset');
-//					return false;
-//				}
-				return true;
+				var termText = $("#termChosen option:selected").html();
+				var a = bootbox.confirm({
+					message: "Are you sure you want to upload <b>" + $('#fileUploaded').val() + "</b> for <b>" + termText + "</b>?",
+					callback: function(result) {
+						if (!result) {
+							$("#submitFormBtn").button('reset');
+						} else {
+							$("#uploadForm").trigger('submit');
+						}
+					}
+				});
+				
+				return false;
 //				var fileJson = {};
 //				fileJson['termId'] = termSelected;
 //				fileJson['fileUploaded'] = file;
