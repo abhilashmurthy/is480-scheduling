@@ -20,6 +20,7 @@ import model.Settings;
 import model.Timeslot;
 import model.User;
 import notification.email.RejectedBookingEmail;
+import org.hibernate.Hibernate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.Job;
@@ -90,12 +91,18 @@ public class ClearPendingBookingJob implements Job {
                 cal.clear();
                 cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
                 cal.add(Calendar.DATE, noOfDaysToRespond);
-//                cal.add(Calendar.MINUTE, noOfDaysToRespond); //For testing
+                //cal.add(Calendar.MINUTE, noOfDaysToRespond); //For testing
                 Timestamp dueDate = new Timestamp(cal.getTimeInMillis());
                 //Delete booking is date is passed
                 if (now.after(dueDate)) {
                     //Send an email to inform that booking has been rejected by system
 					if(isOn){
+						logger.debug("email sending now");
+						
+						//Forcing initialization for sending email
+						Hibernate.initialize(pendingBooking.getTeam().getMembers());
+						Hibernate.initialize(pendingBooking.getTimeslot().getSchedule().getMilestone());
+						
 						RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(pendingBooking, systemAsUser);
 						rejectedEmail.sendEmail();
 					}
