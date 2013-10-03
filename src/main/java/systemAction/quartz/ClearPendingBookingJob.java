@@ -20,6 +20,8 @@ import model.Settings;
 import model.Timeslot;
 import model.User;
 import notification.email.RejectedBookingEmail;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -50,18 +52,25 @@ public class ClearPendingBookingJob implements Job {
             em = MiscUtil.getEntityManagerInstance();
 			
 			//get the number of days for email reminder
-			Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
-			String value = currentSettings.getValue();
+			//Getting the email settings value
+			Settings notificationSettings = SettingsManager.getNotificationSettings(em);
+
+			JSONArray notificationArray = new JSONArray(notificationSettings.getValue());
 			
-			//convert settingsDetails into an array
-			String[] setArr = value.split(",");
+			//get email settings
+			JSONObject obj = notificationArray.getJSONObject(0);
+			String getEmailStatus = obj.getString("emailStatus");
+			int emailFrequency = obj.getInt("emailFrequency");
 			
 			//get the number of days
-			noOfDaysToRespond = Integer.parseInt(setArr[2]);
+			noOfDaysToRespond = emailFrequency;
 			
 			//see if the email functionality is set as on
-			boolean isOn = Boolean.parseBoolean(setArr[1]);
-            
+			boolean isOn = false;
+			
+			if(getEmailStatus.equalsIgnoreCase("On")){
+				 isOn = true;
+			}
             em.getTransaction().begin();
             
             User systemAsUser = new User("is480.scheduling", "IS480 Scheduling System", null, null, null);
