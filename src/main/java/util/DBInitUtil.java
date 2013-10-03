@@ -830,6 +830,7 @@ public class DBInitUtil {
 
 		JSONObject email = new JSONObject();
 		JSONObject sms = new JSONObject();
+		JSONObject clearEmail = new JSONObject();
 		
 		email.put("emailStatus","On");
 		email.put("emailFrequency","1");
@@ -839,6 +840,10 @@ public class DBInitUtil {
 		sms.put("smsStatus","On");
 		sms.put("smsFrequency","24");
 		notificationArray.put(1,sms);
+		
+		clearEmail.put("emailClearStatus","On");
+		clearEmail.put("emailClearFrequency","2");
+		notificationArray.put(2,clearEmail);
 			
 		manageNotifications.setValue(notificationArray.toString());
 		

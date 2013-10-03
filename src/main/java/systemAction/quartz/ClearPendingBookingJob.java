@@ -59,9 +59,9 @@ public class ClearPendingBookingJob implements Job {
 			JSONArray notificationArray = new JSONArray(notificationSettings.getValue());
 			
 			//get email settings
-			JSONObject obj = notificationArray.getJSONObject(0);
-			String getEmailStatus = obj.getString("emailStatus");
-			int emailFrequency = obj.getInt("emailFrequency");
+			JSONObject obj = notificationArray.getJSONObject(2);
+			String getEmailStatus = obj.getString("emailClearStatus");
+			int emailFrequency = obj.getInt("emailClearFrequency");
 			
 			//get the number of days
 			noOfDaysToRespond = emailFrequency;

@@ -27,6 +27,8 @@ import model.User;
 import model.role.Faculty;
 import notification.email.FacultyReminderEmail;
 import org.hibernate.Hibernate;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -45,12 +47,14 @@ public class RemindPendingBookingJob implements Job {
 
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         logger.debug("Started faculty reminder");
-		//Initializing run log to be stored in database
-		CronLog logItem = new CronLog();
-		logItem.setJobName("Remind faculty Bookings");
+		
 		Calendar cal = Calendar.getInstance();
 		Timestamp now = new Timestamp(cal.getTimeInMillis());
+		
+		CronLog logItem = new CronLog();
+		logItem.setJobName("Remind faculty on booking");
 		logItem.setRunTime(now);
+		
 		
         EntityManager em = null;
         
@@ -58,17 +62,25 @@ public class RemindPendingBookingJob implements Job {
             em = MiscUtil.getEntityManagerInstance();
 			
 			//get the number of days for email reminder
-			Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
-			String value = currentSettings.getValue();
+			Settings notificationSettings = SettingsManager.getNotificationSettings(em);
+
+			JSONArray notificationArray = new JSONArray(notificationSettings.getValue());
 			
-			//convert settingsDetails into an array
-			String[] setArr = value.split(",");
+			//get email settings
+			JSONObject obj = notificationArray.getJSONObject(0);
+			String getEmailStatus = obj.getString("emailStatus");
+			int emailFrequency = obj.getInt("emailFrequency");
 			
 			//get the number of days
-			noOfDaysToRespond = Integer.parseInt(setArr[2]);
-			noOfDaysToRespond--;
+			noOfDaysToRespond = emailFrequency ;
+			//noOfDaysToRespond++;
+			
 			//see if the email functionality is set as on
-			boolean isOn = Boolean.parseBoolean(setArr[1]);
+			boolean isOn = false;
+			
+			if(getEmailStatus.equalsIgnoreCase("On")){
+				isOn = true;
+			}
 
             em.getTransaction().begin();
             List<Booking> pendingBookings = null;
@@ -93,7 +105,7 @@ public class RemindPendingBookingJob implements Job {
                         logger.debug(" the difference between due and now" + (long)difference);
                         
                         //if difference between due date and current time is less than or equal 24hours
-                        if ((long)dueDate1.getTime()-(long)now.getTime() <= noOfDaysToRespond*86400000 && isOn) {
+                        if ((long)dueDate1.getTime()-(long)now.getTime() == (noOfDaysToRespond*86400000) && isOn) {
                             logger.debug("Booking: " + pendingBooking + ". First Reminder sent.");
 							
 							//get response list
@@ -103,9 +115,14 @@ public class RemindPendingBookingJob implements Job {
 								
 								User user = entry.getKey();
 								Response response = entry.getValue();
-								
 
 								if(user.getRole().equals(Role.FACULTY) && response.equals(Response.PENDING)){
+									
+									//cronlog that reminder for this booking has been sent
+									//Initializing run log to be stored in database
+									
+									
+									logItem.setMessage("Faculty reminded." + user.getId().toString());
 									
 									//Forcing initialization for sending email
 									Hibernate.initialize(pendingBooking.getTeam().getMembers());
@@ -137,7 +154,7 @@ public class RemindPendingBookingJob implements Job {
                      }
             //em.getTransaction().commit();
 			logItem.setSuccess(true);
-			logItem.setMessage("Faculty reminded.");
+			//logItem.setMessage("Faculty reminded.");
         } catch (NoResultException n) {
             //Normal, no pending bookings found
 			logItem.setSuccess(true);

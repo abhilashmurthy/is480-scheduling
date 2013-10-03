@@ -54,7 +54,7 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 
 				JSONObject email = notificationArray.getJSONObject(0);
 				JSONObject sms = notificationArray.getJSONObject(1);
-
+				JSONObject clearEmail = notificationArray.getJSONObject(2);
 
 				email.put("emailStatus",setArr[1]);
 				email.put("emailFrequency",setArr[2]);
@@ -62,6 +62,9 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 
 				sms.put("smsStatus",setArr[4]);
 				sms.put("smsFrequency",setArr[5]);
+				
+				clearEmail.put("emailClearStatus",setArr[7]);
+				clearEmail.put("emailClearFrequency",setArr[8]);
 
 				try{	
 					//set to the updated list                				
