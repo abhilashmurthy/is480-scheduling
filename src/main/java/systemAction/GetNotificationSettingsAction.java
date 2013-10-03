@@ -65,13 +65,20 @@ public class GetNotificationSettingsAction extends ActionSupport implements Serv
 						map.put("emailFrequency",emailFrequency);
 						
 						
-					}else{
+					}else if(i==1){
 						String smsEmailStatus = obj.getString("smsStatus");
 						int smsFrequency = obj.getInt("smsFrequency");
 						
 						map.put("smsStatus",smsEmailStatus);
 						map.put("smsFrequency",smsFrequency);
 						
+					}else if(i==2){
+						String smsEmailStatus = obj.getString("emailClearStatus");
+						int smsFrequency = obj.getInt("emailClearFrequency");
+						
+						map.put("emailClearStatus",smsEmailStatus);
+						map.put("emailClearFrequency",smsFrequency);
+
 					}
 
 				}
