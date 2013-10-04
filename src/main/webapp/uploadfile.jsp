@@ -36,7 +36,7 @@
 				<tbody>
 					<tr>
 						<td>
-						<select id="termChosen" name="termChosen">
+						<select id="termChosen" name="termChosen" style="width:170px">
 							<option value=""></option>
 							<s:iterator value="dataList">
 								<option value="<s:property value="termId"/>">
@@ -112,7 +112,7 @@
 			
 			//Disable Pines Notify Settings
 			$.pnotify.defaults.history = false;
-			$.pnotify.defaults.delay = 3000;
+			$.pnotify.defaults.delay = 10000;
 
 //			Getting value from upload file action class and displaying success/error message accordingly
 			var result = '<%= session.getAttribute("csvMsg") %>';

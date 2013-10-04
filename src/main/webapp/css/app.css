@@ -333,6 +333,13 @@ input, button, select, textarea {
 	text-align: center;
 }
 
+/* To display the banner on index page */
+.banner {
+	position: absolute;
+	left:68%;
+	top:39%;
+	width: 340px;
+}
 
 .activeTerms {
     float: right;
