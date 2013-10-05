@@ -97,11 +97,6 @@
             <!-- To display legend for the calendar -->
             <table class="legend">
                 <tr>
-                    <!-- <td style="width:50px"><b>Legend:</b></td>-->
-					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA)) {%>
-                    <td class="legendBox myTeamBooking" style="text-align: center; font-size: 16px; font-weight: bold; border:1px solid #1E647C; width:17px;">T</td><td>&nbsp;My Team</td> 
-					<td style="width:15px"></td>
-					<% } %>
                     <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
                     <td style="width:15px"></td>
                     <td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
@@ -1360,6 +1355,7 @@
 																	(<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam)
 																	|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)
 																	|| (<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined && loggedInTa === timeslot.taId)
+																	|| (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>)
 																	?'myTeamBooking':false)
 																.html(timeslot.team)
 														:false)

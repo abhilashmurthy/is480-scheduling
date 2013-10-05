@@ -153,7 +153,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
-					scheduleSMSReminder(booking); //Scheduling SMS reminders to be sent exactly 24 hrs before the booking
+//					scheduleSMSReminder(booking); //Scheduling SMS reminders to be sent exactly 24 hrs before the booking
 				}
                                 
 				booking.setLastEditedBy(user.getFullName());

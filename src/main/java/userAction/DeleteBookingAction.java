@@ -81,7 +81,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 				Hibernate.initialize(b.getTeam().getMembers());
 				Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
 				
-				deleteSMSReminder(b);
+//				deleteSMSReminder(b);
 
 				//Sending email
 				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(b, (User)request.getSession().getAttribute("user"));

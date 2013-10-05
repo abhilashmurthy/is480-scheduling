@@ -472,6 +472,9 @@ input, button, select, textarea {
 	max-width: 20px;
 }
 
-.myTeamBooking {
-	color: #941992
+.booking:not(.myTeamBooking) {
+	color: grey;
+	background-color: rgba(248, 247, 216, 0.7) !important;
+	border: 2px solid grey !important;
+	opacity: 0.9;
 }
