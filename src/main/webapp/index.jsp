@@ -1415,6 +1415,7 @@
 						tolerance: 'intersect',
 						drop: function(event, ui) {
 							var $booking = ui.draggable;
+							$booking.draggable('option', 'revertDuration', 0);
 							var $oldTimeslot = $booking.closest('.timeslotCell');
 							var timeslot = scheduleData.timeslots[$oldTimeslot.attr('value')];
 							var newDateTime = $(this).attr('value');
@@ -1434,8 +1435,7 @@
 									venue: venue, 
 									datetime: $oldTimeslot.attr('value')
 								};
-								$booking.detach();
-								$newTimeslot.append($booking);
+								$booking.detach().appendTo($newTimeslot);
 								setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
 								initDragNDrop();
 							} else {
