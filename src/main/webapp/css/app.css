@@ -88,13 +88,14 @@ input, button, select, textarea {
 	margin:15px
 }
 
-.periodView {
+.settingsView {
+	padding-left: 20px;
     display: inline;
     float: right;
-    clear: both;
+    clear: left;
 }
 
-#weekViewLabel {
+#settingsViewLabel {
 	font-size: 14px;
 	padding-right: 5px;
 }

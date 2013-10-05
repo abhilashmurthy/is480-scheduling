@@ -77,14 +77,22 @@
             <% }%>
             
 			
-            <div class="periodView">
-				<span id="weekViewLabel">Select View: </span>
+            <div class="settingsView">
+				<span id="settingsViewLabel">Select View: </span>
 				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
 					<input type="checkbox" checked>
 				</div>
 				<span id="previousWeek" class="traverseWeek icon-circle-arrow-left" style="color: #5bc0de; display: none; cursor: pointer"></span>
 				<span id="nextWeek" class="traverseWeek icon-circle-arrow-right" style="color: #5bc0de; display: none; cursor: pointer"></span>
             </div>
+			<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
+				<div class="settingsView">
+					<span id="settingsViewLabel">Update Bookings Drag-N-Drop: </span>
+					<div id="dragDropView" data-on="warning" data-off="success" data-on-label="On" data-off-label="Off" class="make-switch switch-small">
+						<input type="checkbox">
+					</div>
+				</div>
+			<% } %>
 
             <!-- To display legend for the calendar -->
             <table class="legend">
@@ -148,6 +156,7 @@
                 var scheduleData = null; //This state shall be stored here
                 var weekView = null;
 				var maxWeekView = null;
+				var dragDropView = false;
                 
                 //Student-specific variables
                 var teamName = "<%= team != null ? team.getTeamName() : null%>"; //Student's active team name
@@ -223,6 +232,7 @@
                     semester = "<%= activeTerm.getSemester()%>";
                     populateSchedule(milestone, year, semester);
 					$("#weekView").bootstrapSwitch('setState', true);
+					$("#dragDropView").bootstrapSwitch('setState', false);
                     return false;
                 });
                 
@@ -269,9 +279,12 @@
                         convertScheduleData();
                         //Draw the schedule table
                         makeSchedule();
-                        appendPopovers();
+						//Append popovers
+						if (!dragDropView) appendPopovers();
                         //Setup mouse events
                         setupMouseEvents();
+						//Add drag and drop
+						if (dragDropView) initDragNDrop();
                     } else {
                         var eid = btoa(scheduleData.message);
                         window.location = "error.jsp?eid=" + eid;
@@ -989,6 +1002,17 @@
                         }
                         return false;
                     });
+					
+                    //Drag-Drop view functions
+					$("#dragDropView").off('switch-change');
+                    $("#dragDropView").on('switch-change', function(e, data){
+						setTimeout(function(){
+							//Timeout for animation of setting change
+							dragDropView = data.value;
+							populateSchedule(milestone, year, semester);
+						}, 500);
+                        return false;
+                    });
                     
                     //Week view functions
 					$("#weekView").off('switch-change');
@@ -1361,6 +1385,117 @@
                     }
                     return dateArray;
                 }
+				
+				function initDragNDrop() {
+					var originalTimeslots = {};
+					$(".unbookedTimeslot").each(function(){
+						if ($(this).data('droppable')) $(this).droppable('destroy');
+					});
+					$(".unbookedTimeslot").droppable({
+						tolerance: 'intersect',
+						drop: function(event, ui) {
+							var $booking = ui.draggable;
+							var $oldTimeslot = $booking.closest('.timeslotCell');
+							var timeslot = scheduleData.timeslots[$oldTimeslot.attr('value')];
+							var newDateTime = $(this).attr('value');
+							var venue = timeslot.venue;
+							var optionals = timeslot.optionals;
+							bootbox.confirm({
+								title: "Update Booking?",
+								message: function(){
+									var message = "Team: <b>" + timeslot.team + "</b><br/>";
+									message += "Old Timeslot: <b style='color:red;'>" + Date.parse(timeslot.datetime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(timeslot.datetime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
+									message += "New Timeslot: <b>" + Date.parse(newDateTime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(newDateTime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
+									return message;
+								},
+								callback: function(result) {
+									if (result) {
+										var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
+										if (returnData && returnData.success) {
+											var $newTimeslot = $("#timeslot_" + returnData.booking.id);
+											$newTimeslot.removeClass('unbookedTimeslot');
+											$newTimeslot.addClass('bookedTimeslot');
+											scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
+											$oldTimeslot.removeClass('bookedTimeslot');
+											$oldTimeslot.addClass('unbookedTimeslot');
+											delete scheduleData.timeslots[$oldTimeslot.attr('value')];
+											scheduleData.timeslots[$oldTimeslot.attr('value')] = {
+												id: $oldTimeslot.attr('id').split("_")[1],
+												venue: venue, 
+												datetime: $oldTimeslot.attr('value')
+											};
+											$booking.detach();
+											$newTimeslot.append($booking);
+											setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
+											initDragNDrop();
+										} else {
+											showNotification("INFO", $oldTimeslot, returnData.message);
+										}
+									}
+								}
+							});
+						},
+						out: function(event, ui) {
+							ui.draggable.draggable('option', 'revert', function(){
+								//Return to original position
+								var datetime = $(this).closest('.timeslotCell').attr('value');
+								if (!originalTimeslots[datetime]) return true;
+								$(this).animate({
+									top: '+=' + (originalTimeslots[datetime].start.top - $(this).offset().top),
+									left: '+=' + (originalTimeslots[datetime].start.left - $(this).offset().left)
+								});
+								return false;
+							});
+						}
+					});
+					
+					$(".booking").each(function(){
+						if ($(this).data('draggable')) $(this).draggable('destroy');
+					});
+					$(".booking").draggable({
+						start: function(event, ui) {
+							//Register original position
+							var datetime = $(this).closest('.timeslotCell').attr('value');
+							console.log("Dragging: " + datetime);
+							if (originalTimeslots[datetime] && originalTimeslots[datetime].start) return true;
+							originalTimeslots[datetime] = {
+								start: {
+									top: $(this).offset().top,
+									left: $(this).offset().left
+								}
+							};
+						},
+						stop: function(event, ui) {
+							//Register stop position
+							var datetime = $(this).closest('.timeslotCell').attr('value');
+							originalTimeslots[datetime] = {
+								stop: {
+									top: $(this).offset().top,
+									left: $(this).offset().left
+								}
+							};
+						},
+						revert: true
+					});
+				}
+				
+//                $(".booking").draggable({
+////                    helper: "clone",
+//                    appendTo: "body"
+//                });
+//                $(".unbookedTimeslot").droppable({
+//                        tolerance:"intersect",
+//                        drop: function(event, ui) {
+//                            var drop_p = $(this).offset();
+//                            var drag_p = ui.draggable.offset();
+//                            var left_end = drop_p.left - drag_p.left + 1;
+//                            var top_end = drop_p.top - drag_p.top + 1;
+//                            ui.draggable.animate({
+//                                top: '+=' + top_end,
+//                                left: '+=' + left_end
+//                            });
+//                        }
+//                });
                 
                 /*****************************
                  PLUGINS AND COMPONENTS
@@ -1449,24 +1584,6 @@
                     }
                     booking.find('.optionalAttendees').tokenInput(users, opts);
                 }
-                
-//                $(".booking").draggable({
-////                    helper: "clone",
-//                    appendTo: "body"
-//                });
-//                $(".unbookedTimeslot").droppable({
-//                        tolerance:"intersect",
-//                        drop: function(event, ui) {
-//                            var drop_p = $(this).offset();
-//                            var drag_p = ui.draggable.offset();
-//                            var left_end = drop_p.left - drag_p.left + 1;
-//                            var top_end = drop_p.top - drag_p.top + 1;
-//                            ui.draggable.animate({
-//                                top: '+=' + top_end,
-//                                left: '+=' + left_end
-//                            });
-//                        }
-//                });
             };
             
             /* POPOVER */
