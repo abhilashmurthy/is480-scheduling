@@ -98,7 +98,7 @@
 				<ul class="nav pull-right">
 				<!-- To display the user information -->
 				<li id="userInfo">
-					<a class="navbar-title">
+					<a class='navbar-username'>
 					<i class="icon-user icon-white icon-large"></i>&nbsp;<% out.print(user.getFullName());%>
 					&nbsp;-&nbsp;
 					<% if (activeRole.equals(Role.STUDENT)) { %>

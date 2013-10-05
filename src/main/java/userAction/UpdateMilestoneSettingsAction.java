@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import manager.SettingsManager;
 import model.Settings;
 import model.User;
@@ -97,6 +96,22 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 					milestonesList.add(map);
 				} //end of for loop
 
+				//Check whether the milestone names are the same or not
+				for (int i = 0; i < milestonesList.size() - 1; i++) {
+					HashMap<String, Object> startMilestoneMap = milestonesList.get(i);
+					String startMilestoneName = (String) startMilestoneMap.get("milestone");
+					for (int j = i + 1; j < milestonesList.size(); j++) {
+						HashMap<String, Object> nextMilestoneMap = milestonesList.get(j);
+						String nextMilestoneName = (String) nextMilestoneMap.get("milestone");
+						if (startMilestoneName.equals(nextMilestoneName)) {
+							json.put("message", "Error! Milestone names cannot be same!");
+							json.put("success", false);
+							return SUCCESS;
+						}
+					}
+				}
+				
+				
 				//Checking for error whether any 2 order numbers are the same 
 				if (orderList != null) {
 					for (int j = 0; j < orderList.length; j++) {
