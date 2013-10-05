@@ -433,6 +433,12 @@ input, button, select, textarea {
 	color: gainsboro !important;
 }
 
+/* COLOR FOR NAME ON NAVBAR */
+.navbar-username {
+	color: white !important
+}
+
+
 .popoverBtn {
     margin-right: 20px !important;
 }

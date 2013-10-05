@@ -179,7 +179,7 @@
                         <tr>
                             <td></td>
                             <td>
-                                <table class="timeslotsTable table-condensed table-hover table-bordered table-striped"></table>
+                                <table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
                             </td>
                         </tr>
                     </table>
