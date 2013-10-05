@@ -214,7 +214,6 @@
 			$('.ui-datepicker').remove();
             //Hide all notifications
             $.pnotify_remove_all();
-			return false;
         });    
             
         
