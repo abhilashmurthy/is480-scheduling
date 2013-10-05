@@ -456,7 +456,7 @@
 						Venue: timeslot.venue,
 						Milestone: milestone,
 						TA: timeslot.TA,
-						External: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+						Others: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
 					};
                    
 				   if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
