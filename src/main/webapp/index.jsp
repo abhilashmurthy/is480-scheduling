@@ -53,7 +53,8 @@
 				<button type="button" class="close" data-dismiss="alert">×</button>
 				Hi <%= user.getFullName()%>, <br/><br/>
 				We have spent a lot of time building this system. We will really appreciate
-				if you could give us <a href="http://smusg.asia.qualtrics.com/SE/?SID=SV_1TilRZmAClTRIbz" target="_blank">feedback</a> 
+				if you could give us <a href="https://docs.google.com/forms/d/1dZvPHlAV5VhJjupRCHiYT52hHZ2nIDD4IoLNeX98ogM/viewform" 
+										target="_blank">feedback</a> 
 				on your experience with our system!<br/><br/>
 				Thanking you,<br/>
 				IS480 Scheduling Team
@@ -66,9 +67,9 @@
                     <button type="button" class="close" data-dismiss="alert">×</button>
                     <a href="approveReject" style="color:#B88A00;">
                         <s:if test="%{pendingBookingCount > 1}">
-                            <b>You have <s:property value="pendingBookingCount"/> pending bookings!</b>
+                            You have <s:property value="pendingBookingCount"/> pending bookings!
                         </s:if><s:else>
-                            <b>You have <s:property value="pendingBookingCount"/> pending booking!</b>
+                            You have <s:property value="pendingBookingCount"/> pending booking!
                         </s:else>
                     </a>
                 </div>
@@ -348,7 +349,7 @@
 							return facultyList;
 						},
 						TA: timeslot.TA,
-						External: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+						External : $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
 					};
 
                     //Allow team to edit booking
@@ -1421,7 +1422,7 @@
                         allowTabOut: true,
                         propertyToSearch: "name",
                         resultsLimit: 4,
-                        hintText: "Add users or emails",
+                        hintText: "Enter email address...",
                         noResultsText: "Press [TAB] to add as email",
                         tokenFormatter: function(item) {
                             if (item && item.id) {

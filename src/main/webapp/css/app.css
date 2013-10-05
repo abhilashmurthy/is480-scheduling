@@ -329,8 +329,8 @@ input, button, select, textarea {
 	position: absolute;
 	left:40%;
 	top:9%;
-	width: 250px;
-	text-align: center;
+	width: 220px;
+	text-align: left;
 }
 
 /* To display the banner on index page */

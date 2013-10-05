@@ -38,7 +38,8 @@
 				<input type="hidden" id="dropdownValues"/>
 				Hide Columns:
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
-				<select id="hideColumns" class="multiselect" multiple="multiple" onchange="onChangeInDropdown();">
+				<select id="hideColumns" class="multiselect" multiple="multiple">
+					<option value="0">Select All</option>
 					<% if (activeRole.equals(Role.STUDENT)){ %>
 						<option value="1">My Team</option>
 					<% } else { %>
@@ -213,6 +214,9 @@
 		<script type="text/javascript">
 		//For data tables
 		$(document).ready(function(){
+			function hideAllValues() {
+				alert("haha");
+			}
 			//To select all values in multiple select dropdown by default
 			$('#hideColumns option').attr('selected', 'selected');
 			var values = $("#hideColumns").val();
@@ -221,17 +225,42 @@
 			
 			$('#hideColumns').change(function(){
 				var n = $('#dropdownValues').val();
+				console.log("All values: " + n);
 				var allValues = n.split(","); 
 				//First show all columns then hide whichever column has been chosen
-				for (var j=0; j<allValues.length; j++) {
+				//Starting from 1st index, not 0th index
+				for (var j=1; j<allValues.length; j++) {
 					$('td:nth-child('+ allValues[j] +'),th:nth-child('+ allValues[j] +')').show();
 				}
 				//Hiding the columns which have been selected
 				var selectedValues = $("#hideColumns").val();
+				console.log("Value to hide: " + selectedValues);
 				//Only if a column has been selected
 				if (selectedValues.length > 0) {
-					for (var i=0; i<selectedValues.length; i++) {
-						$('td:nth-child('+ selectedValues[i] +'),th:nth-child('+ selectedValues[i] +')').hide();
+					if (selectedValues.length > 1) {
+						console.log("Multiple values: " + selectedValues);
+						if (selectedValues[0] === "0") {
+							for (var i=1; i<=7; i++) {
+								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
+							}
+							$('#hideColumns option').attr('selected', 'selected');
+						} else {
+							for (var i=0; i<selectedValues.length; i++) {
+								$('td:nth-child('+ selectedValues[i] +'),th:nth-child('+ selectedValues[i] +')').hide();
+							}
+						}
+					} else {
+						console.log("Single value: " + selectedValues);
+						if (selectedValues[0] === "0") {
+							for (var i=1; i<=7; i++) {
+								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
+							}
+							$('#hideColumns option').attr('selected', 'selected');
+						} else {
+							for (var i=0; i<selectedValues.length; i++) {
+								$('td:nth-child('+ selectedValues[i] +'),th:nth-child('+ selectedValues[i] +')').hide();
+							}
+						}
 					}
 				}
 			}); //end of function
@@ -261,6 +290,9 @@
 			
 			//For the multiselect dropdown
 			$('.multiselect').multiselect({
+//			   includeSelectAllOption: true,
+//			   selectAllText: true,
+//			   selectAllValue: 'multiselect-all',
 			   buttonClass: 'btn',
 			   buttonWidth: '175px',
 			   buttonContainer: '<div class="btn-group" />',
@@ -268,9 +300,12 @@
 			   buttonText: function(options) {
 				   if (options.length === 0) {
 					   return 'None selected <b class="caret"></b>';
+				   } else if (options.length === 8) {
+					   return 'All selected <b class="caret"></b>';
 				   } else if (options.length > 1) {
 					   return options.length + ' selected <b class="caret"></b>';
-				   } else {
+				   } 
+				   else {
 					   var selected = '';
 					   options.each(function() {
 					   selected += $(this).text() + ', ';
@@ -281,7 +316,6 @@
 		   });
 		});
 	
-		
 		$(document).on('mouseenter','[rel=tooltip]', function(){
 			$(this).tooltip('show');
 		});
