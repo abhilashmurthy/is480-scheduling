@@ -388,7 +388,6 @@
 									.attr('placeholder', outputData.Date)
 									.attr('title', 'Enter a new date (YYYY-MM-DD)')
 									.addClass('updateFormDate popoverInput')
-									.datepicker({dateFormat: "yy-mm-dd"})
 									.val(outputData.Date).change();
 						outputData.Time = 
 								$(document.createElement('input'))
@@ -397,14 +396,7 @@
 									.attr('placeholder', outputData.Time)
 									.attr('title', 'Enter a new start time (HH:MM)')
 									.addClass('updateFormDate popoverInput')
-									.timepicker({
-										minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
-										maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
-										step: 30,
-										forceRoundTime: true,
-										timeFormat: 'H:i'
-									})
-									.val(outputData.Time).change();				
+									.val(outputData.Time).change();	
                         outputData[""] = (
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
@@ -636,8 +628,10 @@
 								return false;
 							}
 							self = ($(this).is('.booking')) ? $(this) : $(this).children('.booking');
+							var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 							self.popover('show');
-							console.log('showing ' + self.attr('class'));
+							self.find("#updateFormDate").val(timeslot.startDate).change();
+							self.find("#updateFormStartTime").val(timeslot.time).change();
 							self.find('ul').remove();
 							appendTokenInput(self); //Optional attendees
 						}
@@ -909,8 +903,12 @@
                     $('body').on('click', '#updateFormDate', function(e){
                         //Add date and timepickers
                         if (e.target === this) {
-                            console.log("clicked " + $(this).parents(".bookedTimeslot").attr('value'));
-                            $(this).datepicker('show');
+                            $(this)
+								.datepicker({
+									dateFormat: "yy-mm-dd"
+								})
+								.datepicker('setDate', Date.parse($(this).val()))
+								.datepicker('show');
                         }
                         return false;
                     });
@@ -920,8 +918,17 @@
                     $('body').on('click', '#updateFormStartTime', function(e){
                         //Add timepicker
                         if (e.target === this) {
-                            $(this).timepicker('show');
-                        }
+                            $(this)
+								.timepicker({
+									minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
+									maxTime: Date.parse(scheduleData.dayEndTime + ":00").addHours(-2).toString("HH:mm"),
+									step: 30,
+									forceRoundTime: true,
+									timeFormat: 'H:i'
+								});
+							$(this).timepicker('setTime', $(this).val().split(" - ")[0]);
+							$(this).timepicker('show');
+                        }	
                         return false;
                     });
                     

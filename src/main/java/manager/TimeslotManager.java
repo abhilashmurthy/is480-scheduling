@@ -54,12 +54,11 @@ public class TimeslotManager {
     public static List<Timeslot> findBySchedule(EntityManager em, Schedule schedule) {
         logger.trace("Getting timeslot based on Schedule ID: " + schedule);
         List<Timeslot> timeslots;
-        boolean justHere = true;
+        boolean justHere = false;
         try {
-            if (em.getTransaction().isActive()) {
-                justHere = false;
-            } else {
-                em.getTransaction().begin();
+            if (!em.getTransaction().isActive()) {
+				em.getTransaction().begin();
+                justHere = true;
             }
             Query q = em.createQuery("select t from Timeslot t where t.schedule = :schedule")
                     .setParameter("schedule", schedule);
@@ -76,14 +75,17 @@ public class TimeslotManager {
 
     public static boolean saveTimeslots(EntityManager em, Set<Timeslot> timeslots, EntityTransaction transaction) {
         logger.trace("Saving timeslots starting from: " + timeslots);
+		boolean justHere = false;
         try {
-            transaction = em.getTransaction();
-            transaction.begin();
+			if (!em.getTransaction().isActive()) {
+				justHere = true;
+				em.getTransaction().begin();
+			}
             for (Timeslot t : timeslots) {
                 em.merge(t);
             }
             logger.trace("All timeslots have been saved");
-            transaction.commit();
+			if (justHere) em.getTransaction().commit();
             return true;
         } catch (PersistenceException ex) {
             //Rolling back data transactions
@@ -119,67 +121,23 @@ public class TimeslotManager {
 		removeBookings.executeUpdate();
 		em.remove(timeslot);
     }
-
-    public static boolean deleteTimeslotBooking(EntityManager em, Timeslot ts) {
-        EntityTransaction transaction = em.getTransaction();
-        try {
-            HashMap<User, Response> statusList = new HashMap<User, Response>();
-            
-            transaction.begin();
-            String sQuery = "UPDATE Timeslot t SET t.statusList = :statusList, t.team = :team"
-                   + "WHERE t.id = :id";
-           
-            Query query = em.createQuery(sQuery);
-
-            query.setParameter("statusList", statusList);
-            query.setParameter("team", null);
-            query.setParameter("id", ts.getId());
-            
-            query.executeUpdate();
-            transaction.commit();
-
-            return true;
-        } catch (PersistenceException ex) {
-            //Rolling back data transactions
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            logger.error("Error making database call for update timeslot status");
-            ex.printStackTrace();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
-     public static List<Timeslot> getAllTimeslots(EntityManager em) {
-        logger.trace("Getting all timeslots");
-        List<Timeslot> result = null;
-        try {
-            em.getTransaction().begin();
-            Query q = em.createQuery("select o from Timeslot o");
-            result = q.getResultList();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("Database Operation Error");
-            em.getTransaction().rollback();
-        }
-        return result;
-    }
      
      public static Timeslot getByTimestampAndSchedule(EntityManager em, Timestamp ts, Schedule s) {
         logger.trace("Getting Timeslot by Timestamp: " + ts + " and schedule: " + s);
         Timeslot timeslot = null;
+		boolean justHere = false;
         try {
-            em.getTransaction().begin();
+			if (!em.getTransaction().isActive()) {
+				em.getTransaction().begin();
+				justHere = true;
+			}
             Query q = em.createQuery("select o from Timeslot o where o.startTime = :startTime and o.schedule = :schedule")
                     .setParameter("startTime", ts)
                     .setParameter("schedule", s);
             timeslot = (Timeslot) q.getSingleResult();
-            em.getTransaction().commit();
+			if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
-            logger.error("Database Operation Error");
+            logger.error("Database Operation Error: " + e.getMessage());
             logger.trace(e.getMessage());
             em.getTransaction().rollback();
         }
