@@ -915,7 +915,6 @@
 						}
 					} else {
 						//Select a timeslot
-						var foundOverlapping = false;
 						var $nextTr = $timeslotCell.closest('tr');
 						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
 						for (var i = 0; i < slotSize; i++) {
@@ -933,18 +932,6 @@
 								//Uh oh, overlapping timeslot detected. Let's remove it.
 								var $overlappingTimeslot = $nextTr.children().eq($timeslotCell.index());
 								triggerTimeslot($overlappingTimeslot);
-								foundOverlapping = true;
-							}
-						}
-						if (foundOverlapping) {
-							//Actually, let's reset every consequent timeslot
-							var $nextTr = $timeslotCell.closest('tr');
-							while ($nextTr.parent().children().index($nextTr) + slotSize <= $nextTr.parent().children().length) {
-								if (!$nextTr.children().eq($timeslotCell.index()).hasClass('chosen')) {
-									var $consequentOverlappingTimeslot = $nextTr.children().eq($timeslotCell.index());
-									triggerTimeslot($consequentOverlappingTimeslot);
-								}
-								$nextTr = $nextTr.next();
 							}
 						}
 					}

@@ -362,7 +362,7 @@
 							return facultyList;
 						},
 						TA: timeslot.TA,
-						External : $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+						Others: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
 					};
 
                     //Allow team to edit booking
