@@ -568,6 +568,13 @@
                     var bookingExists = 0;
                     var $existingTimeslot = null;
                     var teamsPendingBooking = null;
+					//Initialize dragDropView
+					if (!$('.booking').length) {
+						$("#dragDropView").parent().hide(); 
+						
+					} else { 
+						$("#dragDropView").parent().show(); 
+					}
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
                         for (var key in scheduleData.timeslots) {
                             if (scheduleData.timeslots.hasOwnProperty(key)) {
@@ -765,7 +772,6 @@
                         self.append(bookingDiv);
                         showNotification('SUCCESS', self, null);
                         scheduleData.timeslots[self.attr('value')] = returnData.booking;
-                        refreshScheduleData();
                         if (<%= activeRole.equals(Role.STUDENT)%>) {
                             appendViewBookingPopover(self);
                         } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
@@ -787,8 +793,8 @@
 									var timeslot = self.parents('.timeslotCell');
 									deleteBooking(timeslot);
 									setTimeout(function(){showNotification("ERROR", timeslot, null);},500);
-									timeslot.removeClass();
-									timeslot.addClass("timeslotCell unbookedTimeslot");
+									timeslot.removeClass('bookedTimeslot');
+									timeslot.addClass('unbookedTimeslot');
 									timeslot.popover('destroy');
 									delete scheduleData.timeslots[timeslot.attr('value')];
 									scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
@@ -800,17 +806,19 @@
 												.addClass('icon-info-sign');
 											makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
 											timeslot.append(deletedDiv);
+											appendCreateBookingPopover(timeslot);
+											refreshScheduleData();
 										});
-										appendCreateBookingPopover(timeslot);
 									} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
 										self.effect('clip', 'slow', function(){
 											self.remove();
+											refreshScheduleData();
+											appendPopovers();
 										});
-										appendPopovers();
 									}
 								}
 							}
-						});                    
+						});
                         return false;
                     });
                     
@@ -865,6 +873,7 @@
                         } else {
                             showNotification("WARNING", timeslot, returnData.message);
                         }
+						refreshScheduleData();
                         return false;
                     });
 					
@@ -1400,40 +1409,61 @@
 							var newDateTime = $(this).attr('value');
 							var venue = timeslot.venue;
 							var optionals = timeslot.optionals;
-							bootbox.confirm({
-								title: "Update Booking?",
-								message: function(){
-									var message = "Team: <b>" + timeslot.team + "</b><br/>";
-									message += "Old Timeslot: <b style='color:red;'>" + Date.parse(timeslot.datetime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(timeslot.datetime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
-									message += "New Timeslot: <b>" + Date.parse(newDateTime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(newDateTime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
-									return message;
-								},
-								callback: function(result) {
-									if (result) {
-										var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
-										if (returnData && returnData.success) {
-											var $newTimeslot = $("#timeslot_" + returnData.booking.id);
-											$newTimeslot.removeClass('unbookedTimeslot');
-											$newTimeslot.addClass('bookedTimeslot');
-											scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
-											$oldTimeslot.removeClass('bookedTimeslot');
-											$oldTimeslot.addClass('unbookedTimeslot');
-											delete scheduleData.timeslots[$oldTimeslot.attr('value')];
-											scheduleData.timeslots[$oldTimeslot.attr('value')] = {
-												id: $oldTimeslot.attr('id').split("_")[1],
-												venue: venue, 
-												datetime: $oldTimeslot.attr('value')
-											};
-											$booking.detach();
-											$newTimeslot.append($booking);
-											setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
-											initDragNDrop();
-										} else {
-											showNotification("INFO", $oldTimeslot, returnData.message);
-										}
-									}
-								}
-							});
+							var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
+							if (returnData && returnData.success) {
+								var $newTimeslot = $("#timeslot_" + returnData.booking.id);
+								$newTimeslot.removeClass('unbookedTimeslot');
+								$newTimeslot.addClass('bookedTimeslot');
+								scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
+								$oldTimeslot.removeClass('bookedTimeslot');
+								$oldTimeslot.addClass('unbookedTimeslot');
+								delete scheduleData.timeslots[$oldTimeslot.attr('value')];
+								scheduleData.timeslots[$oldTimeslot.attr('value')] = {
+									id: $oldTimeslot.attr('id').split("_")[1],
+									venue: venue, 
+									datetime: $oldTimeslot.attr('value')
+								};
+								$booking.detach();
+								$newTimeslot.append($booking);
+								setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
+								initDragNDrop();
+							} else {
+								showNotification("INFO", $oldTimeslot, returnData.message);
+							}
+//							bootbox.confirm({
+//								title: "Update Booking?",
+//								message: function(){
+//									var message = "Team: <b>" + timeslot.team + "</b><br/>";
+//									message += "Old Timeslot: <b style='color:red;'>" + Date.parse(timeslot.datetime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(timeslot.datetime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
+//									message += "New Timeslot: <b>" + Date.parse(newDateTime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(newDateTime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
+//									return message;
+//								},
+//								callback: function(result) {
+//									if (result) {
+//										var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
+//										if (returnData && returnData.success) {
+//											var $newTimeslot = $("#timeslot_" + returnData.booking.id);
+//											$newTimeslot.removeClass('unbookedTimeslot');
+//											$newTimeslot.addClass('bookedTimeslot');
+//											scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
+//											$oldTimeslot.removeClass('bookedTimeslot');
+//											$oldTimeslot.addClass('unbookedTimeslot');
+//											delete scheduleData.timeslots[$oldTimeslot.attr('value')];
+//											scheduleData.timeslots[$oldTimeslot.attr('value')] = {
+//												id: $oldTimeslot.attr('id').split("_")[1],
+//												venue: venue, 
+//												datetime: $oldTimeslot.attr('value')
+//											};
+//											$booking.detach();
+//											$newTimeslot.append($booking);
+//											setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
+//											initDragNDrop();
+//										} else {
+//											showNotification("INFO", $oldTimeslot, returnData.message);
+//										}
+//									}
+//								}
+//							});
 						},
 						out: function(event, ui) {
 							ui.draggable.draggable('option', 'revert', function(){
