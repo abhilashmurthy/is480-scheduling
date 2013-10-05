@@ -584,7 +584,7 @@
                 $("#editScheduleForm").on('submit', function(e) {
                     $("#editScheduleSubmitBtn").button('loading');
                     e.preventDefault();
-                    e.stopPropagation();                  
+                    e.stopPropagation();     
 					
 					//Validate year and semester
 					var year = activeAcademicYearStr;

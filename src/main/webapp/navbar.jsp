@@ -208,10 +208,6 @@
 				self.parent().popover('hide');
 				$(".hasDatepicker").datepicker('destroy');
             });
-			//Remove all hidden plugins
-			$('.token-input-dropdown-facebook').remove();
-			$('.ui-timepicker-wrapper').remove();
-			$('.ui-datepicker').remove();
             //Hide all notifications
             $.pnotify_remove_all();
         });    
