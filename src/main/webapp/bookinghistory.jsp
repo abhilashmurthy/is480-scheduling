@@ -34,9 +34,9 @@
 			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
 		<% } %>
 		<s:if test="%{data != null && data.size() > 0}">
-			<div style="float:right">
+			<div style="float:right;margin-top:16px">
 				<input type="hidden" id="dropdownValues"/>
-				Hide Columns:
+				Hide/Show Columns:
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
 				<select id="hideColumns" class="multiselect" multiple="multiple">
 					<option value="0">Select All</option>
@@ -265,21 +265,40 @@
 				}
 			}); //end of function
 		
-			$('#bookingHistoryTable').dataTable({
-				"aLengthMenu": [
-					[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
-				"iDisplayLength" : -1,
-//				"bPaginate": false,
-//				"bLengthChange": false,
-//				"bFilter": false,
-//				"bSort": false,
-				"bInfo": false,
-//				"bAutoWidth": false,
-//				"asStripClasses": null,
-				"bSortClasses": false,
-				"aaSorting":[],
-//				"oSearch": {"sSearch": "Initial search"}
-			});
+			var role = '<%= (Role) session.getAttribute("activeRole") %>';
+			if (role === "STUDENT") {
+				$('#bookingHistoryTable').dataTable({
+					"aLengthMenu": [
+						[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
+					"iDisplayLength" : -1,
+	//				"bPaginate": false,
+					"bLengthChange": false,
+	//				"bFilter": false,
+	//				"bSort": false,
+					"bInfo": false,
+	//				"bAutoWidth": false,
+	//				"asStripClasses": null,
+					"bSortClasses": false,
+					"aaSorting":[]
+	//				"oSearch": {"sSearch": "Initial search"}
+				});
+			} else {
+				$('#bookingHistoryTable').dataTable({
+					"aLengthMenu": [
+						[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
+					"iDisplayLength" : -1,
+	//				"bPaginate": false,
+	//				"bLengthChange": false,
+	//				"bFilter": false,
+	//				"bSort": false,
+					"bInfo": false,
+	//				"bAutoWidth": false,
+	//				"asStripClasses": null,
+					"bSortClasses": false,
+					"aaSorting":[]
+	//				"oSearch": {"sSearch": "Initial search"}
+				});
+			}
 			
 			//Tooltip and placeholder for search box of datatable
 			$('.dataTables_filter input').attr("placeholder", "e.g. Acceptance");

@@ -236,7 +236,7 @@
 										<td class="formLabelTd">Year</td>
 										<td class="fuelux"> <!-- Putting default values for testing purposes -->
 											<div id="yearSpinnerInput" class="spinner">
-												<input id="yearInput" type="text" class="spinner-input"/>
+												<input id="yearInput" type="text" class="spinner-input" disabled=""/>
 												<div class="spinner-buttons  btn-group btn-group-vertical">
 													<button class="btn spinner-up" type="button">
 														<i class="icon-chevron-up"></i>
