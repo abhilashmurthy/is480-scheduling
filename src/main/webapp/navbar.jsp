@@ -187,6 +187,7 @@
         //Logout link
         $("#logoutLink").on('click', function() {
             document.location.href = '/is480-scheduling/logout';
+			return false;
         });
         
         //Hide all popovers on other button click
@@ -194,18 +195,23 @@
             if ($('.popover').hasClass("in")) {
                 $('.popover').parent().popover('hide');
             }
+			return false;
         });
         
         //Hide all popovers on page click
-        $("body").on('click', function(e) {
+        $('body').on('click', function(e) {
             //Hide all popovers
-            $('.popover.in').each(function(f){
+			if ($(e.target).closest('.ui-datepicker').length || $(e.target).closest('.ui-timepicker-wrapper').length) return false;
+            $('.popover.in').each(function(e){
                 var self = $(this);
                 //Don't detect datepicker and timepicker
-                if (!$(e.target).closest("div#ui-datepicker-div").length && !$(e.target).closest(".ui-timepicker-wrapper").length) {
-                    self.parent().popover('hide');
-                }
+				self.parent().popover('hide');
+				$(".hasDatepicker").datepicker('destroy');
             });
+			//Remove all hidden plugins
+			$('.token-input-dropdown-facebook').remove();
+			$('.ui-timepicker-wrapper').remove();
+			$('.ui-datepicker').remove();
             //Hide all notifications
             $.pnotify_remove_all();
         });    
