@@ -635,6 +635,7 @@
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
 						self = <%= activeRole.equals(Role.FACULTY) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
 						$('.timeslotCell, .booking').not(self).popover('hide');
+						$(".hasDatepicker").datepicker('destroy');
 						$.pnotify_remove_all();
                         return false;
                     });
@@ -645,11 +646,19 @@
 						if (e.target === this) {
 							if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
 								$(this).popover('show');
+								if ($(this).find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
+									$('body').animate({scrollTop: $(this).find('tr:last').offset().top - $(window).scrollTop()}, 500);
+								} else if ($(this).find('tr:first').offset().top - $(window).scrollTop() < window.innerHeight) {
+									$('body').animate({scrollTop: $(this).find('tr:last').offset().top - $(window).scrollTop()}, 500);
+								}
 								return false;
 							}
 							self = ($(this).is('.booking')) ? $(this) : $(this).children('.booking');
 							var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 							self.popover('show');
+							if (self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
+								$('body').animate({scrollTop: self.find('tr:last').offset().top - $(window).scrollTop()}, 500);
+							}
 							self.find("#updateFormDate").val(timeslot.startDate).change();
 							self.find("#updateFormStartTime").val(timeslot.time).change();
 							self.find('ul').remove();
@@ -693,6 +702,9 @@
 //                            console.log(".unbookedTimeslot clicked.");
                             self.tooltip('hide');
                             self.popover('show');
+							if (self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
+								$('body').animate({scrollTop: self.find('tr:last').offset().top - $(window).scrollTop()}, 500);
+							}
                             self.find('ul').remove(); //Remove all old tokenInputs
                             appendTokenInput(self); //Optional attendees
                         }
@@ -732,6 +744,9 @@
 								}
 							}
 							self.popover('show');
+							if (self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
+								$('body').animate({scrollTop: self.find('tr:last').offset().top - $(window).scrollTop()}, 500);
+							}
 							self.find('ul').remove();
 							appendTokenInput(self); //Optional attendees
 						}
