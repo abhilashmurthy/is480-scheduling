@@ -39,7 +39,7 @@
 				Hide/Show Columns:
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
 				<select id="hideColumns" class="multiselect" multiple="multiple">
-					<option value="0">Select All</option>
+					<option value="0">Select/Deselect All</option>
 					<% if (activeRole.equals(Role.STUDENT)){ %>
 						<option value="1">My Team</option>
 					<% } else { %>
