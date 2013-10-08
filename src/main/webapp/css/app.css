@@ -116,6 +116,7 @@ input, button, select, textarea {
     /*margin: auto;*/
     display: table;
     table-layout: fixed;
+	z-index: 0;
 }
 
 .timeDisplayCell {
@@ -477,4 +478,8 @@ input, button, select, textarea {
 	background-color: rgba(248, 247, 216, 0.7) !important;
 	border: 2px solid grey !important;
 	opacity: 0.9;
+}
+
+.booking:not(.myTeamBooking) .popover {
+	z-index: 1032 !important;
 }

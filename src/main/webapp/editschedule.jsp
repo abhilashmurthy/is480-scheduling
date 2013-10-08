@@ -340,6 +340,7 @@
 					//Draw and populate milestones' datepickers and timepickers
                     for (var i = 0; i < schedules.length; i++) {
                         var schedule = schedules[i];
+						schedule["milestoneId"] = schedule.milestoneName.toLowerCase().replace(' ', '');
 						var dates = schedule.dates;
                         var milestoneTr = $(document.createElement('tr'));
                         //Milestone name
@@ -351,8 +352,8 @@
 							.append(
 								//Milestone dates[] MultiDatesPicker
 								$(document.createElement('div'))
-									.attr('name', schedule.milestoneName.toLowerCase() + "Dates")
-									.attr('id', "milestone_" + schedule.milestoneName.toLowerCase())
+									.attr('name', schedule.milestoneId + "Dates")
+									.attr('id', "milestone_" + schedule.milestoneId)
 									.attr('class', "milestoneOrder_" + schedule.milestoneOrder)
 									.addClass('datepicker')
 									.multiDatesPicker({
@@ -374,7 +375,7 @@
 							.append(
 								//Milestone dates[] Pillbox
 								$(document.createElement('div'))
-									.attr('id', schedule.milestoneName.toLowerCase() + 'Pillbox')
+									.attr('id', schedule.milestoneId + 'Pillbox')
 									.addClass('pillbox')
 									.append(function() {
 										var $ul = $(document.createElement('ul'));
@@ -395,7 +396,7 @@
 									.append(
 										$(document.createElement('input'))
 											.attr('type', 'text')
-											.attr('id', "milestoneDayStart_" + schedule.milestoneName.toLowerCase())
+											.attr('id', "milestoneDayStart_" + schedule.milestoneId)
 											.attr('name', schedule.milestoneName + "DayStartTime")
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
@@ -416,8 +417,8 @@
 									.append(
 										$(document.createElement('input'))
 											.attr('type', 'text')
-											.attr('id', "milestoneDayEnd_" + schedule.milestoneName.toLowerCase())
-											.attr('name', schedule.milestoneName.toLowerCase() + "DayEndTime")
+											.attr('id', "milestoneDayEnd_" + schedule.milestoneId)
+											.attr('name', schedule.milestoneId + "DayEndTime")
 											.addClass('scheduleDayTimeSelect timepicker')
 											.css('float', 'right')
 											.timepicker({
@@ -435,13 +436,13 @@
 							.css('padding-left', '40px')
 							.append(
 								$(document.createElement('div'))
-									.attr('id', 'milestoneBookable_' + schedule.milestoneName.toLowerCase())
+									.attr('id', 'milestoneBookable_' + schedule.milestoneId)
 									.addClass('make-switch switch-medium')
 									.attr('data-on', 'success')
 									.attr('data-off', 'danger')
 									.attr('data-on-label', 'Yes')
 									.attr('data-off-label', 'No')
-									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'milestoneBookable_' + schedule.milestoneName.toLowerCase()).attr('checked', schedule.bookable))
+									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'milestoneBookable_' + schedule.milestoneId).attr('checked', schedule.bookable))
 									.bootstrapSwitch()
 							);
                         milestoneTr.append(milestoneBookableTd);
@@ -601,15 +602,15 @@
                         var milestoneItem = milestoneArray[i];
                         for (var j = 0; j < schedules.length; j++) {
                             var schedule = schedules[j];
-							var dates = $("#milestone_" + schedule.milestoneName.toLowerCase()).multiDatesPicker('getDates');
-							schedule["bookable"] = $("#milestoneBookable_" + schedule.milestoneName.toLowerCase()).bootstrapSwitch('status');
+							var dates = $("#milestone_" + schedule.milestoneId).multiDatesPicker('getDates');
+							schedule["bookable"] = $("#milestoneBookable_" + schedule.milestoneId).bootstrapSwitch('status');
 							if (dates.length === 0) {
 								showNotification("WARNING", "Please pick dates for milestone: " + schedule.milestoneName);
 								$("#editScheduleSubmitBtn").button('reset');
 								return false;
 							}
 							schedule["dates[]"] = dates;
-                            if (milestoneItem.name.split("DayStartTime")[0].toLowerCase() === schedule.milestoneName.toLowerCase()) {
+                            if (milestoneItem.name.split("DayStartTime")[0].toLowerCase() === schedule.milestoneId) {
                                 if (milestoneItem.value.length < 1) {
                                     showNotification("WARNING", "Please select valid times for milestone: " + schedule.milestoneName);
                                     $("#editScheduleSubmitBtn").button('reset');
@@ -617,7 +618,7 @@
                                 }
                                 schedule["dayStartTime"] = Date.parse(milestoneItem.value).toString('H');
                             }
-                            if (milestoneItem.name.split("DayEndTime")[0].toLowerCase() === schedule.milestoneName.toLowerCase()) {
+                            if (milestoneItem.name.split("DayEndTime")[0].toLowerCase() === schedule.milestoneId) {
                                 if (milestoneItem.value.length < 1) {
                                     showNotification("WARNING", "Please select valid times for milestone: " + schedule.milestoneName);
                                     $("#editScheduleSubmitBtn").button('reset');
