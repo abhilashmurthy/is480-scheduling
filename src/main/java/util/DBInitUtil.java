@@ -302,6 +302,7 @@ public class DBInitUtil {
         User uCourseCoordinator = new User("benjamingan", "Benjamin GAN Kok Siew", null, Role.COURSE_COORDINATOR, null);
 
         TA ta1 = new TA("kjsebastian.2011", "SEBASTIAN Kiran Joy", null, term12013);
+        TA ta2 = new TA("dudeTA", "Dude TA", null, term12013);
 
         Student u1 = new Student("suresh.s.2010", "Suresh SUBRAMANIAM", null, term12013);
 
@@ -429,6 +430,7 @@ public class DBInitUtil {
         em.persist(uAdmin);
         em.persist(uCourseCoordinator);
         em.persist(ta1);
+        em.persist(ta2);
         em.persist(u1);
         em.persist(u2);
         em.persist(u3);

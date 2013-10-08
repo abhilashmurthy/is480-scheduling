@@ -87,7 +87,7 @@
             </div>
 			<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 				<div class="settingsView">
-					<span id="settingsViewLabel">Update Bookings Drag-N-Drop: </span>
+					<span id="settingsViewLabel">Enable Drag-N-Drop: </span>
 					<div id="dragDropView" data-on="warning" data-off="success" data-on-label="On" data-off-label="Off" class="make-switch switch-small">
 						<input type="checkbox">
 					</div>
@@ -356,9 +356,10 @@
 							}
 							return facultyList;
 						},
-						TA: timeslot.TA,
-						Others: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+						TA: timeslot.TA
 					};
+					
+					outputData["Invite Others"] = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput');
 
                     //Allow team to edit booking
                     if (timeslot.team === teamName) {
@@ -376,6 +377,7 @@
 								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
 								.append('Save')
 								.css('float', 'right')
+								.attr('disabled', true)
 								.outerHTML()
 						);
                     }
@@ -418,6 +420,7 @@
 								.addClass('popoverBtn btn btn-info')
 								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
 								.append("Save")
+								.attr('disabled', true)
 								.outerHTML()
 						);
                     }
@@ -450,9 +453,10 @@
 						Time: Date.parse($td.attr('value')).toString('HH:mm')+ " - " + Date.parse($td.attr('value')).addMinutes(scheduleData.duration).toString('HH:mm'),
 						Venue: timeslot.venue,
 						Milestone: milestone,
-						TA: timeslot.TA,
-						Others: $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+						TA: timeslot.TA
 					};
+					
+					outputData["Invite Others"] = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput');
                    
 				   if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
 					   //Make fields editable for admin
@@ -477,6 +481,7 @@
 								.addClass('popoverBtn btn btn-info')
 								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
 								.append("Save")
+								.attr('disabled', true)
 								.outerHTML();
 				   } else {
 					   //For students
@@ -767,25 +772,29 @@
                         var attendees = $('.optionalAttendees').tokenInput('get');
                         var returnData = createBooking(self, attendees);
                         //REFRESH STATE OF scheduleData
-                        self.popover('destroy');
-                        self.tooltip('destroy');
-                        self.removeClass('unbookedTimeslot');
-                        self.addClass('bookedTimeslot');
-                        var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
-                        if ($deletedDiv) $deletedDiv.remove();
-                        var bookingDiv = $(document.createElement('div'));
-                        bookingDiv.addClass('booking pendingBooking myTeamBooking');
-                        bookingDiv.html(returnData.booking.team);
-                        bookingDiv.css('display', 'none');
-                        self.append(bookingDiv);
-                        showNotification('SUCCESS', self, null);
-                        scheduleData.timeslots[self.attr('value')] = returnData.booking;
-                        if (<%= activeRole.equals(Role.STUDENT)%>) {
-                            appendViewBookingPopover(self);
-                        } else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
-                            appendPopovers();
-                        }
-                        bookingDiv.show('clip', 'slow');
+						if (returnData && returnData.success) {
+							self.popover('destroy');
+							self.tooltip('destroy');
+							self.removeClass('unbookedTimeslot');
+							self.addClass('bookedTimeslot');
+							var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
+							if ($deletedDiv) $deletedDiv.remove();
+							var bookingDiv = $(document.createElement('div'));
+							bookingDiv.addClass('booking pendingBooking myTeamBooking');
+							bookingDiv.html(returnData.booking.team);
+							bookingDiv.css('display', 'none');
+							self.append(bookingDiv);
+							showNotification('SUCCESS', self, null);
+							scheduleData.timeslots[self.attr('value')] = returnData.booking;
+							if (<%= activeRole.equals(Role.STUDENT)%>) {
+								appendViewBookingPopover(self);
+							} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+								appendPopovers();
+							}
+							bookingDiv.show('clip', 'slow');
+						} else {
+							showNotification("ERROR", self, returnData.message);
+						}
                         return false;
                     });
 
@@ -829,6 +838,12 @@
 						});
                         return false;
                     });
+					
+					//Make Update Button visible on clicking an input
+					$('.timeslotCell').off('click', 'input');
+					$('.timeslotCell').on('click', 'input', function(){
+						$(this).closest('tr').siblings(':last').find('#updateBookingBtn').attr('disabled', false);
+					});
                     
                     //Update Booking Button
                     $('.timeslotCell').off('click', '#updateBookingBtn');
@@ -856,7 +871,7 @@
                                 newTimeslot.removeClass();
                                 newTimeslot.addClass('timeslotCell bookedTimeslot');
                                 var bookingDiv = $(document.createElement('div'));
-                                bookingDiv.addClass('booking pendingBooking myTeamBooking');
+                                bookingDiv.addClass(self.attr('class'));
                                 bookingDiv.html(returnData.booking.team);
                                 bookingDiv.css('display', 'none');
                                 newTimeslot.append(bookingDiv);
