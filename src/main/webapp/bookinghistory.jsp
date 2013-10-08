@@ -34,6 +34,7 @@
 			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
 		<% } %>
 		<s:if test="%{data != null && data.size() > 0}">
+			<% if (!activeRole.equals(Role.STUDENT)) { %>
 			<div style="float:right;margin-top:16px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
@@ -64,7 +65,7 @@
 				</select>
 				<!--</a>-->
 			</div>
-			
+			<% } %>
 			<div style="clear: both;">
 			<table id="bookingHistoryTable" class="table table-hover zebra-striped" style="font-size: 13px;">
 				<thead>
