@@ -410,6 +410,7 @@
                     milestones.sort(compare); //Sort by order first
                     for (var i = 0; i < milestones.length; i++) {
                         var milestone = milestones[i];
+						milestone["id"] = milestone.name.toLowerCase().replace(' ', '');
                         var milestoneTr = $(document.createElement('tr'));
                         //Milestone name
                         var milestoneTd = $(document.createElement('td'))
@@ -420,8 +421,8 @@
 							.append(
 								//Milestone dates[] MultiDatesPicker
 								$(document.createElement('div'))
-									.attr('name', milestone.name.toLowerCase() + "Dates")
-									.attr('id', "milestone_" + milestone.name.toLowerCase())
+									.attr('name', milestone.id + "Dates")
+									.attr('id', "milestone_" + milestone.id)
 									.attr('class', "milestoneOrder_" + milestone.milestoneOrder)
 									.addClass('datepicker')
 									.multiDatesPicker({
@@ -441,7 +442,7 @@
 							.append(
 								//Milestone dates[] Pillbox
 								$(document.createElement('div'))
-									.attr('id', milestone.name.toLowerCase() + 'Pillbox')
+									.attr('id', milestone.id + 'Pillbox')
 									.css('opacity', '0')
 									.addClass('pillbox')
 									.append($(document.createElement('ul')))
@@ -457,8 +458,8 @@
 									.append(
 										$(document.createElement('input'))
 											.attr('type', 'text')
-											.attr('id', "milestoneDayStart_" + milestone.name.toLowerCase())
-											.attr('name', milestone.name.toLowerCase() + "DayStartTime")
+											.attr('id', "milestoneDayStart_" + milestone.id)
+											.attr('name', milestone.id + "DayStartTime")
 											.attr('value', '09:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.timepicker({
@@ -478,8 +479,8 @@
 									.append(
 										$(document.createElement('input'))
 											.attr('type', 'text')
-											.attr('id', "milestoneDayEnd_" + milestone.name.toLowerCase())
-											.attr('name', milestone.name.toLowerCase() + "DayEndTime")
+											.attr('id', "milestoneDayEnd_" + milestone.id)
+											.attr('name', milestone.id + "DayEndTime")
 											.attr('value', '19:00')
 											.addClass('scheduleDayTimeSelect timepicker')
 											.css('float', 'right')
@@ -497,14 +498,14 @@
 							.css('padding-left', '40px')
 							.append(
 								$(document.createElement('div'))
-									.attr('id', 'milestoneBookable_' + milestone.name.toLowerCase())
+									.attr('id', 'milestoneBookable_' + milestone.id)
 									.addClass('make-switch switch-medium')
 									.attr('data-on', 'success')
 									.attr('data-off', 'danger')
 									.attr('data-on-label', 'Yes')
 									.attr('data-off-label', 'No')
 									.attr('padding-left', '30px')
-									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'milestoneBookable_' + milestone.name.toLowerCase()).attr('checked', true))
+									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'milestoneBookable_' + milestone.id).attr('checked', true))
 									.bootstrapSwitch()
 							);
                         milestoneTr.append(milestoneBookableTd);
@@ -664,15 +665,15 @@
                         var milestoneItem = milestoneArray[i];
                         for (var j = 0; j < milestones.length; j++) {
                             var milestone = milestones[j];
-							milestone["bookable"] = $("#milestoneBookable_" + milestone.name.toLowerCase()).bootstrapSwitch('status');
-							var dates = $("#milestone_" + milestone.name.toLowerCase()).multiDatesPicker('getDates');
+							milestone["bookable"] = $("#milestoneBookable_" + milestone.id).bootstrapSwitch('status');
+							var dates = $("#milestone_" + milestone.id).multiDatesPicker('getDates');
 							if (dates.length === 0) {
 								showNotification("WARNING", "Please pick dates for milestone: " + milestone.name);
 								$("#createScheduleSubmitBtn").button('reset');
 								return false;
 							}
 							milestone["dates[]"] = dates;
-                            if (milestoneItem.name.split("DayStartTime")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                            if (milestoneItem.name.split("DayStartTime")[0].toLowerCase() === milestone.id) {
                                 if (milestoneItem.value.length < 1) {
                                     showNotification("WARNING", "Please select valid times for milestone: " + milestone.name);
                                     $("#createScheduleSubmitBtn").button('reset');
@@ -680,7 +681,7 @@
                                 }
                                 milestone["dayStartTime"] = Date.parse(milestoneItem.value).toString('H');
                             }
-                            if (milestoneItem.name.split("DayEndTime")[0].toLowerCase() === milestone.name.toLowerCase()) {
+                            if (milestoneItem.name.split("DayEndTime")[0].toLowerCase() === milestone.id) {
                                 if (milestoneItem.value.length < 1) {
                                     showNotification("WARNING", "Please select valid times for milestone: " + milestone.name);
                                     $("#createScheduleSubmitBtn").button('reset');

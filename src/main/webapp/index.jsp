@@ -632,6 +632,7 @@
 						$('.timeslotCell, .booking').not(self).popover('hide');
 						$(".hasDatepicker").datepicker('destroy');
 						$.pnotify_remove_all();
+						if (dragDropView) showNotification("ERROR", self, "You are in Drag-N-Drop view");
                         return false;
                     });
 
@@ -641,9 +642,7 @@
 						if (e.target === this) {
 							if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
 								$(this).popover('show');
-								if ($(this).find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
-									$('body').animate({scrollTop: $(this).find('tr:last').offset().top - $(window).scrollTop()}, 500);
-								} else if ($(this).find('tr:first').offset().top - $(window).scrollTop() < window.innerHeight) {
+								if ($(this).find('tr:last').length && $(this).find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
 									$('body').animate({scrollTop: $(this).find('tr:last').offset().top - $(window).scrollTop()}, 500);
 								}
 								return false;
@@ -651,7 +650,7 @@
 							self = ($(this).is('.booking')) ? $(this) : $(this).children('.booking');
 							var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 							self.popover('show');
-							if (self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
+							if (self.find('tr:last').length && self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
 								$('body').animate({scrollTop: self.find('tr:last').offset().top - $(window).scrollTop()}, 500);
 							}
 							self.find("#updateFormDate").val(timeslot.startDate).change();
@@ -695,9 +694,9 @@
                                 }
                             }
 //                            console.log(".unbookedTimeslot clicked.");
-                            self.tooltip('hide');
+							self.tooltip('hide');
                             self.popover('show');
-							if (self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
+							if (self.find('tr:last').length && self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
 								$('body').animate({scrollTop: self.find('tr:last').offset().top - $(window).scrollTop()}, 500);
 							}
                             self.find('ul').remove(); //Remove all old tokenInputs
@@ -739,7 +738,7 @@
 								}
 							}
 							self.popover('show');
-							if (self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
+							if (self.find('tr:last').length && self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
 								$('body').animate({scrollTop: self.find('tr:last').offset().top - $(window).scrollTop()}, 500);
 							}
 							self.find('ul').remove();
@@ -775,8 +774,7 @@
                         var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
                         if ($deletedDiv) $deletedDiv.remove();
                         var bookingDiv = $(document.createElement('div'));
-                        bookingDiv.addClass('booking pendingBooking');
-						bookingDiv.addClass(<%= activeRole.equals(Role.STUDENT) %>?'myTeamBooking':false);
+                        bookingDiv.addClass('booking pendingBooking myTeamBooking');
                         bookingDiv.html(returnData.booking.team);
                         bookingDiv.css('display', 'none');
                         self.append(bookingDiv);
@@ -858,7 +856,7 @@
                                 newTimeslot.removeClass();
                                 newTimeslot.addClass('timeslotCell bookedTimeslot');
                                 var bookingDiv = $(document.createElement('div'));
-                                bookingDiv.addClass('booking pendingBooking');
+                                bookingDiv.addClass('booking pendingBooking myTeamBooking');
                                 bookingDiv.html(returnData.booking.team);
                                 bookingDiv.css('display', 'none');
                                 newTimeslot.append(bookingDiv);
@@ -1359,7 +1357,7 @@
 																	?'myTeamBooking':false)
 																.html(timeslot.team)
 														:false)
-														.append(timeslot.lastBookingWasRemoved?
+														.append(!timeslot.team && timeslot.lastBookingWasRemoved?
 															function(){
 																var $removedDiv = $(document.createElement('div'));
 																if (timeslot.lastBookingRejectReason) {
@@ -1415,6 +1413,7 @@
 						tolerance: 'intersect',
 						drop: function(event, ui) {
 							var $booking = ui.draggable;
+							$booking.draggable('option', 'revertDuration', 0);
 							var $oldTimeslot = $booking.closest('.timeslotCell');
 							var timeslot = scheduleData.timeslots[$oldTimeslot.attr('value')];
 							var newDateTime = $(this).attr('value');
@@ -1434,8 +1433,7 @@
 									venue: venue, 
 									datetime: $oldTimeslot.attr('value')
 								};
-								$booking.detach();
-								$newTimeslot.append($booking);
+								$booking.detach().appendTo($newTimeslot);
 								setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
 								initDragNDrop();
 							} else {
