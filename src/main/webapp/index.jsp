@@ -1357,7 +1357,7 @@
 																	?'myTeamBooking':false)
 																.html(timeslot.team)
 														:false)
-														.append(timeslot.lastBookingWasRemoved?
+														.append(!timeslot.team && timeslot.lastBookingWasRemoved?
 															function(){
 																var $removedDiv = $(document.createElement('div'));
 																if (timeslot.lastBookingRejectReason) {
