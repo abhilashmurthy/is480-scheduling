@@ -18,6 +18,8 @@
 		<%  Role activeR = (Role) session.getAttribute("activeRole"); %>
 		<% if (activeR.equals(Role.ADMINISTRATOR) || activeR.equals(Role.COURSE_COORDINATOR)) { %>
 	        IS480 Scheduling System | All Bookings
+		<% } else if (activeR.equals(Role.TA)) { %>
+			IS480 Scheduling System | My Sign Ups!
 		<% } else { %>
 			IS480 Scheduling System | My Bookings
 		<% } %>
@@ -30,10 +32,13 @@
 		<div class="container">
 		<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)){ %>
 			<h3 style="float: left; margin-right: 50px;">All Bookings</h3> 
+		<% } else if (activeR.equals(Role.TA)) { %>
+			<h3 style="float: left; margin-right: 50px;">My Sign Ups</h3> 
 		<% } else { %>
 			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
 		<% } %>
 		<s:if test="%{data != null && data.size() > 0}">
+			<% if (!activeRole.equals(Role.STUDENT)) { %>
 			<div style="float:right;margin-top:16px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
@@ -64,7 +69,7 @@
 				</select>
 				<!--</a>-->
 			</div>
-			
+			<% } %>
 			<div style="clear: both;">
 			<table id="bookingHistoryTable" class="table table-hover zebra-striped" style="font-size: 13px;">
 				<thead>
@@ -202,7 +207,11 @@
 				<br/><br/>
 		</s:if><s:else>
 			<div style="clear: both;">
-				<h4>No bookings have been made!</h4>
+				<% if (activeR.equals(Role.TA)) { %>
+					<h4> No sign ups yet! </h4>
+				<% } else { %>
+					<h4>No bookings have been made!</h4>
+				<% } %>
 			</div>
 		</s:else>
 		</div>
