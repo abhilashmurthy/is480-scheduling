@@ -34,7 +34,7 @@
 			.timeslotsTable {
 /*				margin-top: 5px;*/
 				position: absolute;
-                left: 33%;
+                left: 36%;
                 top: 11%;
 			}
             
@@ -161,15 +161,14 @@
 							<td>
                                 <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
                             </td>
+							<td></td>
                         </tr>
 						<tr>
-                            <td></td>
                             <td>
                                 <table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
                             <td>
                                 <table class='availabilityLegend'>
                                     <tr>

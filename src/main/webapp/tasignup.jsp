@@ -31,6 +31,13 @@
                 /*border-bottom: 1px solid black;*/
             }
             
+			.timeslotsTable {
+/*				margin-top: 5px;*/
+				position: absolute;
+                left: 36%;
+                top: 11%;
+			}
+			
             .legend td {
                 font-size: 16px !important;
             }
@@ -77,10 +84,14 @@
                 background-color: #F9FCBD !important;
             }
             
+			#milestoneTimeslotsSelect {
+				margin-bottom: 0px !important;
+			}
+			
             .availabilityLegend {
                 position: absolute;
-                left: 70%;
-                top: 12%;
+                left: 7%;
+                top: 35%;
             }
 			
 			.glow-top {
@@ -122,13 +133,17 @@
                     <table>
                         <tr>
                             <td>Milestone</td>
-                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td>
+                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect" style="width:150px"></select></td>
+							 <td>
+                                <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
+                            </td>
+							 <td>
+                                <table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
+                            </td>
+							<td></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td>
-                                <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
-                            </td>
                             <td>
                                 <table class='availabilityLegend'>
                                     <tr>
@@ -146,9 +161,6 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td>
-                                <table class="timeslotsTable table-condensed table-hover table-bordered table-striped"></table>
-                            </td>
                         </tr>
                     </table>
                 </div>
