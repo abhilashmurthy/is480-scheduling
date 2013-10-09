@@ -382,7 +382,7 @@
                     }
 					
                     //Allow supervisor to update booking
-                    if (<%= activeRole.equals(Role.FACULTY) %>) {
+                    if (<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam) {
                         outputData[""] = (
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
@@ -1645,9 +1645,9 @@
                     var timeslot = scheduleData.timeslots[booking.parents('.timeslotCell').attr('value')];
                     if (timeslot) {
                         //View Booking Data
-                        opts["prePopulate"] = timeslot.optionals;
-                        if ((<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName) || booking.is('.unavailableTimeslot')) {
-                            opts["disabled"] = true;
+                        opts.prePopulate = timeslot.optionals;
+                        if ((<%= activeRole.equals(Role.FACULTY) %> && !timeslot.isMyTeam) ||(<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName) || booking.is('.unavailableTimeslot')) {
+                            opts.disabled= true;
                         }
                     }
                     booking.find('.optionalAttendees').tokenInput(users, opts);

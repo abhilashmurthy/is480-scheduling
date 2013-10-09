@@ -474,11 +474,10 @@ input, button, select, textarea {
 
 .booking:not(.myTeamBooking) {
 	color: grey;
-	background-color: rgba(248, 247, 216, 0.7) !important;
+	background-color: rgba(248, 247, 216, 0.5) !important;
 	border: 2px solid grey !important;
-	opacity: 0.9;
 }
 
-.booking:not(.myTeamBooking) .popover {
-	z-index: 1032 !important;
+.booking:not(.myTeamBooking) > .popover {
+	opacity: 0.9;
 }
