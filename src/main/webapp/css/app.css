@@ -481,3 +481,16 @@ input, button, select, textarea {
 .booking:not(.myTeamBooking) > .popover {
 	opacity: 0.9;
 }
+
+.fuelux .spinner input {
+	width: 206px !important;
+}
+
+#milestoneConfigButtons {
+	float: right;
+	margin-right: 60px;
+}
+
+#addMilestoneBtn {
+	margin-left: 20px;
+}

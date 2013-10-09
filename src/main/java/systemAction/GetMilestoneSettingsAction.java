@@ -4,6 +4,7 @@
  */
 package systemAction;
 
+import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class GetMilestoneSettingsAction extends ActionSupport implements Servlet
 
 					String milestone = (String) map.get("milestone");
 					map.put("milestone", milestone);
+					map.put("id", milestone.replaceAll(" ", ""));
 
 					ArrayList<String> attendees = (ArrayList<String>) map.get("attendees");
 					List<HashMap<String, String>> attendeesList = new ArrayList<HashMap<String, String>>();
@@ -68,6 +70,7 @@ public class GetMilestoneSettingsAction extends ActionSupport implements Servlet
 						}
 					}
 					map.put("attendees", attendeesList);
+					map.put("attendeesJson", new Gson().toJson(attendees));
 
 					data.add(map);
 				}

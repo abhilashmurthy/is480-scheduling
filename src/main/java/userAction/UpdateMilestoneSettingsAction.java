@@ -67,9 +67,9 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 					String duration = milestone.getString("newDuration");
 					map.put("duration", Double.valueOf(duration));
 
-					String newAttendees = milestone.getString("newAttendees");
+					String newAttendees = milestone.getString("newAttendees").replaceAll(", ", ",");
 					//Removing the comma from the end
-					String[] attendees = newAttendees.substring(0, newAttendees.length() - 1).split(",");
+					String[] attendees = newAttendees.split(",");
 					map.put("attendees", attendees);
 
 					//If more than 3 attendees for a milestone return error
@@ -95,6 +95,17 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 
 					milestonesList.add(map);
 				} //end of for loop
+				
+				//Check whether milestone names exists
+				for (int i = 0; i < milestonesList.size(); i++) {
+					HashMap<String, Object> startMilestoneMap = milestonesList.get(i);
+					String milestoneName = (String) startMilestoneMap.get("milestone");
+					if (milestoneName.trim().equals("")) {
+						json.put("message", "Milestones must have names!");
+						json.put("success", false);
+						return SUCCESS;
+					}
+				}
 
 				//Check whether the milestone names are the same or not
 				for (int i = 0; i < milestonesList.size() - 1; i++) {
