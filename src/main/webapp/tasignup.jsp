@@ -32,10 +32,12 @@
             }
             
 			.timeslotsTable {
-/*				margin-top: 5px;*/
-				position: absolute;
-                left: 36%;
-                top: 11%;
+				margin-top: 60px;
+				margin-left: 90px !important;
+			}
+            
+			#milestoneTimeslotsSelect {
+				margin-bottom: 0px !important;
 			}
 			
             .legend td {
@@ -68,10 +70,11 @@
             .start-marker { /* Triangle marker for the start of a timeslot */
                 width: 0;
                 height: 0;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 10px solid #5C7AFF;
+                border-left: 5px solid #5C7AFF;
+                border-right: 5px solid #5C7AFF;
+                border-top: 7px solid #5C7AFF;
                 z-index: 1;
+				float: left;
             }
             .chosen {
                 background-color: #B8F79E !important ;
@@ -89,10 +92,26 @@
 			}
 			
             .availabilityLegend {
-                position: absolute;
-                left: 7%;
-                top: 35%;
+				float: right;
+/*                position: absolute;
+                left: 70%;
+                top: 12%;*/
+/*                left: 7%;
+                top: 35%;*/
             }
+			
+			.availabilityLegend td {
+				height: 10px;
+				line-height: 10px;
+			}
+			
+			.border-top {
+				border-top: 1px solid #dddddd !important;
+			}
+			
+			.border-left {
+				border-left: 1px solid #dddddd !important;
+			}
 			
 			.glow-top {
 				border-top: 1px solid #fff966 !important;
@@ -108,6 +127,10 @@
 				border-bottom: 1px solid #fff966 !important;
 				border-radius: 0px 0px 5px 5px; 
 				box-shadow: inset 0 -16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
+			}
+			
+			.dateHeader {
+				font-size: 15px;
 			}
 
         </style>
@@ -128,41 +151,23 @@
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
-                <h3>Your Availability</h3>
+                <h3>Sign Up For Filming!</h3>
+					<table class='availabilityLegend'>
+						<tr>
+							<td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td>
+							<td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td>
+							<td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td>
+						</tr>
+						<tr><td style='height: 2px'></td></tr>
+					</table>
                 <div id="timeslotsTableSection">
                     <table>
                         <tr>
                             <td>Milestone</td>
-                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect" style="width:150px"></select></td>
-							 <td>
-                                <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
-                            </td>
-							 <td>
-                                <table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
-                            </td>
-							<td></td>
+                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button></td>
                         </tr>
-                        <tr>
-                            <td></td>
-                            <td>
-                                <table class='availabilityLegend'>
-                                    <tr>
-                                        <!-- <td style="width:50px"><b>Legend:</b></td>-->
-                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td> 
-                                    </tr>
-                                    <tr>
-                                        <td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td> 
-                                    </tr>
-                                    <tr>
-                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td> 
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                        </tr>
-                    </table>
+					</table>
+					<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
                 </div>
                 <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
                 <br/><br/>
@@ -296,7 +301,7 @@
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
                     for (i = 0; i < dateArray.length; i++) {
-                        var th = $(document.createElement("td"));
+                        var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
                         th.html(headerVal);
                         thead.append(th);
@@ -331,9 +336,12 @@
                             var datetimeString = date + " " + timesArray[i] + ":00";
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                             if (timeslot) {
-								td.addClass("markable");
+								td.addClass('markable border-top');
 								td.attr("value", "timeslot_" + timeslot.id);
+								td.attr("align", "center");
+								td.html(timeslot.team?'<b>' + timeslot.team + '</b>':'');
                             }
+							td.addClass('border-left');
                             tr.append(td);
                         }
                         $("." + tableClass).append(tr);
