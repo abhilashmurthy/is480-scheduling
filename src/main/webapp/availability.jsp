@@ -32,10 +32,8 @@
             }
 			
 			.timeslotsTable {
-/*				margin-top: 5px;*/
-				position: absolute;
-                left: 36%;
-                top: 11%;
+				margin-top: 50px;
+				margin-left: 90px !important;
 			}
             
 			#milestoneTimeslotsSelect {
@@ -109,10 +107,18 @@
 			}
             
             .availabilityLegend {
-                position: absolute;
-                left: 7%;
-                top: 35%;
+				float: right;
+/*                position: absolute;
+                left: 70%;
+                top: 12%;*/
+/*                left: 7%;
+                top: 35%;*/
             }
+			
+			.availabilityLegend td {
+				height: 10px;
+				line-height: 10px;
+			}
 			
 			.glow-top {
 				border-top: 1px solid #fff966 !important;
@@ -153,42 +159,23 @@
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
                 <h3>My Availability</h3>
+					<table class='availabilityLegend'>
+						<tr>
+							<td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available</td><td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available & there's a team</td> 
+						</tr>
+						<tr><td style='height: 2px'></td></tr>
+						<tr>
+							<td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm unavailable</td><td style="background-color:#F56753;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Oh dear, I'm unavailable & there's a team!</td> 
+						</tr>
+					</table>
                 <div id="timeslotsTableSection">
                     <table>
                         <tr>
                             <td>Milestone</td>
-                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect" style="width:150px"></select></td>
-							<td>
-                                <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
-                            </td>
-							<td></td>
+                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button></td>
                         </tr>
-						<tr>
-                            <td>
-                                <table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <table class='availabilityLegend'>
-                                    <tr>
-                                        <!-- <td style="width:50px"><b>Legend:</b></td>-->
-                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available</td> 
-                                        <!--<td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm Unavailable</td>--> 
-                                    </tr>
-									<tr>
-                                        <td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available & there's a team</td> 
-                                    </tr>
-                                    <tr>
-                                        <td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm unavailable</td> 
-                                    </tr>
-                                    <tr>
-                                        <td style="background-color:#F56753;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Oh dear, I'm unavailable & there's a team!</td> 
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
+					</table>
+					<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
                 </div>
                 <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
                 <br/><br/>
