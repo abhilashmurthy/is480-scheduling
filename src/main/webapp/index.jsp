@@ -1823,6 +1823,5 @@
 
             addLoadEvent(viewScheduleLoad);
         </script>
-        <br/>
     </body>
 </html>

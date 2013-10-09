@@ -77,7 +77,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				rejectReason = inputObject.getString("rejectReason");
 			} else {
 				logger.error("No valid response recorded from user");
-				return ERROR;
+				return SUCCESS;
 			}
 
 			HttpSession session = request.getSession();
@@ -89,7 +89,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				f = em.find(Faculty.class, user.getId());
 			} else {
 				logger.error("User is not a faculty member");
-				return ERROR;
+				return SUCCESS;
 			}
 
 			//The list of slots to update in db
@@ -116,7 +116,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					}
 				} else {
 					logger.error("Faculty not found in responseList for required attendees");
-					return ERROR;
+					return SUCCESS;
 				}
 				
 				//Storing the reason for rejection
@@ -179,7 +179,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			} else {
 				request.setAttribute("error", "No timeslot selected!");
 				logger.error("User hasn't selected a timeslot to approve/reject!");
-				return ERROR;
+				return SUCCESS;
 			}
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
