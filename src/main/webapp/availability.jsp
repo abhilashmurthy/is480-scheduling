@@ -32,7 +32,7 @@
             }
 			
 			.timeslotsTable {
-				margin-top: 50px;
+				margin-top: 60px;
 				margin-left: 90px !important;
 			}
             
@@ -70,9 +70,9 @@
             .start-marker { /* Triangle marker for the start of a timeslot */
                 width: 0;
                 height: 0;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 10px solid #5C7AFF;
+                border-left: 5px solid #5C7AFF;
+                border-right: 5px solid #5C7AFF;
+                border-top: 7px solid #5C7AFF;
                 z-index: 1;
 				float: left;
             }
@@ -120,6 +120,14 @@
 				line-height: 10px;
 			}
 			
+			.border-top {
+				border-top: 1px solid #dddddd !important;
+			}
+			
+			.border-left {
+				border-left: 1px solid #dddddd !important;
+			}
+			
 			.glow-top {
 				border-top: 1px solid #fff966 !important;
 				border-radius: 5px 5px 0px 0px; 
@@ -134,6 +142,10 @@
 				border-bottom: 1px solid #fff966 !important;
 				border-radius: 0px 0px 5px 5px; 
 				box-shadow: inset 0 -16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
+			}
+			
+			.dateHeader {
+				font-size: 15px;
 			}
 
         </style>
@@ -315,7 +327,7 @@
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
                     for (i = 0; i < dateArray.length; i++) {
-                        var th = $(document.createElement("td"));
+                        var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
                         th.html(headerVal);
                         thead.append(th);
@@ -355,9 +367,10 @@
                                     td.attr("align", "center");
                                     td.addClass("teamExists");
                                 }
-								td.addClass("markable");
+								td.addClass('markable border-top');
 								td.attr("value", "timeslot_" + timeslot.id);
                             }
+							td.addClass('border-left');
                             tr.append(td);
                         }
                         $("." + tableClass).append(tr);
