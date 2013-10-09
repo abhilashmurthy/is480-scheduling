@@ -327,6 +327,11 @@
                             appendChangeAvailabilityPopover($(this));
                         });
                     }
+                    if (<%= activeRole.equals(Role.TA) %>) {
+                        $('.timeslotCell').each(function() {
+                            appendChangeSignupPopover($(this));
+                        });
+                    }
                     //Show progress bar
                     $('#scheduleProgressBar').hide();
                     $('#milestoneTabContent').show();
@@ -573,6 +578,47 @@
 					//Popover
 					makePopover($td, "Change Availability", $changeAvailabilityTable);
                 }
+				
+                function appendChangeSignupPopover($td) {
+                    if ($td.hasClass('legendBox')) return;
+                    var $changeSignupTable = $(document.createElement('table')).attr('id', 'createTimeslotTable');
+                    var outputData = {};
+					
+					outputData["Filming"] = function() {
+						if ($td.is('.taChosenTimeslot')) {
+							return $(document.createElement('button'))
+										.attr('id', 'unsignupTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('icon-minus-sign icon-white'))
+										.append("Cancel")
+										.outerHTML();
+						} else {
+							return $(document.createElement('button'))
+										.attr('id', 'signupTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+										.append("Sign Up")
+										.outerHTML();
+						}
+					};
+					
+                    //Append all fields
+					for (var key in outputData) {
+						if (outputData.hasOwnProperty(key)) {
+							$changeSignupTable
+								.append(
+									$(document.createElement('tr'))
+										.append($(document.createElement('td')).html(key))
+										.append($(document.createElement('td')).html(outputData[key]))
+								);
+						}
+					}
+                    
+					//Popover
+					makePopover($td, "Sign Up For Filming", $changeSignupTable);
+                }
                 
                 //Function to refresh booking exists
                 function refreshScheduleData() {
@@ -646,7 +692,7 @@
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
 //						console.log('timeslotCell clicked');
-						self = <%= activeRole.equals(Role.FACULTY) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
+						self = <%= activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateBookingBtn').attr('disabled', true);
 						$('.timeslotCell, .booking').not(self).popover('hide');
 						$(".hasDatepicker").datepicker('destroy');
@@ -659,7 +705,7 @@
                     $('body').off('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking');
                     $('body').on('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking', function(e) {
 						if (e.target === this) {
-							if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY)%>) {
+							if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) %>) {
 								$(this).popover('show');
 								if ($(this).find('tr:last').length && $(this).find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
 									$('body').animate({scrollTop: $(this).find('tr:last').offset().top - $(window).scrollTop()}, 500);
@@ -933,7 +979,7 @@
 					
 					
                     
-                    //Set Available
+                    //Faculty Set Available
                     $('.timeslotCell').off('click', '#availableTimeslotBtn');
                     $('.timeslotCell').on('click', '#availableTimeslotBtn', function(e) {
                         e.stopPropagation();
@@ -945,7 +991,7 @@
                         return false;
                     });
                     
-                    //Set Unavailable
+                    //Faculty Set Unavailable
                     $('.timeslotCell').off('click', '#unavailableTimeslotBtn');
                     $('.timeslotCell').on('click', '#unavailableTimeslotBtn', function(e) {
                         e.stopPropagation();
@@ -954,6 +1000,30 @@
                         showNotification("WARNING", self, "Set as unavailable");
                         self.popover('destroy');
                         appendChangeAvailabilityPopover(self);
+                        return false;
+                    });
+					
+                    //TA Sign Up
+                    $('.timeslotCell').off('click', '#signupTimeslotBtn');
+                    $('.timeslotCell').on('click', '#signupTimeslotBtn', function(e) {
+                        e.stopPropagation();
+                        changeSignup(self, true);
+                        self.addClass('existingTimeslot'); //For showNotification method
+                        showNotification("WARNING", self, "Signed up for filming");
+                        self.popover('destroy');
+                        appendChangeSignupPopover(self);
+                        return false;
+                    });
+                    
+                    //TA Cancel Sign Up
+                    $('.timeslotCell').off('click', '#unsignupTimeslotBtn');
+                    $('.timeslotCell').on('click', '#unsignupTimeslotBtn', function(e) {
+                        e.stopPropagation();
+                        changeSignup(self, false);
+                        self.addClass('existingTimeslot'); //For showNotification method
+                        showNotification("WARNING", self, "Cancelled for filming");
+                        self.popover('destroy');
+                        appendChangeSignupPopover(self);
                         return false;
                     });
                     
@@ -1245,7 +1315,7 @@
                     return toReturn;
                 }
                 
-                //Update Timeslots AJAX Call            
+                //Update Faculty Availability AJAX Call            
                 function changeAvailability(bodyTd, available) {
                     var timeslotsData = {};
                     var timeslot_data = new Array();
@@ -1284,6 +1354,61 @@
                             } else {
                                 var eid = btoa(response.message);
 //                                console.log(response.message);
+                                window.location = "error.jsp?eid=" + eid;
+                            }
+                        } else {
+                            var eid = btoa(response.message);
+                            window.location="error.jsp?eid=" + eid;
+                        }
+                    }).fail(function(error) {
+                        var eid = btoa("Something went wrong");
+                        window.location="error.jsp?eid=" + eid;
+                    });
+                    return false;
+                }
+				
+                //Update TA Signup AJAX Call            
+                function changeSignup(bodyTd, taChosen) {
+                    var timeslotsData = {};
+                    var timeslot_data = new Array();
+                    var allTimeslots = $(".taChosenTimeslot", ".scheduleTable").get();
+                    var timeslotsSet = new HashSet();
+                    for (var i = 0; i < allTimeslots.length; i++) {
+                        var obj = allTimeslots[i];
+                        timeslotsSet.add(obj.id.split("_")[1]);
+                    }
+                    timeslot_data = timeslotsSet.values().sort();
+                    if (taChosen) {
+                        timeslot_data.push(bodyTd.attr('id').split("_")[1]);
+                    } else {
+                        var index = timeslot_data.indexOf(bodyTd.attr('id').split("_")[1]);
+                        timeslot_data.splice(index, 1);
+                    }
+                    timeslotsData["timeslots"] = timeslot_data;
+                    timeslotsData["scheduleId"] = scheduleData.id;
+//                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
+                    $.ajax({
+                        type: 'POST',
+                        async: false,
+                        url: 'taSignupJson',
+                        data: {jsonData: JSON.stringify(timeslotsData)},
+                        dataType: 'json'
+                    }).done(function(response) {
+                        if (!response.exception) {
+                            if (response.success) {
+                                if (taChosen) {
+                                    bodyTd.addClass('taChosenTimeslot');
+									if (bodyTd.children('.booking').length) {
+										bodyTd.children('.booking').addClass('myTeamBooking');
+									}
+                                } else {
+                                    bodyTd.removeClass('taChosenTimeslot');
+									if (bodyTd.children('.booking').length) {
+										bodyTd.children('.booking').removeClass('myTeamBooking');
+									}
+                                }
+                            } else {
+                                var eid = btoa(response.message);
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         } else {
@@ -1646,10 +1771,10 @@
                     if (timeslot) {
                         //View Booking Data
                         opts.prePopulate = timeslot.optionals;
-                        if ((<%= activeRole.equals(Role.FACULTY) %> && !timeslot.isMyTeam) ||(<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName) || booking.is('.unavailableTimeslot')) {
+                        if ((<%= activeRole.equals(Role.FACULTY) %> && !timeslot.isMyTeam) ||(<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName) || booking.is('.unavailableTimeslot') || <%= activeRole.equals(Role.TA) %>) {
                             opts.disabled= true;
                         }
-                    }
+                    }	
                     booking.find('.optionalAttendees').tokenInput(users, opts);
                 }
             };
