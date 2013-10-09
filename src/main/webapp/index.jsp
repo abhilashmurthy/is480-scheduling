@@ -356,10 +356,9 @@
 							}
 							return facultyList;
 						},
-						TA: timeslot.TA
+						TA: timeslot.TA,
+						"Invite Others": $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
 					};
-					
-					outputData["Invite Others"] = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput');
 
                     //Allow team to edit booking
                     if (timeslot.team === teamName) {
@@ -381,9 +380,23 @@
 								.outerHTML()
 						);
                     }
+					
+                    //Allow supervisor to update booking
+                    if (<%= activeRole.equals(Role.FACULTY) %>) {
+                        outputData[""] = (
+							$(document.createElement('button'))
+								.attr('id', 'updateBookingBtn')
+								.addClass('popoverBtn btn btn-info')
+								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append('Save')
+								.css('float', 'right')
+								.attr('disabled', true)
+								.outerHTML()
+						);
+                    }
 
                     //Allow admin to edit fields
-                    if (<%=activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+                    if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
 						outputData.Venue =
 								$(document.createElement('input'))
 									.attr('id', 'updateFormVenue')
@@ -453,10 +466,9 @@
 						Time: Date.parse($td.attr('value')).toString('HH:mm')+ " - " + Date.parse($td.attr('value')).addMinutes(scheduleData.duration).toString('HH:mm'),
 						Venue: timeslot.venue,
 						Milestone: milestone,
-						TA: timeslot.TA
+						TA: timeslot.TA,
+						"Invite Others": $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
 					};
-					
-					outputData["Invite Others"] = $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput');
                    
 				   if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
 					   //Make fields editable for admin
@@ -1634,7 +1646,7 @@
                     if (timeslot) {
                         //View Booking Data
                         opts["prePopulate"] = timeslot.optionals;
-                        if (<%= activeRole.equals(Role.FACULTY) %> || (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName) || booking.is('.unavailableTimeslot')) {
+                        if ((<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName) || booking.is('.unavailableTimeslot')) {
                             opts["disabled"] = true;
                         }
                     }

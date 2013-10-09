@@ -65,8 +65,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 
             //Checking whether the user setting optional attendees is student, admin or cc
             User user = (User) session.getAttribute("user");
-            if (user.getRole().equals(Role.ADMINISTRATOR) || user.getRole().equals(Role.COURSE_COORDINATOR)
-                    || user.getRole().equals(Role.STUDENT)) {
+            if (!user.getRole().equals(Role.TA)) {
 
                 //Getting input data from url
                 JSONObject inputData = (JSONObject) new JSONObject(request.getParameter("jsonData"));

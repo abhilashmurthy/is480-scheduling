@@ -106,7 +106,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
             }
             
             //Add users into session if user is admin/course coordinator/student
-            if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR || activeRole == Role.STUDENT) {
+            if (activeRole != Role.TA) {
                 addUsersJson(em, session);
             }
 
