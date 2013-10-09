@@ -31,15 +31,6 @@
                 /*border-bottom: 1px solid black;*/
             }
             
-			.timeslotsTable {
-				margin-top: 60px;
-				margin-left: 90px !important;
-			}
-            
-			#milestoneTimeslotsSelect {
-				margin-bottom: 0px !important;
-			}
-			
             .legend td {
                 font-size: 16px !important;
             }
@@ -70,11 +61,10 @@
             .start-marker { /* Triangle marker for the start of a timeslot */
                 width: 0;
                 height: 0;
-                border-left: 5px solid #5C7AFF;
-                border-right: 5px solid #5C7AFF;
-                border-top: 7px solid #5C7AFF;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 10px solid #5C7AFF;
                 z-index: 1;
-				float: left;
             }
             .chosen {
                 background-color: #B8F79E !important ;
@@ -87,51 +77,11 @@
                 background-color: #F9FCBD !important;
             }
             
-			#milestoneTimeslotsSelect {
-				margin-bottom: 0px !important;
-			}
-			
             .availabilityLegend {
-				float: right;
-/*                position: absolute;
+                position: absolute;
                 left: 70%;
-                top: 12%;*/
-/*                left: 7%;
-                top: 35%;*/
+                top: 12%;
             }
-			
-			.availabilityLegend td {
-				height: 10px;
-				line-height: 10px;
-			}
-			
-			.border-top {
-				border-top: 1px solid #dddddd !important;
-			}
-			
-			.border-left {
-				border-left: 1px solid #dddddd !important;
-			}
-			
-			.glow-top {
-				border-top: 1px solid #fff966 !important;
-				border-radius: 5px 5px 0px 0px; 
-				box-shadow: inset 0  16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
-			}
-			.glow-sides {
-				border-left: 1px solid #fff966 !important;
-				border-right: 1px solid #fff966 !important;
-				box-shadow: inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966;
-			}
-			.glow-bottom {
-				border-bottom: 1px solid #fff966 !important;
-				border-radius: 0px 0px 5px 5px; 
-				box-shadow: inset 0 -16px 16px -16px #fff966, inset 16px 0 16px -16px #fff966, inset -16px 0 16px -16px #fff966 !important;
-			}
-			
-			.dateHeader {
-				font-size: 15px;
-			}
 
         </style>
     </head>
@@ -151,23 +101,40 @@
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
-                <h3>Sign Up For Filming!</h3>
-					<table class='availabilityLegend'>
-						<tr>
-							<td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td>
-							<td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td>
-							<td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td>
-						</tr>
-						<tr><td style='height: 2px'></td></tr>
-					</table>
+                <h3>Your Availability</h3>
                 <div id="timeslotsTableSection">
                     <table>
                         <tr>
                             <td>Milestone</td>
-                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button></td>
+                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select></td>
                         </tr>
-					</table>
-					<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
+                            </td>
+                            <td>
+                                <table class='availabilityLegend'>
+                                    <tr>
+                                        <!-- <td style="width:50px"><b>Legend:</b></td>-->
+                                        <td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td> 
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td> 
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td> 
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <table id="timeslotsTable" class="timeslotsTable table-condensed table-hover table-bordered table-striped"></table>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
                 <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
                 <br/><br/>
@@ -201,6 +168,7 @@
                 var milestones = new Array();
 
                 loadMilestones();
+                loadUnavailableTimeslots();
                 loadSelectDropdown();
                 
                 function loadMilestones() {
@@ -209,6 +177,12 @@
                         milestones.push(milestonesData.milestones[i].name);
                     }
                 };
+
+                function loadUnavailableTimeslots() {
+                    <s:iterator value="unavailableTimeslotIds">
+                    unavailableTimeslots.push("timeslot_<s:property/>");
+                    </s:iterator>
+                }
                 
                 function loadSelectDropdown() {
                     for (var i = 0; i < milestones.length; i++) {
@@ -230,12 +204,11 @@
                 $("#milestoneTimeslotsSelect").val(milestones[0]).change(); //Select first milestone
 
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
-                    var tableClass = "timeslotsTable";
-                    var table = $("." + tableClass);
-                    makeTimeslotTable(tableClass, scheduleData, getDistinctDates(scheduleData, "typeString"));
-					convertScheduleData();
-                    populateTimeslotsTable(tableClass, scheduleData);
-                    populateUnavailableTimeslots(tableClass, scheduleData);
+                    var tableId = "timeslotsTable";
+                    var table = $("#" + tableId);
+                    makeTimeslotTable(tableId, scheduleData, getDistinctDates(scheduleData, "typeString"));
+                    populateTimeslotsTable(tableId, scheduleData);
+                    populateUnavailableTimeslots(tableId, scheduleData);
                 }
 
                 function getScheduleData(milestone, year, semester) {
@@ -281,19 +254,8 @@
                     var scheduleDataDates = datesSet.values().sort();
                     return scheduleDataDates;
                 }
-				
-                function convertScheduleData() {
-                    var timeslots = scheduleData.timeslots;
-                    var newTimeslots = {};
-                    for (var i = 0; i < timeslots.length; i++) {
-                        var timeslot = timeslots[i];
-                        var key = timeslot.id;
-                        newTimeslots[key] = timeslot;
-                    }
-                    scheduleData["timeslots"] = newTimeslots;
-                }
 
-                function makeTimeslotTable(tableClass, scheduleData, dateArray) {
+                function makeTimeslotTable(tableId, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
                     var minTime = 9;
                     var maxTime = 19;
@@ -301,13 +263,13 @@
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
                     for (i = 0; i < dateArray.length; i++) {
-                        var th = $(document.createElement("td")).addClass('dateHeader');
+                        var th = $(document.createElement("td"));
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
                         th.html(headerVal);
                         thead.append(th);
                     }
                     //Inserting constructed table header into table
-                    $("." + tableClass).append(thead);
+                    $("#" + tableId).append(thead);
 
                     //Creating table body with times and empty cells
 //                    var tbody = $(document.createElement("tbody"));
@@ -336,141 +298,149 @@
                             var datetimeString = date + " " + timesArray[i] + ":00";
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                             if (timeslot) {
-								td.addClass('markable border-top');
-								td.attr("value", "timeslot_" + timeslot.id);
-								td.attr("align", "center");
-								td.html(timeslot.team?'<b>' + timeslot.team + '</b>':'');
+                                td.attr("value", "timeslot_" + timeslot.id);
+                                if (timeslot.hasOwnProperty("taId")) { //Timeslot has been chosen by some TA
+									if (timeslot.taId === loggedInTaId) { //Slot chosen by logged in TA
+										td.addClass("markable");
+										td.addClass("unavailable");
+									} else { //Slot chosen by someone else
+										td.addClass("teamExists");
+									}
+								} else { //Timeslot is free for TA to choose
+									td.addClass("markable");
+								}
                             }
-							td.addClass('border-left');
                             tr.append(td);
                         }
-                        $("." + tableClass).append(tr);
+                        $("#" + tableId).append(tr);
                     }
 
                     //Inserting constructed table body into table
-//                    $("#" + tableClass).append(tbody);
+//                    $("#" + tableId).append(tbody);
                 }
 
                 /*
                  * METHOD TO MARK TIMESLOTS ON TABLE
                  */
-                function triggerTimeslot($timeslotCell) {
-                    if (!$timeslotCell.hasClass('timeslotcell')) return false;
-					var slotSize = scheduleData.duration / 30;
-					if ($timeslotCell.hasClass('chosen')) {
-						//Unavaiable a timeslot
-						var $prevTr = $timeslotCell.closest('tr');
-						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
-								//Unselect this timeslot
-								var $nextTr = $prevTr;
-								for (var j = 0; j < slotSize; j++) {
-									$nextTr.children().eq($timeslotCell.index()).removeClass('chosen');
-									$nextTr.children().eq($timeslotCell.index()).addClass('unavailable');
-									$nextTr = $nextTr.next();
-								}
-								break;
-							}
-							$prevTr = $prevTr.prev();
-						}
-					} else if ($timeslotCell.hasClass('unavailable')) {
-						//Available a timeslot
-						var $prevTr = $timeslotCell.closest('tr');
-						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
-								//Unselect this timeslot
-								var $nextTr = $prevTr;
-								for (var j = 0; j < slotSize; j++) {
-									$nextTr.children().eq($timeslotCell.index()).removeClass('unavailable');
-									$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
-									$nextTr = $nextTr.next();
-								}
-								break;
-							}
-							$prevTr = $prevTr.prev();
-						}
-					} else {
-						//Select a timeslot
-						var $nextTr = $timeslotCell.closest('tr');
-						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
-						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
-						for (var i = 0; i < slotSize; i++) {
-							$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
-							$nextTr = $nextTr.next();
-						}
-					}
-					return false;
+                function triggerTimeslot(e, duration) {
+                    if (!$(e).hasClass('markable')) return false;
+                    var col = $(e).parent().children().index(e);
+                    var tr = $(e).parent();
+                    var row = $(tr).parent().children().index(tr);
+                    var tbody = $(e).parents('.timeslotsTable').children('tbody');
+                    var slotSize = duration / 30;
+                    
+                    if ($(e).hasClass("chosen")) {
+                        //Section for a cell thats available
+                        //Checking if the cell clicked is the start of the chosen timeslot (Important!)
+                        if ($(e).children().index(".start-marker") !== -1) {
+                            $(e).removeClass("chosen");
+                            $(e).children().remove();
+                            for (i = 1; i < slotSize; i++) {
+                                var nextRow = $(tbody).children().get(row + i);
+                                var nextCell = $(nextRow).children().get(col);
+                                $(nextCell).removeClass("chosen");
+                            }
+                        }
+
+                        //Add unavailable class
+                        for (i = 1; i < slotSize; i++) {
+                            var nextRow = $(tbody).children().get(row + i);
+                            var nextCell = $(nextRow).children().get(col);
+                            if ($(nextCell).hasClass("chosen")) {
+                                return;
+                            }
+                        }
+
+                        var numRows = $(tbody).children().length;
+                        //Checking if there are enough cells for the slot duration
+                        if ((row + slotSize) <= numRows) {
+                            $(e).addClass("unavailable");
+                            var marker = document.createElement("div");
+                            $(marker).addClass("start-marker");
+                            $(e).append(marker);
+                            for (i = 1; i < slotSize; i++) {
+                                var nextRow = $(tbody).children().get(row + i);
+                                var nextCell = $(nextRow).children().get(col);
+                                $(nextCell).addClass("unavailable");
+                            }
+                        }
+
+                    } else {
+                        //Section for a cell thats available
+                        if ($(e).children().index(".start-marker") !== -1) {
+                            $(e).removeClass("unavailable");
+                            $(e).children().remove();
+                            for (i = 1; i < slotSize; i++) {
+                                var nextRow = $(tbody).children().get(row + i);
+                                var nextCell = $(nextRow).children().get(col);
+                                $(nextCell).removeClass("unavailable");
+                            }
+                        }
+
+                        //Checking if there will be an overlap of timeslots
+                        //Abort if there is going to be an overlap
+                        for (i = 1; i < slotSize; i++) {
+                            var nextRow = $(tbody).children().get(row + i);
+                            var nextCell = $(nextRow).children().get(col);
+                            if ($(nextCell).hasClass("unavailable")) {
+                                return;
+                            }
+                        }
+
+                        var numRows = $(tbody).children().length;
+                        //Checking if there are enough cells for the slot duration
+                        if ((row + slotSize) <= numRows) {
+                            $(e).addClass("chosen");
+                            var marker = document.createElement("div");
+                            $(marker).addClass("start-marker");
+                            $(e).append(marker);
+                            for (i = 1; i < slotSize; i++) {
+                                var nextRow = $(tbody).children().get(row + i);
+                                var nextCell = $(nextRow).children().get(col);
+                                $(nextCell).addClass("chosen");
+                            }
+                        }
+                    }
                 }
-				
-				//Hover glow effect
-                $('body').on('mouseenter', '.timeslotsTable tr:not(:has(table, th)) td:not(:first-child)', function(e) {
-					var $td = $(this);
-					var slotSize = scheduleData.duration / 30;
-					if ($td.hasClass('chosen') || $td.hasClass('unavailable')) {
-						//If hovering over a chosen timeslot
-						var $prevTr = $td.closest('tr');
-						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($td.index()).children('div.start-marker').length) {
-								//Highlight this timeslot
-								var $nextTr = $prevTr;
-								for (var j = 0; j < slotSize; j++) {
-									if (j === 0) {
-										$nextTr.children().eq($td.index()).addClass('glow-top');
-									}
-									$nextTr.children().eq($td.index()).addClass('glow-sides');
-									if (j === slotSize - 1) {
-										$nextTr.children().eq($td.index()).addClass('glow-bottom');
-									}
-									$nextTr = $nextTr.next();
-								}
-								break;
-							}
-							$prevTr = $prevTr.prev();
-						}
-					}
-					return false;
-                });
-                $('body').on('mouseleave', '.timeslotsTable td', function(e) {
-					var $td = $(this);
-					var slotSize = scheduleData.duration / 30;
-					if ($td.hasClass('glow-sides')) {
-						var $prevTr = $td.closest('tr');
-						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($td.index()).hasClass('glow-top')) {
-								//Highlight this timeslot
-								var $nextTr = $prevTr;
-								for (var j = 0; j < slotSize; j++) {
-									$nextTr.children().eq($td.index()).removeClass('glow-top glow-bottom glow-sides');
-									$nextTr = $nextTr.next();
-								}
-								break;
-							}
-							$prevTr = $prevTr.prev();
-						}
-					}
-                    return false;
-                });
-				
 
                 $('body').on('click', 'td.chosen , td.unavailable', function(e){
-                    triggerTimeslot($(this));
+                    triggerTimeslot(e.target, scheduleData.duration);
                 });
 
-                function populateTimeslotsTable(tableClass, scheduleData) {
+                function populateTimeslotsTable(tableId, scheduleData) {
                     $(".timeslotcell").each(function(e) {
                         var self = $(this);
                         if (self.hasClass("markable")) {
-                            triggerTimeslot(self);
+                            triggerTimeslot(this, scheduleData.duration);
+                        }
+                    });
+					$(".unavailable").each(function(e) {
+                        triggerTimeslot(this, scheduleData.duration);
+                    });
+                    $(".teamExists").each(function(){
+                        var tr = $(this).parent();
+                        var tbody = $(this).parents("tbody");
+                        var row = tr.parent().children().index(tr);
+                        var nextRow = $(tbody).children().get(row + i);
+                        var slotSize = scheduleData.duration / 30;
+                        var col = $(this).parent().children().index(this);
+                        for (var i = 0; i < slotSize; i++) {
+                            var nextRow = $(tbody).children().get(row + i);
+                            var nextCell = $(nextRow).children().get(col);
+                            $(nextCell).addClass('teamExists');
                         }
                     });
                 }
 
-                function populateUnavailableTimeslots(tableClass, scheduleData) {
+                function populateUnavailableTimeslots(tableId, scheduleData) {
                     $(".timeslotcell").each(function() {
                         var self = $(this);
-						if (self.attr('value') && scheduleData.timeslots[self.attr('value').split("_")[1]].taId === loggedInTaId) {
-							triggerTimeslot(self);
-						}
+                        for (var i = 0; i < unavailableTimeslots.length; i++) {
+                            if (self.attr('value') === unavailableTimeslots[i]) {
+                                triggerTimeslot(this, scheduleData.duration);
+                            }
+                        }
                     });
                 }
 
@@ -497,7 +467,7 @@
 					var timeslotsData = {};
                     var timeslot_data = new Array();
 
-                    var allTimeslots = $("td.unavailable > div.start-marker", ".timeslotsTable").get();
+                    var allTimeslots = $("td.unavailable > div.start-marker", "#timeslotsTable").get();
                     for (var i = 0; i < allTimeslots.length; i++) {
                         var obj = allTimeslots[i];
 						var timeslotId = parseInt(($(obj).parent().attr("value").split("_"))[1]);
@@ -508,10 +478,13 @@
 					timeslotsData["scheduleId"] = scheduleData.id;
                     
                     $.ajax({
+                        
                         type: 'POST',
                         url: 'taSignupJson',
                         data: {jsonData: JSON.stringify(timeslotsData)},
                         dataType: 'json'
+                        
+                        
                     }).done(function(response) {
                         if (!response.exception) {
                             if (response.success) {
