@@ -694,6 +694,7 @@
 //						console.log('timeslotCell clicked');
 						self = <%= activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateBookingBtn').attr('disabled', true);
+						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateTimeslotBtn').attr('disabled', true);
 						$('.timeslotCell, .booking').not(self).popover('hide');
 						$(".hasDatepicker").datepicker('destroy');
 						$.pnotify_remove_all();
@@ -902,7 +903,7 @@
 					//Make Update Button visible on clicking an input
 					$('.timeslotCell').off('click focus', 'input');
 					$('.timeslotCell').on('click focus', 'input', function(){
-						$(this).closest('tr').siblings(':last').find('#updateBookingBtn').attr('disabled', false);
+						$(this).closest('table').find('#updateBookingBtn, #updateTimeslotBtn').attr('disabled', false);
 					});
                     
                     //Update Booking Button

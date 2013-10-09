@@ -197,6 +197,7 @@
                 var self = $(this);
                 //Don't detect datepicker and timepicker
 				self.parent().find('#updateBookingBtn').attr('disabled', true);
+				self.parent().find('#updateTimeslotBtn').attr('disabled', true);
 				self.parent().popover('hide');
 				$(".hasDatepicker").datepicker('destroy');
             });
