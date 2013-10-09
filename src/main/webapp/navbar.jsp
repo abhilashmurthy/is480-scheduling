@@ -190,11 +190,13 @@
         
         //Hide all popovers on page click
         $('body').on('click', function(e) {
+//			console.log('body clicked');
             //Hide all popovers
 			if ($(e.target).closest('.ui-datepicker').length || $(e.target).closest('.ui-timepicker-wrapper').length) return false;
             $('.popover.in').each(function(e){
                 var self = $(this);
                 //Don't detect datepicker and timepicker
+				self.parent().find('#updateBookingBtn').attr('disabled', true);
 				self.parent().popover('hide');
 				$(".hasDatepicker").datepicker('destroy');
             });

@@ -633,7 +633,9 @@
                     //Hide other popovers when others clicked
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
+//						console.log('timeslotCell clicked');
 						self = <%= activeRole.equals(Role.FACULTY) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
+						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateBookingBtn').attr('disabled', true);
 						$('.timeslotCell, .booking').not(self).popover('hide');
 						$(".hasDatepicker").datepicker('destroy');
 						$.pnotify_remove_all();
@@ -840,8 +842,8 @@
                     });
 					
 					//Make Update Button visible on clicking an input
-					$('.timeslotCell').off('click', 'input');
-					$('.timeslotCell').on('click', 'input', function(){
+					$('.timeslotCell').off('click focus', 'input');
+					$('.timeslotCell').on('click focus', 'input', function(){
 						$(this).closest('tr').siblings(':last').find('#updateBookingBtn').attr('disabled', false);
 					});
                     
