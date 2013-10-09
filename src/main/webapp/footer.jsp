@@ -22,3 +22,5 @@
 <script type="text/javascript" src="js/plugins/bootstrap-switch.js"></script>
 <!-- Bootbox -->
 <script type="text/javascript" src="js/plugins/bootbox.min.js"></script>
+<!-- DataTables -->
+<script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script>

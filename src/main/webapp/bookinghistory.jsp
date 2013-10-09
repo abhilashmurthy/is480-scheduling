@@ -223,9 +223,6 @@
 		<script type="text/javascript">
 		//For data tables
 		$(document).ready(function(){
-			function hideAllValues() {
-				alert("haha");
-			}
 			//To select all values in multiple select dropdown by default
 			$('#hideColumns option').attr('selected', 'selected');
 			var values = $("#hideColumns").val();

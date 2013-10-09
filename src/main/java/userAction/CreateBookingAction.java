@@ -6,6 +6,7 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.lang.reflect.Method;
@@ -32,6 +33,7 @@ import model.User;
 import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
+import notification.email.ConfirmedBookingEmail;
 import notification.email.NewBookingEmail;
 import notification.email.RespondToBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -116,6 +118,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 					booking.setTeam(team);
 					Timestamp currentTime = new Timestamp(Calendar.getInstance().getTimeInMillis());
 					booking.setCreatedAt(currentTime);
+					
+					if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) booking.setBookingStatus(BookingStatus.APPROVED);
 
 					//Add team members to attendees
 					HashSet<User> reqAttendees = new HashSet<User>();
@@ -128,7 +132,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 					for (String roleName : requiredAttendees) {
 						Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
 						Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
-						responseList.put(roleUser, Response.PENDING);
+						Response response = (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) ? Response.PENDING : Response.APPROVED ;
+						responseList.put(roleUser, response);
 						reqAttendees.add(roleUser);
 					}
 
@@ -141,10 +146,16 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 					booking.setOptionalAttendees(optionalAttendees);
 					booking.setLastEditedBy(user.getFullName());
 					booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
-					NewBookingEmail newEmail = new NewBookingEmail(booking);
-					RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
-					newEmail.sendEmail();
-					responseEmail.sendEmail();
+					if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) { //Emails to be sent if the Administrator is not creating a booking
+						NewBookingEmail newEmail = new NewBookingEmail(booking);
+						RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
+						newEmail.sendEmail();
+						responseEmail.sendEmail();
+					} else { //Booking is automatically approved by all if the Administrator creates a booking
+						ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
+						confirmationEmail.sendEmail();
+					}
+					
 					em.persist(booking);
 
 					//Setting the current active booking in the timeslot object

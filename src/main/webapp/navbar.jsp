@@ -63,7 +63,7 @@
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Manage Terms</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">CSV Upload</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="getNotificationSettings">Manage Notifications</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="getNotificationSettings">Manage Reminder Settings</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>
@@ -197,6 +197,7 @@
                 var self = $(this);
                 //Don't detect datepicker and timepicker
 				self.parent().find('#updateBookingBtn').attr('disabled', true);
+				self.parent().find('#updateTimeslotBtn').attr('disabled', true);
 				self.parent().popover('hide');
 				$(".hasDatepicker").datepicker('destroy');
             });

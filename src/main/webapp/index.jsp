@@ -49,7 +49,7 @@
             </div>
 
 			<!-- To display a banner for filling survey. Remove later -->
-			<div class="banner alert">
+<!--			<div class="banner alert">
 				<button type="button" class="close" data-dismiss="alert">×</button>
 				Hi <%= user.getFullName()%>, <br/><br/>
 				We have spent a lot of time building this system. We will really appreciate
@@ -58,7 +58,7 @@
 				on your experience with our system!<br/><br/>
 				Thanking you,<br/>
 				IS480 Scheduling Team
-			</div>
+			</div>-->
 			
             <!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
@@ -694,6 +694,7 @@
 //						console.log('timeslotCell clicked');
 						self = <%= activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateBookingBtn').attr('disabled', true);
+						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateTimeslotBtn').attr('disabled', true);
 						$('.timeslotCell, .booking').not(self).popover('hide');
 						$(".hasDatepicker").datepicker('destroy');
 						$.pnotify_remove_all();
@@ -902,7 +903,7 @@
 					//Make Update Button visible on clicking an input
 					$('.timeslotCell').off('click focus', 'input');
 					$('.timeslotCell').on('click focus', 'input', function(){
-						$(this).closest('tr').siblings(':last').find('#updateBookingBtn').attr('disabled', false);
+						$(this).closest('table').find('#updateBookingBtn, #updateTimeslotBtn').attr('disabled', false);
 					});
                     
                     //Update Booking Button
@@ -1823,6 +1824,5 @@
 
             addLoadEvent(viewScheduleLoad);
         </script>
-        <br/>
     </body>
 </html>
