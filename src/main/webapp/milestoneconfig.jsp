@@ -57,8 +57,8 @@
                                 <td>
 									<select id='attendees_<s:property value="id"/>' class='attendeesMultiselect multiselect' multiple='multiple'>
 										<option value='supervisor'>Supervisor</option>
-										<option value='reviewer1'>Reviewer 1</option>
-										<option value='reviewer2'>Reviewer 2</option>
+										<option value='reviewer1'>Reviewer1</option>
+										<option value='reviewer2'>Reviewer2</option>
 									</select>
                                 </td>
                                 <td>
@@ -174,8 +174,8 @@
 										.append(function() {
 												var optionsArray = new Array();
 												optionsArray.push($(document.createElement('option')).attr('value', 'supervisor').html('Supervisor'));
-												optionsArray.push($(document.createElement('option')).attr('value', 'reviewer1').html('Reviewer 1'));
-												optionsArray.push($(document.createElement('option')).attr('value', 'reviewer2').html('Reviewer 2'));
+												optionsArray.push($(document.createElement('option')).attr('value', 'reviewer1').html('Reviewer1'));
+												optionsArray.push($(document.createElement('option')).attr('value', 'reviewer2').html('Reviewer2'));
 												return optionsArray;
 											}
 										)
@@ -206,7 +206,7 @@
 							newOrderNumber: $this.find('.orderNum').text().toString(),
 							newMilestoneName: $this.find('.milestoneNameInput').val(),
 							newDuration: $this.find('.durationSpinnerInput').spinner('value').toString(),
-							newAttendees: $this.find('.attendeesMultiselect').next().find('.dropdown-toggle').attr('title')
+							newAttendees: $this.find('.attendeesMultiselect').next().find('.dropdown-toggle').attr('title').replace(' ', '')
 						});
 					});
 					console.log('Submitting: ' + JSON.stringify(updatedMilestones));
