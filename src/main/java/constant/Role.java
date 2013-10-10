@@ -13,8 +13,7 @@ public enum Role {
 	FACULTY("Faculty"),
 	TA("TA"),
 	ADMINISTRATOR("Administrator"),
-	COURSE_COORDINATOR("Course Coordinator"),
-	GUEST("Guest");
+	COURSE_COORDINATOR("Course Coordinator");
 	
 	private Role(String displayName) {
 		this.displayName = displayName;

@@ -101,7 +101,17 @@
 					<a class='navbar-username'>
 					<i class="icon-user icon-white icon-large"></i>&nbsp;<% out.print(user.getFullName());%>
 					&nbsp;-&nbsp;
-					<%= activeRole.getDisplayName() %>
+					<% if (activeRole.equals(Role.STUDENT)) { %>
+						Student
+					<% } else if (activeRole.equals(Role.ADMINISTRATOR)) { %>
+						Administrator
+					<% } else if (activeRole.equals(Role.COURSE_COORDINATOR)) { %>
+						Course Coordinator
+					<% } else if (activeRole.equals(Role.FACULTY)) { %>
+						Faculty
+					<% } else if (activeRole.equals(Role.TA)) { %>
+						TA
+					<% } %>
 					</a>	
 				</li>
 							

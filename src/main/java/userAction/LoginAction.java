@@ -6,13 +6,11 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Role;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -187,19 +185,38 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 		
 		//Check if user exists in our DB
 		String smuUsername = request.getParameter("smu_username");
-		String smuFullName = request.getParameter("smu_fullname");
-		if (smuFullName == null) smuFullName = smuUsername; 
 		//Getting the active term
 		Term activeTerm = SettingsManager.getDefaultTerm(em);
-		ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerm);
-
-		if (users.isEmpty()) {
-			User tempUser = new User(smuUsername, smuFullName, null, Role.GUEST, activeTerm);
-			users.add(tempUser);
-		}
-
-		session.setAttribute("userRoles", users);
-		session.setAttribute("currentActiveTerm", activeTerm);
+		//Getting the user object based on the username
+//		User loggedInUser = em.find(User.class, smuUsername);
+		//Getting all the users from the system
+//		List<User> usersFromDB = UserManager.getAllUsers(em);
+		//Checking whether the user exists in the system or not
+//		boolean userExists = false;
+//		for (User user: usersFromDB) {
+//			if (loggedInUser.equals(user)) {
+//				userExists = true;
+				//If user is in the db get the users roles
+				//Getting the user based on username and active term
+				ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerm);
+				if (users.size() > 0) {
+					//Welcome to the system. 
+					session.setAttribute("userRoles", users);
+					session.setAttribute("currentActiveTerm", activeTerm);
+				} else {
+					//Kick user out
+					request.setAttribute("error", "Login failed. You are not authorized to access this system!");
+					request.getRequestDispatcher("login.jsp").forward(request, response);
+				}
+//			}
+//		}
+		
+		//If user is not in db
+//		if (userExists == false) {
+//			//Kick user out
+//			request.setAttribute("error", "Login failed. Please login with an authorized User ID!");
+//			request.getRequestDispatcher("login.jsp").forward(request, response);
+//		}
 	}
 
     public HttpServletRequest getServletRequest() {
