@@ -94,7 +94,7 @@ public class SMSReminderJob implements Job {
                 }
                 
                 //Builds RESTful URL
-                StringBuilder url = new StringBuilder();
+                StringBuilder url = new StringBuilder("");
                 url.append("http://smsc.vianett.no/v3/send.ashx?")
                         .append("tel=")
                         .append(phoneNums.toString().substring(0, phoneNums.length() - 1))

@@ -211,13 +211,13 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 		
 		//Calculating the time to trigger the job
 		Calendar scheduledTime = Calendar.getInstance();
-		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
-		scheduledTime.setTime(presentationStartTime);
+//		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
+//		scheduledTime.setTime(presentationStartTime);
 		
 		//get the number of days for sms reminder
-		EntityManager em = MiscUtil.getEntityManagerInstance();
-		Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
-		String value = currentSettings.getValue();
+//		EntityManager em = MiscUtil.getEntityManagerInstance();
+//		Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
+//		String value = currentSettings.getValue();
 
 		//convert settingsDetails into an array
 //		String[] setArr = value.split(",");
