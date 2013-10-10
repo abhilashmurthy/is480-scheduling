@@ -24,19 +24,19 @@
 			} %>
 
             <!-- SECTION: Booking History -->
+			<table id="milestoneConfigTable" class="table table-hover zebra-striped" cellspacing="0">
+				<thead>
+					<tr>
+						<th style="width: 5px;">Order</th>
+						<th style="width: 10px;">Milestone</th>
+						<th style="width: 5px;">Duration (Mins)</th>
+						<th style="width: 100px;">Required Attendees</th>
+						<th style="width: 10px;"></th>
+						<th style="width: 10px;"></th>
+					</tr>
+				</thead>
+				<tbody> 
             <s:if test="%{data.size() > 0 && data != null}"> 
-                <table id="milestoneConfigTable" class="table table-hover zebra-striped" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th style="width: 5px;">Order</th>
-                            <th style="width: 10px;">Milestone</th>
-                            <th style="width: 5px;">Duration (Mins)</th>
-                            <th style="width: 100px;">Required Attendees</th>
-                            <th style="width: 10px;"></th>
-                            <th style="width: 10px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody> 
                         <s:iterator value="data">
                             <tr class='milestoneRow' id='row_<s:property value="id"/>'>
                                 <td class='orderNum'><s:property value="order"/></td>
@@ -68,19 +68,20 @@
                                 </td>
                             </tr>
                         </s:iterator>
-                    </tbody>
-                </table>
-
-                <table id='milestoneConfigButtons'>
-                    <tr>
-                        <td><button type="button" id="saveMilestonesBtn" class="btn btn-primary" style="width:80px; height:30px;"><b>Save</b></button></td>
-                        <td><button class="btn btn-warning" id="addMilestoneBtn" style="width:160px; height:30px"><i class="icon-black icon-plus-sign"></i><b>Add Milestone</b></button></td>
-                    </tr>
-                </table>
-            </s:if>
-			<s:else>
-                <h4>No default milestones to set!</h4>
-            </s:else>
+					</s:if>
+				<s:else>
+					<tr><h4 class="noMilestoneMsg">No default milestones to set!</h4></tr>
+				</s:else>
+				</tbody>
+			</table>
+				
+			<table id='milestoneConfigButtons'>
+				<tr>
+					<td><button type="button" id="saveMilestonesBtn" class="btn btn-primary" style="width:80px; height:30px;"><b>Save</b></button></td>
+					<td><button class="btn btn-warning" id="addMilestoneBtn" style="width:160px; height:30px"><i class="icon-black icon-plus-sign"></i><b>Add Milestone</b></button></td>
+				</tr>
+			</table>
+				
         </div>
 		
 		<%@include file="footer.jsp"%>
@@ -115,6 +116,9 @@
 				
 				//Add milestone
 				$("#addMilestoneBtn").on('click', function(){
+					$(".noMilestoneMsg").fadeOut('slow', function(){
+						$(this).remove();
+					});
 					$(document.createElement('tr'))
 						.addClass('milestoneRow')
 						.append(
@@ -198,6 +202,9 @@
 				
 				//Save milestones
 				$('#saveMilestonesBtn').on('click', function(){
+					$(".noMilestoneMsg").fadeOut('slow', function(){
+						$(this).remove();
+					});
 					$('button').attr('disabled', true);
 					var updatedMilestones = new Array();
 					$('.milestoneRow').each(function(){
