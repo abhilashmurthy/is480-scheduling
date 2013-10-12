@@ -108,6 +108,10 @@ public class UserManager {
 		q.setParameter("role", Role.COURSE_COORDINATOR);
 		return (User) q.getSingleResult();
     }
+	
+	public static <T extends User> T getUser(User user) {
+		return (T) getUser(user.getId(), user.getRole().getBaseClassType());
+	}
 
     public static <T extends User> T getUser(long id, Class<T> type) {
         logger.trace("Getting User: " + id + ", by class: " + type);
