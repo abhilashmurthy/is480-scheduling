@@ -12,14 +12,13 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Map;
+import java.util.Iterator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import manager.SettingsManager;
@@ -27,7 +26,6 @@ import manager.UserManager;
 import model.Term;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.apache.struts2.interceptor.ServletResponseAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -36,12 +34,12 @@ import util.MiscUtil;
  *
  * @author Prakhar
  */
-public class LoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
+public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     //Request and Response
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(LoginAction.class);
-    private HttpServletResponse response;
+	private ArrayList<Role> allRoles = new ArrayList<Role>();
     private boolean isSupervisorReviewer;
     private boolean isAdministrator;
     private boolean isCourseCoordinator;
@@ -82,7 +80,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 			
 			if (request.getParameter("bypass") != null) { //BYPASS SSO LOGIN
 				initializeUser(em);
-			} else { //CODE FOR PRODUCTION SERVER
+			} else { //CODE FOR SSO
 				//return to login
 				if (request.getParameter("oauth_callback") == null) {
 					return "error";
@@ -144,28 +142,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 					//Login unsuccessful
 					logger.error("LOGIN - SOMETHING WENT WRONG");
 				}
-			} //END OF CODE FOR PRODUCTION SERVER
-
-            //To check if user has multiple roles 
-//            if (userRoles.size() > 1) {
-//				isSupervisorReviewer = false;
-//				isAdministrator = false;
-//				isCourseCoordinator = false;
-//				for (Role role: userRoles) {
-//					if (role.getName().equalsIgnoreCase("Supervisor") || 
-//							role.getName().equalsIgnoreCase("Reviewer")) {
-//						isSupervisorReviewer = true;
-//					} else if (role.getName().equalsIgnoreCase("Administrator")) {
-//						isAdministrator = true;
-//					} else if (role.getName().equalsIgnoreCase("Course Coordinator")) {
-//						isCourseCoordinator = true;
-//					}
-//				}
-//				//If user is just supervisor & reviewer then he wont go to the multiple roles page
-//				if (isAdministrator == true || isCourseCoordinator == true) {
-//					return "goToRoles";
-//				}
-//            }
+			} //END OF CODE FOR SSO
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -183,6 +160,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     }
 	
 	private void initializeUser(EntityManager em) throws ServletException, IOException {
+		populateAllRoles();
 		HttpSession session = request.getSession();
 		
 		//Check if user exists in our DB
@@ -196,26 +174,49 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 		if (users.isEmpty()) {
 			User tempUser = new User(smuUsername, smuFullName, null, Role.GUEST, activeTerm);
 			users.add(tempUser);
+		} else {
+			User chosenRole = chooseRole(users);
+			session.setAttribute("user", UserManager.getUser(chosenRole));
+			session.setAttribute("activeRole", chosenRole.getRole());
 		}
 
 		session.setAttribute("userRoles", users);
 		session.setAttribute("currentActiveTerm", activeTerm);
+	}
+	
+	//Choosing the user object with the least important/powerful role
+	private User chooseRole(ArrayList<User> users) {
+		User user = users.get(0);
+		int smallestRoleIndex = allRoles.indexOf(user.getRole());
+		
+		Iterator<User> iter = users.iterator();
+		while (iter.hasNext()) {
+			User u = iter.next();
+			if (allRoles.indexOf(u.getRole()) > smallestRoleIndex) { //Current object's role is the least important until now
+				user = u;
+				smallestRoleIndex = allRoles.indexOf(u.getRole());
+			}
+		}
+		
+		return user;
+	}
+	
+	//Adding all the roles in the list in decreasing order of importance/power
+	private void populateAllRoles() {
+		allRoles.add(Role.ADMINISTRATOR);
+		allRoles.add(Role.COURSE_COORDINATOR);
+		allRoles.add(Role.FACULTY);
+		allRoles.add(Role.TA);
+		allRoles.add(Role.STUDENT);
+		allRoles.add(Role.GUEST);
 	}
 
     public HttpServletRequest getServletRequest() {
         return request;
     }
 
-    public HttpServletResponse getServletResponse() {
-        return response;
-    }
-
     public void setServletRequest(HttpServletRequest request) {
         this.request = request;
-    }
-
-    public void setServletResponse(HttpServletResponse response) {
-        this.response = response;
     }
 
 } //end of class
