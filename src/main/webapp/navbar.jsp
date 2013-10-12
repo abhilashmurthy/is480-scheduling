@@ -111,31 +111,19 @@
 						<i class="icon-cogs icon-large"></i>
 					</a>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
-						<%  if (userRoles.size() > 1) { %>
-						<%  if (isAdministrator == true || isCourseCoordinator == true) { %>
+						<%  if (!userRoles.isEmpty()) { %>
 						<li class="dropdown-submenu">
 							<a tabindex="-1" href="#"><i class="icon-user"></i>&nbsp&nbsp;Switch Role:</a>
 							<ul class="dropdown-menu">
 							<form id="myform" action="setRole" method="post">
-								<% if (isAdministrator && (!activeRole.equals(Role.ADMINISTRATOR))) { %>
+								<% for (User u : userRoles) { %>
 								<li>
-									<button type="submit" class="btn-link" value="Administrator" name="administrator">Administrator</button>
-								</li>
-								<% } %>
-								<% if (isFaculty && (!activeRole.equals(Role.FACULTY))) { %>
-								<li>
-									<button type="submit" class="btn-link" value="Faculty" name="faculty">Faculty</button>
-								</li>
-								<% } %>
-								<% if (isCourseCoordinator && (!activeRole.equals(Role.COURSE_COORDINATOR))) {  %>
-								<li>
-									<button type="submit" class="btn-link" value="Course Coordinator" name="courseCoordinator">Course Coordinator</button>
+									<button type="submit" class="btn-link" value="<%= u.getId() %>" name="switchToUserId"><%= u.getRole().getDisplayName() %></button>
 								</li>
 								<% } %>
 							</form>
 							 </ul>
 						</li>
-							<% } %>		
 						<% } %>
 							
 						<li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>

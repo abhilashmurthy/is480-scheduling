@@ -173,11 +173,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
 		if (users.isEmpty()) {
 			User tempUser = new User(smuUsername, smuFullName, null, Role.GUEST, activeTerm);
-			users.add(tempUser);
 		} else {
-			User chosenRole = chooseRole(users);
+			User chosenRole = chooseRole(users); //Choosing the default role to begin with
 			session.setAttribute("user", UserManager.getUser(chosenRole));
 			session.setAttribute("activeRole", chosenRole.getRole());
+			users.remove(chosenRole); //Removing the chosen object from the list of users
 		}
 
 		session.setAttribute("userRoles", users);
