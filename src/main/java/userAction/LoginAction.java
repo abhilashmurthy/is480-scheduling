@@ -206,8 +206,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 		allRoles.add(Role.ADMINISTRATOR);
 		allRoles.add(Role.COURSE_COORDINATOR);
 		allRoles.add(Role.FACULTY);
-		allRoles.add(Role.TA);
 		allRoles.add(Role.STUDENT);
+		allRoles.add(Role.TA);
 		allRoles.add(Role.GUEST);
 	}
 
