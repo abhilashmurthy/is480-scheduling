@@ -4,23 +4,15 @@
  */
 package userAction;
 
-import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.Team;
-import model.Term;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
@@ -152,7 +144,9 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
             } else if (userRoles.get(0).getRole().equals(Role.TA)) {
                 TA ta = em.find(TA.class, userRoles.get(0).getId());
                 session.setAttribute("user", ta);
-            }
+            } else if (userRoles.get(0).getRole().equals(Role.GUEST)) {
+				session.setAttribute("user", userRoles.get(0));
+			}
             return SUCCESS;
 
         } catch (Exception e) {
