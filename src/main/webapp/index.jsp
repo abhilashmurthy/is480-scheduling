@@ -49,7 +49,7 @@
             </div>
 
 			<!-- To display a banner for filling survey. Remove later -->
-<!--			<div class="banner alert">
+			<div class="banner alert">
 				<button type="button" class="close" data-dismiss="alert">×</button>
 				Hi <%= user.getFullName()%>, <br/><br/>
 				We have spent a lot of time building this system. We will really appreciate
@@ -58,7 +58,7 @@
 				on your experience with our system!<br/><br/>
 				Thanking you,<br/>
 				IS480 Scheduling Team
-			</div>-->
+			</div>
 			
             <!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
