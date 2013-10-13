@@ -42,11 +42,10 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
         try {
 			em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("user");
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			if (activeRole.equals(Role.FACULTY)) {
-
-				User user = (User) session.getAttribute("user");
 				//Setting the updated user object in session
 				em.clear();
                 Faculty faculty = em.find(Faculty.class, user.getId());
@@ -115,7 +114,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 				return SUCCESS;
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
-				logger.error("User cannot access this page");
+				MiscUtil.logActivity(logger, user, "User cannot access this page");
 				return ERROR;
 			}
         } catch (Exception e) {

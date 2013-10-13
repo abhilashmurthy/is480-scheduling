@@ -91,6 +91,7 @@ public class UpdateTimeslotAction extends ActionSupport implements ServletReques
                 json.put("success", true);
                 json.put("message", "Timeslot updated successfully!");
 				em.getTransaction().commit();
+				MiscUtil.logActivity(logger, user, oldTimeslot.toString() + " updated");
             } else {
                 //Incorrect user role
                 json.put("success", false);

@@ -20,6 +20,8 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.MiscUtil;
 
 /**
@@ -31,6 +33,7 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
     private HttpServletRequest request;
     private String settingDetails;
     private HashMap<String, Object> json = new HashMap<String, Object>();
+	private Logger logger = LoggerFactory.getLogger(UpdateNotificationSettingsAction.class);
 
     @Override
     public String execute() throws ServletException, IOException {
@@ -77,7 +80,7 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 
 					json.put("success",true);
 					json.put("message", "Settings saved successfully!");
-
+					MiscUtil.logActivity(logger, user, "Notification settings updated");
 				} catch (Exception e) {   
 					if (MiscUtil.DEV_MODE) {
 						for (StackTraceElement s : e.getStackTrace()) {

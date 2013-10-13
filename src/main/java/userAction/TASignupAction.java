@@ -128,7 +128,7 @@ public class TASignupAction extends ActionSupport implements ServletRequestAware
             //succesfully updated
             json.put("success",true);
             json.put("message", "You have succesfully signed up for all slots!");
-
+			MiscUtil.logActivity(logger, user, "Sign-ups updated for " + sc.toString());
         }catch(Exception e){
             json.put("success", false);
             json.put("exception", true);

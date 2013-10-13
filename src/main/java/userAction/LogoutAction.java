@@ -6,10 +6,10 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import org.slf4j.Logger;
@@ -30,10 +30,10 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
     @Override
     public String execute() throws Exception {
         try {
-			logger.info("Reached LogoutAction");
 			HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("user");
 			session.invalidate();
-			logger.info("Logout successful");
+			MiscUtil.logActivity(logger, user, "Logged out");
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {

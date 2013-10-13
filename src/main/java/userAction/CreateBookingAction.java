@@ -210,6 +210,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 					json.put("booking", map);
 
 					em.getTransaction().commit();
+					MiscUtil.logActivity(logger, user, booking.toString() + " created");
 				}
             } catch (Exception e) {
                 //Rolling back write operations

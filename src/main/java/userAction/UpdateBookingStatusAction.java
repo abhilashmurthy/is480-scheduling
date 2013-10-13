@@ -176,6 +176,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 						json.put("message", "Your booking has been rejected!");
 					}
 				}
+				
+				MiscUtil.logActivity(logger, user, booking.toString() + " " + response.toString());
 			} else {
 				request.setAttribute("error", "No timeslot selected!");
 				logger.error("User hasn't selected a timeslot to approve/reject!");

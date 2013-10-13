@@ -191,7 +191,7 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 				
 				json.put("success", true);
 				json.put("message", "Your settings have been updated!");
-
+				MiscUtil.logActivity(logger, user, "Milestone settings updated");
 			} else {
 				//Incorrect user role
 				json.put("error", true);

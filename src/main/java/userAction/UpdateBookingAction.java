@@ -259,8 +259,6 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 				Hibernate.initialize(booking.getTeam().getMembers());
 				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
 				
-				logger.info("Team Members initialized: " + Boolean.toString(Hibernate.isInitialized(booking.getTeam().getMembers())));
-				
 				//Sending email update
 				EditBookingEmail email = new EditBookingEmail(booking, user);
 				email.sendEmail();
@@ -269,6 +267,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 json.put("booking", map);
                 json.put("success", true);
                 json.put("message", "Booking updated successfully!");
+				MiscUtil.logActivity(logger, user, booking.toString() + " updated");
             } else {
                 //Incorrect user role
                 json.put("success", false);

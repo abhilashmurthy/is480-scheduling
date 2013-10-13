@@ -210,6 +210,8 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				}
 			}
 			json.put("success", true);
+			
+			MiscUtil.logActivity(logger, user, "Viewed booking history (My Bookings)");
 			return SUCCESS;
 
 		} catch (Exception e) {

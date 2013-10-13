@@ -81,7 +81,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 				Hibernate.initialize(b.getTeam().getMembers());
 				Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
 				
-//				deleteSMSReminder(b);
+				deleteSMSReminder(b);
 
 				//Sending email
 				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(b, (User)request.getSession().getAttribute("user"));
@@ -90,6 +90,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
                 //if the booking has been removed successfully
                 json.put("message", "Booking deleted successfully! All attendees have been notified via email.");
 
+				MiscUtil.logActivity(logger, user, b.toString() + " deleted");
             } catch (Exception e) {
                 logger.error("Exception caught: " + e.getMessage());
                 if (MiscUtil.DEV_MODE) {
@@ -126,9 +127,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
 		Scheduler scheduler = factory.getScheduler();
 		
-		boolean deleted = scheduler.deleteJob(new JobKey(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS));
-		
-		logger.info("SMS Reminder Job Deleted = " + deleted);
+		scheduler.deleteJob(new JobKey(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS));
 	}
 
     public HttpServletRequest getRequest() {

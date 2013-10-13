@@ -95,6 +95,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 
                 json.put("success", true);
                 json.put("message", "Your availability has been updated successfully!");
+				MiscUtil.logActivity(logger, user, "Updated availability for " + dealingWithSchedule.toString());
             } catch (NullPointerException n) {
                 json.put("success", false);
                 json.put("message", "An error was detected. Please reload and try again.");

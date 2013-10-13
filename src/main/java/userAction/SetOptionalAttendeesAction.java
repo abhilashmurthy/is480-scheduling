@@ -88,6 +88,7 @@ public class SetOptionalAttendeesAction extends ActionSupport implements Servlet
 					return SUCCESS;
 				}
 
+				MiscUtil.logActivity(logger, user, "Optional attendees updated for " + b.toString());
 			} else {
 				//Incorrect user role
 				json.put("error", true);

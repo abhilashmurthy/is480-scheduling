@@ -61,6 +61,7 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
 				userToUpdate.setMobileNumber(number);
 				em.persist(userToUpdate);
 				em.getTransaction().commit();
+				MiscUtil.logActivity(logger, userToUpdate, "User preferences updated");
 			} else {
 				//Deleting user's mobile number
 				em.getTransaction().begin();

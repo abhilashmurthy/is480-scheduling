@@ -22,7 +22,6 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.quartz.utils.FindbugsSuppressWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -101,10 +100,10 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 				
 				json.put("success", true);
 				json.put("message", "Your settings have been updated!");
-
+				MiscUtil.logActivity(logger, user, "Active and default terms updated");
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
-				logger.error("User cannot access this page");
+				MiscUtil.logActivity(logger, user, "User cannot access this page");
 				return ERROR;
 			}
 		
