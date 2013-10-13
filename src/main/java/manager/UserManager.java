@@ -24,14 +24,9 @@ import util.MiscUtil;
 public class UserManager {
 
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
-	private ArrayList<Role> allRoles = new ArrayList<Role>();
-	
-	public UserManager() {
-		populateAllRoles();
-	}
 	
 	//Adding all the roles in the list in decreasing order of importance/power
-	private void populateAllRoles() {
+	private void populateAllRoles(ArrayList<Role> allRoles) {
 		allRoles.add(Role.ADMINISTRATOR);
 		allRoles.add(Role.COURSE_COORDINATOR);
 		allRoles.add(Role.FACULTY);
@@ -42,6 +37,7 @@ public class UserManager {
 	
 	//Choosing the user object with the least important/powerful role
 	private User chooseRole(ArrayList<User> users) {
+		ArrayList<Role> allRoles = new ArrayList<Role>(); populateAllRoles(allRoles);
 		User user = users.get(0);
 		int smallestRoleIndex = allRoles.indexOf(user.getRole());
 		
@@ -68,9 +64,16 @@ public class UserManager {
 			session.setAttribute("user", tempUser);
 			session.setAttribute("activeRole", tempUser.getRole());
 		} else {
-			User chosenRole = chooseRole(users); //Choosing the default role to begin with
-			session.setAttribute("user", getUser(chosenRole));
-			session.setAttribute("activeRole", chosenRole.getRole());
+			User chosenRole;
+			User currentUser = (User) session.getAttribute("user");
+			//Checking if the existing user is an Admin or Course Coordinator. Prevening automatic selection of role then. (Not applicable during first login)
+			if (currentUser != null && (currentUser.getRole() == Role.ADMINISTRATOR || currentUser.getRole() == Role.COURSE_COORDINATOR)) {
+				chosenRole = currentUser;
+			} else {
+				chosenRole = chooseRole(users); //Choosing the default role to begin with
+				session.setAttribute("user", getUser(chosenRole));
+				session.setAttribute("activeRole", chosenRole.getRole());
+			}
 			users.remove(chosenRole); //Removing the chosen object from the list of users
 		}
 
