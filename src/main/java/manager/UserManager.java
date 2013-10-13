@@ -6,13 +6,13 @@ package manager;
 
 import constant.Role;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.servlet.http.HttpSession;
 import model.Term;
 import model.User;
-import model.role.Faculty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -24,6 +24,58 @@ import util.MiscUtil;
 public class UserManager {
 
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
+	private ArrayList<Role> allRoles = new ArrayList<Role>();
+	
+	public UserManager() {
+		populateAllRoles();
+	}
+	
+	//Adding all the roles in the list in decreasing order of importance/power
+	private void populateAllRoles() {
+		allRoles.add(Role.ADMINISTRATOR);
+		allRoles.add(Role.COURSE_COORDINATOR);
+		allRoles.add(Role.FACULTY);
+		allRoles.add(Role.STUDENT);
+		allRoles.add(Role.TA);
+		allRoles.add(Role.GUEST);
+	}
+	
+	//Choosing the user object with the least important/powerful role
+	private User chooseRole(ArrayList<User> users) {
+		User user = users.get(0);
+		int smallestRoleIndex = allRoles.indexOf(user.getRole());
+		
+		Iterator<User> iter = users.iterator();
+		while (iter.hasNext()) {
+			User u = iter.next();
+			if (allRoles.indexOf(u.getRole()) > smallestRoleIndex) { //Current object's role is the least important until now
+				user = u;
+				smallestRoleIndex = allRoles.indexOf(u.getRole());
+			}
+		}
+		
+		return user;
+	}
+	
+	/**
+	 * Sets the default user object and role based on the current active term in the system
+	 */
+	public void initializeUser(EntityManager em, HttpSession session, String username, String fullName, Term activeTerm) {
+		ArrayList<User> users = findActiveRolesByUsername (em, username, activeTerm);
+
+		if (users.isEmpty()) {
+			User tempUser = new User(username, fullName, null, Role.GUEST, activeTerm);
+			session.setAttribute("user", tempUser);
+			session.setAttribute("activeRole", tempUser.getRole());
+		} else {
+			User chosenRole = chooseRole(users); //Choosing the default role to begin with
+			session.setAttribute("user", getUser(chosenRole));
+			session.setAttribute("activeRole", chosenRole.getRole());
+			users.remove(chosenRole); //Removing the chosen object from the list of users
+		}
+
+		session.setAttribute("userRoles", users);
+	}
 
     public static void save(EntityManager em, User user) {
         logger.trace("Saving user: " + user.getFullName());

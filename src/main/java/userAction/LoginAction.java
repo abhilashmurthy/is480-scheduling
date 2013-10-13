@@ -39,10 +39,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     //Request and Response
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(LoginAction.class);
-	private ArrayList<Role> allRoles = new ArrayList<Role>();
-    private boolean isSupervisorReviewer;
-    private boolean isAdministrator;
-    private boolean isCourseCoordinator;
     // sorted in alphabetical order. ordering is important
     // when generating the signature
     private static final String[] keys = {
@@ -160,7 +156,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     }
 	
 	private void initializeUser(EntityManager em) throws ServletException, IOException {
-		populateAllRoles();
 		HttpSession session = request.getSession();
 		
 		//Check if user exists in our DB
@@ -169,48 +164,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 		if (smuFullName == null) smuFullName = smuUsername; 
 		//Getting the active term
 		Term activeTerm = SettingsManager.getDefaultTerm(em);
-		ArrayList<User> users = UserManager.findActiveRolesByUsername (em, smuUsername, activeTerm);
-
-		if (users.isEmpty()) {
-			User tempUser = new User(smuUsername, smuFullName, null, Role.GUEST, activeTerm);
-		} else {
-			User chosenRole = chooseRole(users); //Choosing the default role to begin with
-			session.setAttribute("user", UserManager.getUser(chosenRole));
-			session.setAttribute("activeRole", chosenRole.getRole());
-			users.remove(chosenRole); //Removing the chosen object from the list of users
-		}
-
-		session.setAttribute("userRoles", users);
 		session.setAttribute("currentActiveTerm", activeTerm);
+		new UserManager().initializeUser(em, session, smuUsername, smuFullName, activeTerm);
 	}
 	
-	//Choosing the user object with the least important/powerful role
-	private User chooseRole(ArrayList<User> users) {
-		User user = users.get(0);
-		int smallestRoleIndex = allRoles.indexOf(user.getRole());
-		
-		Iterator<User> iter = users.iterator();
-		while (iter.hasNext()) {
-			User u = iter.next();
-			if (allRoles.indexOf(u.getRole()) > smallestRoleIndex) { //Current object's role is the least important until now
-				user = u;
-				smallestRoleIndex = allRoles.indexOf(u.getRole());
-			}
-		}
-		
-		return user;
-	}
-	
-	//Adding all the roles in the list in decreasing order of importance/power
-	private void populateAllRoles() {
-		allRoles.add(Role.ADMINISTRATOR);
-		allRoles.add(Role.COURSE_COORDINATOR);
-		allRoles.add(Role.FACULTY);
-		allRoles.add(Role.STUDENT);
-		allRoles.add(Role.TA);
-		allRoles.add(Role.GUEST);
-	}
-
     public HttpServletRequest getServletRequest() {
         return request;
     }

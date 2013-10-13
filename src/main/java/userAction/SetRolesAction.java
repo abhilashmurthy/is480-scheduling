@@ -43,7 +43,7 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 			for (User u : userRoles) {
 				if (u.getId() == switchToUserId) { //Found the role to be switch to
 					session.setAttribute("user", UserManager.getUser(u)); //Setting the new user object in the session
-					session.setAttribute("activeRole", u.getRole());
+					session.setAttribute("activeRole", u.getRole()); //Setting the new role in the session
 					userRoles.remove(u); //Removing the new user object from the list of roles
 					userRoles.add(currentUser); //Adding the previously assumed role back into the list
 				}

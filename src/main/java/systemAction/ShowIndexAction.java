@@ -14,14 +14,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
+import manager.UserManager;
 import model.Booking;
 import model.Team;
 import model.Term;
@@ -78,6 +77,8 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                 for (Term term : activeTerms) {
                     if (term.getId() == termId) {
                         session.setAttribute("currentActiveTerm", term);
+						//Refreshing the user object in the session based on the new term selected if the user is not an Admin or Course Coordinator
+						new UserManager().initializeUser(em, session, user.getUsername(), user.getFullName(), term);
                     }
                 }
             }
