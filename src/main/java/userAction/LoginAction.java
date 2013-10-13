@@ -72,7 +72,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 		EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
-            logger.info("Reached LoginAction");
 			
 			if (request.getParameter("bypass") != null) { //BYPASS SSO LOGIN
 				initializeUser(em);
@@ -80,11 +79,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 				//return to login
 				if (request.getParameter("oauth_callback") == null) {
 					return "error";
-				}
-
-				//Set strings of parameters
-				for (Object o : request.getParameterMap().keySet()) {
-					logger.info("Parameter key: " + (String) o + ", value: " + request.getParameter((String) o));
 				}
 
 				//Get callback URL
@@ -127,16 +121,15 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 				clientCal.setTimeInMillis(currentTime);
 				clientCal.setTimeInMillis(currentTime * 1000);
 
-				logger.info("Server signature: " + serverSignature);
-				logger.info("Client signature: " + generatedSignature);
-				logger.info("Server signature time * 1000: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(serverCal.getTime()));
-				logger.info("Client signature time * 1000: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(clientCal.getTime()));
-
 				if (serverSignature.equals(generatedSignature)) {
 					initializeUser(em);
 				} else {
 					//Login unsuccessful
-					logger.error("LOGIN - SOMETHING WENT WRONG");
+					logger.error("Signature mismatch. SSO Login failed. ");
+					logger.info("Server signature: " + serverSignature);
+					logger.info("Client signature: " + generatedSignature);
+					logger.info("Server signature time * 1000: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(serverCal.getTime()));
+					logger.info("Client signature time * 1000: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(clientCal.getTime()));
 				}
 			} //END OF CODE FOR SSO
         } catch (Exception e) {
@@ -166,6 +159,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 		Term activeTerm = SettingsManager.getDefaultTerm(em);
 		session.setAttribute("currentActiveTerm", activeTerm);
 		new UserManager().initializeUser(em, session, smuUsername, smuFullName, activeTerm);
+		MiscUtil.logActivity(logger, smuUsername, null, "Logged in");
 	}
 	
     public HttpServletRequest getServletRequest() {
