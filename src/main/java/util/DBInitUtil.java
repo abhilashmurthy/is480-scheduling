@@ -304,15 +304,15 @@ public class DBInitUtil {
         TA ta1 = new TA("kjsebastian.2011", "SEBASTIAN Kiran Joy", null, term12013);
         TA ta2 = new TA("dudeTA", "Dude TA", null, term12013);
 
-//        Student u1 = new Student("suresh.s.2010", "Suresh SUBRAMANIAM", null, term12013);
-//
-//        Student u2 = new Student("abhilashm.2010", "Abhilash MURTHY", null, term12013);
-//
-//        Student u3 = new Student("tsgill.ps.2010", "Tarlochan Singh GILL S/O P S", null, term12013);
-//
-//        Student u4 = new Student("prakhara.2010", "Prakhar AGARWAL", null, term12013);
-//
-//        Student u5 = new Student("xuling.dai.2010", "DAI Xuling", null, term12013);
+        Student u1 = new Student("suresh.s.2010", "Suresh SUBRAMANIAM", null, term12013);
+
+        Student u2 = new Student("abhilashm.2010", "Abhilash MURTHY", null, term12013);
+
+        Student u3 = new Student("tsgill.ps.2010", "Tarlochan Singh GILL S/O P S", null, term12013);
+
+        Student u4 = new Student("prakhara.2010", "Prakhar AGARWAL", null, term12013);
+
+        Student u5 = new Student("xuling.dai.2010", "DAI Xuling", null, term12013);
 
         Faculty u6 = new Faculty("rcdavis", "Richard C. DAVIS", null, term12013);
 
@@ -431,11 +431,11 @@ public class DBInitUtil {
         em.persist(uCourseCoordinator);
         em.persist(ta1);
         em.persist(ta2);
-//        em.persist(u1);
-//        em.persist(u2);
-//        em.persist(u3);
-//        em.persist(u4);
-//        em.persist(u5);
+        em.persist(u1);
+        em.persist(u2);
+        em.persist(u3);
+        em.persist(u4);
+        em.persist(u5);
         em.persist(u6);
         em.persist(u7);
         em.persist(u8);
@@ -497,19 +497,19 @@ public class DBInitUtil {
         /*
          * TEAM TABLE POPULATION
          */
-//        Team t1 = new Team();
-//        t1.setTerm(term12013);
-//        t1.setTeamName("Thunderbolt");
-//        t1.setSupervisor(u6);
-//        t1.setReviewer1(u7);
-//        t1.setReviewer2(u8);
-//        HashSet<Student> members = new HashSet<Student>();
-//        members.add(u1);
-//        members.add(u2);
-//        members.add(u3);
-//        members.add(u4);
-//        members.add(u5);
-//        t1.setMembers(members);
+        Team t1 = new Team();
+        t1.setTerm(term12013);
+        t1.setTeamName("Thunderbolt");
+        t1.setSupervisor(u6);
+        t1.setReviewer1(u7);
+        t1.setReviewer2(u8);
+        HashSet<Student> members = new HashSet<Student>();
+        members.add(u1);
+        members.add(u2);
+        members.add(u3);
+        members.add(u4);
+        members.add(u5);
+        t1.setMembers(members);
 
 
         Team t2 = new Team();
@@ -645,7 +645,7 @@ public class DBInitUtil {
         t10.setMembers(t10members);
 
         // Persistence
-//        em.persist(t1);
+        em.persist(t1);
         em.persist(t2);
         em.persist(t3);
         em.persist(t4);
@@ -660,11 +660,11 @@ public class DBInitUtil {
         /*
          * LINKING USERS AND TEAMS
          */
-//        u1.setTeam(t1);
-//        u2.setTeam(t1);
-//        u3.setTeam(t1);
-//        u4.setTeam(t1);
-//        u5.setTeam(t1);
+        u1.setTeam(t1);
+        u2.setTeam(t1);
+        u3.setTeam(t1);
+        u4.setTeam(t1);
+        u5.setTeam(t1);
 
         u9.setTeam(t2);
         u10.setTeam(t2);
@@ -726,11 +726,11 @@ public class DBInitUtil {
         u60.setTeam(t10);
         u61.setTeam(t10);
 
-//        em.persist(u1);
-//        em.persist(u2);
-//        em.persist(u3);
-//        em.persist(u4);
-//        em.persist(u5);
+        em.persist(u1);
+        em.persist(u2);
+        em.persist(u3);
+        em.persist(u4);
+        em.persist(u5);
         em.persist(u9);
         em.persist(u10);
         em.persist(u11);
