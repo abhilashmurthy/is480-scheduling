@@ -4,12 +4,14 @@
  */
 package util;
 
+import constant.Role;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,5 +53,30 @@ public class MiscUtil {
 	
 	public static EntityManager getEntityManagerInstance() {
 		return emf.createEntityManager();
+	}
+	
+	/**
+	 * Overloaded method using a user object instead
+	 * @param logObj
+	 * @param user
+	 * @param message 
+	 */
+	public static void logActivity(Logger logObj, User user, String message) {
+		logActivity(logObj, user.getUsername(), user.getRole(), message);
+	}
+	
+	/**
+	 * Method to log user activity in the system. Role information is optional
+	 * @param logObj Logger object to be used for logging. (Retains class location)
+	 * @param username Username of the user performing the action
+	 * @param role (Optional) Role of the user at that point of time
+	 * @param message Message describing the action performed
+	 */
+	public static void logActivity(Logger logObj, String username, Role role, String message) {
+		StringBuilder logMsg = new StringBuilder();
+		logMsg.append(username);
+		if (role != null) logMsg.append("[").append(role).append("]");
+		logMsg.append(": ").append(message);
+		logObj.info(logMsg.toString());
 	}
 }
