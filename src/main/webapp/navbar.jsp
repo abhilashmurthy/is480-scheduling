@@ -125,8 +125,9 @@
 							 </ul>
 						</li>
 						<% } %>
-							
+						<% if (activeRole != Role.GUEST) { %>	
 						<li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
+						<% } %>
 						<li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
 					</ul>
 				</li>
