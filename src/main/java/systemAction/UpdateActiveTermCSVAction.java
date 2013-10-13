@@ -12,7 +12,9 @@ import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import manager.SettingsManager;
+import manager.UserManager;
 import model.Term;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -33,7 +35,7 @@ public class UpdateActiveTermCSVAction extends ActionSupport implements ServletR
 		EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
-			
+			User user = (User) request.getSession().getAttribute("user");
 			JSONObject inputObject = (JSONObject) new JSONObject(request.getParameter("jsonData"));
 			long activeTermId = Long.valueOf(inputObject.getString("termId"));
 			//Changing active term
@@ -42,6 +44,8 @@ public class UpdateActiveTermCSVAction extends ActionSupport implements ServletR
                 for (Term term : activeTerms) {
                     if (term.getId() == activeTermId) {
                         request.getSession().setAttribute("currentActiveTerm", term);
+						//Refreshing the user object in the session based on the new term selected
+						new UserManager().initializeUser(em, request.getSession(), user.getUsername(), user.getFullName(), term);
                     }
                 }
             } 

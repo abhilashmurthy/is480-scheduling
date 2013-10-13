@@ -18,11 +18,12 @@ import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.SettingsManager;
 import manager.TimeslotManager;
+import manager.UserManager;
 import model.Milestone;
 import model.Schedule;
 import model.Term;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -49,6 +50,7 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
             em = MiscUtil.getEntityManagerInstance();
 			ArrayList<Term> allActiveTerms = SettingsManager.getActiveTerms(em);
 			Term activeTerm = (Term) request.getSession().getAttribute("currentActiveTerm");
+			User user = (User) request.getSession().getAttribute("user");
 			
 			//Changing active term
             if (termId != 0) {
@@ -56,6 +58,8 @@ public class PrepareEditScheduleAction extends ActionSupport implements ServletR
                 for (Term term : allActiveTerms) {
                     if (term.getId() == termId) {
                         request.getSession().setAttribute("currentActiveTerm", term);
+						//Refreshing the user object in the session based on the new term selected
+						new UserManager().initializeUser(em, request.getSession(), user.getUsername(), user.getFullName(), term);
 						activeTerm = term;
                     }
                 }

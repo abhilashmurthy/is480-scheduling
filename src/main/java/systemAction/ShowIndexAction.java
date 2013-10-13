@@ -77,7 +77,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                 for (Term term : activeTerms) {
                     if (term.getId() == termId) {
                         session.setAttribute("currentActiveTerm", term);
-						//Refreshing the user object in the session based on the new term selected if the user is not an Admin or Course Coordinator
+						//Refreshing the user object in the session based on the new term selected
 						new UserManager().initializeUser(em, session, user.getUsername(), user.getFullName(), term);
                     }
                 }

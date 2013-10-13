@@ -15,8 +15,10 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
+import manager.UserManager;
 import model.Settings;
 import model.Term;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,6 +44,7 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
         try {
 			em = MiscUtil.getEntityManagerInstance();
 			HttpSession session = request.getSession();
+			User user = (User) request.getSession().getAttribute("user");
 			Role activeRole = (Role) session.getAttribute("activeRole");
 
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
@@ -93,6 +96,8 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 				//Getting the term object and updating the active term object in the session
 				Term defaultActiveTerm = em.find(Term.class, defaultActiveTermId);
 				session.setAttribute("currentActiveTerm", defaultActiveTerm);
+				//Refreshing the user object in the session based on the new term selected
+				new UserManager().initializeUser(em, request.getSession(), user.getUsername(), user.getFullName(), defaultActiveTerm);
 				
 				json.put("success", true);
 				json.put("message", "Your settings have been updated!");
