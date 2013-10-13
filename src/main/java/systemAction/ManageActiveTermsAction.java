@@ -10,15 +10,14 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
 import model.Term;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +42,7 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
         try {
 			em = MiscUtil.getEntityManagerInstance();
 			HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("user");
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
@@ -57,7 +57,7 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
 				
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
-				logger.error("User cannot access this page");
+				MiscUtil.logActivity(logger, user, "User cannot access this page");
 				return ERROR;
 			}
 			

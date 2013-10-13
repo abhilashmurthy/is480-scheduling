@@ -77,8 +77,6 @@ public class GetTeamsAction extends ActionSupport implements ServletRequestAware
             
             //Get term
             Term term = TermManager.findByYearAndSemester(em, Integer.parseInt(academicYearString), semesterString);
-            
-            logger.info("Getting all teams for term: " + term.getAcademicYear() + " " + term.getSemester());
             List<Team> teamList = null;
             EntityTransaction transaction = em.getTransaction();
             try {

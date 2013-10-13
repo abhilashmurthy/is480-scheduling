@@ -36,7 +36,6 @@ import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
