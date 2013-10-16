@@ -4,13 +4,16 @@
  */
 package manager;
 
+import constant.BookingStatus;
 import constant.Role;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpSession;
+import model.Booking;
 import model.Term;
 import model.User;
 import org.slf4j.Logger;
@@ -26,7 +29,7 @@ public class UserManager {
     private static Logger logger = LoggerFactory.getLogger(UserManager.class);
 	
 	//Adding all the roles in the list in decreasing order of importance/power
-	private void populateAllRoles(ArrayList<Role> allRoles) {
+	private static void populateAllRoles(ArrayList<Role> allRoles) {
 		allRoles.add(Role.ADMINISTRATOR);
 		allRoles.add(Role.COURSE_COORDINATOR);
 		allRoles.add(Role.FACULTY);
@@ -36,7 +39,7 @@ public class UserManager {
 	}
 	
 	//Choosing the user object with the least important/powerful role
-	private User chooseRole(ArrayList<User> users) {
+	private static User chooseRole(ArrayList<User> users) {
 		ArrayList<Role> allRoles = new ArrayList<Role>(); populateAllRoles(allRoles);
 		User user = users.get(0);
 		int smallestRoleIndex = allRoles.indexOf(user.getRole());
@@ -78,6 +81,24 @@ public class UserManager {
 		}
 
 		session.setAttribute("userRoles", users);
+	}
+	
+	public static <T> ArrayList<T> findActiveByRoleAndUsername(EntityManager em, Class<T> type, String username) {
+		ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+		ArrayList<T> list;
+		try {
+			Query q = em.createQuery("SELECT x FROM " + type.getSimpleName() + " x WHERE x.username = :username AND x.term.id IN (:termIds)");
+			q.setParameter("username", username);
+			ArrayList<Long> termIds = new ArrayList<Long>();
+			for (Term t : activeTerms) { termIds.add(t.getId()); }
+			q.setParameter("termIds", termIds);
+			list = (ArrayList<T>) q.getResultList();
+		} catch (Exception e) {
+			logger.error("Error in findActiveByRoleAndUsername()");
+			logger.error(e.getMessage());
+			return null;
+		}
+		return list;
 	}
 
     public static void save(EntityManager em, User user) {

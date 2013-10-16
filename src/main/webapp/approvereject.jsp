@@ -30,6 +30,16 @@
          %>
 		 
         <div class="container">
+		<div style="float: right">
+			<form action="approveReject" method="post">
+			<select name="chosenTermId" onchange="this.form.submit()">
+				<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
+				<s:iterator value="termData">
+					<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
+				</s:iterator>
+			</select>
+			</form>
+		</div>	
         <h3>Approve Booking</h3>
 			<s:if test="%{data != null && data.size() > 0}"> 
 					<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
