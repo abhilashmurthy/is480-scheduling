@@ -492,16 +492,25 @@
 								.append("Save")
 								.attr('disabled', true)
 								.outerHTML();
-				   } else {
+				   }
+				   
+				   if (<%= activeRole.equals(Role.STUDENT)%>) {
 					   //For students
 					   if ($td.is('.unavailableTimeslot')) {
 						   outputData["Unavailable"] = function() {
 							   var unavailableList = '';
 							   for (var i = 0; i < timeslot.unavailable.length; i++) {
-								   unavailableList += timeslot.unavailable[i] + "<br/>"
+								   unavailableList += timeslot.unavailable[i] + "<br/>";
 							   }
 							   return unavailableList;
 						   };
+						outputData[""] = 
+							$(document.createElement('button'))
+								.attr('id', 'createAnywayBookingBtn')
+								.addClass('popoverBtn btn btn-warning')
+								.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+								.append("Book Anyway")
+								.outerHTML();
 					   } else {
 						outputData[""] = 
 							$(document.createElement('button'))
@@ -510,7 +519,6 @@
 								.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
 								.append("Book")
 								.outerHTML();
-							//TODO: Can create booking still? Add button here
 					   }	
 				   }
 					
@@ -817,10 +825,8 @@
                     //Create Booking Button
                     $('.timeslotCell').off('click', '#createBookingBtn');
                     $('.timeslotCell').on('click', '#createBookingBtn', function(e) {
-                        //NOTE: self is a .timeslotCell here
                         var attendees = $('.optionalAttendees').tokenInput('get');
                         var returnData = createBooking(self, attendees);
-                        //REFRESH STATE OF scheduleData
 						if (returnData && returnData.success) {
 							self.popover('destroy');
 							self.tooltip('destroy');
@@ -846,6 +852,51 @@
 						}
                         return false;
                     });
+					
+                    //Create Anyway Booking Button
+                    $('.timeslotCell').off('click', '#createAnywayBookingBtn');
+                    $('.timeslotCell').on('click', '#createAnywayBookingBtn', function(e) {
+						bootbox.confirm({
+							title: "Faculty Unavailable",
+							message: "Create Booking Anyway?",
+							callback: function(result) {
+								if (result) {
+									var attendees = $('.optionalAttendees').tokenInput('get');
+									var timeslot = scheduleData.timeslots[self.attr('value')];
+									var returnData = createBooking(self, attendees);
+									//REFRESH STATE OF scheduleData
+									if (returnData && returnData.success) {
+										self.popover('destroy');
+										self.tooltip('destroy');
+										self.removeClass('unbookedTimeslot');
+										self.addClass('bookedTimeslot');
+										var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
+										if ($deletedDiv) $deletedDiv.remove();
+										var bookingDiv = $(document.createElement('div'));
+										bookingDiv.addClass('booking pendingBooking myTeamBooking');
+										bookingDiv.html(returnData.booking.team);
+										bookingDiv.css('display', 'none');
+										self.append(bookingDiv);
+										showNotification('SUCCESS', self, null);
+										for (var key in returnData.booking) {
+											if (returnData.booking.hasOwnProperty(key)) {
+												timeslot[key] = returnData.booking[key];
+											}
+										}
+										if (<%= activeRole.equals(Role.STUDENT)%>) {
+											appendViewBookingPopover(self);
+										} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+											appendPopovers();
+										}
+										bookingDiv.show('clip', 'slow');
+									} else {
+										showNotification("ERROR", self, returnData.message);
+									}
+								}
+							}
+						});
+                        return false;
+                    });
 
                     //Delete Booking Button
                     $('.timeslotCell').off('click', '#deleteBookingBtn');
@@ -856,14 +907,14 @@
 							message: "Are you sure?",
 							callback: function(result) {
 								if (result) {
-									var timeslot = self.parents('.timeslotCell');
-									deleteBooking(timeslot);
-									setTimeout(function(){showNotification("ERROR", timeslot, null);},500);
-									timeslot.removeClass('bookedTimeslot');
-									timeslot.addClass('unbookedTimeslot');
-									timeslot.popover('destroy');
-									delete scheduleData.timeslots[timeslot.attr('value')];
-									scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
+									var $timeslot = self.parents('.timeslotCell');
+									var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
+									deleteBooking($timeslot);
+									delete timeslot.team;
+									setTimeout(function(){showNotification("ERROR", $timeslot, null);},500);
+									$timeslot.removeClass('bookedTimeslot');
+									$timeslot.addClass('unbookedTimeslot');
+									$timeslot.popover('destroy');
 									if (<%= activeRole.equals(Role.STUDENT)%>) {
 										self.effect('clip', 'slow', function(){
 											self.remove();
@@ -871,9 +922,8 @@
 												.addClass('deletedBookingOnTimeslot')
 												.addClass('icon-info-sign');
 											makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
-											timeslot.append(deletedDiv);
-											appendCreateBookingPopover(timeslot);
-											refreshScheduleData();
+											$timeslot.append(deletedDiv);
+											appendCreateBookingPopover($timeslot);
 										});
 									} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
 										self.effect('clip', 'slow', function(){
