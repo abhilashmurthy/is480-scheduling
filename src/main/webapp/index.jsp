@@ -270,6 +270,7 @@
                         //Setup mouse events
                         setupMouseEvents();
 						//Add drag and drop
+						if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>)
 						initDragNDrop();
                     } else {
                         var eid = btoa(scheduleData.message);
