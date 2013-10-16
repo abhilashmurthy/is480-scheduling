@@ -20,8 +20,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import manager.UserManager;
 import model.Booking;
 import model.Team;
+import model.Term;
 import model.User;
 import model.role.Faculty;
 import util.MiscUtil;
@@ -35,6 +37,8 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(ResponseAction.class);
     private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
+	private ArrayList<HashMap<String, String>> termData = new ArrayList<HashMap<String, String>>();
+	private long chosenTermId; //The term ID that the user chooses to switch to
 
     @Override
     public String execute() throws Exception {
@@ -46,9 +50,9 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			if (activeRole.equals(Role.FACULTY)) {
-				//Setting the updated user object in session
-				em.clear();
-                Faculty faculty = em.find(Faculty.class, user.getId());
+				Faculty faculty = loadFacultyMemberForTerm(em, user); //Load the appropriate faculty object based on the chosen/active term
+				
+				//Setting the chosen user object in session
 				session.setAttribute("user", faculty);
 				
 				//Getting all the bookings for the faculty for the active term
@@ -131,6 +135,49 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 			if (em != null && em.isOpen()) em.close();
 		}
     }
+	
+	//Load the appropriate faculty object based on the chosen/active term
+	private Faculty loadFacultyMemberForTerm(EntityManager em, User user) {
+		//Get all the active terms that this user is Faculty for
+		ArrayList<Faculty> availableTerms = UserManager.findActiveByRoleAndUsername(em, Faculty.class, user.getUsername());
+		Faculty faculty;
+		if (chosenTermId != 0) { //User has selected a term ID to switch to
+			faculty = getFacultyByTerm(availableTerms, chosenTermId);
+		} else { //Load object from session
+			faculty = em.find(Faculty.class, user.getId());
+		}
+		availableTerms.remove(faculty); //Removing  chosen/active user from the list
+		
+		//Populate termData with the remaining available term options
+		populateTermDataForDisplay(availableTerms);
+		
+		return faculty;
+	}
+	
+	private Faculty getFacultyByTerm(ArrayList<Faculty> userObjs, long termId) {
+		for (Faculty f : userObjs) {
+			if (f.getTerm().getId() == termId) return f;
+		}
+		return null;
+	}
+	
+	private void populateTermDataForDisplay(ArrayList<Faculty> availableTerms) {
+		for (Faculty f : availableTerms) {
+			HashMap<String, String> map = new HashMap<String, String>();
+			Term term = f.getTerm();
+			map.put("termName", term.getDisplayName());
+			map.put("termId", String.valueOf(term.getId()));
+			termData.add(map);
+		}
+	}
+
+	public ArrayList<HashMap<String, String>> getTermData() {
+		return termData;
+	}
+
+	public void setTermData(ArrayList<HashMap<String, String>> termData) {
+		this.termData = termData;
+	}
 
     public ArrayList<HashMap<String, String>> getData() {
         return data;
