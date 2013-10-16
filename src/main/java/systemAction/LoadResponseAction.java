@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package userAction;
+package systemAction;
 
 import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
@@ -32,10 +32,10 @@ import util.MiscUtil;
  *
  * @author Prakhar
  */
-public class ResponseAction extends ActionSupport implements ServletRequestAware {
+public class LoadResponseAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
-    private static Logger logger = LoggerFactory.getLogger(ResponseAction.class);
+    private static Logger logger = LoggerFactory.getLogger(LoadResponseAction.class);
     private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 	private ArrayList<HashMap<String, String>> termData = new ArrayList<HashMap<String, String>>();
 	private long chosenTermId; //The term ID that the user chooses to switch to
@@ -143,6 +143,7 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 		Faculty faculty;
 		if (chosenTermId != 0) { //User has selected a term ID to switch to
 			faculty = getFacultyByTerm(availableTerms, chosenTermId);
+			request.getSession().setAttribute("currentActiveTerm", faculty.getTerm());
 		} else { //Load object from session
 			faculty = em.find(Faculty.class, user.getId());
 		}
@@ -177,6 +178,14 @@ public class ResponseAction extends ActionSupport implements ServletRequestAware
 
 	public void setTermData(ArrayList<HashMap<String, String>> termData) {
 		this.termData = termData;
+	}
+
+	public long getChosenTermId() {
+		return chosenTermId;
+	}
+
+	public void setChosenTermId(long chosenTermId) {
+		this.chosenTermId = chosenTermId;
 	}
 
     public ArrayList<HashMap<String, String>> getData() {
