@@ -211,9 +211,6 @@
                 //Default milestoneStr is ACCEPTANCE
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
-                var acceptanceId = null;
-                var midtermId = null;
-                var finalId = null;
                 var unavailableTimeslots = new Array();
                 var scheduleData = null;
                 var selectedMilestone = null;

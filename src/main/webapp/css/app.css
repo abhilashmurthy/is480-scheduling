@@ -268,6 +268,10 @@ input, button, select, textarea {
 	background-size: 8px 8px;
 }
 
+.otherTATimeslot {
+	background-color: #FFDFD6 !important;
+}
+
 .booking, .rejectedBooking {
     margin: auto;
     width: 100px;
@@ -493,4 +497,12 @@ input, button, select, textarea {
 
 #addMilestoneBtn {
 	margin-left: 20px;
+}
+
+.textinside {
+	border: 1px solid black;
+	border-radius: 5px;
+	text-align: center;
+	vertical-align: middle;
+	padding: 0 5px 0 5px;
 }

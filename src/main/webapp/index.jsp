@@ -110,7 +110,8 @@
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)) {%>
                     <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
 					<% } else if (activeRole.equals(Role.TA)) { %>
-					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Your video signup</td>
+					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td style="padding-right: 5px;">&nbsp;Your video signup</td>
+					<td class="legendBox timeslotCell otherTATimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Another TA signup</td>
 					<% } %>
                 </tr>
             </table>
@@ -581,28 +582,34 @@
 				
                 function appendChangeSignupPopover($td) {
                     if ($td.hasClass('legendBox')) return;
-                    var $changeSignupTable = $(document.createElement('table')).attr('id', 'createTimeslotTable');
-                    var outputData = {};
-					
-					outputData["Filming"] = function() {
-						if ($td.is('.taChosenTimeslot')) {
-							return $(document.createElement('button'))
-										.attr('id', 'unsignupTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
-										.css('float', 'right')
-										.append($(document.createElement('i')).addClass('icon-minus-sign icon-white'))
-										.append("Cancel")
-										.outerHTML();
-						} else {
-							return $(document.createElement('button'))
-										.attr('id', 'signupTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
-										.css('float', 'right')
-										.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
-										.append("Sign Up")
-										.outerHTML();
-						}
-					};
+					var timeslot = scheduleData.timeslots[$td.attr('value')];
+					var $changeSignupTable = $(document.createElement('table')).attr('id', 'createTimeslotTable');
+					var outputData = {};
+					var title = "Sign Up For Filming";
+					if ($td.is('.otherTATimeslot')) {
+						outputData["TA"] = timeslot.TA;
+						title = "Another TA signup";
+					} else {
+						outputData["Filming"] = function() {
+							if ($td.is('.taChosenTimeslot')) {
+								return $(document.createElement('button'))
+											.attr('id', 'unsignupTimeslotBtn')
+											.addClass('popoverBtn btn btn-primary')
+											.css('float', 'right')
+											.append($(document.createElement('i')).addClass('icon-minus-sign icon-white'))
+											.append("Cancel")
+											.outerHTML();
+							} else {
+								return $(document.createElement('button'))
+											.attr('id', 'signupTimeslotBtn')
+											.addClass('popoverBtn btn btn-primary')
+											.css('float', 'right')
+											.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+											.append("Sign Up")
+											.outerHTML();
+							}
+						};
+					}
 					
                     //Append all fields
 					for (var key in outputData) {
@@ -617,7 +624,7 @@
 					}
                     
 					//Popover
-					makePopover($td, "Sign Up For Filming", $changeSignupTable);
+					makePopover($td, title, $changeSignupTable);
                 }
                 
                 //Function to refresh booking exists
@@ -1805,7 +1812,7 @@
                 });
             }
             
-            /* POPOVER */
+            /* TOOLTIP */
             function makeTooltip(container, title) {
                 container.tooltip({
                     container: container,
