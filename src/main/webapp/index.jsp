@@ -682,7 +682,6 @@
                     //Hide other popovers when others clicked
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
-//						console.log('timeslotCell clicked');
 						self = <%= activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateBookingBtn').attr('disabled', true);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateTimeslotBtn').attr('disabled', true);
@@ -749,7 +748,6 @@
                                     return false;
                                 }
                             }
-//                            console.log(".unbookedTimeslot clicked.");
 							self.tooltip('hide');
                             self.popover('show');
 							if (self.find('tr:last').length && self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
@@ -1214,7 +1212,7 @@
                     //get the timeslotID for that cell and send as request
                     var cellId = $(bodyTd).attr('id').split("_")[1];
                     var data = {timeslotId: cellId};
-//                    console.log("Submitting delete booking data: " + JSON.stringify(data));
+                    console.log("Submitting delete booking data: " + JSON.stringify(data));
                     //Delete Booking AJAX
                     $.ajax({
                         type: 'POST',
@@ -1314,7 +1312,7 @@
                     }
                     timeslotsData["timeslot_data[]"] = timeslot_data;
                     timeslotsData["scheduleId"] = scheduleData.id;
-//                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
+                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
                     $.ajax({
                         type: 'POST',
                         async: false,
@@ -1333,7 +1331,6 @@
                                 }
                             } else {
                                 var eid = btoa(response.message);
-//                                console.log(response.message);
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         } else {
@@ -1366,7 +1363,7 @@
                     }
                     timeslotsData["timeslots"] = timeslot_data;
                     timeslotsData["scheduleId"] = scheduleData.id;
-//                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
+                    console.log('Submitting availability data: ' + JSON.stringify(timeslotsData));
                     $.ajax({
                         type: 'POST',
                         async: false,
@@ -1632,7 +1629,6 @@
 							if ($(this).children('.popover').length) $(this).popover('hide');
 							//Register original position
 							var datetime = $(this).closest('.timeslotCell').attr('value');
-							console.log("Dragging: " + datetime);
 							if (originalTimeslots[datetime] && originalTimeslots[datetime].start) return true;
 							originalTimeslots[datetime] = {
 								start: {
