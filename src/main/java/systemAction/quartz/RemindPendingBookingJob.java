@@ -42,7 +42,7 @@ import util.MiscUtil;
  */
 public class RemindPendingBookingJob implements Job {
 
-    private static Logger logger = LoggerFactory.getLogger(ClearPendingBookingJob.class);
+    private static Logger logger = LoggerFactory.getLogger(RemindPendingBookingJob.class);
     private int noOfDaysToRespond;
 
     public void execute(JobExecutionContext jec) throws JobExecutionException {

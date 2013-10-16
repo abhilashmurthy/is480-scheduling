@@ -85,14 +85,6 @@
 				<span id="previousWeek" class="traverseWeek icon-circle-arrow-left" style="color: #5bc0de; display: none; cursor: pointer"></span>
 				<span id="nextWeek" class="traverseWeek icon-circle-arrow-right" style="color: #5bc0de; display: none; cursor: pointer"></span>
             </div>
-			<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
-				<div class="settingsView">
-					<span id="settingsViewLabel">Enable Drag-N-Drop: </span>
-					<div id="dragDropView" data-on="warning" data-off="success" data-on-label="On" data-off-label="Off" class="make-switch switch-small">
-						<input type="checkbox">
-					</div>
-				</div>
-			<% } %>
 
             <!-- To display legend for the calendar -->
             <table class="legend">
@@ -152,7 +144,6 @@
                 var scheduleData = null; //This state shall be stored here
                 var weekView = null;
 				var maxWeekView = null;
-				var dragDropView = false;
                 
                 //Student-specific variables
                 var teamName = "<%= team != null ? team.getTeamName() : null%>"; //Student's active team name
@@ -228,7 +219,6 @@
                     semester = "<%= activeTerm.getSemester()%>";
                     populateSchedule(milestone, year, semester);
 					$("#weekView").bootstrapSwitch('setState', true);
-					$("#dragDropView").bootstrapSwitch('setState', false);
                     return false;
                 });
                 
@@ -276,11 +266,11 @@
                         //Draw the schedule table
                         makeSchedule();
 						//Append popovers
-						if (!dragDropView) appendPopovers();
+						appendPopovers();
                         //Setup mouse events
                         setupMouseEvents();
 						//Add drag and drop
-						if (dragDropView) initDragNDrop();
+						initDragNDrop();
                     } else {
                         var eid = btoa(scheduleData.message);
                         window.location = "error.jsp?eid=" + eid;
@@ -633,13 +623,6 @@
                     var bookingExists = 0;
                     var $existingTimeslot = null;
                     var teamsPendingBooking = null;
-					//Initialize dragDropView
-					if (!$('.booking').length) {
-						$("#dragDropView").parent().hide(); 
-						
-					} else { 
-						$("#dragDropView").parent().show(); 
-					}
                     if (<%= activeRole.equals(Role.STUDENT) %>) {
                         for (var key in scheduleData.timeslots) {
                             if (scheduleData.timeslots.hasOwnProperty(key)) {
@@ -705,7 +688,6 @@
 						$('.timeslotCell, .booking').not(self).popover('hide');
 						$(".hasDatepicker").datepicker('destroy');
 						$.pnotify_remove_all();
-						if (dragDropView) showNotification("ERROR", self, "You are in Drag-N-Drop view");
                         return false;
                     });
 
@@ -1124,17 +1106,6 @@
                             var wellFormedTime = time.toString("HH:mm") + " - " + time.addMinutes(scheduleData.duration).toString("HH:mm");
                             $("#updateFormStartTime").val(wellFormedTime).change();
                         }
-                        return false;
-                    });
-					
-                    //Drag-Drop view functions
-					$("#dragDropView").off('switch-change');
-                    $("#dragDropView").on('switch-change', function(e, data){
-						setTimeout(function(){
-							//Timeout for animation of setting change
-							dragDropView = data.value;
-							populateSchedule(milestone, year, semester);
-						}, 500);
                         return false;
                     });
                     
@@ -1581,60 +1552,60 @@
 							var newDateTime = $(this).attr('value');
 							var venue = timeslot.venue;
 							var optionals = timeslot.optionals;
-							var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
-							if (returnData && returnData.success) {
-								var $newTimeslot = $("#timeslot_" + returnData.booking.id);
-								$newTimeslot.removeClass('unbookedTimeslot');
-								$newTimeslot.addClass('bookedTimeslot');
-								scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
-								$oldTimeslot.removeClass('bookedTimeslot');
-								$oldTimeslot.addClass('unbookedTimeslot');
-								delete scheduleData.timeslots[$oldTimeslot.attr('value')];
-								scheduleData.timeslots[$oldTimeslot.attr('value')] = {
-									id: $oldTimeslot.attr('id').split("_")[1],
-									venue: venue, 
-									datetime: $oldTimeslot.attr('value')
-								};
-								$booking.detach().appendTo($newTimeslot);
-								setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
-								initDragNDrop();
-							} else {
-								showNotification("INFO", $oldTimeslot, returnData.message);
-							}
-//							bootbox.confirm({
-//								title: "Update Booking?",
-//								message: function(){
-//									var message = "Team: <b>" + timeslot.team + "</b><br/>";
-//									message += "Old Timeslot: <b style='color:red;'>" + Date.parse(timeslot.datetime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(timeslot.datetime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
-//									message += "New Timeslot: <b>" + Date.parse(newDateTime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(newDateTime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
-//									return message;
-//								},
-//								callback: function(result) {
-//									if (result) {
-//										var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
-//										if (returnData && returnData.success) {
-//											var $newTimeslot = $("#timeslot_" + returnData.booking.id);
-//											$newTimeslot.removeClass('unbookedTimeslot');
-//											$newTimeslot.addClass('bookedTimeslot');
-//											scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
-//											$oldTimeslot.removeClass('bookedTimeslot');
-//											$oldTimeslot.addClass('unbookedTimeslot');
-//											delete scheduleData.timeslots[$oldTimeslot.attr('value')];
-//											scheduleData.timeslots[$oldTimeslot.attr('value')] = {
-//												id: $oldTimeslot.attr('id').split("_")[1],
-//												venue: venue, 
-//												datetime: $oldTimeslot.attr('value')
-//											};
-//											$booking.detach();
-//											$newTimeslot.append($booking);
-//											setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
-//											initDragNDrop();
-//										} else {
-//											showNotification("INFO", $oldTimeslot, returnData.message);
-//										}
-//									}
-//								}
-//							});
+//							var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
+//							if (returnData && returnData.success) {
+//								var $newTimeslot = $("#timeslot_" + returnData.booking.id);
+//								$newTimeslot.removeClass('unbookedTimeslot');
+//								$newTimeslot.addClass('bookedTimeslot');
+//								scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
+//								$oldTimeslot.removeClass('bookedTimeslot');
+//								$oldTimeslot.addClass('unbookedTimeslot');
+//								delete scheduleData.timeslots[$oldTimeslot.attr('value')];
+//								scheduleData.timeslots[$oldTimeslot.attr('value')] = {
+//									id: $oldTimeslot.attr('id').split("_")[1],
+//									venue: venue, 
+//									datetime: $oldTimeslot.attr('value')
+//								};
+//								$booking.detach().appendTo($newTimeslot);
+//								setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
+//								initDragNDrop();
+//							} else {
+//								showNotification("INFO", $oldTimeslot, returnData.message);
+//							}
+							bootbox.confirm({
+								title: "Update Booking?",
+								message: function(){
+									var message = "Team: <b>" + timeslot.team + "</b><br/>";
+									message += "Old Timeslot: <b style='color:red;'>" + Date.parse(timeslot.datetime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(timeslot.datetime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
+									message += "New Timeslot: <b>" + Date.parse(newDateTime).toString('dd-MMM-yy, HH:mm') + " - " + Date.parse(newDateTime).addMinutes(scheduleData.duration).toString('HH:mm') + "</b><br/>";
+									return message;
+								},
+								callback: function(result) {
+									if (result) {
+										var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
+										if (returnData && returnData.success) {
+											var $newTimeslot = $("#timeslot_" + returnData.booking.id);
+											$newTimeslot.removeClass('unbookedTimeslot');
+											$newTimeslot.addClass('bookedTimeslot');
+											scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
+											$oldTimeslot.removeClass('bookedTimeslot');
+											$oldTimeslot.addClass('unbookedTimeslot');
+											delete scheduleData.timeslots[$oldTimeslot.attr('value')];
+											scheduleData.timeslots[$oldTimeslot.attr('value')] = {
+												id: $oldTimeslot.attr('id').split("_")[1],
+												venue: venue, 
+												datetime: $oldTimeslot.attr('value')
+											};
+											$booking.detach();
+											$newTimeslot.append($booking);
+											setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
+											initDragNDrop();
+										} else {
+											showNotification("INFO", $oldTimeslot, returnData.message);
+										}
+									}
+								}
+							});
 						},
 						out: function(event, ui) {
 							ui.draggable.draggable('option', 'revert', function(){
@@ -1647,7 +1618,9 @@
 								});
 								return false;
 							});
-						}
+						},
+						accept: '.booking',
+						hoverClass: 'bookingTimeslotHover'
 					});
 					
 					$(".booking").each(function(){
@@ -1655,6 +1628,7 @@
 					});
 					$(".booking").draggable({
 						start: function(event, ui) {
+							if ($(this).children('.popover').length) $(this).popover('hide');
 							//Register original position
 							var datetime = $(this).closest('.timeslotCell').attr('value');
 							console.log("Dragging: " + datetime);
@@ -1676,27 +1650,14 @@
 								}
 							};
 						},
-						revert: true
+						revert: true,
+						helper: function() {
+							return $(this).clone().empty().html($.trim($(this).children().remove().end().text()));
+						},
+						appendTo: 'body',
+						scroll: false
 					});
 				}
-				
-//                $(".booking").draggable({
-////                    helper: "clone",
-//                    appendTo: "body"
-//                });
-//                $(".unbookedTimeslot").droppable({
-//                        tolerance:"intersect",
-//                        drop: function(event, ui) {
-//                            var drop_p = $(this).offset();
-//                            var drag_p = ui.draggable.offset();
-//                            var left_end = drop_p.left - drag_p.left + 1;
-//                            var top_end = drop_p.top - drag_p.top + 1;
-//                            ui.draggable.animate({
-//                                top: '+=' + top_end,
-//                                left: '+=' + left_end
-//                            });
-//                        }
-//                });
                 
                 /*****************************
                  PLUGINS AND COMPONENTS
@@ -1793,14 +1754,10 @@
                     container: container,
                     trigger: 'manual',
                     html: true,
-                    title: title,
-//                    title: function(){
-//                        var buttonClose = $(document.createElement('button'));
-//                        buttonClose.attr('type', 'button');
-//                        buttonClose.addClass('close');
-//                        buttonClose.append("&times;"); //X sign
-//                        return title + buttonClose.outerHTML();
-//                    },
+                    title: function(){
+						return title + $(document.createElement('button')).addClass('close').append($(document.createElement('i')).addClass('icon-remove icon-black')).outerHTML();
+						
+                    },
                     content: content,
                     placement: function(){
                         if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 7) {

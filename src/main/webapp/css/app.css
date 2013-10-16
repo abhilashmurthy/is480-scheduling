@@ -506,3 +506,7 @@ input, button, select, textarea {
 	vertical-align: middle;
 	padding: 0 5px 0 5px;
 }
+
+.bookingTimeslotHover {
+	background-color: #FFDFD6;
+}
