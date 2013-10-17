@@ -373,19 +373,20 @@
 					//Update multiDatesPickers to year selected
 					$(".datepicker").each(function(){
 						var $nextMilestone = $(this);
-						$nextMilestone.multiDatesPicker('resetDates', 'picked');
+						var dates = $nextMilestone.multiDatesPicker('getDates');
 						$nextMilestone.datepicker('destroy');
 						$nextMilestone.multiDatesPicker({
 							dateFormat: "yy-mm-dd",
-							defaultDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
-//							minDate: Date.today() > Date.parse(yearVal + '-01-01')?Date.today():Date.parse(yearVal + '-01-01'),
-//							beforeShowDay: $.datepicker.noWeekends,
+							defaultDate: Date.today() > Date.parse(yearVal + '-01-01')?dates.length > 0?Date.parse(dates[0]):Date.today():Date.parse(yearVal + '-01-01'),
 							onSelect: function(date) {
 								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 								resetDisabledDates(date, order);
 								updatePillbox();
 							}
 						});
+						if (dates.length > 0) {
+							$nextMilestone.multiDatesPicker('addDates', dates);
+						}
 					});
 					updatePillbox();
 					return false;
