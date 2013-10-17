@@ -835,7 +835,8 @@
 							var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
 							if ($deletedDiv) $deletedDiv.remove();
 							var bookingDiv = $(document.createElement('div'));
-							bookingDiv.addClass('booking pendingBooking myTeamBooking');
+							bookingDiv.addClass('booking myTeamBooking');
+							bookingDiv.addClass(<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>?'approvedBooking':'pendingBooking');
 							bookingDiv.html(returnData.booking.team);
 							bookingDiv.css('display', 'none');
 							self.append(bookingDiv);
@@ -847,6 +848,7 @@
 								appendPopovers();
 							}
 							bookingDiv.show('clip', 'slow');
+							initDragNDrop();
 						} else {
 							showNotification("ERROR", self, returnData.message);
 						}
@@ -1673,6 +1675,8 @@
 					
 					$(".booking").each(function(){
 						if ($(this).data('draggable')) $(this).draggable('destroy');
+						if ($(this).children('i').length) $(this).children('i').remove();
+						$(this).append($(document.createElement('i')).addClass('moveIcon icon-move icon-black'));
 					});
 					$(".booking").draggable({
 						start: function(event, ui) {
@@ -1696,10 +1700,17 @@
 									left: $(this).offset().left
 								}
 							};
+							initDragNDrop();
 						},
 						revert: true,
 						helper: function() {
-							return $(this).clone().empty().html($.trim($(this).children().remove().end().text()));
+							return $(this).clone().empty()
+									.append(
+										$.trim($(this).children().remove().end().text())
+									)
+									.append(
+										$(document.createElement('i')).addClass('moveIcon icon-move icon-black')
+									);
 						},
 						appendTo: 'body',
 						scroll: false
