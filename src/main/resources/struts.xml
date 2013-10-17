@@ -76,6 +76,10 @@
             <result name="success">/bookinghistory.jsp</result>
         </action>
 		
+<!--		<action name="mySubscriptions" class="userAction.ViewSubscriptionsAction" method="execute">
+            <result name="success">/mysubscriptions.jsp</result>
+        </action>-->
+		
 		<action name="manageActiveTerms" class="systemAction.ManageActiveTermsAction" method="execute">
             <result name="success">/activeterms.jsp</result>
         </action>
