@@ -252,7 +252,7 @@
 									</td>
 									</tr>
 									<tr>
-										<td class="formLabelTd">Semester Name</td>
+										<td class="formLabelTd">Term Name</td>
 										<td><input id="semesterInput" type="text" name="semester" placeholder="eg. <%= nextSem %>"/><div id="semesterNameAvailabilityChecker" class="statusText"></div></td><td><input id="editScheduleSubmitBtn" type="submit" value="Save" data-loading-text="Done" class="btn btn-primary"/></td>
 									</tr>
 								</table>
@@ -591,7 +591,7 @@
 					var year = activeAcademicYearStr;
 					var term = $("#semesterInput").val();
 					if (year === null || term === null || !term.length) {
-						showNotification("WARNING", "Please enter a semester name");
+						showNotification("WARNING", "Please enter a term name");
 						$("#editScheduleSubmitBtn").button('reset');
 						return false;
 					}
