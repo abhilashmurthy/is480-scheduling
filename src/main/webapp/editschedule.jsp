@@ -571,12 +571,12 @@
 					if (thisPoint === "start") {
 						//Reset end point timepicker
 						var $endPoint = $("#milestoneDayEnd_" + milestone);
-						if ($endPoint.timepicker('getTime') <= Date.parse(selectedTime)) $endPoint.timepicker('setTime', Date.parse(selectedTime).addHours(2));
+						if ($endPoint.timepicker('getTime') <= Date.parse(selectedTime).addHours(1)) $endPoint.timepicker('setTime', Date.parse(selectedTime).addHours(2));
 						$endPoint.timepicker('option', 'minTime', Date.parse(selectedTime).addHours(2).toString('HH:mm'));
 					} else {
 						//Reset start point timepicker
 						var $startPoint = $("#milestoneDayStart_" + milestone);
-						if ($startPoint.timepicker('getTime') >= Date.parse(selectedTime)) $startPoint.timepicker('setTime', Date.parse(selectedTime).addHours(-2));
+						if ($startPoint.timepicker('getTime') >= Date.parse(selectedTime).addHours(-1)) $startPoint.timepicker('setTime', Date.parse(selectedTime).addHours(-2));
 						$startPoint.timepicker('option', 'maxTime', Date.parse(selectedTime).addHours(-2).toString('HH:mm'));
 					}
 				}
