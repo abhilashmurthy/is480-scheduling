@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import manager.BookingManager;
+import manager.UserManager;
 import model.Booking;
 import model.Term;
 import model.role.Faculty;
@@ -43,6 +44,8 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(BookingHistoryAction.class);
     private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
+	private ArrayList<HashMap<String, String>> termData = new ArrayList<HashMap<String, String>>();
+	private long chosenTermId; //The term ID that the user chooses to switch to
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     @Override
@@ -61,9 +64,9 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			User user = em.find(User.class, oldUser.getId());
 			session.setAttribute("user", user);
 				
-			/* Getting active term. Initially, only bookings for active term will be displayed to the user. 
+			/* Getting active term. Only bookings for active term will be displayed to the user. 
 			 * If the user wishes to view bookin history for another term, he/she will have to change the 
-			 * active term.
+			 * active term from the dropdown list.
 			*/
 			Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
 			
@@ -230,6 +233,42 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 		}
         return ERROR;
     } //end of execute function
+	
+	//Load the appropriate faculty object based on the chosen/active term
+	private Faculty loadUserForTerm(EntityManager em, User user) {
+		//Get all the active terms that this user is Faculty for
+		ArrayList<Faculty> availableTerms = UserManager.findActiveByRoleAndUsername(em, user.getRole().getBaseClassType(), user.getUsername());
+		Faculty faculty;
+		if (chosenTermId != 0) { //User has selected a term ID to switch to
+			faculty = getUserByTerm(availableTerms, chosenTermId);
+			request.getSession().setAttribute("currentActiveTerm", faculty.getTerm());
+		} else { //Load object from session
+			faculty = em.find(Faculty.class, user.getId());
+		}
+		availableTerms.remove(faculty); //Removing  chosen/active user from the list
+		
+		//Populate termData with the remaining available term options
+		populateTermDataForDisplay(availableTerms);
+		
+		return faculty;
+	}
+	
+	private Faculty getUserByTerm(ArrayList<Faculty> userObjs, long termId) {
+		for (Faculty f : userObjs) {
+			if (f.getTerm().getId() == termId) return f;
+		}
+		return null;
+	}
+	
+	private void populateTermDataForDisplay(ArrayList<Faculty> availableTerms) {
+		for (Faculty f : availableTerms) {
+			HashMap<String, String> map = new HashMap<String, String>();
+			Term term = f.getTerm();
+			map.put("termName", term.getDisplayName());
+			map.put("termId", String.valueOf(term.getId()));
+			termData.add(map);
+		}
+	}
 
     public ArrayList<HashMap<String, Object>> getData() {
         return data;
@@ -238,6 +277,22 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     public void setData(ArrayList<HashMap<String, Object>> data) {
         this.data = data;
     }
+
+	public ArrayList<HashMap<String, String>> getTermData() {
+		return termData;
+	}
+
+	public void setTermData(ArrayList<HashMap<String, String>> termData) {
+		this.termData = termData;
+	}
+
+	public long getChosenTermId() {
+		return chosenTermId;
+	}
+
+	public void setChosenTermId(long chosenTermId) {
+		this.chosenTermId = chosenTermId;
+	}
 
     public HashMap<String, Object> getJson() {
         return json;

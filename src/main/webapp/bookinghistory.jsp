@@ -37,6 +37,17 @@
 		<% } else { %>
 			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
 		<% } %>
+		<!-- TERM SELECTION DROP DOWN -->
+		<div style="float:right; margin-top:20px">
+			<form action="approveReject" method="post">
+				Select Term: <select name="chosenTermId" onchange="this.form.submit()">
+					<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
+					<s:iterator value="termData">
+						<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
+					</s:iterator>
+				</select>
+			</form>
+		</div>
 		<s:if test="%{data != null && data.size() > 0}">
 			<% if (!activeRole.equals(Role.STUDENT)) { %>
 			<div style="float:right;margin-top:16px">

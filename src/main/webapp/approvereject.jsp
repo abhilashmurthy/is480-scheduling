@@ -32,6 +32,7 @@
         <div class="container">
 		<div style="float: right">
 			<form action="approveReject" method="post">
+			<!-- TERM SELECTION DROP DOWN -->
 			<select name="chosenTermId" onchange="this.form.submit()">
 				<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
 				<s:iterator value="termData">
