@@ -45,9 +45,7 @@
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
 				<select id="hideColumns" class="multiselect" multiple="multiple">
 					<option value="0">Select/Deselect All</option>
-					<% if (activeRole.equals(Role.STUDENT)){ %>
-						<option value="1">My Team</option>
-					<% } else { %>
+					<% if (!activeRole.equals(Role.STUDENT)){ %>
 						<option value="1">Team</option>
 					<% } %>
 					<option value="2">Presentation</option>
@@ -80,13 +78,11 @@
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<tr>
 							<!--<th>#</th>-->
+							<% if (!activeRole.equals(Role.STUDENT)) { %>
 							<th>
-							<% if (activeRole.equals(Role.STUDENT)) { %>
-								My Team
-							<% } else { %>
 								Team
-							<% } %>
 							</th>
+							<% } %> 
 							<th>Presentation</th>
 							<th>Date & Time</th>
 							<th>Venue</th>
@@ -135,7 +131,9 @@
 							<tr class="info">
 						</s:if>
 								<%--<td><%= count %></td>--%>
-								<td><s:property value="teamName"/></td>
+								<% if (!activeRole.equals(Role.STUDENT)) { %>
+									<td><s:property value="teamName"/></td>
+								<% } %>
 								<td><s:property value="milestone"/></td>
 								<td><s:property value="date"/> <s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
@@ -255,7 +253,7 @@
 					if (selectedValues.length > 1) {
 						console.log("Multiple values: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=7; i++) {
+							for (var i=1; i<=8; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');
@@ -267,7 +265,7 @@
 					} else {
 						console.log("Single value: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=7; i++) {
+							for (var i=1; i<=8; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');
