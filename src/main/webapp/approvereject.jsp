@@ -30,17 +30,17 @@
          %>
 		 
         <div class="container">
-		<div style="float: right">
-			<form action="approveReject" method="post">
-			<select name="chosenTermId" onchange="this.form.submit()">
-				<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
-				<s:iterator value="termData">
-					<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
-				</s:iterator>
-			</select>
-			</form>
-		</div>	
-        <h3>Approve Booking</h3>
+			<h3 style="float: left; margin-right: 50px;">Approve Booking</h3>
+			<div style="float:right; margin-top:20px">
+				<form action="approveReject" method="post">
+					Select Term: <select name="chosenTermId" onchange="this.form.submit()">
+						<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
+						<s:iterator value="termData">
+							<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
+						</s:iterator>
+					</select>
+				</form>
+			</div>	
 			<s:if test="%{data != null && data.size() > 0}"> 
 					<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
 						<thead>
@@ -121,7 +121,7 @@
 			</s:if><s:else>
 				<h4>No pending bookings available!</h4>
 			</s:else>
-
+			</div>
 		<h4 id="approveRejectMessage"></h4>
         </div>
 		 

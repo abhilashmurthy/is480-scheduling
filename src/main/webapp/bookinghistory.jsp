@@ -38,7 +38,7 @@
 			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
 		<% } %>
 		<s:if test="%{data != null && data.size() > 0}">
-			<% if (!activeRole.equals(Role.STUDENT)) { %>
+			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA)) { %>
 			<div style="float:right;margin-top:16px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
@@ -66,6 +66,9 @@
 					<% if (!activeRole.equals(Role.TA)) { %>
 						<option value="7">Reason for Rejection</option>
 					<% } %>
+					<% if (!activeRole.equals(Role.TA)) { %>
+						<option value="8">Last Modified</option>
+					<% } %>
 				</select>
 				<!--</a>-->
 			</div>
@@ -90,6 +93,7 @@
 							<th>Response</th>
 							<th>Booking Status</th>
 							<th>Reason for Rejection</th>
+							<th>Last Modified</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<tr>
@@ -101,10 +105,11 @@
 							<th>My Response</th>
 							<th>Booking Status</th>
 							<th>Reason for Rejection</th>
+							<th>Last Modified</th>
 						</tr>
 					<% } else { %>
 						<tr>
-							<!--<th>#</th>-->
+							<!--For TA's-->
 							<th>Team</th>
 							<th>Presentation</th>
 							<th>Date & Time</th>
@@ -146,7 +151,9 @@
 								</td>
 								<td><s:property value="overallBookingStatus"/></td>
 								<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+									<s:property value="lastModifiedBy"/></td>
 								<%--</s:if><s:else>--%>
 									<!--<td>-</td>-->
 								<%--</s:else>--%>
@@ -175,7 +182,9 @@
 								<s:property value="overallBookingStatus"/><br/><br/>
 							</td>
 							<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+									<s:property value="lastModifiedBy"/></td>
 							<%--</s:if><s:else>--%>
 								<!--<td>-</td>-->
 							<%--</s:else>--%>
@@ -198,7 +207,7 @@
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
 							<td><s:property value="date"/> <s:property value="time"/></td>
-							<td><s:property value="venue"/></td>
+							<td><s:property value="venue"/><br/><br/></td>
 						</tr>
 						<% } %>
 					</s:iterator>
