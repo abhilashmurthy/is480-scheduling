@@ -236,7 +236,7 @@
 										<td class="formLabelTd">Year</td>
 										<td class="fuelux"> <!-- Putting default values for testing purposes -->
 											<div id="yearSpinnerInput" class="spinner">
-												<input id="yearInput" type="text" class="spinner-input" disabled=""/>
+												<input id="yearInput" type="text" class="spinner-input"/>
 												<div class="spinner-buttons  btn-group btn-group-vertical">
 													<button class="btn spinner-up" type="button">
 														<i class="icon-chevron-up"></i>
@@ -327,11 +327,18 @@
                  ------------------------------------------*/
 				
 				//Spinner
+				var thisYear = parseInt((new Date()).toString('yyyy'));
 				$("#yearSpinnerInput").spinner({
 					value: parseInt('<%= nextYear %>'),
-					min: 2013,
+					min: thisYear,
 					max: 9999,
 					step: 1
+				});
+				$("#yearSpinnerInput").on('focusout', function(){
+					var value = $(this).spinner('value');
+					if (value < thisYear) {
+						$(this).spinner('value', thisYear);
+					}
 				});
 				
 				//Term name availability check
