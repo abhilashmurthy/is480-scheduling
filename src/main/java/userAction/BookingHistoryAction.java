@@ -61,8 +61,11 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			//For updating user object after booking is creating (Status update & delete booking code already present in respective files)
 			em.clear();
 			User oldUser = (User) session.getAttribute("user");
-			User user = em.find(User.class, oldUser.getId());
+			//Loading the appropriate object for the user based on the term selected and populating the term dropdown with available options
+			User user = loadUserForTerm(em, oldUser, oldUser.getRole().getBaseClassType());
 			session.setAttribute("user", user);
+			
+			
 				
 			/* Getting active term. Only bookings for active term will be displayed to the user. 
 			 * If the user wishes to view bookin history for another term, he/she will have to change the 
@@ -292,35 +295,35 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     } //end of execute function
 	
 	//Load the appropriate faculty object based on the chosen/active term
-	private Faculty loadUserForTerm(EntityManager em, User user) {
+	private <T extends User> T loadUserForTerm(EntityManager em, User user, Class<T> baseClass) {
 		//Get all the active terms that this user is Faculty for
-		ArrayList<Faculty> availableTerms = UserManager.findActiveByRoleAndUsername(em, user.getRole().getBaseClassType(), user.getUsername());
-		Faculty faculty;
+		ArrayList<T> availableTerms = UserManager.findActiveByRoleAndUsername(em, baseClass, user.getUsername());
+		T currentUser;
 		if (chosenTermId != 0) { //User has selected a term ID to switch to
-			faculty = getUserByTerm(availableTerms, chosenTermId);
-			request.getSession().setAttribute("currentActiveTerm", faculty.getTerm());
+			currentUser = getUserByTerm(availableTerms, chosenTermId);
+			request.getSession().setAttribute("currentActiveTerm", currentUser.getTerm());
 		} else { //Load object from session
-			faculty = em.find(Faculty.class, user.getId());
+			currentUser = em.find(baseClass, user.getId());
 		}
-		availableTerms.remove(faculty); //Removing  chosen/active user from the list
+		availableTerms.remove(currentUser); //Removing  chosen/active user from the list
 		
 		//Populate termData with the remaining available term options
 		populateTermDataForDisplay(availableTerms);
 		
-		return faculty;
+		return currentUser;
 	}
 	
-	private Faculty getUserByTerm(ArrayList<Faculty> userObjs, long termId) {
-		for (Faculty f : userObjs) {
-			if (f.getTerm().getId() == termId) return f;
+	private <T extends User> T getUserByTerm(ArrayList<T> userObjs, long termId) {
+		for (T user : userObjs) {
+			if (user.getTerm().getId() == termId) return user;
 		}
 		return null;
 	}
 	
-	private void populateTermDataForDisplay(ArrayList<Faculty> availableTerms) {
-		for (Faculty f : availableTerms) {
+	private <T extends User> void populateTermDataForDisplay(ArrayList<T> availableTerms) {
+		for (T user : availableTerms) {
 			HashMap<String, String> map = new HashMap<String, String>();
-			Term term = f.getTerm();
+			Term term = user.getTerm();
 			map.put("termName", term.getDisplayName());
 			map.put("termId", String.valueOf(term.getId()));
 			termData.add(map);

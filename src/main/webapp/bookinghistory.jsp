@@ -39,7 +39,7 @@
 		<% } %>
 		<!-- TERM SELECTION DROP DOWN -->
 		<div style="float:right; margin-top:20px">
-			<form action="approveReject" method="post">
+			<form action="bookingHistory" method="post">
 				Select Term: <select name="chosenTermId" onchange="this.form.submit()">
 					<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
 					<s:iterator value="termData">
