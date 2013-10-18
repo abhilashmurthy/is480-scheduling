@@ -519,83 +519,36 @@
                         milestoneTr.insertBefore('#createScheduleSubmitRow');
                     }
                     $(".createScheduleTab a").tab('show');
-					disableDatePickers();
                 }
-				
-				function disableDatePickers() {
-					//Disabled subsequent
-					$(".datepicker").each(function(i, e){
-						if (i > 0) {
-							//Disable datepicker
-							$(this).multiDatesPicker('resetDates', 'picked');
-							$(this).datepicker('option', 'maxDate', -2);
-						}
-					});
-				}
                 
                 //Reset Dates On Adding/Removing from multiDatesPicker
-                function resetDisabledDates(minDateStr, orderNum) {
-					var isSelected = $(".milestoneOrder_" + orderNum).multiDatesPicker('gotDate', Date.parse(minDateStr));
-					var $nextMilestone = $(".milestoneOrder_" + (orderNum + 1));
-					if ($nextMilestone.length && isSelected) {
+                function resetDisabledDates(dateStr, orderNum) {
+					var $thisMilestone = $(".milestoneOrder_" + orderNum);
+					var theseDates = $thisMilestone.multiDatesPicker('getDates');
+					var thisMilestoneName = $thisMilestone.attr('id').split("_")[1].toUpperCase();
+					var selectedDate = Date.parse(dateStr);
+					if ($(".milestoneOrder_" + orderNum).multiDatesPicker('gotDate', selectedDate) >= 0) {
 						//A date has been added
-						//Reset all subsequent dates
-						for (var i = orderNum + 1; i > 0; i++) {
-							var $subseqMilestone = $(".milestoneOrder_" + i);
-							if (!$subseqMilestone.length) break; //No more milestones
-							$subseqMilestone.multiDatesPicker('resetDates', 'picked');
-						}
-						$nextMilestone.datepicker('destroy');
-						var minDate = Date.parse(minDateStr);
-						$nextMilestone.multiDatesPicker({
-							dateFormat: "yy-mm-dd",
-							defaultDate: minDate.addDays(1),
-							minDate: minDate.addDays(1),
-//							beforeShowDay: $.datepicker.noWeekends,
-							onSelect: function(date) {
-								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
-								resetDisabledDates(date, order);
-								updatePillbox();
+						for (var i = orderNum; i > 0; i--) {
+							var $prevMilestone = $(".milestoneOrder_" + (i - 1));
+							if (!$prevMilestone.length) break;
+							var prevDates = $prevMilestone.multiDatesPicker('getDates');
+							if (prevDates.length > 0 && selectedDate <= Date.parse(prevDates[prevDates.length - 1])) {
+								var prevMilestoneName = $prevMilestone.attr('id').split("_")[1].toUpperCase();
+								showNotification("WARNING", "Overlap detected <br/>" + thisMilestoneName + " [" + selectedDate.toString('dd-MMM-yy') + "]<br/> <= " + prevMilestoneName + " [" + Date.parse(prevDates[prevDates.length - 1]).toString('dd-MMM-yy') + "]");
+								$thisMilestone.multiDatesPicker('removeDates', selectedDate);
+								return false;
 							}
-						});
-					} else if ($nextMilestone.length) {
-						//A date has been removed
-						//Reset all subsequent dates
-						var dates = $(".milestoneOrder_" + orderNum).multiDatesPicker('getDates');
-						var nextOrder = parseInt($nextMilestone.attr('class').split(" ")[0].split("_")[1]);
-						for (var i = nextOrder; i > 0; i++) {
-							$nextMilestone = $(".milestoneOrder_" + i);
-							if (!$nextMilestone.length) break; //No more milestones
-							$nextMilestone.multiDatesPicker('resetDates', 'picked');
-							$nextMilestone.datepicker('destroy');
-							if (dates.length > 0) {
-								//If picked dates are still there
-								$nextMilestone.multiDatesPicker({
-									dateFormat: "yy-mm-dd",
-									defaultDate: Date.parse(dates[dates.length - 1]).addDays(1),
-									minDate: Date.parse(dates[dates.length - 1]).addDays(1),
-//									beforeShowDay: $.datepicker.noWeekends,
-									onSelect: function(date) {
-										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
-										resetDisabledDates(date, order);
-										updatePillbox();
-									}
-								});
-							} else {
-								//If picked dates are not there anymore
-								$nextMilestone.multiDatesPicker({
-									dateFormat: "yy-mm-dd",
-									defaultDate: Date.today(),
-//									minDate: Date.today(),
-//									beforeShowDay: $.datepicker.noWeekends,
-									onSelect: function(date) {
-										var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
-										resetDisabledDates(date, order);
-										updatePillbox();
-									}
-								});
-								//Disable datepicker
-								$nextMilestone.datepicker('option', 'maxDate', -2);
+						}
+						for (var i = orderNum; i > 0; i++) {
+							var $nextMilestone = $(".milestoneOrder_" + (i + 1));
+							if (!$nextMilestone.length) break;
+							var nextDates = $nextMilestone.multiDatesPicker('getDates');
+							if (nextDates.length > 0 && selectedDate >= Date.parse(nextDates[0])) {
+								var nextMilestoneName = $nextMilestone.attr('id').split("_")[1].toUpperCase();
+								showNotification("WARNING", "Overlap detected <br/>" + thisMilestoneName + " [" + selectedDate.toString('dd-MMM-yy') + "]<br/> >= " + nextMilestoneName + " [" + Date.parse(nextDates[0]).toString('dd-MMM-yy') + "]");
+								$thisMilestone.multiDatesPicker('removeDates', selectedDate);
+								return false;
 							}
 						}
 					}
@@ -641,12 +594,12 @@
 					if (thisPoint === "start") {
 						//Reset end point timepicker
 						var $endPoint = $("#milestoneDayEnd_" + milestone);
-						if ($endPoint.timepicker('getTime') <= Date.parse(selectedTime)) $endPoint.timepicker('setTime', Date.parse(selectedTime).addHours(2));
+						if ($endPoint.timepicker('getTime') <= Date.parse(selectedTime).addHours(1)) $endPoint.timepicker('setTime', Date.parse(selectedTime).addHours(2));
 						$endPoint.timepicker('option', 'minTime', Date.parse(selectedTime).addHours(2).toString('HH:mm'));
 					} else {
 						//Reset start point timepicker
 						var $startPoint = $("#milestoneDayStart_" + milestone);
-						if ($startPoint.timepicker('getTime') >= Date.parse(selectedTime)) $startPoint.timepicker('setTime', Date.parse(selectedTime).addHours(-2));
+						if ($startPoint.timepicker('getTime') >= Date.parse(selectedTime).addHours(-1)) $startPoint.timepicker('setTime', Date.parse(selectedTime).addHours(-2));
 						$startPoint.timepicker('option', 'maxTime', Date.parse(selectedTime).addHours(-2).toString('HH:mm'));
 					}
 				}
