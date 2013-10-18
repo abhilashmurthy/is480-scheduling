@@ -27,6 +27,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import manager.BookingManager;
+import manager.SettingsManager;
+import manager.UserManager;
 import model.Booking;
 import model.Term;
 import model.role.Faculty;
@@ -43,6 +45,8 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(BookingHistoryAction.class);
     private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
+	private ArrayList<HashMap<String, String>> termData = new ArrayList<HashMap<String, String>>();
+	private long chosenTermId; //The term ID that the user chooses to switch to
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     @Override
@@ -57,13 +61,28 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 			//Setting updated user object in session
 			//For updating user object after booking is creating (Status update & delete booking code already present in respective files)
 			em.clear();
-			User oldUser = (User) session.getAttribute("user");
-			User user = em.find(User.class, oldUser.getId());
+			User user = (User) session.getAttribute("user");
+			if (user.getRole() == Role.ADMINISTRATOR || user.getRole() == Role.COURSE_COORDINATOR) { //Only load term dropdown for permanent roles
+				ArrayList<Term> allActiveTerms = SettingsManager.getActiveTerms(em);
+				Term termToDisplay = (Term) request.getSession().getAttribute("currentActiveTerm");
+				if (chosenTermId != 0) { //User has selected a term ID to switch to
+					termToDisplay = getTermById(allActiveTerms, chosenTermId);
+					request.getSession().setAttribute("currentActiveTerm", termToDisplay);
+				}
+				allActiveTerms.remove(termToDisplay); //Removing the active/chosen term from getting populated in the dropdown list
+				for (Term t : allActiveTerms) {
+					addTermDataToDropdown(t);
+				}
+			} else { //Load applicable terms and objects for other users
+				//Loading the appropriate object for the user based on the term selected and populating the term dropdown with available options
+				user = loadUserForTerm(em, user, user.getRole().getBaseClassType());
+			}
 			session.setAttribute("user", user);
+			
 				
-			/* Getting active term. Initially, only bookings for active term will be displayed to the user. 
+			/* Getting active term. Only bookings for active term will be displayed to the user. 
 			 * If the user wishes to view bookin history for another term, he/she will have to change the 
-			 * active term.
+			 * active term from the dropdown list.
 			*/
 			Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
 			
@@ -287,6 +306,52 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 		}
         return ERROR;
     } //end of execute function
+	
+	//Load the appropriate faculty object based on the chosen/active term
+	private <T extends User> T loadUserForTerm(EntityManager em, User user, Class<T> baseClass) {
+		//Get all the active terms applicable for this user
+		ArrayList<T> availableTerms = UserManager.findActiveByRoleAndUsername(em, baseClass, user.getUsername());
+		T currentUser;
+		if (chosenTermId != 0) { //User has selected a term ID to switch to
+			currentUser = getUserByTerm(availableTerms, chosenTermId);
+			request.getSession().setAttribute("currentActiveTerm", currentUser.getTerm());
+		} else { //Load object from session
+			currentUser = em.find(baseClass, user.getId());
+		}
+		availableTerms.remove(currentUser); //Removing  chosen/active user from the list
+		
+		//Populate termData with the remaining available term options
+		populateTermDataForDisplay(availableTerms);
+		
+		return currentUser;
+	}
+	
+	private <T extends User> T getUserByTerm(ArrayList<T> userObjs, long termId) {
+		for (T user : userObjs) {
+			if (user.getTerm().getId() == termId) return user;
+		}
+		return null;
+	}
+	
+	private <T extends User> void populateTermDataForDisplay(ArrayList<T> availableTerms) {
+		for (T user : availableTerms) {
+			addTermDataToDropdown(user.getTerm());
+		}
+	}
+	
+	private void addTermDataToDropdown(Term term) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("termName", term.getDisplayName());
+		map.put("termId", String.valueOf(term.getId()));
+		termData.add(map);
+	}
+	
+	private Term getTermById (ArrayList<Term> terms, long id) {
+		for (Term t : terms) {
+			if (t.getId() == id) return t;
+		}
+		return null;
+	}
 
 	//Sorting timestamps by descending order (latest) to sort bookings 
 	private static Long[] sortTimestamps(Long[] ts) {
@@ -310,6 +375,22 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
     public void setData(ArrayList<HashMap<String, Object>> data) {
         this.data = data;
     }
+
+	public ArrayList<HashMap<String, String>> getTermData() {
+		return termData;
+	}
+
+	public void setTermData(ArrayList<HashMap<String, String>> termData) {
+		this.termData = termData;
+	}
+
+	public long getChosenTermId() {
+		return chosenTermId;
+	}
+
+	public void setChosenTermId(long chosenTermId) {
+		this.chosenTermId = chosenTermId;
+	}
 
     public HashMap<String, Object> getJson() {
         return json;

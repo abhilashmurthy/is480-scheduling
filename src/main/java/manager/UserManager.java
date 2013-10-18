@@ -59,7 +59,7 @@ public class UserManager {
 	/**
 	 * Sets the default user object and role based on the current active term in the system
 	 */
-	public void initializeUser(EntityManager em, HttpSession session, String username, String fullName, Term activeTerm) {
+	public static void initializeUser(EntityManager em, HttpSession session, String username, String fullName, Term activeTerm) {
 		ArrayList<User> users = findActiveRolesByUsername (em, username, activeTerm);
 
 		if (users.isEmpty()) {

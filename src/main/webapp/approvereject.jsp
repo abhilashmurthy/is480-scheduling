@@ -31,6 +31,7 @@
 		 
         <div class="container">
 			<h3 style="float: left; margin-right: 50px;">Approve Booking</h3>
+			<!-- TERM SELECTION DROP DOWN -->
 			<div style="float:right; margin-top:20px">
 				<form action="approveReject" method="post">
 					Select Term: <select name="chosenTermId" onchange="this.form.submit()">
@@ -40,7 +41,7 @@
 						</s:iterator>
 					</select>
 				</form>
-			</div>	
+			</div>
 			<s:if test="%{data != null && data.size() > 0}"> 
 					<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
 						<thead>

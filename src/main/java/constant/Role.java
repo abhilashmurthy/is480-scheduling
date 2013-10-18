@@ -19,7 +19,7 @@ public enum Role {
 	TA("TA", TA.class),
 	ADMINISTRATOR("Administrator", User.class),
 	COURSE_COORDINATOR("Course Coordinator", User.class),
-	GUEST("Guest", null);
+	GUEST("Guest", User.class);
 	
 	private Role(String displayName, Class baseClassType) {
 		this.displayName = displayName;
