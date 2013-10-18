@@ -50,40 +50,23 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
         try {
             em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("user");
 
-            //<----- 1st Part: To get number of pending bookings ------>
-            //Checking whether user is supervisor/reviewer
-            Role activeRole = (Role) session.getAttribute("activeRole");
-            if (activeRole == Role.FACULTY) {
-                em.clear();
-                Faculty faculty = em.find(Faculty.class, user.getId());
-                session.setAttribute("user", faculty);
-                //Getting all bookings for the user
-                for (Booking b : faculty.getRequiredBookings()) {
-                    if (b.getBookingStatus() != BookingStatus.DELETED
-                            && b.getBookingStatus() != BookingStatus.REJECTED) {
-                        if (b.getResponseList().get(faculty) == Response.PENDING) {
-                            pendingBookingCount++;
-                        }
-                    }
-                }
-            }  //end of outer if
 
-            //<----- 2rd Part: To set the current active term based on users response ------>
+            //<----- 1st Part: To set the current active term based on users response ------>
             //Active term is first set during login. Only if user selects another term from UI will the new active term be set
             if (termId != 0) {
                 ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
                 for (Term term : activeTerms) {
                     if (term.getId() == termId) {
                         session.setAttribute("currentActiveTerm", term);
+						User user = (User) session.getAttribute("user");
 						//Refreshing the user object in the session based on the new term selected
-						new UserManager().initializeUser(em, session, user.getUsername(), user.getFullName(), term);
+						UserManager.initializeUser(em, session, user.getUsername(), user.getFullName(), term);
                     }
                 }
             }
 
-            //<----- 3rd Part: Displaying all active terms for the user to choose from ------>
+            //<----- 2nd Part: Displaying all active terms for the user to choose from ------>
             ArrayList<Term> allActiveTerms = SettingsManager.getActiveTerms(em);
             //Removing the active term set during login or in the above code from the list to be displayed
             Term activeTerm = (Term) session.getAttribute("currentActiveTerm");
@@ -101,6 +84,25 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                     data.add(map);
                 }
             }
+			
+			//<----- 3rd Part: To get number of pending bookings ------>
+            //Checking whether user is supervisor/reviewer
+            Role activeRole = (Role) session.getAttribute("activeRole");
+            if (activeRole == Role.FACULTY) {
+                em.clear();
+				User user = (User) session.getAttribute("user");
+                Faculty faculty = em.find(Faculty.class, user.getId());
+                //Getting all bookings for the user
+                for (Booking b : faculty.getRequiredBookings()) {
+                    if (b.getBookingStatus() != BookingStatus.DELETED
+                            && b.getBookingStatus() != BookingStatus.REJECTED) {
+                        if (b.getResponseList().get(faculty) == Response.PENDING) {
+                            pendingBookingCount++;
+                        }
+                    }
+                }
+            }  //end of outer if
+			
             //Add teams into session if user is admin/course coordinator
             if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) {
                 addTeamsJson(em, session);
