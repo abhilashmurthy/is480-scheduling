@@ -69,41 +69,55 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				//<--------------------Validation checks for the csv file---------------------->
 				//1. Validate that there are no empty cells in the csv file for the 4 columns
 				logger.info("Validating for empty cells in the relevant part of the csv file");
-				boolean errorWithEmptyCells = validateEmptyCells(csvFile);
-				if (errorWithEmptyCells) {
-					session.setAttribute("csvMsg", "Wrong Structure! There are blank cells in the csv file!");
-					logger.error("Error due to blank cells in csv file");
+				String[] errorWithEmptyCells = validateEmptyCells(csvFile);
+				if (errorWithEmptyCells[0].equalsIgnoreCase("true")) {
+					session.setAttribute("csvMsg", "Wrong Structure! There are blank cells in the csv file. Row Number: " + 
+							errorWithEmptyCells[1]);
+					logger.error("Error due to blank cells in csv file. Row Number: " + errorWithEmptyCells[1]);
 					return SUCCESS;
 				}
 				
 				//2. Validate that every user has a username or a "-"
 				logger.info("Validating usernames");
-				boolean errorInUsername = validateUsernames(csvFile);
-				if (errorInUsername) {
-					session.setAttribute("csvMsg", "Wrong Usernames! If a username doesnt exist, please put a '-' symbol");
-					logger.error("Error with usernames in csv upload");
+				String[] errorInUsername = validateUsernames(csvFile);
+				if (errorInUsername[0].equalsIgnoreCase("true")) {
+					session.setAttribute("csvMsg", "Wrong Username! If a username doesnt exist, please put a '-' symbol."
+							+ "Row Number: " + errorWithEmptyCells[1]);
+					logger.error("Error with usernames in csv upload. Row Number: " + errorWithEmptyCells[1]);
 					return SUCCESS;
 				}
 
 				//3. Validate roles of each user
 				logger.info("Validating user roles");
-				boolean errorInRole = validateRoles(csvFile);
-				if (errorInRole) {
-					session.setAttribute("csvMsg", "Wrong User Roles! Role can only be - TA, Student, Supervisor, Reviewer 1, Reviewer 2");
-					logger.error("Error with user roles in csv upload");
+				String[] errorInRole = validateRoles(csvFile);
+				if (errorInRole[0].equalsIgnoreCase("true")) {
+					session.setAttribute("csvMsg", "Wrong User Roles! Role can only be - TA, Student, Supervisor, Reviewer 1, "
+							+ "Reviewer 2. Row Number: " + errorInRole[1]);
+					logger.error("Error with user roles in csv upload. Row Number: " + errorInRole[1]);
 					return SUCCESS;
 				}
-
+				
 				//4. Validate for team names
 				logger.info("Validating team names");
-				boolean errorInTeamName = validateTeamNames(csvFile);
-				if (errorInTeamName) {
-					session.setAttribute("csvMsg", "Wrong Team Name! For TA, please put a '-'. For other roles, put the team name");
-					logger.error("Error with team names in csv upload");
+				String[] errorInTeamName = validateTeamNames(csvFile);
+				if (errorInTeamName[0].equalsIgnoreCase("true")) {
+					session.setAttribute("csvMsg", "Wrong Team Name! For TA, please put a '-'. For other roles, put the "
+							+ "team name. Row Number: " + errorInTeamName[1]);
+					logger.error("Error with team names in csv upload. Row Number: " + errorInTeamName[1]);
 					return SUCCESS;
 				}
-
-				//5. Validate that TA's are at the start of the file
+				
+//				//5. Validate for team presentation type (private, internal, public)
+//				logger.info("Validating team presentation type (private, internal, public)");
+//				String[] errorInPresentationType = validatePresentationTypes(csvFile);
+//				if (errorInPresentationType[0].equalsIgnoreCase("true")) {
+//					session.setAttribute("csvMsg", "Wrong Presentation Type! Presentation types can only be Private, Internal "
+//							+ "or Public (For TA, please put a '-') Row Number: " + errorInPresentationType[1]);
+//					logger.error("Error with presentation types in csv upload. Row Number: " + errorInPresentationType[1]);
+//					return SUCCESS;
+//				}
+				
+				//6. Validate that TA's are at the start of the file
 //				logger.info("Validating order of roles for TA");
 //				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
 //				if (errorInOrderOfRoles) {
@@ -548,25 +562,29 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating for empty cells in the csv file
-	private static boolean validateEmptyCells(File csvFile) {
-		boolean errorWithEmptyCells = false;
+	private static String[] validateEmptyCells(File csvFile) {
+		String[] errorWithEmptyCells = new String[2];
+		errorWithEmptyCells[0] = "false";
+		errorWithEmptyCells[0] = "0";
+		int lineNo = 0;
 		try {
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
-			int lineNo = 0;
+//			int lineNo = 0;
 			String[] nextLine;
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
 				if (lineNo != 1) {
 					if (!(nextLine[0].length() > 0) || !(nextLine[1].length() > 0) || !(nextLine[2].length() > 0) 
 						|| !(nextLine[3].length() > 0)) {
-						errorWithEmptyCells = true;
+						errorWithEmptyCells[0] = "true";
+						errorWithEmptyCells[1] = String.valueOf(lineNo);
 						return errorWithEmptyCells;
 					} 
 				}
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
-			errorWithEmptyCells = true;
+			errorWithEmptyCells[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -574,7 +592,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
-			errorWithEmptyCells = true;
+			errorWithEmptyCells[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -582,7 +600,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
-			errorWithEmptyCells = true;
+			errorWithEmptyCells[0] = "true";
+			errorWithEmptyCells[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -595,24 +614,27 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	
 	
 	//Validating usernames
-	private static boolean validateUsernames(File csvFile) {
-		boolean errorInUsername = false;
+	private static String[] validateUsernames(File csvFile) {
+		String[] errorInUsername = new String[2];
+		errorInUsername[0] = "false";
+		errorInUsername[0] = "0";
+		int lineNo = 0;
 		try {
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
-			int lineNo = 0;
 			String[] nextLine;
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
 				if (lineNo != 1) {
 					if (!(nextLine[2].length() > 0)) {
-						errorInUsername = true;
+						errorInUsername[0] = "true";
+						errorInUsername[1] = String.valueOf(lineNo);
 						return errorInUsername;
 					}
 				}
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
-			errorInUsername = true;
+			errorInUsername[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -620,7 +642,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
-			errorInUsername = true;
+			errorInUsername[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -628,7 +650,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
-			errorInUsername = true;
+			errorInUsername[0] = "true";
+			errorInUsername[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -641,11 +664,13 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	
 	
 	//Validating user roles
-	private static boolean validateRoles(File csvFile) {
-		boolean errorInRole = false;
+	private static String[] validateRoles(File csvFile) {
+		String[] errorInRole = new String[2];
+		errorInRole[0] = "false";
+		errorInRole[1] = "0";
+		int lineNo = 0;
 		try {
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
-			int lineNo = 0;
 			String[] nextLine;
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
@@ -655,7 +680,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 						if (!nextLine[3].equalsIgnoreCase("TA") && !nextLine[3].equalsIgnoreCase("Student")
 							&& !nextLine[3].equalsIgnoreCase("Supervisor") && !nextLine[3].equalsIgnoreCase("Reviewer 1") 
 							&& !nextLine[3].equalsIgnoreCase("Reviewer 2")) {
-								errorInRole = true;
+								errorInRole[0] = "true";
+								errorInRole[1] = String.valueOf(lineNo);
 								return errorInRole;
 						}
 					}
@@ -663,7 +689,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
-			errorInRole = true;
+			errorInRole[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -671,7 +697,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
-			errorInRole = true;
+			errorInRole[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -679,7 +705,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
-			errorInRole = true;
+			errorInRole[0] = "true";
+			errorInRole[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -691,23 +718,27 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating team names
-	private static boolean validateTeamNames(File csvFile) {
-		boolean errorInTeamName = false;
+	private static String[] validateTeamNames(File csvFile) {
+		String[] errorInTeamName = new String[2];
+		errorInTeamName[0] = "false";
+		errorInTeamName[1] = "0";
+		int lineNo = 0;
 		try {
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
-			int lineNo = 0;
 			String[] nextLine;
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
 				if (lineNo != 1) {
 					if (nextLine[3].equalsIgnoreCase("TA")) {
 						if (!nextLine[0].equalsIgnoreCase("-")) {
-							errorInTeamName = true;
+							errorInTeamName[0] = "true";
+							errorInTeamName[1] = String.valueOf(lineNo);
 							return errorInTeamName;
 						}
 					} else {
 						if (nextLine[0].equalsIgnoreCase("") || nextLine[0].equalsIgnoreCase("-")) {
-							errorInTeamName = true;
+							errorInTeamName[0] = "true";
+							errorInTeamName[1] = String.valueOf(lineNo);
 							return errorInTeamName;
 						}
 					}
@@ -715,7 +746,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
-			errorInTeamName = true;
+			errorInTeamName[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -723,7 +754,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
-			errorInTeamName = true;
+			errorInTeamName[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -731,7 +762,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
-			errorInTeamName = true;
+			errorInTeamName[0] = "true";
+			errorInTeamName[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -740,6 +772,64 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 		}
 		return errorInTeamName;
+	}
+	
+	//Validating presentation types (private, internal or public)
+	private static String[] validatePresentationTypes(File csvFile) {
+		String[] errorInPresentationType = new String[2];
+		errorInPresentationType[0] = "false";
+		errorInPresentationType[1] = "0";
+		int lineNo = 0;
+		try {
+			CSVReader reader = new CSVReader(new FileReader(csvFile));
+			String[] nextLine;
+			while ((nextLine = reader.readNext()) != null) {
+				lineNo++;
+				if (lineNo != 1) {
+					if (nextLine[3].equalsIgnoreCase("TA")) {
+						if (!nextLine[4].equalsIgnoreCase("-")) {
+							errorInPresentationType[0] = "true";
+							errorInPresentationType[1] = String.valueOf(lineNo);
+							return errorInPresentationType;
+						}
+					} else {
+						if (!nextLine[4].equalsIgnoreCase("Private") && !nextLine[4].equalsIgnoreCase("Internal") &&
+								!nextLine[4].equalsIgnoreCase("Public")) {
+							errorInPresentationType[0] = "true";
+							errorInPresentationType[1] = String.valueOf(lineNo);
+							return errorInPresentationType;
+						}
+					}
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			errorInPresentationType[0] = "true";
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (IOException e) {
+			errorInPresentationType[0] = "true";
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		} catch (Exception e) {
+			errorInPresentationType[0] = "true";
+			errorInPresentationType[1] = String.valueOf(lineNo);
+			logger.error("Exception caught: " + e.getMessage());
+			if (MiscUtil.DEV_MODE) {
+			   for (StackTraceElement s : e.getStackTrace()) {
+				   logger.debug(s.toString());
+			   }
+			}
+		}
+		return errorInPresentationType;
 	}
 	
 	//Validating order of roles

@@ -117,6 +117,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 				
 				/* Arranging the booking depending on their status. 
 				 * Bookings will be displayed in the following order: PENDING->APPROVED->RJEJECTED->DELETED
+				 * Under each category, they will be sorted by "Latest Date Modified"
 				 */
 				for (Booking b: bookings) {
 					if (b.getBookingStatus() == BookingStatus.PENDING) {
@@ -130,29 +131,78 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					}
 				}
 				
-				//Adding bookings in the relevant order
+				//Adding bookings in the relevant order but sorting according to timestamp
 				ArrayList<Booking> orderedBookings = new ArrayList<Booking>();
 				if (pendingBookings.size() > 0) {
-					for (Booking b : pendingBookings) {
-						orderedBookings.add(b);
+					Long[] ts = new Long[pendingBookings.size()];
+					int i = 0;
+					for (Booking b: pendingBookings) {
+						ts[i] = b.getLastEditedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: pendingBookings) {
+							if (b.getLastEditedAt().getTime() == ts[j]) {
+								orderedBookings.add(b);
+								break;
+							}
+						}
 					}
 				}
 				if (approvedBookings.size() > 0) {
-					for (Booking b : approvedBookings) {
-						orderedBookings.add(b);
+					Long[] ts = new Long[approvedBookings.size()];
+					int i = 0;
+					for (Booking b: approvedBookings) {
+						ts[i] = b.getLastEditedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: approvedBookings) {
+							if (b.getLastEditedAt().getTime() == ts[j]) {
+								orderedBookings.add(b);
+								break;
+							}
+						}
 					}
 				}
 				if (rejectedBookings.size() > 0) {
-					for (Booking b : rejectedBookings) {
-						orderedBookings.add(b);
+					Long[] ts = new Long[rejectedBookings.size()];
+					int i = 0;
+					for (Booking b: rejectedBookings) {
+						ts[i] = b.getLastEditedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: rejectedBookings) {
+							if (b.getLastEditedAt().getTime() == ts[j]) {
+								orderedBookings.add(b);
+								break;
+							}
+						}
 					}
 				}
 				if (deletedBookings.size() > 0) {
-					for (Booking b : deletedBookings) {
-						orderedBookings.add(b);
+					Long[] ts = new Long[deletedBookings.size()];
+					int i = 0;
+					for (Booking b: deletedBookings) {
+						ts[i] = b.getLastEditedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: deletedBookings) {
+							if (b.getLastEditedAt().getTime() == ts[j]) {
+								orderedBookings.add(b);
+								break;
+							}
+						}
 					}
 				}
 				
+				//<---------Getting the actual details of the bookings starts here-------->
 				for (Booking b: orderedBookings) {
 					Timeslot timeslot = b.getTimeslot();
 					HashMap<String, Object> map = new HashMap<String, Object>();
@@ -201,13 +251,20 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					
 					//Getting the reason for rejection if booking has been rejected
 					String rejectReason = b.getRejectReason();
-
+					
+					//Getting the last edited by and time for the booking
+					SimpleDateFormat sdfForEdited = new SimpleDateFormat("MMM dd, HH:mm:ss");
+					String lastModifiedAt = sdfForEdited.format(b.getLastEditedAt());
+					String lastModifiedBy = b.getLastEditedBy();
+					
 					map.put("teamName", teamName);
 					map.put("milestone", milestoneName);
 					map.put("date", date);
 					map.put("time", time);
 					map.put("venue", venue);
 					map.put("rejectReason", rejectReason);
+					map.put("lastModifiedAt", lastModifiedAt);
+					map.put("lastModifiedBy", lastModifiedBy);
 
 					data.add(map);
 				}
@@ -270,6 +327,21 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 		}
 	}
 
+	//Sorting timestamps by descending order (latest) to sort bookings 
+	private static Long[] sortTimestamps(Long[] ts) {
+		for (int i = 0; i < ts.length - 1; i++) {
+			for (int j = 1; j < ts.length; j++) {
+				if (ts[j] > ts[i]) {
+					long temp = 0;
+					temp = ts[i];
+					ts[i] = ts[j];
+					ts[j] = temp;
+				}
+			}
+		}
+		return ts;
+	}
+	
     public ArrayList<HashMap<String, Object>> getData() {
         return data;
     }

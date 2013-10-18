@@ -510,3 +510,11 @@ input, button, select, textarea {
 .bookingTimeslotHover {
 	background-color: #FFDFD6;
 }
+
+.moveIcon {
+	font-size: 10px;
+	float: right;
+	height: 100%;
+	margin-left: 5px;
+	vertical-align: bottom;
+}

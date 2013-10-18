@@ -87,11 +87,13 @@
 							<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Bookings</b></a></li>
+						<!--<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>-->
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.TA)) { %>	
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Sign Ups</b></a></li>
 						<li id="bookingHistory"><a href="taAvailability" class="navbar-title"><b>Sign Up for Filming!</b></a></li>
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
+				<% } else if (activeRole.equals(Role.GUEST)) { %>
 				<% } %>
 				</ul>
 			</div>

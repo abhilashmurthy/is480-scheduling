@@ -39,11 +39,11 @@
             <s:if test="%{data.size() > 0 && data != null}"> 
                         <s:iterator value="data">
                             <tr class='milestoneRow' id='row_<s:property value="id"/>'>
-                                <td class='orderNum'><s:property value="order"/></td>
+                                <td class='orderNum'></td>
                                 <td><input type='text' id='name_<s:property value="id"/>' class='milestoneNameInput' style="width:90px; height:20px" value='<s:property value="milestone"/>'/></td>
                                 <td class='fuelux'>
 									<div id='duration_<s:property value="id"/>' class="durationSpinnerInput spinner">
-										<input class="durationInput spinner-input" type="text" disabled='disabled' style='width: 50px !important'/>
+										<input class="durationInput spinner-input" type="text" style='width: 50px !important'/>
 										<div class="spinner-buttons btn-group btn-group-vertical">
 											<button class="btn spinner-up" type="button">
 												<i class="icon-chevron-up"></i>
@@ -64,7 +64,8 @@
                                 <td>
                                     <button type="button" title="Delete Milestone" class="deleteMilestoneBtn btn btn-danger">
                                         <i class='icon-trash icon-white'></i>
-                                    </button>                                                                             
+                                    </button>
+									<i class='moveIcon icon-move icon-black'></i>
                                 </td>
                             </tr>
                         </s:iterator>
@@ -148,7 +149,6 @@
 												.attr('type', 'text')
 												.addClass('durationInput spinner-input')
 												.css('cssText', 'width: 50px !important')
-												.attr('disabled', 'disabled')
 										)
 										.append(
 											$(document.createElement('div'))
@@ -195,8 +195,9 @@
 										.addClass('deleteMilestoneBtn btn btn-danger')
 										.append($(document.createElement('i')).addClass('icon-trash icon-white'))
 								)
+								.append($(document.createElement('i')).addClass('moveIcon icon-move icon-black'))
 						)
-						.appendTo('#milestoneConfigTable tbody')
+						.appendTo('#milestoneConfigTable tbody');
 						resetPlugins();
 				});
 				
@@ -315,10 +316,17 @@
 						var duration = parseInt(milestones[milestoneName].duration);
 						$(this).spinner('value', duration);
 					});
+					$('.spinner').on('focusout', function(){
+						var value = $(this).spinner('value');
+						if (value % 30 !== 0) {
+							$(this).spinner('value', value - (value % 30) === 0?30:value - (value % 30));
+						}
+					});
 					
 					//Drag and Drop milestones
 					$('tbody').find('td.orderNum').each(function(i){
-						$(this).html(i + 1);
+						$(this).empty();
+						$(this).append(i + 1);
 					});
 					
 					$("#milestoneConfigTable tbody").sortable({
@@ -332,7 +340,8 @@
 						},
 						stop: function(e, ui) {
 							ui.item.parent().find('td.orderNum').each(function(i){
-								$(this).html(i + 1);
+								$(this).empty();
+								$(this).append(i + 1);
 							});
 						}
 					}).disableSelection();

@@ -49,16 +49,14 @@
 			</form>
 		</div>
 		<s:if test="%{data != null && data.size() > 0}">
-			<% if (!activeRole.equals(Role.STUDENT)) { %>
+			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA)) { %>
 			<div style="float:right;margin-top:16px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
 				<select id="hideColumns" class="multiselect" multiple="multiple">
 					<option value="0">Select/Deselect All</option>
-					<% if (activeRole.equals(Role.STUDENT)){ %>
-						<option value="1">My Team</option>
-					<% } else { %>
+					<% if (!activeRole.equals(Role.STUDENT)){ %>
 						<option value="1">Team</option>
 					<% } %>
 					<option value="2">Presentation</option>
@@ -77,6 +75,9 @@
 					<% if (!activeRole.equals(Role.TA)) { %>
 						<option value="7">Reason for Rejection</option>
 					<% } %>
+					<% if (!activeRole.equals(Role.TA)) { %>
+						<option value="8">Last Modified</option>
+					<% } %>
 				</select>
 				<!--</a>-->
 			</div>
@@ -88,19 +89,18 @@
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<tr>
 							<!--<th>#</th>-->
+							<% if (!activeRole.equals(Role.STUDENT)) { %>
 							<th>
-							<% if (activeRole.equals(Role.STUDENT)) { %>
-								My Team
-							<% } else { %>
 								Team
-							<% } %>
 							</th>
+							<% } %> 
 							<th>Presentation</th>
 							<th>Date & Time</th>
 							<th>Venue</th>
 							<th>Response</th>
 							<th>Booking Status</th>
 							<th>Reason for Rejection</th>
+							<th>Last Modified</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<tr>
@@ -112,10 +112,11 @@
 							<th>My Response</th>
 							<th>Booking Status</th>
 							<th>Reason for Rejection</th>
+							<th>Last Modified</th>
 						</tr>
 					<% } else { %>
 						<tr>
-							<!--<th>#</th>-->
+							<!--For TA's-->
 							<th>Team</th>
 							<th>Presentation</th>
 							<th>Date & Time</th>
@@ -141,7 +142,9 @@
 							<tr class="info">
 						</s:if>
 								<%--<td><%= count %></td>--%>
-								<td><s:property value="teamName"/></td>
+								<% if (!activeRole.equals(Role.STUDENT)) { %>
+									<td><s:property value="teamName"/></td>
+								<% } %>
 								<td><s:property value="milestone"/></td>
 								<td><s:property value="date"/> <s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
@@ -157,7 +160,9 @@
 								</td>
 								<td><s:property value="overallBookingStatus"/></td>
 								<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+									<s:property value="lastModifiedBy"/></td>
 								<%--</s:if><s:else>--%>
 									<!--<td>-</td>-->
 								<%--</s:else>--%>
@@ -186,7 +191,9 @@
 								<s:property value="overallBookingStatus"/><br/><br/>
 							</td>
 							<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="rejectReason"/></td>
+								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+									<s:property value="lastModifiedBy"/></td>
 							<%--</s:if><s:else>--%>
 								<!--<td>-</td>-->
 							<%--</s:else>--%>
@@ -209,7 +216,7 @@
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
 							<td><s:property value="date"/> <s:property value="time"/></td>
-							<td><s:property value="venue"/></td>
+							<td><s:property value="venue"/><br/><br/></td>
 						</tr>
 						<% } %>
 					</s:iterator>
@@ -257,7 +264,7 @@
 					if (selectedValues.length > 1) {
 						console.log("Multiple values: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=7; i++) {
+							for (var i=1; i<=8; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');
@@ -269,7 +276,7 @@
 					} else {
 						console.log("Single value: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=7; i++) {
+							for (var i=1; i<=8; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');

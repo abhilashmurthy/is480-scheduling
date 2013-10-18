@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -108,6 +109,22 @@ public abstract class EmailTemplate {
 			}
 		}
 		map.put("[REQUIRED_ATTENDEES]", result.toString());
+		
+		//Insert optional attendees
+		HashSet<String> optionalEmails = b.getOptionalAttendees();
+		StringBuilder optionalEmailsString = new StringBuilder();
+		if (optionalEmails.isEmpty()) { //Insert "-" if there are no emails
+			optionalEmailsString.append("-");
+		} else { //Insert emails separated by commas
+			Iterator<String> optionalIter = optionalEmails.iterator();
+			while (optionalIter.hasNext()) {
+				optionalEmailsString.append(optionalIter.next());
+				if (optionalIter.hasNext()) {
+					optionalEmailsString.append(",&nbsp;");
+				}
+			}
+		}
+		map.put("[OPTIONAL_ATTENDEES]", optionalEmailsString.toString());
 		
 		return map;
 	}
