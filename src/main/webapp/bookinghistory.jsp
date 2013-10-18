@@ -30,13 +30,6 @@
     <body>
 		<%@include file="navbar.jsp" %>
 		<div class="container">
-		<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)){ %>
-			<h3 style="float: left; margin-right: 50px;">All Bookings</h3> 
-		<% } else if (activeR.equals(Role.TA)) { %>
-			<h3 style="float: left; margin-right: 50px;">My Sign Ups</h3> 
-		<% } else { %>
-			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
-		<% } %>
 		<!-- TERM SELECTION DROP DOWN -->
 		<div style="float:right; margin-top:20px">
 			<form action="bookingHistory" method="post">
@@ -48,9 +41,16 @@
 				</select>
 			</form>
 		</div>
+		<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)){ %>
+			<h3 style="float: left; margin-right: 50px;">All Bookings</h3> 
+		<% } else if (activeR.equals(Role.TA)) { %>
+			<h3 style="float: left; margin-right: 50px;">My Sign Ups</h3> 
+		<% } else { %>
+			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
+		<% } %>
 		<s:if test="%{data != null && data.size() > 0}">
 			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA)) { %>
-			<div style="float:right;margin-top:16px">
+			<div style="float:right; clear:both ;margin-bottom:16px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
