@@ -53,6 +53,8 @@ public class Booking implements Serializable {
     private Set<User> requiredAttendees = new HashSet<User>();
     @Column(length = 19000000)
     private HashSet<String> optionalAttendees = new HashSet<String>();
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<User> subscribedUsers = new HashSet<User>();
     private String rejectReason;
     private String lastEditedBy;
     private Timestamp lastEditedAt;
@@ -136,6 +138,14 @@ public class Booking implements Serializable {
     public void setOptionalAttendees(HashSet<String> optionalAttendees) {
         this.optionalAttendees = optionalAttendees;
     }
+
+	public Set<User> getSubscribedUsers() {
+		return subscribedUsers;
+	}
+
+	public void setSubscribedUsers(Set<User> subscribedUsers) {
+		this.subscribedUsers = subscribedUsers;
+	}
 
     public Long getId() {
         return id;

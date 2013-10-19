@@ -22,7 +22,7 @@
 		
 		 <!-- Kick unauthorized user -->
         <%
-            if (!activeRole.equals(Role.STUDENT)) {
+            if (activeRole.equals(Role.COURSE_COORDINATOR)) {
                 request.setAttribute("error", "Oops. You are not authorized to access this page!");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
@@ -30,30 +30,28 @@
          %>
 		 
         <div class="container">
-			<h3 style="float: left; margin-right: 50px;">My Subscriptions</h3>
+			<h3 style="float: left; margin-right: 50px;">My Subscriptions!</h3>
 			<s:if test="%{data != null && data.size() > 0}"> 
 					<table id="mySubscriptionsTable" class="table table-hover" style="font-size: 13px;">
 						<thead>
 							<tr>
-								<th>Team Presenting</th>
+								<th></th>
+								<th>Presenting Team</th>
 								<th>Date of Presentation</th>
 								<th>Venue</th>
 								<th>More Information</th>
+								<th>Unsubscribe</th>
 							</tr>
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
-								<s:if test="%{myStatus.equalsIgnoreCase('Pending')}"> 
-									<tr class="warning">
-								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Approved')}">
-									<tr class="success">
-								</s:elseif><s:elseif test="%{myStatus.equalsIgnoreCase('Rejected')}">
-									<tr class="error">
-								</s:elseif>
+								<tr class="success">
+									<td><i class="icon-ok-circle"></i></td>
 									<td><s:property value="teamName"/></td>
-									<td><s:property value="date"/> <s:property value="time"/></td>
+									<td><s:property value="time"/></td>
 									<td><s:property value="venue"/></td>
 									<td><s:property value="wikiLink"/></td>
+									<td><button type="button" class="btn btn-danger" name="Unsubscribe!"><i class="icon-remove"></i></button></td>
 								</tr>
 							</s:iterator>
 							</tbody>
