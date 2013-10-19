@@ -4,7 +4,6 @@
  */
 package userAction;
 
-import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
@@ -18,13 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
-import manager.SettingsManager;
 import model.Booking;
-import model.Settings;
 import model.Timeslot;
 import model.User;
 import model.role.Faculty;
@@ -107,13 +103,6 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				HashMap<User, Response> responseList = booking.getResponseList();
 				if (responseList.containsKey(user)) { //Checking if the faculty is part of the response list for required attendees
 					responseList.put(user, response);
-					if (response == Response.APPROVED) {
-						ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(booking, user);
-						approvedEmail.sendEmail();
-					} else if (response == Response.REJECTED) {
-						RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(booking, user);
-						rejectedEmail.sendEmail();
-					}
 				} else {
 					logger.error("Faculty not found in responseList for required attendees");
 					return SUCCESS;
@@ -154,6 +143,12 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
 //					scheduleSMSReminder(booking); //Scheduling SMS reminders to be sent exactly 24 hrs before the booking
+				} else if (response == Response.APPROVED) {
+					ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(booking, user);
+					approvedEmail.sendEmail();
+				} else if (response == Response.REJECTED) {
+					RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(booking, user);
+					rejectedEmail.sendEmail();
 				}
                                 
 				booking.setLastEditedBy(user.getFullName());
