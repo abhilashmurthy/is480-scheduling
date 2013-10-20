@@ -4,15 +4,22 @@
  */
 package notification.email;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import manager.SettingsManager;
 import model.Booking;
+import model.Settings;
 import model.User;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
@@ -126,6 +133,41 @@ public abstract class EmailTemplate {
 		}
 		map.put("[OPTIONAL_ATTENDEES]", optionalEmailsString.toString());
 		
+		return map;
+	}
+	
+	public HashMap<String, String> generateDueDate(HashMap<String, String> map, long createdAtMillis) {
+		EntityManager em = null;
+		try {
+			em = MiscUtil.getEntityManagerInstance();
+			Settings notificationSettings = SettingsManager.getByName(em, "manageNotifications");
+			String jsonData = notificationSettings.getValue();
+			Gson gson = new Gson();
+			
+			JsonArray notifArray = gson.fromJson(jsonData, JsonArray.class);
+			JsonObject clearBookingSetting = notifArray.get(2).getAsJsonObject();
+			String durationStr = clearBookingSetting.get("emailClearFrequency").getAsString();
+			int duration = Integer.parseInt(durationStr);
+			
+			Calendar deadline = Calendar.getInstance();
+			deadline.setTimeInMillis(createdAtMillis);
+			deadline.add(Calendar.DAY_OF_MONTH, duration);
+			
+			//Showing the deadline date in a more readable manner: Date with 23:59 time
+			int daysToSubtract = 0;
+			if (deadline.get(Calendar.HOUR_OF_DAY) < 3) { //Booking was made between 12 and 3 AM
+				daysToSubtract = -1;
+			}
+			deadline.add(Calendar.DAY_OF_MONTH, daysToSubtract);
+			deadline.set(Calendar.HOUR_OF_DAY, 23);
+			deadline.set(Calendar.MINUTE, 59);
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
+			map.put("[DUE_DATE]", sdf.format(deadline.getTime()));
+		} finally {
+            if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
+            if (em != null && em.isOpen()) em.close();
+        }
 		return map;
 	}
 	

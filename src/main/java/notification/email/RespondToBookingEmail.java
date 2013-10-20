@@ -42,9 +42,9 @@ public class RespondToBookingEmail extends EmailTemplate{
 	@Override
 	public HashMap<String, String> prepareBodyData() {
 		HashMap<String, String> map = new HashMap<String, String>();
-		
 		map = generateStandardDetails(b, map);
-		
+		//Inserting the due date for response
+		map = generateDueDate(map, b.getCreatedAt().getTime());
 		return map;
 	}
 
