@@ -95,7 +95,16 @@ public class ClearPendingBookingJob implements Job {
                 Timestamp dueDate = new Timestamp(cal.getTimeInMillis());
                 //Delete booking is date is passed
                 if (now.after(dueDate)) {
-                    //Send an email to inform that booking has been rejected by system
+                    logger.debug("Booking: " + pendingBooking + " passed due date. Deleting.");
+                    pendingBooking.setBookingStatus(BookingStatus.REJECTED);
+                    pendingBooking.setLastEditedBy("IS480 Scheduling System");
+                    pendingBooking.setLastEditedAt(now);
+                    pendingBooking.setRejectReason("Faculty response overdue. Releasing timeslot.");
+                    Timeslot ts = pendingBooking.getTimeslot();
+                    ts.setCurrentBooking(null);
+                    em.persist(pendingBooking);
+                    em.persist(ts);
+					//Send an email to inform that booking has been rejected by system
 					if(isOn){
 						logger.debug("email sending now");
 						
@@ -106,15 +115,6 @@ public class ClearPendingBookingJob implements Job {
 						RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(pendingBooking, systemAsUser);
 						rejectedEmail.sendEmail();
 					}
-                    logger.debug("Booking: " + pendingBooking + " passed due date. Deleting.");
-                    pendingBooking.setBookingStatus(BookingStatus.REJECTED);
-                    pendingBooking.setLastEditedBy("IS480 Scheduling System");
-                    pendingBooking.setLastEditedAt(now);
-                    pendingBooking.setRejectReason("Faculty response overdue. Releasing timeslot.");
-                    Timeslot ts = pendingBooking.getTimeslot();
-                    ts.setCurrentBooking(null);
-                    em.persist(pendingBooking);
-                    em.persist(ts);
 					count++;
                 }
             }
