@@ -42,13 +42,14 @@ public class ViewSubscriptionsAction extends ActionSupport implements ServletReq
         try {
 			em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
-			User user = (User) session.getAttribute("user");
+			User tempUser = (User) session.getAttribute("user");
+			User user = em.find(User.class, tempUser.getId());
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.GUEST)
 					|| activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.TA)) {
 				
-				Set<Booking> subscribedTo = new HashSet<Booking>();
+				Set<Booking> subscribedTo;
 				//Getting all the bookings the user has subscribed to
 				subscribedTo = user.getSubscribedBookings();
 				

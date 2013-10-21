@@ -30,7 +30,7 @@
          %>
 		 
         <div class="container">
-			<h3 style="float: left; margin-right: 50px;">My Subscriptions!</h3>
+			<h3 style="float: left; margin-right: 50px;">My Subscriptions</h3>
 			<s:if test="%{data != null && data.size() > 0}"> 
 					<table id="mySubscriptionsTable" class="table table-hover" style="font-size: 13px;">
 						<thead>
@@ -57,10 +57,12 @@
 							</tbody>
 						</table>
 						<br/><br/>
-				</div>
 			</s:if><s:else>
+				<div style="clear: both;">
 				<h4>You haven't subscribed to any presentations yet!</h4>
+				</div>
 			</s:else>
+		</div>
 		 
 		<%@include file="footer.jsp"%>
 		

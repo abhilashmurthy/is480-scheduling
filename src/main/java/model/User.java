@@ -57,7 +57,7 @@ public class User implements Serializable {
 	
 	private Role role;
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy = "subscribedUsers", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Booking> subscribedBookings = new HashSet<Booking>();
 	
 	public String getUsername() {

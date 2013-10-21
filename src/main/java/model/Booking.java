@@ -44,6 +44,7 @@ public class Booking implements Serializable {
     private BookingStatus bookingStatus = BookingStatus.PENDING;
     @Column(length = 19000000) //Track the responses of the required attendees
     private HashMap<User, Response> responseList = new HashMap<User, Response>();
+	
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "Booking_Required_Attendees",
             joinColumns =
@@ -51,10 +52,18 @@ public class Booking implements Serializable {
             inverseJoinColumns =
             @JoinColumn(name = "user_id"))
     private Set<User> requiredAttendees = new HashSet<User>();
+	
     @Column(length = 19000000)
     private HashSet<String> optionalAttendees = new HashSet<String>();
+	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "Booking_Subscribers",
+            joinColumns =
+            @JoinColumn(name = "booking_id"),
+            inverseJoinColumns =
+            @JoinColumn(name = "user_id"))
 	private Set<User> subscribedUsers = new HashSet<User>();
+	
     private String rejectReason;
     private String lastEditedBy;
     private Timestamp lastEditedAt;
