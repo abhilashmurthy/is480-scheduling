@@ -90,9 +90,9 @@ input, button, select, textarea {
 
 .settingsView {
 	padding-left: 20px;
-    display: inline;
+/*    display: inline;*/
     float: right;
-    clear: left;
+    /*clear: left;*/
 }
 
 #settingsViewLabel {

@@ -57,22 +57,16 @@
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
-								<s:if test="%{myStatus.equalsIgnoreCase('Pending')}"> 
-									<tr class="warning">
-								</s:if><s:elseif test="%{myStatus.equalsIgnoreCase('Approved')}">
-									<tr class="success">
-								</s:elseif><s:elseif test="%{myStatus.equalsIgnoreCase('Rejected')}">
-									<tr class="error">
-								</s:elseif>
-									<td><s:property value="teamName"/></td>
-									<td><s:property value="milestone"/></td>
-									<td><s:property value="userRole"/></td>
-									<td><s:property value="date"/> <s:property value="time"/></td>
-									<td><s:property value="venue"/></td>
-									<td>
-										<s:property value="myStatus"/><br/><br/>
+								<tr class="warning" style="height:50px">
+									<td style="vertical-align: middle"><s:property value="teamName"/></td>
+									<td style="vertical-align: middle"><s:property value="milestone"/></td>
+									<td style="vertical-align: middle"><s:property value="userRole"/></td>
+									<td style="vertical-align: middle"><s:property value="date"/> <s:property value="time"/></td>
+									<td style="vertical-align: middle"><s:property value="venue"/></td>
+									<td style="vertical-align: middle">
+										<s:property value="myStatus"/>
 									</td>
-									<td>
+									<td style="vertical-align: middle">
 										<button type="button" class="approveBookingBtn updateStatusBtn btn btn-success" value="<s:property value="bookingId"/>" name="approve">
 											Approve
 										</button>
@@ -82,6 +76,7 @@
 										</button>
 										</span>
 									</td>
+									<br/><br/>
 								</tr>
 							</s:iterator>
 							</tbody>
@@ -120,11 +115,12 @@
 					</div>
 				</div>
 			</s:if><s:else>
+				<div style="clear: both;">
 				<h4>No pending bookings available!</h4>
+				</div>
 			</s:else>
 			</div>
 		<h4 id="approveRejectMessage"></h4>
-        </div>
 		 
 		<%@include file="footer.jsp"%>
 		
