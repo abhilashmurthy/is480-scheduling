@@ -7,7 +7,9 @@ package systemAction.quartz;
 import constant.BookingStatus;
 import constant.Role;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -80,12 +82,8 @@ public class ClearPendingBookingJob implements Job {
             Query queryBookings = em.createQuery("select p from Booking p where p.bookingStatus = :pendingBookingStatus")
                     .setParameter("pendingBookingStatus", BookingStatus.PENDING);
             pendingBookings = (List<Booking>) queryBookings.getResultList();
-
-            if (pendingBookings.isEmpty()) {
-                throw new NoResultException();
-            }
 			
-			int count = 0;
+			ArrayList<Long> remindedIds = new ArrayList<Long>();
             for (Booking pendingBooking : pendingBookings) {
                 //Do the time calculation
                 cal.clear();
@@ -115,12 +113,20 @@ public class ClearPendingBookingJob implements Job {
 						RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(pendingBooking, systemAsUser);
 						rejectedEmail.sendEmail();
 					}
-					count++;
+					remindedIds.add(pendingBooking.getId());
                 }
             }
             em.getTransaction().commit();
             logItem.setSuccess(true);
-            logItem.setMessage(count + " Pending bookings cleared.");
+			if (remindedIds.isEmpty()) throw new NoResultException(); //There were no reminders sent in this round
+			
+			StringBuilder idString = new StringBuilder();
+			Iterator iter = remindedIds.iterator();
+			while (iter.hasNext()) {
+				idString.append(iter.next());
+				if (iter.hasNext()) idString.append(",");
+			}
+			logItem.setMessage("Pending bookings cleared. (IDs: " + idString.toString() + ")");
         } catch (NoResultException n) {
             //Normal, no pending bookings found
             logItem.setSuccess(true);

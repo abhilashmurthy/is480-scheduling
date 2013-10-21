@@ -119,7 +119,7 @@ public class RemindPendingBookingJob implements Job {
 				idString.append(iter.next());
 				if (iter.hasNext()) idString.append(",");
 			}
-			logItem.setMessage("Faculty reminded for booking IDs: " + idString.toString());
+			logItem.setMessage("Faculty reminded for bookings. (IDs: " + idString.toString() + ")");
         } catch (NoResultException n) {
             //Normal, no pending bookings found
 			logItem.setSuccess(true);
