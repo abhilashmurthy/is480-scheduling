@@ -120,11 +120,12 @@
 					</div>
 				</div>
 			</s:if><s:else>
+				<div style="clear: both;">
 				<h4>No pending bookings available!</h4>
+				</div>
 			</s:else>
 			</div>
 		<h4 id="approveRejectMessage"></h4>
-        </div>
 		 
 		<%@include file="footer.jsp"%>
 		
