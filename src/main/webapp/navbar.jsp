@@ -99,7 +99,7 @@
 						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.GUEST)) { %>
-						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>
+						<!--<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>-->
 				<% } %>
 				</ul>
 			</div>
