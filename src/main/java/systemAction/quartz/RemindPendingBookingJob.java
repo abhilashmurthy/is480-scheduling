@@ -95,7 +95,7 @@ public class RemindPendingBookingJob implements Job {
                         //get one day break
 						Calendar cal2 = Calendar.getInstance();
                         cal2.clear();
-                        cal2.setTimeInMillis(pendingBooking.getTimeslot().getStartTime().getTime());
+                        cal2.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
                         cal2.add(Calendar.DATE, 0);
                         Timestamp dueDate1 = new Timestamp(cal2.getTimeInMillis());
 						
@@ -131,7 +131,7 @@ public class RemindPendingBookingJob implements Job {
 									
 									Faculty facultyMember = UserManager.getUser(user.getId(), Faculty.class);
 									
-									FacultyReminderEmail facultyReminder = new FacultyReminderEmail(pendingBooking,facultyMember,cal2);
+									FacultyReminderEmail facultyReminder = new FacultyReminderEmail(pendingBooking,facultyMember);
 									facultyReminder.sendEmail();
 									
 								}
