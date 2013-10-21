@@ -4,16 +4,19 @@
  */
 package systemAction.quartz;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -22,13 +25,10 @@ import manager.UserManager;
 import model.Booking;
 import model.CronLog;
 import model.Settings;
-import model.Timeslot;
 import model.User;
 import model.role.Faculty;
 import notification.email.FacultyReminderEmail;
 import org.hibernate.Hibernate;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -43,16 +43,15 @@ import util.MiscUtil;
 public class RemindPendingBookingJob implements Job {
 
     private static Logger logger = LoggerFactory.getLogger(RemindPendingBookingJob.class);
-    private int noOfDaysToRespond;
 
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         logger.debug("Started faculty reminder");
 		
-		Calendar cal = Calendar.getInstance();
-		Timestamp now = new Timestamp(cal.getTimeInMillis());
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 		
 		CronLog logItem = new CronLog();
-		logItem.setJobName("Remind faculty on booking");
+		logItem.setJobName("Faculty Booking Reminder");
 		logItem.setRunTime(now);
 		
 		
@@ -61,26 +60,17 @@ public class RemindPendingBookingJob implements Job {
         try {
             em = MiscUtil.getEntityManagerInstance();
 			
-			//get the number of days for email reminder
-			Settings notificationSettings = SettingsManager.getNotificationSettings(em);
-
-			JSONArray notificationArray = new JSONArray(notificationSettings.getValue());
+			Settings notificationSettings = SettingsManager.getByName(em, "manageNotifications");
+			String jsonData = notificationSettings.getValue();
+			Gson gson = new Gson();
 			
-			//get email settings
-			JSONObject obj = notificationArray.getJSONObject(0);
-			String getEmailStatus = obj.getString("emailStatus");
-			int emailFrequency = obj.getInt("emailFrequency");
-			
-			//get the number of days
-			noOfDaysToRespond = emailFrequency ;
-			//noOfDaysToRespond++;
-			
-			//see if the email functionality is set as on
-			boolean isOn = false;
-			
-			if(getEmailStatus.equalsIgnoreCase("On")){
-				isOn = true;
-			}
+			JsonArray notifArray = gson.fromJson(jsonData, JsonArray.class);
+			JsonObject clearBookingSetting = notifArray.get(2).getAsJsonObject();
+			String durationStr = clearBookingSetting.get("emailClearFrequency").getAsString();
+			int duration = Integer.parseInt(durationStr); //Duration for faculty to respond to booking
+			Calendar tomorrow = Calendar.getInstance();
+			tomorrow.add(Calendar.DAY_OF_MONTH, 1); //Tomorrow 3AM
+//			tomorrow.add(Calendar.MINUTE, 1); //TESTING. Next minute
 
             em.getTransaction().begin();
             List<Booking> pendingBookings = null;
@@ -88,73 +78,48 @@ public class RemindPendingBookingJob implements Job {
             Query queryBookings = em.createQuery("select p from Booking p where p.bookingStatus = :pendingBookingStatus")
                     .setParameter("pendingBookingStatus", BookingStatus.PENDING);
             pendingBookings = (List<Booking>) queryBookings.getResultList();
+
+			ArrayList<Long> remindedIds = new ArrayList<Long>();
+			for (Booking pendingBooking : pendingBookings) {
+				Calendar deadline = Calendar.getInstance();
+				deadline.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
+				deadline.add(Calendar.DAY_OF_MONTH, duration);
+//				deadline.add(Calendar.MINUTE, duration); //TESTING
+
+				//If the deadline is between today 3AM and tomorrow 3AM, send a reminder
+				if (deadline.compareTo(nowCal) >= 0 && deadline.compareTo(tomorrow) <= 0) {
+					logger.debug("Booking: " + pendingBooking + ". Reminder sent.");
+					//get response list
+					HashMap<User,Response> allStatus = pendingBooking.getResponseList();
+
+					for (Map.Entry<User, Response> entry  : allStatus.entrySet()) {
+						User user = entry.getKey();
+						Response response = entry.getValue();
+
+						if(user.getRole().equals(Role.FACULTY) && response.equals(Response.PENDING)){
+							Faculty facultyMember = UserManager.getUser(user.getId(), Faculty.class);
+							//Forcing initialization for sending email
+							Hibernate.initialize(pendingBooking.getTeam().getMembers());
+							Hibernate.initialize(pendingBooking.getTimeslot().getSchedule().getMilestone());
+							
+							FacultyReminderEmail facultyReminder = new FacultyReminderEmail(pendingBooking,facultyMember);
+							facultyReminder.sendEmail();
+						}
+					}
+					remindedIds.add(pendingBooking.getId());
+				}
+			}
 			
-                    if (pendingBookings.isEmpty()) throw new  NoResultException();
-
-                    for (Booking pendingBooking : pendingBookings) {
-                        //get one day break
-						Calendar cal2 = Calendar.getInstance();
-                        cal2.clear();
-                        cal2.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
-                        cal2.add(Calendar.DATE, 0);
-                        Timestamp dueDate1 = new Timestamp(cal2.getTimeInMillis());
-						
-						long difference = (long)dueDate1.getTime()-(long)now.getTime();
-						logger.debug("due date" + (long)dueDate1.getDate());
-						logger.debug("now " + (long)now.getTime());
-                        logger.debug(" the difference between due and now" + (long)difference);
-                        
-                        //if difference between due date and current time is less than or equal 24hours
-                        if ((long)dueDate1.getTime()-(long)now.getTime() == (noOfDaysToRespond*86400000) && isOn) {
-                            logger.debug("Booking: " + pendingBooking + ". First Reminder sent.");
-							
-							//get response list
-							HashMap<User,Response> allStatus = pendingBooking.getResponseList();
-							
-							for(Map.Entry<User, Response> entry  : allStatus.entrySet()) {
-								
-								User user = entry.getKey();
-								Response response = entry.getValue();
-
-								if(user.getRole().equals(Role.FACULTY) && response.equals(Response.PENDING)){
-									
-									//cronlog that reminder for this booking has been sent
-									//Initializing run log to be stored in database
-									
-									
-									logItem.setMessage("Faculty reminded." + user.getId().toString());
-									
-									//Forcing initialization for sending email
-									Hibernate.initialize(pendingBooking.getTeam().getMembers());
-									Hibernate.initialize(pendingBooking.getTimeslot().getSchedule().getMilestone());
-				
-									
-									Faculty facultyMember = UserManager.getUser(user.getId(), Faculty.class);
-									
-									FacultyReminderEmail facultyReminder = new FacultyReminderEmail(pendingBooking,facultyMember);
-									facultyReminder.sendEmail();
-									
-								}
-							}
-							
-							
-							/*NewBookingEmail newEmail = new NewBookingEmail(booking);
-							RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
-							newEmail.sendEmail();
-							responseEmail.sendEmail();*/
-							
-							
-							
-                        }
-						
-						/*else if(dueDate1.compareTo(now) >=0){
-                            logger.debug("Booking: " + pendingBooking + ". Second Reminder sent.");
-                            //TODO: Add email notification for this task (last and final reminder)
-                        }*/
-                     }
-            //em.getTransaction().commit();
 			logItem.setSuccess(true);
-			//logItem.setMessage("Faculty reminded.");
+			if (remindedIds.isEmpty()) throw new NoResultException(); //There were no reminders sent in this round
+			
+			StringBuilder idString = new StringBuilder();
+			Iterator iter = remindedIds.iterator();
+			while (iter.hasNext()) {
+				idString.append(iter.next());
+				if (iter.hasNext()) idString.append(",");
+			}
+			logItem.setMessage("Faculty reminded for booking IDs: " + idString.toString());
         } catch (NoResultException n) {
             //Normal, no pending bookings found
 			logItem.setSuccess(true);
