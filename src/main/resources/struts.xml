@@ -125,7 +125,7 @@
 		<action name="updateActiveTermCSV" class="systemAction.UpdateActiveTermCSVAction" method="execute">
 			<result name="success">/uploadfile.jsp</result>
         </action>
-				
+		
     </package>
 
     <!-- JSON Package -->
@@ -250,7 +250,13 @@
                 <param name="root">json</param>
             </result>
         </action>
-
+		
+		<action name="setSubscriptionStatus" class="userAction.SetSubscriptionAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
 	</package>
 
 </struts>

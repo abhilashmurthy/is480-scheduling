@@ -46,6 +46,7 @@ public class ViewSubscriptionsAction extends ActionSupport implements ServletReq
 			User user = em.find(User.class, tempUser.getId());
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
+			//Need to change this for guests. Guests need to be users in our db before they can access any feature
 			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.GUEST)
 					|| activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.TA)) {
 				
@@ -53,8 +54,28 @@ public class ViewSubscriptionsAction extends ActionSupport implements ServletReq
 				//Getting all the bookings the user has subscribed to
 				subscribedTo = user.getSubscribedBookings();
 				
+				//Sort the bookings in ascending order of time
 				if (subscribedTo.size() > 0) {
-					for (Booking b : subscribedTo) {
+					
+					Long[] ts = new Long[subscribedTo.size()];
+					int i = 0;
+					for (Booking b: subscribedTo) {
+						ts[i] = b.getTimeslot().getStartTime().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					
+					List<Booking> subscribedBookings = new ArrayList<Booking>();
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: subscribedTo) {
+							if (b.getTimeslot().getStartTime().getTime() == ts[j]) {
+								subscribedBookings.add(b);
+								break;
+							}
+						}
+					}
+					
+					for (Booking b : subscribedBookings) {
 						Timeslot timeslot = b.getTimeslot();
 						//Getting all the timeslot and booking details
 						HashMap<String, String> map = new HashMap<String, String>();
@@ -64,6 +85,8 @@ public class ViewSubscriptionsAction extends ActionSupport implements ServletReq
 //						SimpleDateFormat sdfForStartTime = new SimpleDateFormat("HH:mm");
 						SimpleDateFormat sdfForEndTime = new SimpleDateFormat("HH:mm aa");
 						
+						long bookingId = b.getId();
+						
 						String venue = timeslot.getVenue();
 						
 						Team team = b.getTeam();
@@ -72,6 +95,7 @@ public class ViewSubscriptionsAction extends ActionSupport implements ServletReq
 						String time = sdfForStartTime.format(timeslot.getStartTime()) + " - " + 
 								sdfForEndTime.format(timeslot.getEndTime());
 						
+						map.put("bookingId", String.valueOf(bookingId));
 						map.put("teamName", teamName);
 						map.put("time", time);
 						map.put("venue", venue);
@@ -100,6 +124,21 @@ public class ViewSubscriptionsAction extends ActionSupport implements ServletReq
 			if (em != null && em.isOpen()) em.close();
 		}
     }
+	
+	//Sorting timestamps in increasing order of bookings 
+	private static Long[] sortTimestamps(Long[] ts) {
+		for (int i = 0; i < ts.length - 1; i++) {
+			for (int j = 1; j < ts.length; j++) {
+				if (ts[j] < ts[i]) {
+					long temp = 0;
+					temp = ts[i];
+					ts[i] = ts[j];
+					ts[j] = temp;
+				}
+			}
+		}
+		return ts;
+	}
 	
     public ArrayList<HashMap<String, String>> getData() {
         return data;
