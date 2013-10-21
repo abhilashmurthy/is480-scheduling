@@ -29,9 +29,38 @@
 
         <!-- Welcome Text -->
         <div class="container page">
-            <h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>
-
-            <!-- To display the list of active terms -->
+            <!--<h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>-->
+			<br/>
+			<div class="btn-group" style="float: left;">
+				<a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#" >
+					<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<form id="activeTermForm" action="index" method="post">
+						<!--<select name="termId" style="float:right" onchange="this.form.submit()">--> 
+							<s:iterator value="data">
+								<li>
+									<button type="submit" class="btn btn-link" name="termId" value="<s:property value="termId"/>">
+										<s:property value="termName"/>
+									</button>
+								</li>
+							</s:iterator>
+						<!--</select>-->
+					</form>
+				</ul>
+			</div>
+			<br/>
+			<div class="settingsView">
+				<span id="settingsViewLabel">Select View: </span>
+				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
+					<input type="checkbox" checked>
+				</div>
+				<span id="previousWeek" class="traverseWeek icon-circle-arrow-left" style="color: #5bc0de; display: none; cursor: pointer"></span>
+				<span id="nextWeek" class="traverseWeek icon-circle-arrow-right" style="color: #5bc0de; display: none; cursor: pointer"></span>
+            </div>
+			<br/><br/>
+			
+<!--             To display the list of active terms 
             <div class="activeTerms">
                 <table>
                     <tr>
@@ -46,7 +75,7 @@
                             </form></td>
                     </tr>
                 </table>
-            </div>
+            </div>-->
 
 			<!-- To display a banner for filling survey. Remove later -->
 <!--			<div class="banner alert">
@@ -60,7 +89,8 @@
 				IS480 Scheduling Team
 			</div>-->
 			
-            <!-- To display number of pending bookings for supervisor/reviewer -->
+			<div style="clear:both"></div>
+			<!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
             <s:if test="%{pendingBookingCount > 0}">
                 <div class="pendingBookings alert">
@@ -75,16 +105,6 @@
                 </div>
             </s:if>
             <% }%>
-            
-			
-            <div class="settingsView">
-				<span id="settingsViewLabel">Select View: </span>
-				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
-					<input type="checkbox" checked>
-				</div>
-				<span id="previousWeek" class="traverseWeek icon-circle-arrow-left" style="color: #5bc0de; display: none; cursor: pointer"></span>
-				<span id="nextWeek" class="traverseWeek icon-circle-arrow-right" style="color: #5bc0de; display: none; cursor: pointer"></span>
-            </div>
 
             <!-- To display legend for the calendar -->
             <table class="legend">
