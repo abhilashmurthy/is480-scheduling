@@ -655,8 +655,21 @@
 					var outputData = {};
 					var title = "Sign Up For Filming";
 					if ($td.is('.otherTATimeslot')) {
-						outputData["TA"] = timeslot.TA;
-						title = "Another TA signup";
+						//outputData["TA"] = timeslot.TA;
+						title =  (timeslot.TA) + "'s Sign Up";
+						outputData["Filming"] = function() {
+						return $(document.createElement('button'))
+											.attr('id', 'signupTimeslotBtn')
+											.addClass('popoverBtn btn btn-primary')
+											.css('float', 'right')
+											.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+											.append("Swap")
+											.outerHTML();
+						};
+						
+						
+						
+						
 					} else {
 						outputData["Filming"] = function() {
 							if ($td.is('.taChosenTimeslot')) {
