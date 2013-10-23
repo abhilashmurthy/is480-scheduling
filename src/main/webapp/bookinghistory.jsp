@@ -31,7 +31,7 @@
 		<%@include file="navbar.jsp" %>
 		<div class="container">
 		<!-- TERM SELECTION DROP DOWN -->
-		<div style="float:right; margin-top:20px">
+<!--		<div style="float:right; margin-top:20px">
 			<form action="bookingHistory" method="post">
 				Select Term: <select name="chosenTermId" onchange="this.form.submit()">
 					<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
@@ -40,17 +40,37 @@
 					</s:iterator>
 				</select>
 			</form>
-		</div>
+		</div>-->
 		<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)){ %>
-			<h3 style="float: left; margin-right: 50px;">All Bookings</h3> 
+			<h3 style="float: left; margin-right: 25px;">All Bookings</h3> 
 		<% } else if (activeR.equals(Role.TA)) { %>
-			<h3 style="float: left; margin-right: 50px;">My Sign Ups</h3> 
+			<h3 style="float: left; margin-right: 25px;">My Sign Ups</h3> 
 		<% } else { %>
-			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
+			<h3 style="float: left; margin-right: 25px;">My Bookings</h3> 
 		<% } %>
+		
+		<div style="float:left; margin-top:16px" class="btn-group">
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" >
+				<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+				<form action="bookingHistory" method="post">
+					<!--<select name="termId" style="float:right" onchange="this.form.submit()">--> 
+						<s:iterator value="termData">
+							<li>
+								<button type="submit" class="btn btn-link" name="chosenTermId" value="<s:property value="termId"/>">
+									<s:property value="termName"/>
+								</button>
+							</li>
+						</s:iterator>
+					<!--</select>-->
+				</form>
+			</ul>
+		</div>
+			
 		<s:if test="%{data != null && data.size() > 0}">
 			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA) && !activeRole.equals(Role.FACULTY)) { %>
-			<div style="float:right; clear:both ;margin-bottom:16px">
+			<div style="float:right; margin-top:16px; margin-bottom:30px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
@@ -90,7 +110,12 @@
 				<thead>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
-						<tr>
+							<% if (activeRole.equals(Role.STUDENT)) { %>
+								<br/>
+								<tr>
+							<% } else { %>
+								<tr>
+							<% } %>
 							<!--<th>#</th>-->
 							<% if (!activeRole.equals(Role.STUDENT)) { %>
 							<th>
@@ -107,6 +132,7 @@
 							<th>Last Modified</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
+						<br/>
 						<tr>
 							<!--<th>#</th>-->
 							<th>Team</th>
@@ -119,6 +145,7 @@
 							<th>Last Modified</th>
 						</tr>
 					<% } else { %>
+						<br/>
 						<tr>
 							<!--For TA's-->
 							<th>Team</th>
@@ -220,7 +247,7 @@
 										<div style="text-align:center">-</div>
 									</s:else>	
 								</td>
-								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+								<td style="width:150px"><s:property value="lastModifiedAt"/> by
 									<s:property value="lastModifiedBy"/></td>
 							<%--</s:if><s:else>--%>
 								<!--<td>-</td>-->
@@ -318,13 +345,13 @@
 			}); //end of function
 		
 			var role = '<%= (Role) session.getAttribute("activeRole") %>';
-			if (role === "STUDENT") {
+			if (role === "STUDENT" || role === "TA") {
 				$('#bookingHistoryTable').dataTable({
 					"aLengthMenu": [
-						[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
+						[5, 10, -1],[5, 10, "All"]], 
 					"iDisplayLength" : -1,
 	//				"bPaginate": false,
-					"bLengthChange": false,
+//					"bLengthChange": false,
 	//				"bFilter": false,
 	//				"bSort": false,
 					"bInfo": false,
