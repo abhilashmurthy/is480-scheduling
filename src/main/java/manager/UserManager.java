@@ -211,4 +211,26 @@ public class UserManager {
         }
         return user;
     }
+	
+	public static boolean usernameExists(EntityManager em, String username, Role role, Term term, User user) {
+		StringBuilder queryString = new StringBuilder("select u from User u where u.username = :username AND u.role = :role AND u.term = :term");
+		if (user != null) { //Add existing user object in query
+			queryString.append(" AND u NOT IN (:user)");
+		}
+		//Checking if the username already exists for the current term
+		Query q = em.createQuery(queryString.toString())
+				.setParameter("username", username)
+				.setParameter("role", role)
+				.setParameter("term", term);
+		if (user != null) {
+			q.setParameter("user", user);
+		}
+		
+		List users = q.getResultList();
+		if (users.isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
