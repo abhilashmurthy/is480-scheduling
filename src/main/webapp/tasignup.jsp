@@ -159,7 +159,7 @@
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
-                <h3>My Sign Ups</h3>
+                <h3>Sign Up</h3>
 					<table class='availabilityLegend'>
 						<tr>
 							<!-- <td style="width:50px"><b>Legend:</b></td>-->
@@ -355,7 +355,10 @@
 										td.append($(document.createElement('div')).addClass('start-marker'));
 									} else {
 										td.addClass('otherTAChosen');
-										td.append($(document.createElement('div')).addClass('textinside').html(timeslot.TA));
+										//td.append($(document.createElement('div')).addClass('textinside').html(timeslot.TA));
+										//ADDED CODE FOR DROPDOWN
+										td.append($(document.createElement('container')).html("<select id='switch_" + timeslot.id +  "' style='width:150px;heigth:30px;'><option selected>" +
+											timeslot.TA + "</option><option>" + "You" + "</option></select>"));
 									}
 								} else {
 									td.addClass('markable');
@@ -524,7 +527,28 @@
                     for (var i = 0; i < allTimeslots.length; i++) {
                         var obj = allTimeslots[i];
                         timeslot_data.push($(obj).parent().attr("value").split("_")[1]);
+						console.log($(obj).parent().attr("value").split("_")[1]);
                     }
+					
+					//ADDED: POPULATE THE NEW SLOTS THAT ARE TAKEN
+					var allTimeslots2 =  $("container", ".timeslotsTable").get()
+					for (var i = 0; i < allTimeslots2.length; i++) {
+						
+                        var obj = allTimeslots2[i];
+						var timeslot = $(obj).parent().attr("value").split("_")[1];
+						//console.log("switch_"+timeslot);
+						var id = "switch_"+timeslot;
+						var valtest = document.getElementById(id);
+						var strUser = valtest.options[valtest.selectedIndex].text;
+                        
+						if(strUser === 'You'){
+							  console.log(timeslot);
+							 timeslot_data.push(timeslot);
+						}
+
+                    }
+					
+					
                     timeslotsData["timeslots"] = timeslot_data;
                     timeslotsData["scheduleId"] = scheduleData.id;
                     $.ajax({
