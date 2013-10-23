@@ -273,6 +273,19 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					String lastModifiedAt = sdfForEdited.format(b.getLastEditedAt());
 					String lastModifiedBy = b.getLastEditedBy();
 					
+					//Getting the list of users who have subscribed to the booking
+					Set<User> subscribedUsers = b.getSubscribedUsers();
+					List<HashMap<String, String>> sUsernamesList = new ArrayList<HashMap<String, String>>();
+					if (subscribedUsers.size() > 0) {
+						for (User sUser: subscribedUsers) {
+							HashMap<String, String> userMap = new HashMap<String, String>();
+							userMap.put("username", sUser.getFullName());
+							sUsernamesList.add(userMap);
+						}
+					}
+					map.put("subscribedUsers", sUsernamesList);
+					map.put("noOfSubscribers", sUsernamesList.size());
+					
 					map.put("teamName", teamName);
 					map.put("milestone", milestoneName);
 					map.put("date", date);
@@ -281,6 +294,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					map.put("rejectReason", rejectReason);
 					map.put("lastModifiedAt", lastModifiedAt);
 					map.put("lastModifiedBy", lastModifiedBy);
+					
 
 					data.add(map);
 				}

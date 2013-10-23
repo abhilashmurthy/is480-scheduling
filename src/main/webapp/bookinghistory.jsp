@@ -49,7 +49,7 @@
 			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
 		<% } %>
 		<s:if test="%{data != null && data.size() > 0}">
-			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA)) { %>
+			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA) && !activeRole.equals(Role.FACULTY)) { %>
 			<div style="float:right; clear:both ;margin-bottom:16px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
@@ -72,11 +72,14 @@
 					<% if (!activeRole.equals(Role.TA)) { %>
 						<option value="6">Booking Status</option>
 					<% } %>
-					<% if (!activeRole.equals(Role.TA)) { %>
-						<option value="7">Reason for Rejection</option>
+					<% if (!activeRole.equals(Role.TA) && !activeRole.equals(Role.FACULTY)) { %>
+						<option value="7">Subscribed Users</option>
 					<% } %>
 					<% if (!activeRole.equals(Role.TA)) { %>
-						<option value="8">Last Modified</option>
+						<option value="8">Reason for Rejection</option>
+					<% } %>
+					<% if (!activeRole.equals(Role.TA)) { %>
+						<option value="9">Last Modified</option>
 					<% } %>
 				</select>
 				<!--</a>-->
@@ -99,7 +102,8 @@
 							<th>Venue</th>
 							<th>Response</th>
 							<th>Booking Status</th>
-							<th>Reason for Rejection</th>
+							<th style="width:50px; text-align:center">Subscribed Users</th>
+							<th style="text-align:center">Reason for Rejection</th>
 							<th>Last Modified</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
@@ -111,7 +115,7 @@
 							<th>Venue</th>
 							<th>My Response</th>
 							<th>Booking Status</th>
-							<th>Reason for Rejection</th>
+							<th style="text-align:center">Reason for Rejection</th>
 							<th>Last Modified</th>
 						</tr>
 					<% } else { %>
@@ -146,7 +150,7 @@
 									<td><s:property value="teamName"/></td>
 								<% } %>
 								<td><s:property value="milestone"/></td>
-								<td><s:property value="date"/> <s:property value="time"/></td>
+								<td style="width:110px"><s:property value="date"/> <br/> <s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
 								<td>
 								<% int countRows = 0; %>
@@ -158,10 +162,28 @@
 									<br/>
 								<% } %>
 								</td>
-								<td><s:property value="overallBookingStatus"/></td>
+								<td style="width:70px"><s:property value="overallBookingStatus"/></td>
 								<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td style="width:200px"><s:property value="rejectReason"/></td>
-								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+								<td style="width:50px; text-align:center">
+									<s:if test="%{noOfSubscribers > 0}">
+										<a href="#"><s:property value="noOfSubscribers"/></a>
+									</s:if><s:else>
+										-
+									</s:else>
+<!--									<div id="sUsers" style="visibility:hidden">
+										<s:iterator value="subscribedUsers">
+											<s:property value="username"/> <br/>
+										</s:iterator>
+									</div>-->
+								</td>
+								<td style="width:170px;">
+									<s:if test="%{rejectReason.length() > 0}">
+										<s:property value="rejectReason"/>
+									</s:if><s:else>
+										<div style="text-align:center">-</div>
+									</s:else>	
+								</td>
+								<td style="width:140px"><s:property value="lastModifiedAt"/> by
 									<s:property value="lastModifiedBy"/></td>
 								<%--</s:if><s:else>--%>
 									<!--<td>-</td>-->
@@ -184,14 +206,20 @@
 							<%--<td><%= count %></td>--%>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
-							<td><s:property value="date"/> <s:property value="time"/></td>
+							<td><s:property value="date"/> <br/> <s:property value="time"/></td>
 							<td><s:property value="venue"/></td>
-							<td><s:property value="myStatus"/></td>
-							<td>
+							<td style="width:110px"><s:property value="myStatus"/></td>
+							<td style="width:130px">
 								<s:property value="overallBookingStatus"/><br/><br/>
 							</td>
 							<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td style="width:200px"><s:property value="rejectReason"/></td>
+								<td style="width:200px">
+									<s:if test="%{rejectReason.length() > 0}">
+										<s:property value="rejectReason"/>
+									</s:if><s:else>
+										<div style="text-align:center">-</div>
+									</s:else>	
+								</td>
 								<td style="width:200px"><s:property value="lastModifiedAt"/> by
 									<s:property value="lastModifiedBy"/></td>
 							<%--</s:if><s:else>--%>
@@ -264,7 +292,7 @@
 					if (selectedValues.length > 1) {
 						console.log("Multiple values: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=8; i++) {
+							for (var i=1; i<=9; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');
@@ -276,7 +304,7 @@
 					} else {
 						console.log("Single value: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=8; i++) {
+							for (var i=1; i<=9; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');
