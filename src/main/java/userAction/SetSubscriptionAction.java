@@ -43,8 +43,8 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			//Need to change this for guests. Guests need to be users in our db before they can access any feature
-			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.GUEST)
-					|| activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.TA)) {
+			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.ADMINISTRATOR) 
+					|| activeRole.equals(Role.TA)) {
 				
 				//Getting input data from url
 				JSONObject subscribeObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));

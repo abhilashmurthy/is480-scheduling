@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -30,10 +29,10 @@ import util.MiscUtil;
  *
  * @author Prakhar
  */
-public class ViewSubscriptionsAction extends ActionSupport implements ServletRequestAware {
+public class ViewSubscribedBookingsAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
-    private static Logger logger = LoggerFactory.getLogger(ViewSubscriptionsAction.class);
+    private static Logger logger = LoggerFactory.getLogger(ViewSubscribedBookingsAction.class);
     private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 
     @Override

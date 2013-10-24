@@ -76,7 +76,7 @@
             <result name="success">/bookinghistory.jsp</result>
         </action>
 		
-		<action name="mySubscriptions" class="userAction.ViewSubscriptionsAction" method="execute">
+		<action name="mySubscriptions" class="userAction.ViewSubscribedBookingsAction" method="execute">
             <result name="success">/mysubscriptions.jsp</result>
         </action>
 		
@@ -252,6 +252,12 @@
         </action>
 		
 		<action name="setSubscriptionStatus" class="userAction.SetSubscriptionAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
+		<action name="getSubscribedUsers" class="userAction.GetSubscribedUsersAction" method="execute">
             <result type="json">
 				  <param name="root">json</param>
 			</result>

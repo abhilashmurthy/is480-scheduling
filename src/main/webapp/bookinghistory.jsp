@@ -193,15 +193,17 @@
 								<%--<s:if test="%{rejectReason != null)}">--%> 
 								<td style="width:50px; text-align:center">
 									<s:if test="%{noOfSubscribers > 0}">
-										<a href="#"><s:property value="noOfSubscribers"/></a>
+										<button type="submit" class="getSubscribersBtn btn btn-link" value="<s:property value="bookingId"/>">
+											<s:property value="noOfSubscribers"/>
+										</button>
 									</s:if><s:else>
 										-
 									</s:else>
-<!--									<div id="sUsers" style="visibility:hidden">
+									<div class="hiddenUsersList" style="display:none">
 										<s:iterator value="subscribedUsers">
 											<s:property value="username"/> <br/>
 										</s:iterator>
-									</div>-->
+									</div>
 								</td>
 								<td style="width:170px;">
 									<s:if test="%{rejectReason.length() > 0}">
@@ -288,6 +290,20 @@
 			</div>
 		</s:else>
 		</div>
+			
+			<div class="modal hide fade in" id="subscribersModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" 
+				 style="width:450px" aria-hidden="true">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 id="myModalLabel">This presentation has been subscribed by:</h4>
+				</div>
+				<div class="modal-body">
+					<div id="sUsersList"></div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+				</div>
+			</div>
 		</div>
 		
 		<%@include file="footer.jsp"%>
@@ -421,16 +437,42 @@
 		$(document).on('mouseleave','[rel=tooltip]', function(){
 			$(this).tooltip('hide');
 		});
-//		$("#teamHide").click(function() {
-////                $('td:nth-child(2)').hide();
-//			 // if your table has header(th), use this
-//			 var thisCheck = $(this);
-//			 if (thisCheck.is (':checked')) {
-//				 $('td:nth-child(1),th:nth-child(1)').hide();
-//			 } else {
-//				 $('td:nth-child(1),th:nth-child(1)').show();
-//			 }
-//		 });
+		
+		//To display the subscribed users in a modal
+		$('.getSubscribersBtn').on('click', function(e){
+			var usersList = $(this).parent().children('.hiddenUsersList').html();
+			$('#sUsersList').html(usersList);
+			$('#subscribersModal').modal({
+				keyboard: true
+			});
+			$('#subscribersModal').modal('show');
+			return false;
+//			var bookingId = $(this).attr("value");
+////			var $this = $(this);
+//			console.log('Submitting: ' + JSON.stringify({bookingId: bookingId}));
+//			$.ajax({
+//				type: 'POST',
+//				async: false,
+//				url: 'getSubscribedUsers',
+//				data: {jsonData: JSON.stringify({bookingId: bookingId})}
+//			}).success(function(response) {
+//				console.log('Got ' + response.data);
+//				var result = response.data;
+//				var userObj = "";
+//				for(var count = 0; count < result.length; count++) {
+//					userObj += result[count] + "<br/>";
+//				}
+//				console.log(userObj);
+//				$('#sUsersList').html(userObj);
+//				$('#subscribersModal').modal({
+//					keyboard: true
+//				});
+//				$('#subscribersModal').modal('show');
+//			}).fail(function(error) {
+//				showNotification("WARNING", "Oops.. something went wrong");
+//			});
+//			return false;
+		});
 		</script>
     </body>
 </html>

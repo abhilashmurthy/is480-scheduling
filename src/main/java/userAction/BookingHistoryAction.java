@@ -286,6 +286,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					map.put("subscribedUsers", sUsernamesList);
 					map.put("noOfSubscribers", sUsernamesList.size());
 					
+					map.put("bookingId", b.getId());
 					map.put("teamName", teamName);
 					map.put("milestone", milestoneName);
 					map.put("date", date);
