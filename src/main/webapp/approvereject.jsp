@@ -30,9 +30,27 @@
          %>
 		 
         <div class="container">
-			<h3 style="float: left; margin-right: 50px;">Approve Booking</h3>
+			<h3 style="float: left; margin-right: 25px;">Approve Booking</h3>
 			<!-- TERM SELECTION DROP DOWN -->
-			<div style="float:right; margin-top:20px">
+			<div style="float:left; margin-top:16px" class="btn-group">
+				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" >
+					<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<form action="approveReject" method="post">
+						<!--<select name="termId" style="float:right" onchange="this.form.submit()">--> 
+							<s:iterator value="termData">
+								<li>
+									<button type="submit" class="btn btn-link" name="chosenTermId" value="<s:property value="termId"/>">
+										<s:property value="termName"/>
+									</button>
+								</li>
+							</s:iterator>
+						<!--</select>-->
+					</form>
+				</ul>
+			</div>
+<!--			<div style="float:right; margin-top:20px">
 				<form action="approveReject" method="post">
 					Select Term: <select name="chosenTermId" onchange="this.form.submit()">
 						<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
@@ -41,7 +59,8 @@
 						</s:iterator>
 					</select>
 				</form>
-			</div>
+			</div>-->
+						
 			<s:if test="%{data != null && data.size() > 0}"> 
 					<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
 						<thead>
