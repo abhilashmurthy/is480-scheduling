@@ -4,20 +4,24 @@
  */
 package manager;
 
-import constant.BookingStatus;
+import com.google.gson.JsonElement;
 import constant.Role;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpSession;
-import model.Booking;
+import model.Team;
 import model.Term;
 import model.User;
+import model.role.Faculty;
+import model.role.Student;
+import model.role.TA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.CustomException;
 import util.MiscUtil;
 
 /**
@@ -232,5 +236,76 @@ public class UserManager {
 		} else {
 			return true;
 		}
+	}
+	
+	public static HashMap<String, Object> addEditUser
+			(EntityManager em, Role role, long termId,
+			String username, String fullName, long teamId, long existingUserId)
+			throws Exception
+	{
+		HashMap<String, Object> json = new HashMap<String, Object>();
+		User user = null;
+		
+		if (existingUserId != 0) { //User ID is specified if this is an edit operation
+			user = em.find(role.getBaseClassType(), existingUserId);
+			if (user == null) throw new CustomException("User not found.");
+		}
+
+		Term term = null;
+		//Finding the chosen term if the ID is specified
+		if (termId != 0) {
+			term = em.find(Term.class, termId);
+			if (term == null) throw new CustomException("Term not found.");
+		}
+
+		//Checking if this combination of username and term exists
+		if (usernameExists(em, username, role, term, user)) {
+			throw new CustomException("Username already exists for the selected term & role.");
+		}
+		
+		if (user == null) { //ADD operation
+			if (role == Role.STUDENT) { //Create Student object
+				user = new Student(username, fullName, null, term);
+				Team team = null;
+				if (teamId != 0) { //Specifying team information is optional
+					team = em.find(Team.class, teamId);
+					if (team == null) {
+						throw new CustomException("Specified team not found.");
+					}
+				}
+				((Student)user).setTeam(team);
+			} else if (role == Role.FACULTY) {
+				user = new Faculty(username, fullName, null, term);
+			} else if (role == Role.TA) {
+				user = new TA(username, fullName, null, term);
+			} else if (role == Role.ADMINISTRATOR || role == Role.COURSE_COORDINATOR) {
+				user = new User(username, fullName, null, role, term);
+			} //TODO Store guest roles if needed
+
+			em.persist(user);
+			json.put("success", true);
+			json.put("userId", user.getId());
+
+			return json;
+		} else { //EDIT operation
+			user.setUsername(username);
+			user.setFullName(fullName);
+			user.setTerm(term);
+			
+			if (role == Role.STUDENT) {
+				Team team = null;
+				if (teamId != 0) { //Specifying team information is optional
+					team = em.find(Team.class, teamId);
+					if (team == null) {
+						throw new CustomException("Specified team not found.");
+					}
+				}
+				((Student)user).setTeam(team);
+			}
+			
+			json.put("success", true);
+			return json;
+		}
+		
 	}
 }
