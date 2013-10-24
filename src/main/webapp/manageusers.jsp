@@ -24,10 +24,207 @@
                     rd.forward(request, response);
 			} %>
 			
+			<!-- TERM TABLE -->
+			
+			<table id="selectTermTable">
+				<tr>
+					<td class="formLabelTd">Select Term</td>
+					<td>
+						<select class="termPicker" name="termId" onchange="this.form.submit()">
+							<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
+							<s:iterator value="termData">
+								<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
+							</s:iterator>
+						</select>
+					</td>
+				</tr>
+			</table>
+							
+			<!-- OTHERS USERS AND TEAMS -->				
+							
+			<div class='termUsers'>
+				<div class='users'>
+					<ul class='usersNav nav nav-tabs' id='myTab'>
+						<li class='students active'><a href='#students'><h4>Students</h4></a></li>
+						<li class='faculty'><a href='#faculty'><h4>Faculty</h4></a></li>
+						<li class='tas'><a href='#tas'><h4>TAs</h4></a></li>
+					</ul>
+					<div class='tab-content'>
+						<div class='tab-pane active' id='students'>
+							<!-- Students -->
+							<table id='studentUsersTable' class='subUsersTable table table-hover zebra-striped'>
+								<thead>
+									<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Team</th><th>Edit</th><th>Delete</th></tr>
+								</thead>
+								<tbody>
+									<s:if test="%{studentData != null && studentData.size() > 0}">
+										<s:iterator value="studentData">
+											<tr id='user_<s:property value="id"/>' class='studentRow'>
+												<td><i class='icon-user icon-black'></i></td>
+												<td><s:property value="name"/></td>
+												<td><s:property value="username"/></td>
+												<td><s:property value="mobileNumber"/></td>
+												<td><s:property value="teamName"/></td>
+												<td>
+													<button type='button' title="Edit User" class='btn btn-info'>
+														<i class='icon-pencil icon-white'></i>
+													</button>
+												</td>
+												<td>
+													<button type='button' title="Delete User" class='btn btn-danger'>
+														<i class='icon-trash icon-white'></i>
+													</button>
+												</td>
+											</tr>
+										</s:iterator>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='addStudentBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+									</s:if>
+									<s:else>
+										<tr><h3 class='noUsersMsg'>No students set!</h3></tr>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='addStudentBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+								</s:else>
+								</tbody>
+							</table>
+						</div>
+						<div class='tab-pane' id='faculty'>
+							<!-- Faculty -->
+							<table id='facultyUsersTable' class='subUsersTable table table-hover zebra-striped'>
+								<thead>
+									<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Info</th><th>Edit</th><th>Delete</th></tr>
+								</thead>
+								<tbody>
+									<s:if test="%{facultyData != null && facultyData.size() > 0}">
+										<s:iterator var="faculty" value="facultyData">
+											<tr id='user_<s:property value="id"/>' class='studentRow'>
+												<td><i class='icon-user icon-black'></i></td>
+												<td><s:property value="name"/></td>
+												<td><s:property value="username"/></td>
+												<td><s:property value="mobileNumber"/></td>
+												<td>
+													<button type='button' title="Info" class='btn'>
+														<i class='icon-info-sign icon-white'></i>
+													</button>
+												</td>
+												<td>
+													<button type='button' title="Edit User" class='btn btn-info'>
+														<i class='icon-pencil icon-white'></i>
+													</button>
+												</td>
+												<td>
+													<button type='button' title="Delete User" class='btn btn-danger'>
+														<i class='icon-trash icon-white'></i>
+													</button>
+												</td>
+											</tr>
+										</s:iterator>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='addFacultyBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+									</s:if>
+									<s:else>
+										<tr><h3 class='noUsersMsg'>No faculty set!</h3></tr>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='addFacultyBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+								</s:else>
+								</tbody>
+							</table>
+						</div>
+						<div class='tab-pane' id='tas'>
+							<!-- TAs -->
+							<table id='taUsersTable' class='subUsersTable table table-hover zebra-striped'>
+								<thead>
+									<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Info</th><th>Edit</th><th>Delete</th></tr>
+								</thead>
+								<tbody>
+									<s:if test="%{taData != null && taData.size() > 0}">
+										<s:iterator var="ta" value="taData">
+											<tr id='user_<s:property value="id"/>' class='studentRow'>
+												<td><i class='icon-user icon-black'></i></td>
+												<td><s:property value="name"/></td>
+												<td><s:property value="username"/></td>
+												<td><s:property value="mobileNumber"/></td>
+												<td>
+													<button type='button' title="Info" class='btn'>
+														<i class='icon-info-sign icon-white'></i>
+													</button>
+												</td>
+												<td>
+													<button type='button' title="Edit User" class='btn btn-info'>
+														<i class='icon-pencil icon-white'></i>
+													</button>
+												</td>
+												<td>
+													<button type='button' title="Delete User" class='btn btn-danger'>
+														<i class='icon-trash icon-white'></i>
+													</button>
+												</td>
+											</tr>
+										</s:iterator>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='addTABtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+									</s:if>
+									<s:else>
+										<tr><h3 class='noUsersMsg'>No TA set!</h3></tr>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='addTABtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+								</s:else>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class='teams'>
+					<h4>Teams</h4>
+				</div>
+			</div>
+			
 			<!-- COURSE COORDINATORS -->
 			
-			<h3 class='userTypeTitle'>Course Coordinator</h3>
-			<table id='ccUsersTable' class='table table-hover zebra-striped'>
+			<h4 class='userTypeTitle'>Course Coordinator</h4>
+			<table id='ccUsersTable' class='usersTable table table-hover zebra-striped'>
 				<thead>
 					<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Edit</th></tr>
 				</thead>
@@ -54,7 +251,7 @@
 						<td></td>
 						<td></td>
 						<td></td>
-						<td><button type='button' id='addAdminBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+						<td><button type='button' id='addCcBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 					</tr>
 				</s:else>
 				</tbody>
@@ -62,8 +259,8 @@
 			
 			<!-- ADMINISTRATORS -->
 
-			<h3 class='userTypeTitle'>Administrator</h3>
-			<table id='adminUsersTable' class='table table-hover zebra-striped'>
+			<h4 class='userTypeTitle'>Administrator</h4>
+			<table id='adminUsersTable' class='usersTable table table-hover zebra-striped'>
 				<thead>
 					<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Edit</th><th>Delete</th></tr>
 				</thead>
@@ -109,29 +306,12 @@
 				</tbody>
 			</table>
 			
-			<table id="selectTermTable">
-				<tr>
-					<td class="formLabelTd">Select Term</td>
-					<td>
-						<select class="termPicker" name="termId" onchange="this.form.submit()">
-							<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
-							<s:iterator value="termData">
-								<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
-							</s:iterator>
-						</select>
-					</td>
-				</tr>
-			</table>
-			
         </div>
 		
 		<%@include file="footer.jsp"%>
         <script type="text/javascript">
 			milestoneConfigLoad = function() {
 				var milestones = {};
-				
-//				loadMilestones();
-//				resetPlugins();
 
 				loadUsers();
 				
@@ -149,6 +329,17 @@
 					console.log('\n\nFaculty data: ' + JSON.stringify(facultyData));
 					console.log('\n\nTA data: ' + JSON.stringify(taData));
 				}
+				
+				 //Manual navigation because of struts URL
+                 $(".usersNav li a").on('click', function(){
+					 var href = $(this).attr('href').split('#')[1];
+					 $(".tab-pane, .nav-tabs li").removeClass('active');
+					 $(".tab-pane").hide();
+					 $(".tab-pane #" + href).addClass('active');
+					 $(".nav-tabs ." + href).addClass('active');
+					 $("#" + href).show();
+					 return false;
+                 });
 				
 				function loadMilestones() {
 					<s:iterator value="data">

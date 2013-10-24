@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +63,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
     public String execute() {
 		EntityManager em = null;
 		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
         try {
             em = MiscUtil.getEntityManagerInstance();
@@ -180,7 +182,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 						if (myRoles.size() > 0) {
 							HashMap<String, Object> teamMap = new HashMap<String, Object>();
 							teamMap.put("id", team.getId());
-							teamMap.put("name", team.getTeamName());
+							teamMap.put("teamName", team.getTeamName());
 							teamMap.put("myRoles", myRoles);
 							myTeamsMap.put(team.getTeamName(), teamMap);
 						}
@@ -201,17 +203,20 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					List<Schedule> schedules = ScheduleManager.findByTerm(em, term);
 					HashMap<String, Object> myScheduleMap = new HashMap<String, Object>();
 					for (Schedule schedule : schedules) {
-						List<String> mySignups = new ArrayList<String>();
+						List<HashMap<String, Object>> mySignups = new ArrayList<HashMap<String, Object>>();
 						HashMap<String, Object> scheduleMap = new HashMap<String, Object>();
-						scheduleMap.put("name", schedule.getMilestone().getName());
 						for (Timeslot timeslot : schedule.getTimeslots()) {
 							if (timeslot.getTA() != null && timeslot.getTA().equals(ta)) {
-								if (timeslot.getCurrentBooking() != null) mySignups.add(timeslot.getCurrentBooking().getTeam().getTeamName() + " | " + timeslot.getStartTime().toString());
-								else mySignups.add(timeslot.getStartTime().toString());
+								HashMap<String, Object> signup = new HashMap<String, Object>();
+								signup.put("datetime", sdf.format(timeslot.getStartTime()));
+								if (timeslot.getCurrentBooking() != null) signup.put("team", timeslot.getCurrentBooking().getTeam().getTeamName());
+								mySignups.add(signup);
 							}
 						}
-						if (mySignups.size() > 0) scheduleMap.put("signups", mySignups);
-						myScheduleMap.put(schedule.getMilestone().getName(), scheduleMap);
+						if (mySignups.size() > 0) {
+							scheduleMap.put("signups", mySignups);
+							myScheduleMap.put(schedule.getMilestone().getName(), scheduleMap);
+						}
 					}
 					taMap.put("mySchedules", myScheduleMap);
 					taData.add(taMap);

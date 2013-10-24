@@ -518,3 +518,25 @@ input, button, select, textarea {
 	margin-left: 5px;
 	vertical-align: bottom;
 }
+
+.termUsers {
+	padding-top: 20px;
+	overflow: hidden;
+}
+
+.termUsers > .users {
+	width: 50%;
+	float: left;
+}
+
+.teams {
+	padding-left: 15px !important;
+}
+
+.userTypeTitle {
+	padding-top: 20px;
+}
+
+.usersTable {
+	width: 50% !important;
+}
