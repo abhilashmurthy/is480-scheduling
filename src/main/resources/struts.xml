@@ -174,7 +174,6 @@
                 <param name="root">json</param>
             </result>
         </action>
-        
         <action name="updateTimeslotsJson" class="userAction.UpdateTimeslotsAction" method="execute">
             <result type="json">
                 <param name="root">json</param>
