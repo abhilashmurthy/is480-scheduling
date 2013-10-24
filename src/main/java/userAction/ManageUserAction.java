@@ -23,6 +23,7 @@ import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.CustomException;
 import util.MiscUtil;
 
 /**
@@ -56,10 +57,8 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			em.getTransaction().begin();
 			
 			//God I wish they had switch-case for Strings (Java 7!)
-			if (actionType.equalsIgnoreCase("add")) { //Add a new user
-				addUser(dataObj);
-			} else if (actionType.equalsIgnoreCase("edit")) { //Edit an existing user
-				editUser();
+			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
+				addEditUser(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
 				deleteUser();
 			} else {
@@ -90,58 +89,44 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to add a new user to the system
-	public void	addUser(JsonObject dataObj) {
+	public void	addEditUser(String actionType, JsonObject dataObj) {
 		try {
 			//Getting the role of the user object to be created
-			Role role = Role.valueOf(dataObj.get("type").getAsString());
+			JsonElement roleInfo = dataObj.get("type");
+			if (roleInfo == null) throw new CustomException("Please specify the role!");
+			Role role = Role.valueOf(roleInfo.getAsString());
 			
-			//Getting the term information if required
-			Term term = null;
-			//Term info not required for permanent roles: Administrator and Course Coordinator
-			if (role != Role.ADMINISTRATOR && role != Role.COURSE_COORDINATOR) {
-				long termId = dataObj.get("termId").getAsLong();
-				term = em.find(Term.class, termId);
-				if (term == null) throw new CustomException("Term not found.");
-			}
+			
+			long termId = 0;
+			JsonElement termIdInfo = dataObj.get("termId");
+			if (termIdInfo != null) termId = termIdInfo.getAsLong();
 			
 			String username = dataObj.get("username").getAsString();
-			//Checking if this combination of username and term exists
-			if (UserManager.usernameExists(em, username, role, term, null)) {
-				throw new CustomException("Username already exists for the selected term & role.");
-			}
 			String fullName = dataObj.get("fullName").getAsString();
 			
-			User user = null;
-			if (role == Role.STUDENT) { //Create Student object
-				user = new Student(username, fullName, null, term);
-				Team team = null;
-				JsonElement teamIdInfo = dataObj.get("teamId");
-				if (teamIdInfo != null) { //Specifying team information is optional
-					long teamId = teamIdInfo.getAsLong();
-					team = em.find(Team.class, teamId);
-					if (team == null) {
-						throw new CustomException("Specified team not found.");
-					}
-				}
-				((Student)user).setTeam(team);
-			} else if (role == Role.FACULTY) {
-				user = new Faculty(username, fullName, null, term);
-			} else if (role == Role.TA) {
-				user = new TA(username, fullName, null, term);
-			} else if (role == Role.ADMINISTRATOR || role == Role.COURSE_COORDINATOR) {
-				user = new User(username, fullName, null, role, term);
-			} //TODO Store guest roles if needed
+			long teamId = 0;
+			JsonElement teamIdInfo = dataObj.get("teamId");
+			if (teamIdInfo != null) teamId = teamIdInfo.getAsLong();
 			
-			em.persist(user);
-			json.put("success", true);
-			json.put("userId", user.getId());
+			long existingUserId = 0; 
+			JsonElement userIdInfo = dataObj.get("userId");
+			if (actionType.equalsIgnoreCase("edit") && userIdInfo == null) throw new CustomException("Please specify the user ID for editing!");
+			if (userIdInfo != null) existingUserId = userIdInfo.getAsLong();
+			
+			json = UserManager.addEditUser(em, role, termId, username, fullName, teamId, existingUserId);
 		} catch (CustomException e) {
 			json.put("success", false);
 			json.put("message", e.getMessage());
 		} catch (IllegalArgumentException e) {
 			json.put("success", false);
-			json.put("message", "Specified role not found.");
+			json.put("message", "Specified role not found");
 		} catch (Exception e) {
+			logger.error("Exception: " + e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				if (s.getClassName().equals(this.getClass().getName())) {
+					logger.error(s.toString());
+				}
+			}
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong. Please try again!");
 		}
@@ -168,11 +153,4 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	public void setServletRequest(HttpServletRequest hsr) {
 		this.request = hsr;
 	}
-	
-	public class CustomException extends Exception {
-		public CustomException(String string) {
-			super(string);
-		}
-	}
-	
 }
