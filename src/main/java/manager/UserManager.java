@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpSession;
 import model.Booking;
+import model.Team;
 import model.Term;
 import model.User;
 import org.slf4j.Logger;
@@ -210,6 +211,53 @@ public class UserManager {
             }
         }
         return user;
+    }
+	
+    public static <T extends User> List<T> findByTermAndRole(EntityManager em, Term term, Role role) {
+        logger.trace("Getting Users for term: " + (term != null?term.getId():"none") + ", by role: " + role.toString());
+        List<T> users = null;
+		boolean justHere = false;
+        try {
+			if (!em.getTransaction().isActive()) {
+				justHere = true;
+				em.getTransaction().begin();
+			}
+			if (role.equals(Role.ADMINISTRATOR) || role.equals(Role.COURSE_COORDINATOR)) {
+				Query q = em.createQuery("select o from User o where role = :role")
+						.setParameter("role", role);
+				users = q.getResultList();
+			} else {
+				Query q = em.createQuery("select o from User o where role = :role and term = :term")
+						.setParameter("role", role)
+						.setParameter("term", term);
+				users = q.getResultList();
+			}
+            if (justHere) em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return users;
+    }
+	
+    public static List<Team> getTeamsByTerm(EntityManager em, Term term) {
+        logger.trace("Getting teams for term: " + term.getId());
+        List<Team> teams = null;
+		boolean justHere = false;
+        try {
+			if (!em.getTransaction().isActive()) {
+				justHere = true;
+				em.getTransaction().begin();
+			}
+            Query q = em.createQuery("select o from Team o where term = :term")
+					.setParameter("term", term);
+			teams = q.getResultList();
+            if (justHere) em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+            em.getTransaction().rollback();
+        }
+        return teams;
     }
 	
 	public static boolean usernameExists(EntityManager em, String username, Role role, Term term, User user) {

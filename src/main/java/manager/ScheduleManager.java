@@ -68,12 +68,16 @@ public class ScheduleManager {
     public static List<Schedule> findByTerm(EntityManager em, Term term) {
         logger.trace("Getting schedules by term");
         List<Schedule> result = null;
+		boolean justHere = false;
         try {
-            em.getTransaction().begin();
-            Query q = em.createQuery("SELECT o FROM Schedule o WHERE o.term = :term", Schedule.class);
+			if (!em.getTransaction().isActive()) {
+				justHere = true;
+				em.getTransaction().begin();
+			}
+            Query q = em.createQuery("SELECT s FROM Schedule s, Milestone m WHERE s.milestone = m AND m.term = :term", Schedule.class);
             q.setParameter("term", term);
             result = (List<Schedule>) q.getResultList();
-            em.getTransaction().commit();
+            if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error(e.getMessage());
             em.getTransaction().rollback();
