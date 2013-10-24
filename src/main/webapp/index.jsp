@@ -1429,9 +1429,11 @@
                     var toReturn = null;
                     var cellId = bodyTd.attr('id').split("_")[1];
                     var attendeesArray = new Array();
-                    for (var i = 0; i < attendees.length; i++) {
-                        attendeesArray.push(attendees[i].id?attendees[i].id:attendees[i].name);
-                    }
+					if (attendees) {
+						for (var i = 0; i < attendees.length; i++) {
+							attendeesArray.push(attendees[i].id?attendees[i].id:attendees[i].name);
+						}
+					}
                     var data = {timeslotId: cellId, attendees: attendeesArray};
                     if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
                         data["newDateTime"] = newDateTime;
