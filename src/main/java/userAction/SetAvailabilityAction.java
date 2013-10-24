@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
+import manager.ScheduleManager;
 import model.Milestone;
 import model.Schedule;
 import model.Timeslot;
@@ -41,6 +42,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
         EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
+			em.getTransaction().begin();
             User user = (User) request.getSession().getAttribute("user");
             if (user.getRole() != Role.FACULTY) {
                 json.put("success", false);
@@ -54,7 +56,7 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
             //Getting timeslot values
             String[] timeslotIdArray = (String[]) parameters.get("timeslot_data[]");
             int scheduleId = Integer.parseInt(((String[])parameters.get("scheduleId"))[0]);
-            Schedule dealingWithSchedule = null;
+            Schedule dealingWithSchedule = em.find(Schedule.class, Long.valueOf(scheduleId));
 
             HashSet<Timeslot> availability = new HashSet<Timeslot>();
             //Populate timeslots in availability list
@@ -62,9 +64,6 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
                 for (String s : timeslotIdArray) {
                     Long timeslotId = Long.parseLong(s.split("_")[1]);
                     Timeslot t = em.find(Timeslot.class, timeslotId);
-                    if (dealingWithSchedule == null) {
-                        dealingWithSchedule = t.getSchedule();
-                    }
                     availability.add(t);
                 }
             }
@@ -77,7 +76,6 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
                         availability.add(existingTimeslot);
                     }
                 }
-                em.getTransaction().begin();
                 faculty.setUnavailableTimeslots(availability);
                 em.persist(faculty);
                 em.getTransaction().commit();
@@ -97,6 +95,12 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
                 json.put("message", "Your availability has been updated successfully!");
 				MiscUtil.logActivity(logger, user, "Updated availability for " + dealingWithSchedule.toString());
             } catch (NullPointerException n) {
+				logger.error(n.getMessage());
+				if (MiscUtil.DEV_MODE) {
+					for (StackTraceElement s : n.getStackTrace()) {
+						logger.debug(s.toString());
+					}
+				}
                 json.put("success", false);
                 json.put("message", "An error was detected. Please reload and try again.");
             }
@@ -106,12 +110,8 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                     logger.debug(s.toString());
-                    if (s.getClassName().startsWith("SetAvailabilityAction")) {
-                        break;
-                    }
                 }
             }
-
             json.put("success", false);
             json.put("message", "Error with SetAvailability: Escalate to developers!");
         } finally {

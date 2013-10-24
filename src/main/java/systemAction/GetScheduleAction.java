@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -139,6 +140,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         boolean isMyTeam = false; //Variable to track if the booking belongs to the faculty member logged in
                         Date startDate = new Date(t.getStartTime().getTime());
                         Date endDate = new Date(t.getEndTime().getTime());
+						map.put("bookingId", b.getId());
                         map.put("team", b.getTeam().getTeamName());
 
                         //View start date (DDD, dd MMM YYYY)
@@ -185,11 +187,18 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                             optionalMap.put("name", optionalAttendee);
                             optionals.add(optionalMap);
                         }
+						
+						//Adding the subscribe users
+						Set<String> subscribedUsers = new HashSet<String>();
+						for (User s : b.getSubscribedUsers()) {
+							subscribedUsers.add(s.getUsername() + "@smu.edu.sg");
+						}
 
                         //Setting the list of attendees
                         map.put("students", students);
                         map.put("faculties", faculties);
                         map.put("optionals", optionals);
+						map.put("subscribedUsers", subscribedUsers);
 
                         String teamWiki = "-";
                         map.put("teamWiki", teamWiki);

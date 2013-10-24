@@ -69,8 +69,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
             Map parameters = request.getParameterMap();
-            String[] optionalAttendeesArray = (String[]) parameters.get("attendees[]");
-            if (optionalAttendeesArray != null) logger.debug("Optional 1: " + optionalAttendeesArray[0]);
 
             User user = (User) session.getAttribute("user");
             Role activeRole = (Role) session.getAttribute("activeRole");
@@ -137,13 +135,8 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 						reqAttendees.add(roleUser);
 					}
 
-					//Add optional attendees
-					HashSet<String> optionalAttendees = new HashSet<String>();
-					if (optionalAttendeesArray != null) optionalAttendees = new HashSet<String>(Arrays.asList(optionalAttendeesArray));
-
 					booking.setResponseList(responseList);
 					booking.setRequiredAttendees(reqAttendees);
-					booking.setOptionalAttendees(optionalAttendees);
 					booking.setLastEditedBy(user.getFullName());
 					booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 					if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) { //Emails to be sent if the Administrator is not creating a booking
@@ -190,16 +183,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 						faculties.add(facultyMap);
 					}
 					 map.put("faculties", faculties);
-
-					//Adding all optionals
-					List<HashMap<String, String>> optionals = new ArrayList<HashMap<String, String>>();
-					for (String optional : optionalAttendees) {
-						HashMap<String, String> optionalMap = new HashMap<String, String>();
-						optionalMap.put("id", optional);
-						optionalMap.put("name", optional);
-						optionals.add(optionalMap);
-					}
-					map.put("optionals", optionals);
 
 					TA ta = timeslot.getTA();
 					String TA = (ta != null) ? ta.getFullName() : "-";

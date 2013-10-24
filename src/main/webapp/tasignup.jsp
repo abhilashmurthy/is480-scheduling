@@ -527,11 +527,11 @@
                     for (var i = 0; i < allTimeslots.length; i++) {
                         var obj = allTimeslots[i];
                         timeslot_data.push($(obj).parent().attr("value").split("_")[1]);
-						console.log($(obj).parent().attr("value").split("_")[1]);
                     }
 					
 					//ADDED: POPULATE THE NEW SLOTS THAT ARE TAKEN
 					var allTimeslots2 =  $("container", ".timeslotsTable").get()
+					var swappedSlotIds = new Array();
 					for (var i = 0; i < allTimeslots2.length; i++) {
 						
                         var obj = allTimeslots2[i];
@@ -542,8 +542,8 @@
 						var strUser = valtest.options[valtest.selectedIndex].text;
                         
 						if(strUser === 'You'){
-							  console.log(timeslot);
 							 timeslot_data.push(timeslot);
+							 swappedSlotIds.push(id);
 						}
 
                     }
@@ -563,6 +563,23 @@
                                 $("#editTimeslotsSubmitBtn").button('reset');
 								console.log('Unavailable: ' + JSON.stringify(response.unavailableTimeslots));
 								unavailableTimeslots = response.unavailableTimeslots;
+								$('.otherTAChosen').each(function(){
+									var $this = $(this);
+									if ($this.find('select').val() === 'You') {
+										$this.find('container').remove();
+										$this.removeClass();
+										$this.addClass('timeslotcell markable');
+										var slotSize = scheduleData.duration / 30;
+										var $nextTr = $this.closest('tr');
+										for (var j = 0; j < slotSize; j++) {
+											$nextTr.children().eq($this.index()).removeClass();
+											$nextTr.children().eq($this.index()).addClass('timeslotcell');
+											$nextTr = $nextTr.next();
+										}
+										triggerTimeslot($this);
+										triggerTimeslot($this);
+									}
+								});
                             } else {
                                 var eid = btoa(response.message);
                                 console.log(response.message);
