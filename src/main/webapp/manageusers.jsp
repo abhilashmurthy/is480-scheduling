@@ -84,7 +84,7 @@
 											<td></td>
 											<td></td>
 											<td></td>
-											<td><button type='button' id='addStudentBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+											<td><button type='button' id='add_student' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 										</tr>
 									</s:if>
 									<s:else>
@@ -96,7 +96,7 @@
 											<td></td>
 											<td></td>
 											<td></td>
-											<td><button type='button' id='addStudentBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+											<td><button type='button' id='add_student' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 										</tr>
 								</s:else>
 								</tbody>
@@ -138,7 +138,7 @@
 											<td></td>
 											<td></td>
 											<td></td>
-											<td><button type='button' id='addFacultyBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+											<td><button type='button' id='add_faculty' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 										</tr>
 									</s:if>
 									<s:else>
@@ -150,7 +150,7 @@
 											<td></td>
 											<td></td>
 											<td></td>
-											<td><button type='button' id='addFacultyBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+											<td><button type='button' id='add_faculty' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 										</tr>
 								</s:else>
 								</tbody>
@@ -192,7 +192,7 @@
 											<td></td>
 											<td></td>
 											<td></td>
-											<td><button type='button' id='addTABtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+											<td><button type='button' id='add_ta' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 										</tr>
 									</s:if>
 									<s:else>
@@ -204,7 +204,7 @@
 											<td></td>
 											<td></td>
 											<td></td>
-											<td><button type='button' id='addTABtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+											<td><button type='button' id='add_ta' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 										</tr>
 								</s:else>
 								</tbody>
@@ -235,7 +235,7 @@
 								</s:else>
 							</td>
 							<td>
-								<button type='button' title='Add New Team' id='addTeamBtn' class='teamBtn btn btn-primary'>
+								<button type='button' title='Add New Team' id='add_team' class='addBtn teamBtn btn btn-primary'>
 									<i class='icon-plus icon-white'></i>
 								</button>
 							</td>
@@ -303,7 +303,7 @@
 						<td></td>
 						<td></td>
 						<td></td>
-						<td><button type='button' id='addCcBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+						<td><button type='button' id='add_cc' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 					</tr>
 				</s:else>
 				</tbody>
@@ -342,7 +342,7 @@
 						<td></td>
 						<td></td>
 						<td></td>
-						<td><button type='button' id='addAdminBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+						<td><button type='button' id='add_admin' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 					</tr>
 				</s:if>
 				<s:else>
@@ -352,7 +352,7 @@
 						<td></td>
 						<td></td>
 						<td></td>
-						<td><button type='button' id='addAdminBtn' class='btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+						<td><button type='button' id='add_admin' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
 					</tr>
 				</s:else>
 				</tbody>
@@ -559,7 +559,7 @@
 				/*  BUTTONS    */
 				/***************/
 				
-				$('.modBtn').on('click', function(){
+				$('body').on('click', '.modBtn', function(){
 					var $this = $(this);
 					var userType = $this.closest('tr').attr('class').split('Row')[0];
 					var id = $this.closest('tr').attr('id').split('_')[1];
@@ -621,9 +621,111 @@
 					}
 				});
 				
+				$('body').on('click', '.addBtn', function(){
+					var userType = $(this).attr('id').split('_')[1];
+					var addableFields = [{key: "Username", name:"username"}, {key: "Full Name", name: "fullName"}];
+					if (userType === 'student') addableFields.push({key: "Team", name: "teamId"});
+					addUser(userType, addableFields);
+				});
+				
 				/*******************/
 				/*  ACTIONS        */
 				/*******************/
+				
+				function addUser(userType, addableFields) {
+					bootbox.confirm({
+						title: "Add User",
+						message: function() {
+							return $(document.createElement('form')).addClass('modalForm').append($(document.createElement('table')).addClass('modalTable').append(function(){
+									if (addableFields.length === 0) {
+										return $(document.createElement('tr')).append($(document.createElement('td')).html('Not addable user!'));
+									}
+									var $trs = new Array();
+									for (var i = 0; i < addableFields.length; i++) {
+											$trs.push(
+												$(document.createElement('tr'))
+													.append(
+														$(document.createElement('th')).append(addableFields[i].key)
+													)
+													.append(
+														$(document.createElement('td')).append(function(){
+															if (addableFields[i].key === 'Team') {
+																return $(document.createElement('select'))
+																	.attr('id', 'editTeamSelect')
+																	.attr('name', addableFields[i].name)
+																	.append(function(){
+																		var $options = new Array();
+																		$options.push(
+																			$(document.createElement('option'))
+																				.attr('id', 'teamSelectHeader')
+																				.attr('value', '-1')
+																				.html('Select Team')
+																		);
+																		for (var i = 0; i < teamData.length; i++) {
+																			$options.push(
+																				$(document.createElement('option'))
+																					.attr('value', teamData[i].id)
+																					.html(teamData[i].teamName)
+																			);
+																		}
+																		return $options;
+																	});
+															} else {
+																return $(document.createElement('input'))
+																	.attr('type', 'text')
+																	.attr('name', addableFields[i].name);
+															}
+														})
+													)
+											);
+									}
+									return $trs;
+								})
+							);
+						},
+						callback: function(result) {
+							if (result) {
+								var formData = $('.modalForm').serializeArray();
+								var submitData  = {
+									action: 'add',
+									type: userType === 'cc'?'COURSE_COORDINATOR':userType === 'admin'?'ADMINISTRATOR':userType.toUpperCase(),
+									termId: termId
+								};
+								for (var i = 0; i < formData.length; i++) {
+									submitData[formData[i].name] = formData[i].value;
+									if (userType === 'student' && formData[i].name === 'teamId') {
+										for (var j = 0; j < teamData.length; j++) {
+											if (parseInt(teamData[j].id) === parseInt(formData[i].value)) {
+												submitData['teamName'] = teamData[j].teamName;
+												break;
+											}
+										}
+									}
+								}
+								console.log('Submitting add user data: ' + JSON.stringify(submitData));
+								$.ajax({
+									type: 'POST',
+									url: 'manageUser',
+									data: {jsonData: JSON.stringify(submitData)},
+									async: false,
+									cache: false
+								}).done(function(response) {
+									if (response.success) {
+										setTimeout(function(){showNotification("SUCCESS", 'Added successfully');}, 500);
+										updateJsonData({id: response.userId}, userType, submitData);
+										updatePage({id: response.userId}, userType, submitData);
+									} else {
+										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
+									}
+									return true;
+								}).fail(function(error){
+									var eid = btoa(response.message);
+									window.location = "error.jsp?eid=" + eid;
+								});
+							}
+						}
+					});
+				}
 				
 				function editUser(user, userType, editableFields) {
 					//Order comparator
@@ -787,6 +889,27 @@
 					}
 					switch(submitData.action) {
 						case 'add':
+							//Add to role data
+							roleData.push({
+								id: user.id,
+								name: submitData.fullName, 
+								username: submitData.username,
+								teamId: submitData.teamId?submitData.teamId:false,
+								teamName: submitData.teamName?submitData.teamName:false,
+								myTeams: {},
+								mySignups: {}
+							});
+							//Add to team data
+							for (var i = 0; i < teamData.length; i++) {
+								if (parseInt(teamData[i].id) === parseInt(submitData.teamId)) {
+									teamData[i].members.push({
+										id: user.id,
+										name: submitData.fullName,
+										username: submitData.username
+									});
+									break;
+								}
+							}
 							break;
 						case 'edit':
 							//Modify teamData
@@ -892,15 +1015,118 @@
 				}
 				
 				function updatePage(user, userType, submitData) {
-					var $tr = $('tr#user_' + user.id);
-					for (var key in submitData) {
-						if (submitData.hasOwnProperty(key)) {
-							var $td = $tr.find('td.' + key);
-							if ($td.length) {
-								if (key === 'teamName') $td.children('a').html(submitData[key]);
-								else $td.html(submitData[key]);
+					switch (submitData.action) {
+						case 'add':
+							var $lastTr = $('#' + userType + 'UsersTable tr:last');
+							console.log($lastTr);
+							$lastTr.before(
+								$(document.createElement('tr'))
+									.addClass(userType + 'Row')
+									.attr('id', 'user_' + user.id)
+									.append(
+										$(document.createElement('td'))
+											.append(
+												$(document.createElement('i')).addClass('icon-user icon-black')
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('fullName')
+											.append(
+												submitData.fullName
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('username')
+											.append(
+												submitData.username
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('mobileNumber')
+											.append(
+												'-'
+											)
+									)
+									.append(
+										userType === 'student'?
+										$(document.createElement('td'))
+											.addClass('teamId')
+											.append(
+												$(document.createElement('a'))
+													.addClass('studentTeamLink')
+													.attr('id', 'teams_' + submitData.teamId)
+													.attr('href', 'teams_' + submitData.teamName)
+													.html(submitData.teamName)
+											)
+										:userType === 'faculty'?
+										$(document.createElement('td'))
+											.addClass('mobileNumber')
+											.append(
+												$(document.createElement('a'))
+													.addClass('facultyTeamsLink')
+													.attr('id', 'teams_' + submitData.username)
+													.attr('href', 'faculty_' + submitData.username)
+													.html('0')
+											)
+										:userType === 'ta'?
+										$(document.createElement('td'))
+											.addClass('mobileNumber')
+											.append(
+												$(document.createElement('a'))
+													.addClass('taSignupsLink')
+													.attr('id', 'signups_' + submitData.username)
+													.attr('href', 'ta_' + submitData.username)
+													.html('0')
+											)
+										:false
+									)
+									.append(
+										$(document.createElement('td'))
+											.append(
+												$(document.createElement('button'))
+													.attr('type', 'button')
+													.attr('title', 'Edit')
+													.addClass('modBtn editBtn btn btn-info')
+													.append(
+														$(document.createElement('i')).addClass('icon-pencil icon-white')
+													)
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.append(
+												$(document.createElement('button'))
+													.attr('type', 'button')
+													.attr('title', 'Delete')
+													.addClass('modBtn delBtn btn btn-danger')
+													.append(
+														$(document.createElement('i')).addClass('icon-trash icon-white')
+													)
+											)
+									)
+							);
+							break;
+						case 'edit':
+							var $tr = $('tr#user_' + user.id);
+							for (var key in submitData) {
+								if (submitData.hasOwnProperty(key)) {
+									var $td = $tr.find('td.' + key);
+									if ($td.length) {
+										if (key === 'teamName') $td.children('a').html(submitData[key]);
+										else $td.html(submitData[key]);
+									}
+								}
 							}
-						}
+							break;
+						case 'delete':
+							break;
+						default:
+							console.log('Action: ' + submitData.action);
+							showNotification('ERROR', 'Unkown action');
+							return false;
 					}
 					$('#teamSelect').val(-1).change();
 				}
