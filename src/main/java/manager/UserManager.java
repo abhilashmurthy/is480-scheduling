@@ -246,33 +246,39 @@ public class UserManager {
 		HashMap<String, Object> json = new HashMap<String, Object>();
 		User user = null;
 		
-		if (existingUserId != 0) { //User ID is specified if this is an edit operation
+		//Basic validation
+		if (username == null) throw new CustomException("Please specify the username!");
+		if (fullName == null) throw new CustomException("Please specify the fullName!");
+		
+		//User ID is specified if this is an edit operation
+		if (existingUserId != 0) {
 			user = em.find(role.getBaseClassType(), existingUserId);
-			if (user == null) throw new CustomException("User not found.");
+			if (user == null) throw new CustomException("User not found");
 		}
 
 		Term term = null;
 		//Finding the chosen term if the ID is specified
-		if (termId != 0) {
+		if (role != Role.ADMINISTRATOR && role != Role.COURSE_COORDINATOR) {
+			if (termId == 0) throw new CustomException("Term information required for this role");
 			term = em.find(Term.class, termId);
-			if (term == null) throw new CustomException("Term not found.");
+			if (term == null) throw new CustomException("Term not found");
 		}
 
 		//Checking if this combination of username and term exists
 		if (usernameExists(em, username, role, term, user)) {
-			throw new CustomException("Username already exists for the selected term & role.");
+			throw new CustomException("Username already exists for the selected term & role");
+		}
+		
+		Team team = null;
+		//Specifying team information is optional
+		if (role == Role.STUDENT) {
+			team = em.find(Team.class, teamId);
+			if (team == null) throw new CustomException("Specified team not found");
 		}
 		
 		if (user == null) { //ADD operation
-			if (role == Role.STUDENT) { //Create Student object
+			if (role == Role.STUDENT) {
 				user = new Student(username, fullName, null, term);
-				Team team = null;
-				if (teamId != 0) { //Specifying team information is optional
-					team = em.find(Team.class, teamId);
-					if (team == null) {
-						throw new CustomException("Specified team not found.");
-					}
-				}
 				((Student)user).setTeam(team);
 			} else if (role == Role.FACULTY) {
 				user = new Faculty(username, fullName, null, term);
@@ -291,17 +297,7 @@ public class UserManager {
 			user.setUsername(username);
 			user.setFullName(fullName);
 			user.setTerm(term);
-			
-			if (role == Role.STUDENT) {
-				Team team = null;
-				if (teamId != 0) { //Specifying team information is optional
-					team = em.find(Team.class, teamId);
-					if (team == null) {
-						throw new CustomException("Specified team not found.");
-					}
-				}
-				((Student)user).setTeam(team);
-			}
+			if (role == Role.STUDENT) ((Student)user).setTeam(team);
 			
 			json.put("success", true);
 			return json;

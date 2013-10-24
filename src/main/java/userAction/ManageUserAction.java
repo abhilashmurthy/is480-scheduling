@@ -58,7 +58,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			
 			//God I wish they had switch-case for Strings (Java 7!)
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
-				addEditUser(dataObj);
+				addEditUser(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
 				deleteUser();
 			} else {
@@ -89,10 +89,13 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to add a new user to the system
-	public void	addEditUser(JsonObject dataObj) {
+	public void	addEditUser(String actionType, JsonObject dataObj) {
 		try {
 			//Getting the role of the user object to be created
-			Role role = Role.valueOf(dataObj.get("type").getAsString());
+			JsonElement roleInfo = dataObj.get("type");
+			if (roleInfo == null) throw new CustomException("Please specify the role!");
+			Role role = Role.valueOf(roleInfo.getAsString());
+			
 			
 			long termId = 0;
 			JsonElement termIdInfo = dataObj.get("termId");
@@ -105,8 +108,9 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			JsonElement teamIdInfo = dataObj.get("teamId");
 			if (teamIdInfo != null) teamId = teamIdInfo.getAsLong();
 			
-			long existingUserId = 0;
+			long existingUserId = 0; 
 			JsonElement userIdInfo = dataObj.get("userId");
+			if (actionType.equalsIgnoreCase("edit") && userIdInfo == null) throw new CustomException("Please specify the user ID for editing!");
 			if (userIdInfo != null) existingUserId = userIdInfo.getAsLong();
 			
 			json = UserManager.addEditUser(em, role, termId, username, fullName, teamId, existingUserId);
@@ -115,8 +119,14 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			json.put("message", e.getMessage());
 		} catch (IllegalArgumentException e) {
 			json.put("success", false);
-			json.put("message", "Specified role not found.");
+			json.put("message", "Specified role not found");
 		} catch (Exception e) {
+			logger.error("Exception: " + e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				if (s.getClassName().equals(this.getClass().getName())) {
+					logger.error(s.toString());
+				}
+			}
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong. Please try again!");
 		}
