@@ -296,6 +296,18 @@ public class UserManager {
 		}
 	}
 	
+	/**
+	 * Method to add a new user or edit an existing one in the database. This method can be used for all roles in the system.
+	 * @param em
+	 * @param role
+	 * @param termId
+	 * @param username
+	 * @param fullName
+	 * @param teamId Optional information.
+	 * @param existingUserId User ID of an existing object to edit
+	 * @return HashMap with two keys. "success" --> true/false, "message" --> User ID of newly created object or a descriptive error message
+	 * @throws Exception Throws CustomException with a descriptive error message in case of validation errors. To be handled by the caller.
+	 */
 	public static HashMap<String, Object> addEditUser
 			(EntityManager em, Role role, long termId,
 			String username, String fullName, long teamId, long existingUserId)
