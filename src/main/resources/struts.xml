@@ -169,11 +169,6 @@
                 <param name="root">json</param>
             </result>
         </action>
-        <action name="updateTermJson" class="userAction.UpdateTermAction" method="execute">
-            <result type="json">
-                <param name="root">json</param>
-            </result>
-        </action>
         <action name="updateScheduleJson" class="userAction.UpdateScheduleAction" method="execute">
             <result type="json">
                 <param name="root">json</param>
