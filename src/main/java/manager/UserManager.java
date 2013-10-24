@@ -4,7 +4,6 @@
  */
 package manager;
 
-import com.google.gson.JsonElement;
 import constant.Role;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpSession;
-import model.Booking;
 import model.Team;
 import model.Term;
 import model.User;
@@ -265,15 +264,26 @@ public class UserManager {
     }
 	
 	public static boolean usernameExists(EntityManager em, String username, Role role, Term term, User user) {
-		StringBuilder queryString = new StringBuilder("select u from User u where u.username = :username AND u.role = :role AND u.term = :term");
+		StringBuilder queryString = new StringBuilder("select u from User u where u.username = :username AND u.role = :role");
+		
+		if (term == null) { //NULL check in query
+			queryString.append(" AND u.term IS NULL");
+		} else { //Actual term object in query
+			queryString.append(" u.term = :term");
+		}
+		
 		if (user != null) { //Add existing user object in query
 			queryString.append(" AND u NOT IN (:user)");
 		}
 		//Checking if the username already exists for the current term
 		Query q = em.createQuery(queryString.toString())
 				.setParameter("username", username)
-				.setParameter("role", role)
-				.setParameter("term", term);
+				.setParameter("role", role);
+		
+		if (term != null) { //Injecting term into query if not NULL
+			q.setParameter("term", term);
+		}
+		
 		if (user != null) { //Adding existing user object in query
 			q.setParameter("user", user);
 		}

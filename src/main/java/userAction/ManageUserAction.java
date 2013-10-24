@@ -96,7 +96,6 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			if (roleInfo == null) throw new CustomException("Please specify the role!");
 			Role role = Role.valueOf(roleInfo.getAsString());
 			
-			
 			long termId = 0;
 			JsonElement termIdInfo = dataObj.get("termId");
 			if (termIdInfo != null) termId = termIdInfo.getAsLong();
