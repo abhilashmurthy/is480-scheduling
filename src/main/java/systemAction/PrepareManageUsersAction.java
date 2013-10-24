@@ -125,13 +125,15 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					teamMap.put("id", team.getId());
 					teamMap.put("teamName", team.getTeamName());
 					Set<Student> students = team.getMembers();
-					HashMap<String, Object> memberMap = new HashMap<String, Object>();
+					List<HashMap<String, Object>> memberList = new ArrayList<HashMap<String, Object>>();
 					for (Student student : students) {
+						HashMap<String, Object> memberMap = new HashMap<String, Object>();
 						memberMap.put("id", student.getId());
 						memberMap.put("name", student.getFullName());
 						memberMap.put("username", student.getUsername());
+						memberList.add(memberMap);
 					}
-					teamMap.put("members", memberMap);
+					teamMap.put("members", memberList);
 					HashMap<String, Object> supervisorMap = new HashMap<String, Object>();
 					supervisorMap.put("id", team.getSupervisor().getId());
 					supervisorMap.put("name", team.getSupervisor().getFullName());
@@ -201,24 +203,19 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					taMap.put("username", ta.getUsername());
 					taMap.put("mobileNumber", (ta.getMobileNumber() != null?ta.getMobileNumber():"-"));
 					List<Schedule> schedules = ScheduleManager.findByTerm(em, term);
-					HashMap<String, Object> myScheduleMap = new HashMap<String, Object>();
+					HashMap<String, Object> mySignupMap = new HashMap<String, Object>();
 					for (Schedule schedule : schedules) {
-						List<HashMap<String, Object>> mySignups = new ArrayList<HashMap<String, Object>>();
-						HashMap<String, Object> scheduleMap = new HashMap<String, Object>();
 						for (Timeslot timeslot : schedule.getTimeslots()) {
 							if (timeslot.getTA() != null && timeslot.getTA().equals(ta)) {
 								HashMap<String, Object> signup = new HashMap<String, Object>();
 								signup.put("datetime", sdf.format(timeslot.getStartTime()));
-								if (timeslot.getCurrentBooking() != null) signup.put("team", timeslot.getCurrentBooking().getTeam().getTeamName());
-								mySignups.add(signup);
+								signup.put("milestone", schedule.getMilestone().getName());
+								if (timeslot.getCurrentBooking() != null) signup.put("teamName", timeslot.getCurrentBooking().getTeam().getTeamName());
+								mySignupMap.put(sdf.format(timeslot.getStartTime()), signup);
 							}
 						}
-						if (mySignups.size() > 0) {
-							scheduleMap.put("signups", mySignups);
-							myScheduleMap.put(schedule.getMilestone().getName(), scheduleMap);
-						}
 					}
-					taMap.put("mySchedules", myScheduleMap);
+					taMap.put("mySignups", mySignupMap);
 					taData.add(taMap);
 				}
 				

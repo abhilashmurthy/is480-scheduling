@@ -525,17 +525,33 @@ input, button, select, textarea {
 }
 
 .termUsers > .users {
+	border-radius: 10px;
 	width: 50%;
 	float: left;
+	padding: 10px;
 }
 
 .teams {
+	border-radius: 10px;
 	display: inline-block;
+	padding: 10px;
 	padding-left: 30px !important;
 }
 
 #teamTitle {
-	margin-bottom: 47px;
+	margin-bottom: 37px;
+}
+
+.memberName {
+	display: block;
+}
+
+#teamSelectHeader {
+	color: grey;
+}
+
+teamBtn {
+	float: right;
 }
 
 .userTypeTitle {
@@ -544,4 +560,19 @@ input, button, select, textarea {
 
 .usersTable {
 	width: 50% !important;
+}
+
+.modalTable {
+	text-align: left;
+	width: 300px;
+}
+
+.modalTable td, .modalTable th {
+	padding: 5px;
+	border: 1px solid #dddddd;
+	width: 300px;
+}
+
+.taSignupsTable {
+	width: 450px;
 }
