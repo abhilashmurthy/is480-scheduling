@@ -28,11 +28,11 @@ import util.MiscUtil;
 /**
  * JSON package action
  */
-public class ManageUsersAction extends ActionSupport implements ServletRequestAware {
+public class ManageUserAction extends ActionSupport implements ServletRequestAware {
 	
 	private HttpServletRequest request;
 	private HashMap<String, Object> json;
-	private Logger logger = LoggerFactory.getLogger(ManageUsersAction.class);
+	private Logger logger = LoggerFactory.getLogger(ManageUserAction.class);
 	private EntityManager em = null;
 
 	@Override
