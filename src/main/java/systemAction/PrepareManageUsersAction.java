@@ -5,6 +5,7 @@
 package systemAction;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.util.ArrayList;
@@ -42,17 +43,26 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 	private long termId;
 	private ArrayList<HashMap<String, Object>> adminData = new ArrayList<HashMap<String, Object>>();
 	private ArrayList<HashMap<String, Object>> ccData = new ArrayList<HashMap<String, Object>>();
+	private ArrayList<HashMap<String, Object>> teamData = new ArrayList<HashMap<String, Object>>();
 	private ArrayList<HashMap<String, Object>> studentData = new ArrayList<HashMap<String, Object>>();
 	private ArrayList<HashMap<String, Object>> facultyData = new ArrayList<HashMap<String, Object>>();
 	private ArrayList<HashMap<String, Object>> taData = new ArrayList<HashMap<String, Object>>();
-	private ArrayList<HashMap<String, Object>> teamData = new ArrayList<HashMap<String, Object>>();
 	private ArrayList<HashMap<String, Object>> termData = new ArrayList<HashMap<String, Object>>();
+	private String adminJson;
+	private String ccJson;
+	private String teamJson;
+	private String studentJson;
+	private String facultyJson;
+	private String taJson;
+	
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(PrepareManageUsersAction.class);
 	
 	@Override
     public String execute() {
 		EntityManager em = null;
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		
         try {
             em = MiscUtil.getEntityManagerInstance();
 			HttpSession session = request.getSession();
@@ -64,16 +74,6 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 				//TERM MANAGEMENT
 				Term currentActiveTerm = (Term) session.getAttribute("currentActiveTerm");
 				Term term = (Term) session.getAttribute("currentActiveTerm");
-				if (termId != 0) {
-					ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
-					for (Term activeTerm : activeTerms) {
-						if (term.getId() == termId) {
-							term = activeTerm;
-							UserManager.initializeUser(em, session, user.getUsername(), user.getFullName(), term);
-							break;
-						}
-					}
-				}
 				ArrayList<Term> allActiveTerms = SettingsManager.getActiveTerms(em);
 				allActiveTerms.remove(currentActiveTerm);
 				if (allActiveTerms.size() > 0) {
@@ -84,6 +84,15 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 						termData.add(map);
 					}
 				}
+				if (termId != 0) {
+					for (Term activeTerm : allActiveTerms) {
+						if (term.getId() == termId) {
+							term = activeTerm;
+							UserManager.initializeUser(em, session, user.getUsername(), user.getFullName(), term);
+							break;
+						}
+					}
+				}
 				
 				//ADMIN MANAGEMENT
 				List<User> adminUsers = UserManager.findByTermAndRole(em, null, Role.ADMINISTRATOR);
@@ -92,7 +101,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					adminMap.put("id", adminUser.getId());
 					adminMap.put("name", adminUser.getFullName());
 					adminMap.put("username", adminUser.getUsername());
-					adminMap.put("mobileNumber", adminUser.getMobileNumber());
+					adminMap.put("mobileNumber", (adminUser.getMobileNumber() != null?adminUser.getMobileNumber():"-"));
 					adminData.add(adminMap);
 				}
 				
@@ -103,7 +112,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					ccMap.put("id", ccUser.getId());
 					ccMap.put("name", ccUser.getFullName());
 					ccMap.put("username", ccUser.getUsername());
-					ccMap.put("mobileNumber", ccUser.getMobileNumber());
+					ccMap.put("mobileNumber", (ccUser.getMobileNumber() != null?ccUser.getMobileNumber():"-"));
 					ccData.add(ccMap);
 				}
 				
@@ -127,14 +136,14 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					supervisorMap.put("username", team.getSupervisor().getUsername());
 					teamMap.put("supervisor", supervisorMap);
 					HashMap<String, Object> reviewer1Map = new HashMap<String, Object>();
-					supervisorMap.put("id", team.getReviewer1().getId());
-					supervisorMap.put("name", team.getReviewer1().getFullName());
-					supervisorMap.put("username", team.getReviewer1().getUsername());
+					reviewer1Map.put("id", team.getReviewer1().getId());
+					reviewer1Map.put("name", team.getReviewer1().getFullName());
+					reviewer1Map.put("username", team.getReviewer1().getUsername());
 					teamMap.put("reviewer1", reviewer1Map);
 					HashMap<String, Object> reviewer2Map = new HashMap<String, Object>();
-					supervisorMap.put("id", team.getReviewer2().getId());
-					supervisorMap.put("name", team.getReviewer2().getFullName());
-					supervisorMap.put("username", team.getReviewer2().getUsername());
+					reviewer2Map.put("id", team.getReviewer2().getId());
+					reviewer2Map.put("name", team.getReviewer2().getFullName());
+					reviewer2Map.put("username", team.getReviewer2().getUsername());
 					teamMap.put("reviewer2", reviewer2Map);
 					teamData.add(teamMap);
 				}
@@ -147,7 +156,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					studentMap.put("id", student.getId());
 					studentMap.put("name", student.getFullName());
 					studentMap.put("username", student.getUsername());
-					studentMap.put("mobileNumber", student.getMobileNumber());
+					studentMap.put("mobileNumber", (student.getMobileNumber() != null?student.getMobileNumber():"-"));
 					studentMap.put("teamId", student.getTeam().getId());
 					studentMap.put("teamName", student.getTeam().getTeamName());
 					studentData.add(studentMap);
@@ -161,23 +170,17 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					facultyMap.put("id", faculty.getId());
 					facultyMap.put("name", faculty.getFullName());
 					facultyMap.put("username", faculty.getUsername());
-					facultyMap.put("mobileNumber", faculty.getMobileNumber());
+					facultyMap.put("mobileNumber", (faculty.getMobileNumber() != null?faculty.getMobileNumber():"-"));
 					HashMap<String, Object> myTeamsMap = new HashMap<String, Object>();
 					for (Team team : teams) {
 						List<String> myRoles = new ArrayList<String>();
-						HashMap<String, Object> teamMap = new HashMap<String, Object>();
-						teamMap.put("id", team.getId());
-						teamMap.put("name", team.getTeamName());
-						if (team.getSupervisor().equals(faculty)) {
-							myRoles.add("Supervisor");
-						}
-						else if (team.getReviewer1().equals(faculty)) {
-							myRoles.add("Reviewer1");
-						}
-						else if (team.getReviewer2().equals(faculty)) {
-							myRoles.add("Reviewer2");
-						}
+						if (faculty.equals(team.getSupervisor())) myRoles.add("Supervisor"); //TODO: Fix equals() method in User class
+						if (faculty.equals(team.getReviewer1())) myRoles.add("Reviewer1");
+						if (faculty.equals(team.getReviewer2())) myRoles.add("Reviewer2");
 						if (myRoles.size() > 0) {
+							HashMap<String, Object> teamMap = new HashMap<String, Object>();
+							teamMap.put("id", team.getId());
+							teamMap.put("name", team.getTeamName());
 							teamMap.put("myRoles", myRoles);
 							myTeamsMap.put(team.getTeamName(), teamMap);
 						}
@@ -194,7 +197,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					taMap.put("id", ta.getId());
 					taMap.put("name", ta.getFullName());
 					taMap.put("username", ta.getUsername());
-					taMap.put("mobileNumber", ta.getMobileNumber());
+					taMap.put("mobileNumber", (ta.getMobileNumber() != null?ta.getMobileNumber():"-"));
 					List<Schedule> schedules = ScheduleManager.findByTerm(em, term);
 					HashMap<String, Object> myScheduleMap = new HashMap<String, Object>();
 					for (Schedule schedule : schedules) {
@@ -216,9 +219,18 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 				
 				logger.debug("adminData: " + adminData.size());
 				logger.debug("ccData: " + ccData.size());
+				logger.debug("teamData: " + teamData.size());
 				logger.debug("studentData: " + studentData.size());
 				logger.debug("facultyData: " + facultyData.size());
 				logger.debug("taData: " + taData.size());
+				
+				adminJson = gson.toJson(adminData);
+				ccJson = gson.toJson(ccData);
+				teamJson = gson.toJson(teamData);
+				studentJson = gson.toJson(studentData);
+				facultyJson = gson.toJson(facultyData);
+				taJson = gson.toJson(taData);
+				
 				em.getTransaction().commit();
 			}
 		} catch (Exception e) {
@@ -311,4 +323,51 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 		this.termData = termData;
 	}
 	
+	public String getAdminJson() {
+		return adminJson;
+	}
+
+	public void setAdminJson(String adminJson) {
+		this.adminJson = adminJson;
+	}
+
+	public String getCcJson() {
+		return ccJson;
+	}
+
+	public void setCcJson(String ccJson) {
+		this.ccJson = ccJson;
+	}
+
+	public String getTeamJson() {
+		return teamJson;
+	}
+
+	public void setTeamJson(String teamJson) {
+		this.teamJson = teamJson;
+	}
+
+	public String getStudentJson() {
+		return studentJson;
+	}
+
+	public void setStudentJson(String studentJson) {
+		this.studentJson = studentJson;
+	}
+
+	public String getFacultyJson() {
+		return facultyJson;
+	}
+
+	public void setFacultyJson(String facultyJson) {
+		this.facultyJson = facultyJson;
+	}
+
+	public String getTaJson() {
+		return taJson;
+	}
+
+	public void setTaJson(String taJson) {
+		this.taJson = taJson;
+	}
 }

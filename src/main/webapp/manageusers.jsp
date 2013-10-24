@@ -132,6 +132,23 @@
 				
 //				loadMilestones();
 //				resetPlugins();
+
+				loadUsers();
+				
+				function loadUsers() {
+					var adminData = JSON.parse('<s:property escape="false" value="adminJson"/>');
+					var ccData = JSON.parse('<s:property escape="false" value="ccJson"/>');
+					var teamData = JSON.parse('<s:property escape="false" value="teamJson"/>');
+					var studentData = JSON.parse('<s:property escape="false" value="studentJson"/>');
+					var facultyData = JSON.parse('<s:property escape="false" value="facultyJson"/>');
+					var taData = JSON.parse('<s:property escape="false" value="taJson"/>');
+					console.log('\n\nAdmin data: ' + JSON.stringify(adminData));
+					console.log('\n\nCC data: ' + JSON.stringify(ccData));
+					console.log('\n\nTeam data: ' + JSON.stringify(teamData));
+					console.log('\n\nStudent data: ' + JSON.stringify(studentData));
+					console.log('\n\nFaculty data: ' + JSON.stringify(facultyData));
+					console.log('\n\nTA data: ' + JSON.stringify(taData));
+				}
 				
 				function loadMilestones() {
 					<s:iterator value="data">
