@@ -31,7 +31,7 @@ import util.MiscUtil;
 public class ManageUserAction extends ActionSupport implements ServletRequestAware {
 	
 	private HttpServletRequest request;
-	private HashMap<String, Object> json;
+	private HashMap<String, Object> json = new HashMap<String, Object>();
 	private Logger logger = LoggerFactory.getLogger(ManageUserAction.class);
 	private EntityManager em = null;
 
@@ -52,6 +52,9 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			JsonObject dataObj = new Gson().fromJson(request.getParameter("jsonData"), JsonObject.class);
 			String actionType = dataObj.get("action").getAsString(); //Getting the action type being performed
 			
+			//Beginning transaction
+			em.getTransaction().begin();
+			
 			//God I wish they had switch-case for Strings (Java 7!)
 			if (actionType.equalsIgnoreCase("add")) { //Add a new user
 				addUser(dataObj);
@@ -64,11 +67,16 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 				json.put("message", "Unknown action. Options: add/edit/delete");
 				return SUCCESS;
 			}
+			
+			//Committing transaction
+			em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
-                    logger.debug(s.toString());
+					if (s.getClassName().equals(this.getClass().getName())) {
+						logger.error(s.toString());
+					}
                 }
             }
             json.put("success", false);
