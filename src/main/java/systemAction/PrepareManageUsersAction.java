@@ -123,7 +123,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 				for (Team team : teams) {
 					HashMap<String, Object> teamMap = new HashMap<String, Object>();
 					teamMap.put("id", team.getId());
-					teamMap.put("name", team.getTeamName());
+					teamMap.put("teamName", team.getTeamName());
 					Set<Student> students = team.getMembers();
 					HashMap<String, Object> memberMap = new HashMap<String, Object>();
 					for (Student student : students) {

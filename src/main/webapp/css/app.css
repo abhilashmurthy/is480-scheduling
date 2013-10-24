@@ -530,7 +530,12 @@ input, button, select, textarea {
 }
 
 .teams {
-	padding-left: 15px !important;
+	display: inline-block;
+	padding-left: 30px !important;
+}
+
+#teamTitle {
+	margin-bottom: 47px;
 }
 
 .userTypeTitle {

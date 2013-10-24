@@ -217,7 +217,37 @@
 					</div>
 				</div>
 				<div class='teams'>
-					<h4>Teams</h4>
+					<!-- Teams -->
+					<h4 id='teamTitle'>Teams</h4>
+					<table id='teamsTable' class='subUsersTable table table-hover zebra-striped'>
+						<thead>
+							<tr><th>Team</th></tr>
+						</thead>
+						<tr>
+							<td>Name</td>
+							<td>
+								<s:if test="%{teamData != null && teamData.size() > 0}">
+									<select name='teamSelect' id='teamSelect'>
+										<s:iterator var="team" value="teamData">
+											<option value='<s:property value="id"/>'><s:property value="teamName"/></option>
+										</s:iterator>
+									</select>
+								</s:if>
+								<s:else>
+									<b>No Teams Set!</b>
+								</s:else>
+							</td>
+						</tr>
+						<tr><td>
+							<h5 id='memberTitle'>Members</h5>
+							<table id='membersTable' class='subTeamsTable table table-hover zebra-striped'>
+								<thead>
+									<tr><th>Name</th><th>Username</th><th>Edit</th><th>Delete</th></tr>
+								</thead>
+								
+							</table>
+						</td></tr>
+					</table>
 				</div>
 			</div>
 			
