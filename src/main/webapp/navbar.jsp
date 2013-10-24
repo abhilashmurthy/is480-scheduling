@@ -69,6 +69,7 @@
 						</li>
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>All Bookings</b></a></li>
+						<li id="users"><a href="users" class="navbar-title"><b>Users</b></a></li>
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<!--<li class="dropdown">   
