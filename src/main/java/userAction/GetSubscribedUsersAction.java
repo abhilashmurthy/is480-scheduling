@@ -8,12 +8,14 @@ import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import model.Booking;
@@ -25,56 +27,43 @@ import util.MiscUtil;
  *
  * @author Prakhar
  */
-public class SetSubscriptionAction extends ActionSupport implements ServletRequestAware {
+public class GetSubscribedUsersAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
-    private static Logger logger = LoggerFactory.getLogger(SetSubscriptionAction.class);
+    private static Logger logger = LoggerFactory.getLogger(GetSubscribedUsersAction.class);
+	private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 	private HashMap<String, Object> json = new HashMap<String, Object>();
 
     @Override
     public String execute() throws Exception {
 		EntityManager em = null;
         try {
-			json.put("exception", false);
 			em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
-			User tempUser = (User) session.getAttribute("user");
-			User user = em.find(User.class, tempUser.getId());
+			User user = (User) session.getAttribute("user");
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			//Need to change this for guests. Guests need to be users in our db before they can access any feature
-			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.ADMINISTRATOR) 
-					|| activeRole.equals(Role.TA)) {
+			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.COURSE_COORDINATOR) || activeRole.equals(Role.ADMINISTRATOR)) {
 				
 				//Getting input data from url
 				JSONObject subscribeObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
-				//Getting the subscription status (e.g. "Subscribe", "Unsubscribe")
-				String status = subscribeObject.getString("subscriptionStatus");
 				//Getting the booking id
-				long bookingId = Long.valueOf(subscribeObject.getString("subscribedBooking"));
+				long bookingId = Long.valueOf(subscribeObject.getString("bookingId"));
 				
-				em.getTransaction().begin();
 				Booking b = em.find(Booking.class, bookingId);
-				if (status.equalsIgnoreCase("Unsubscribe")) {
-					Set<User> subscribedUsers = b.getSubscribedUsers();
-					for (User userObj: subscribedUsers) {
-						if (userObj.equals(user)) {
-							subscribedUsers.remove(userObj);
-							break;
-						}
+				//Getting the list of users who have subscribed to the booking
+				Set<User> subscribedUsers = b.getSubscribedUsers();
+				List<String> sUsersList = new ArrayList<String>();
+				if (subscribedUsers.size() > 0) {
+					for (User sUser: subscribedUsers) {
+//						HashMap<String, String> userMap = new HashMap<String, String>();
+//						userMap.put("username", sUser.getFullName());
+						sUsersList.add(sUser.getFullName());
+//						data.add(userMap);
 					}
-					b.setSubscribedUsers(subscribedUsers);
-					json.put("message", "You have successfully unsubscribed!");
-				} else if (status.equalsIgnoreCase("Subscribe")) {
-					Set<User> subscribedUsers = b.getSubscribedUsers();
-					subscribedUsers.add(user);
-					b.setSubscribedUsers(subscribedUsers);
-					json.put("message", "You have successfully subscribed!");
 				}
-				em.persist(b);
-				em.getTransaction().commit();
-				
-				json.put("success", true);
+				json.put("data", sUsersList);
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
 				MiscUtil.logActivity(logger, user, "User cannot access this page");
@@ -87,15 +76,20 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
                     logger.debug(s.toString());
                 }
             }
-            json.put("success", false);
-			json.put("exception", true);
-            json.put("message", "Error with SetSubscription: Escalate to developers!");
         } finally {
 			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
 			if (em != null && em.isOpen()) em.close();
 		}
 		return SUCCESS;
     }
+
+	public ArrayList<HashMap<String, String>> getData() {
+		return data;
+	}
+
+	public void setData(ArrayList<HashMap<String, String>> data) {
+		this.data = data;
+	}
 
 	public HashMap<String, Object> getJson() {
 		return json;
