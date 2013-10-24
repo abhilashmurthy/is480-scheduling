@@ -269,7 +269,7 @@ public class UserManager {
 		if (term == null) { //NULL check in query
 			queryString.append(" AND u.term IS NULL");
 		} else { //Actual term object in query
-			queryString.append(" u.term = :term");
+			queryString.append(" AND u.term = :term");
 		}
 		
 		if (user != null) { //Add existing user object in query
@@ -311,7 +311,7 @@ public class UserManager {
 		//User ID is specified if this is an edit operation
 		if (existingUserId != 0) {
 			user = em.find(role.getBaseClassType(), existingUserId);
-			if (user == null) throw new CustomException("User not found");
+			if (user == null || user.getRole() != role) throw new CustomException("User not found");
 		}
 
 		Term term = null;

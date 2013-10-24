@@ -94,7 +94,12 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			//Getting the role of the user object to be created
 			JsonElement roleInfo = dataObj.get("type");
 			if (roleInfo == null) throw new CustomException("Please specify the role!");
-			Role role = Role.valueOf(roleInfo.getAsString());
+			Role role;
+			try {
+				role = Role.valueOf(roleInfo.getAsString());
+			} catch (IllegalArgumentException e) {
+				throw new CustomException("Specified role not found");
+			}
 			
 			long termId = 0;
 			JsonElement termIdInfo = dataObj.get("termId");
@@ -107,18 +112,17 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			JsonElement teamIdInfo = dataObj.get("teamId");
 			if (teamIdInfo != null) teamId = teamIdInfo.getAsLong();
 			
-			long existingUserId = 0; 
-			JsonElement userIdInfo = dataObj.get("userId");
-			if (actionType.equalsIgnoreCase("edit") && userIdInfo == null) throw new CustomException("Please specify the user ID for editing!");
-			if (userIdInfo != null) existingUserId = userIdInfo.getAsLong();
+			long existingUserId = 0;
+			if (actionType.equalsIgnoreCase("edit")) {
+				JsonElement userIdInfo = dataObj.get("userId");
+				if (userIdInfo == null) throw new CustomException("Please specify the user ID for editing!");
+				else existingUserId = userIdInfo.getAsLong();
+			}
 			
 			json = UserManager.addEditUser(em, role, termId, username, fullName, teamId, existingUserId);
 		} catch (CustomException e) {
 			json.put("success", false);
 			json.put("message", e.getMessage());
-		} catch (IllegalArgumentException e) {
-			json.put("success", false);
-			json.put("message", "Specified role not found");
 		} catch (Exception e) {
 			logger.error("Exception: " + e.getMessage());
 			for (StackTraceElement s : e.getStackTrace()) {
