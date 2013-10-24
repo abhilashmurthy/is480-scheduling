@@ -222,7 +222,7 @@ public class UserManager {
 				.setParameter("username", username)
 				.setParameter("role", role)
 				.setParameter("term", term);
-		if (user != null) {
+		if (user != null) { //Adding existing user object in query
 			q.setParameter("user", user);
 		}
 		
