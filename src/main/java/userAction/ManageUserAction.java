@@ -14,12 +14,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import manager.UserManager;
-import model.Team;
-import model.Term;
 import model.User;
-import model.role.Faculty;
-import model.role.Student;
-import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +105,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			
 			long teamId = 0;
 			JsonElement teamIdInfo = dataObj.get("teamId");
-			if (teamIdInfo != null) teamId = teamIdInfo.getAsLong();
+			if (teamIdInfo != null && teamIdInfo.getAsLong() != -1L) teamId = teamIdInfo.getAsLong();
 			
 			long existingUserId = 0;
 			if (actionType.equalsIgnoreCase("edit")) {

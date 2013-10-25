@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpSession;
@@ -186,7 +187,10 @@ public class UserManager {
         logger.trace("Getting Course Coordinator");
 		Query q = em.createQuery("select o from User o where o.role = :role", User.class);
 		q.setParameter("role", Role.COURSE_COORDINATOR);
-		return (User) q.getSingleResult();
+		User cc;
+		try { cc = (User) q.getSingleResult(); }
+		catch (NoResultException e) { cc = null; }
+		return cc;
     }
 	
 	public static <T extends User> T getUser(User user) {
@@ -316,14 +320,30 @@ public class UserManager {
 		HashMap<String, Object> json = new HashMap<String, Object>();
 		User user = null;
 		
-		//Basic validation
-		if (username == null) throw new CustomException("Please specify the username!");
-		if (fullName == null) throw new CustomException("Please specify the fullName!");
+		//Basic validation for username and fullName
+		if (username == null) {
+			throw new CustomException("Please specify the username!");
+		} else {
+			username = username.trim();
+			if (username.isEmpty()) throw new CustomException("Please specify the username!");
+		}
+		if (fullName == null) {
+			throw new CustomException("Please specify the full name!");
+		} else {
+			fullName = fullName.trim();
+			if (fullName.isEmpty()) throw new CustomException("Please specify the full name!");
+		}
 		
-		//User ID is specified if this is an edit operation
+		//User ID is specified if this is an EDIT operation
 		if (existingUserId != 0) {
 			user = em.find(role.getBaseClassType(), existingUserId);
 			if (user == null || user.getRole() != role) throw new CustomException("User not found");
+		} else { //Checks specific to an ADD operation
+			//There can be only 1 course coordinator!
+			if (role == Role.COURSE_COORDINATOR) {
+				User cc = UserManager.getCourseCoordinator(em);
+				if (cc != null) throw new CustomException("Course Coordinator already exists. There can be only one person having this role!");
+			}
 		}
 
 		Term term = null;
@@ -341,7 +361,7 @@ public class UserManager {
 		
 		Team team = null;
 		//Specifying team information is optional
-		if (role == Role.STUDENT) {
+		if (role == Role.STUDENT && teamId != 0) {
 			team = em.find(Team.class, teamId);
 			if (team == null) throw new CustomException("Specified team not found");
 		}
