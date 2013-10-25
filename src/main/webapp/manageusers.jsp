@@ -1,7 +1,7 @@
 <%-- 
-    Document   : manageusers
-    Created on : Oct 24, 2013, 4:49:25 PM
-    Author     : Abhilash
+  Document  : manageusers
+  Created on : Oct 24, 2013, 4:49:25 PM
+  Author   : Abhilash
 --%>
 
 <%@page import="model.Term"%>
@@ -9,19 +9,19 @@
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <%@include file="header.jsp" %>
-        <title>IS480 Scheduling System | Users </title>
-    </head>
-    <body>
-        <%@include file="navbar.jsp" %>
-        <div class="container">
-            <h3>Users</h3>
-            <!-- Kick unauthorized user -->
-            <% if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
-                    request.setAttribute("error", "Oops. You are not authorized to access this page!");
-                    RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-                    rd.forward(request, response);
+  <head>
+    <%@include file="header.jsp" %>
+    <title>IS480 Scheduling System | Users </title>
+  </head>
+  <body>
+    <%@include file="navbar.jsp" %>
+    <div class="container">
+      <h3>Users</h3>
+      <!-- Kick unauthorized user -->
+      <% if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
+          request.setAttribute("error", "Oops. You are not authorized to access this page!");
+          RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+          rd.forward(request, response);
 			} %>
 			
 			<!-- TERM TABLE -->
@@ -45,14 +45,76 @@
 			<div class='termUsers'>
 				<div class='users'>
 					<ul class='usersNav nav nav-tabs' id='myTab'>
-						<li class='students active'><a href='#students'><h4>Students</h4></a></li>
+						<li class='studentTeams active'><a href='#studentTeams'><h4>Teams</h4></a></li>
+						<li class='students'><a href='#students'><h4>Students</h4></a></li>
 						<li class='faculty'><a href='#faculty'><h4>Faculty</h4></a></li>
 						<li class='tas'><a href='#tas'><h4>TAs</h4></a></li>
 					</ul>
 					<div class='tab-content'>
-						<div class='tab-pane active' id='students'>
+						<div class='tab-pane active' id='studentTeams'>
+							<!-- Teams -->
+							<table id='teamsTable' class='subUsersTable table zebra-striped'>
+								<thead>
+									<tr><th></th><th>Name</th><th>Members</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Edit</th><th>Delete</th></tr>
+								</thead>
+								<tbody>
+									<s:if test="%{teamData != null && teamData.size() > 0}">
+										<s:iterator var="team" value="teamData">
+											<tr id='team_<s:property value="id"/>' class='teamRow'>
+												<td><i class='icon-globe icon-black'></i></td>
+												<td class='teamName'><s:property value="teamName"/></td>
+												<td class='members'>
+													<div class='memberList'>
+														<s:iterator var="member" value="members">
+															<span id='member_<s:property value="#member.id"/>' class='memberName'>
+																<a class='teamStudentLink' id='teamStudent_<s:property value="#member.id"/>' href='member_<s:property value="#member.username"/>'><s:property value="#member.name"/></a>
+															</span>
+														</s:iterator>
+													</div>
+												</td>
+												<td class='supervisor'><a class='teamFacultyLink' id='teamSupervisor_<s:property value="#team.id"/>' href='supervisor_<s:property value="#team.teamName"/>'><s:property value="supervisor.name"/></a></td>
+												<td class='reviewer1'><a class='teamFacultyLink' id='teamReviewer1_<s:property value="#team.id"/>' href='reviewer1_<s:property value="#team.teamName"/>'><s:property value="reviewer1.name"/></a></td>
+												<td class='reviewer2'><a class='teamFacultyLink' id='teamReviewer2_<s:property value="#team.id"/>' href='reviewer2_<s:property value="#team.teamName"/>'><s:property value="reviewer2.name"/></a></td>
+												<td>
+													<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
+														<i class='icon-pencil icon-white'></i>
+													</button>
+												</td>
+												<td>
+													<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
+														<i class='icon-trash icon-white'></i>
+													</button>
+												</td>
+											</tr>
+										</s:iterator>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='add_team' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+									</s:if>
+									<s:else>
+										<tr><h3 class='noUsersMsg'>No Team set!</h3></tr>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><button type='button' id='add_team' class='addBtn btn btn-primary'><i class='icon-plus icon-white'></i></button></td>
+										</tr>
+								</s:else>
+								</tbody>
+							</table>
+						</div>
+						<div class='tab-pane' id='students'>
 							<!-- Students -->
-							<table id='studentUsersTable' class='subUsersTable table table-hover zebra-striped'>
+							<table id='studentUsersTable' class='subUsersTable table zebra-striped'>
 								<thead>
 									<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Team</th><th>Edit</th><th>Delete</th></tr>
 								</thead>
@@ -104,9 +166,9 @@
 						</div>
 						<div class='tab-pane' id='faculty'>
 							<!-- Faculty -->
-							<table id='facultyUsersTable' class='subUsersTable table table-hover zebra-striped'>
+							<table id='facultyUsersTable' class='subUsersTable table zebra-striped'>
 								<thead>
-									<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Teams</th><th>Edit</th><th>Delete</th></tr>
+									<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Edit</th><th>Delete</th></tr>
 								</thead>
 								<tbody>
 									<s:if test="%{facultyData != null && facultyData.size() > 0}">
@@ -116,8 +178,44 @@
 												<td class='fullName'><s:property value="name"/></td>
 												<td class='username'><s:property value="username"/></td>
 												<td class='mobileNumber'><s:property value="mobileNumber"/></td>
-												<td>
-													<a class='facultyTeamsLink' id='teams_<s:property value="username"/>' href='faculty_<s:property value="username"/>'><s:property value="%{#faculty.myTeams.size()}"/></a>
+												<td class='supervisorMyTeams'>
+													<div class='memberList'>
+														<s:iterator var="myTeam" value="myTeams">
+															<s:iterator var="myRole" value="#myTeam.myRoles">
+																<s:if test="%{#myRole=='Supervisor'}">
+																	<span id='supervisorMyTeam_<s:property value="#myTeam.id"/>' class='memberName'>
+																		<a class='studentTeamLink' id='supervisorMyTeam_<s:property value="#myTeam.id"/>' href='team_<s:property value="#myTeam.teamName"/>'><s:property value="#myTeam.teamName"/></a>
+																	</span>
+																</s:if>
+															</s:iterator>
+														</s:iterator>
+													</div>
+												</td>
+												<td class='reviewer1MyTeams'>
+													<div class='memberList'>
+														<s:iterator var="myTeam" value="myTeams">
+															<s:iterator var="myRole" value="#myTeam.myRoles">
+																<s:if test="%{#myRole=='Reviewer1'}">
+																	<span id='reviewer1MyTeam_<s:property value="#myTeam.id"/>' class='memberName'>
+																		<a class='studentTeamLink' id='reviewer1MyTeam__<s:property value="#myTeam.id"/>' href='team_<s:property value="#myTeam.teamName"/>'><s:property value="#myTeam.teamName"/></a>
+																	</span>
+																</s:if>
+															</s:iterator>
+														</s:iterator>
+													</div>
+												</td>
+												<td class='reviewer2MyTeams'>
+													<div class='memberList'>
+														<s:iterator var="myTeam" value="myTeams">
+															<s:iterator var="myRole" value="#myTeam.myRoles">
+																<s:if test="%{#myRole=='Reviewer2'}">
+																	<span id='reviewer2MyTeam_<s:property value="#myTeam.id"/>' class='memberName'>
+																		<a class='studentTeamLink' id='reviewer2MyTeam__<s:property value="#myTeam.id"/>' href='team_<s:property value="#myTeam.teamName"/>'><s:property value="#myTeam.teamName"/></a>
+																	</span>
+																</s:if>
+															</s:iterator>
+														</s:iterator>
+													</div>
 												</td>
 												<td>
 													<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
@@ -158,7 +256,7 @@
 						</div>
 						<div class='tab-pane' id='tas'>
 							<!-- TAs -->
-							<table id='taUsersTable' class='subUsersTable table table-hover zebra-striped'>
+							<table id='taUsersTable' class='subUsersTable table zebra-striped'>
 								<thead>
 									<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Signups</th><th>Edit</th><th>Delete</th></tr>
 								</thead>
@@ -212,71 +310,12 @@
 						</div>
 					</div>
 				</div>
-				<div class='teams'>
-					<!-- Teams -->
-					<h4 id='teamTitle'>Teams</h4>
-					<table id='teamsTable' class='subUsersTable table table-hover zebra-striped'>
-						<thead>
-							<tr><th>Team</th></tr>
-						</thead>
-						<tr>
-							<td class='teamItemKey'>Name</td>
-							<td class='teamItemValue'>
-								<s:if test="%{teamData != null && teamData.size() > 0}">
-									<select name='teamSelect' id='teamSelect'>
-										<option id='teamSelectHeader' value='-1' selected>Select Team</option>
-										<s:iterator var="team" value="teamData">
-											<option value='<s:property value="teamName"/>'><s:property value="teamName"/></option>
-										</s:iterator>
-									</select>
-								</s:if>
-								<s:else>
-									<b>No Teams Set!</b>
-								</s:else>
-							</td>
-							<td>
-								<button type='button' title='Add New Team' id='add_team' class='addBtn teamBtn btn btn-primary'>
-									<i class='icon-plus icon-white'></i>
-								</button>
-							</td>
-						</tr>
-						<tr>
-							<td class='teamItemKey'>Members</td>
-							<td class='teamItemValue teamMembers'>
-								<div class='memberList'>
-									<span class='memberName'>Abhilash Murthy</span>
-									<span class='memberName'>Suresh Subramaniam</span>
-								</div>
-							</td>
-							<td class='teamBtns'>
-								<button type='button' title="Edit Team" class='teamBtn btn btn-info'>
-									<i class='icon-pencil icon-white'></i>
-								</button>
-								<button type='button' title="Delete Team" class='modBtn delBtn teamBtn btn btn-danger'>
-									<i class='icon-trash icon-white'></i>
-								</button>
-							</td>
-						</tr>
-						<tr>
-							<td class='teamItemKey'>Supervisor</td>
-							<td class='teamItemValue teamSupervisor'>Richard Davis</td>
-						</tr>
-						<tr>
-							<td class='teamItemKey'>Reviewer 1</td>
-							<td class='teamItemValue teamReviewer1'>Youngsoo Kim</td>
-						</tr>
-						<tr>
-							<td class='teamItemKey'>Reviewer 2</td>
-							<td class='teamItemValue teamReviewer2'>Cheok Lai Tee</td>
-						</tr>
-					</table>
-				</div>
 			</div>
 			
 			<!-- COURSE COORDINATORS -->
 			
 			<h4 class='userTypeTitle'>Course Coordinator</h4>
-			<table id='ccUsersTable' class='usersTable table table-hover zebra-striped'>
+			<table id='ccUsersTable' class='usersTable table zebra-striped'>
 				<thead>
 					<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Edit</th></tr>
 				</thead>
@@ -312,7 +351,7 @@
 			<!-- ADMINISTRATORS -->
 
 			<h4 class='userTypeTitle'>Administrator</h4>
-			<table id='adminUsersTable' class='usersTable table table-hover zebra-striped'>
+			<table id='adminUsersTable' class='usersTable table zebra-striped'>
 				<thead>
 					<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Edit</th><th>Delete</th></tr>
 				</thead>
@@ -358,10 +397,10 @@
 				</tbody>
 			</table>
 			
-        </div>
+    </div>
 		
 		<%@include file="footer.jsp"%>
-        <script type="text/javascript">
+    <script type="text/javascript">
 			manageUsersLoad = function() {
 				var adminData = null;
 				var ccData = null;
@@ -389,112 +428,65 @@
 				}
 				
 				/****************/
-				/*  NAVIGATION */
+				/* NAVIGATION */
 				/***************/
 				
 				 //Manual navigation because of struts URL
-                 $(".usersNav li a").on('click', function(){
-					 var href = $(this).attr('href').split('#')[1];
-					 $(".tab-pane, .nav-tabs li").removeClass('active');
-					 $(".tab-pane").hide();
-					 $(".tab-pane #" + href).addClass('active');
-					 $(".nav-tabs ." + href).addClass('active');
-					 $("#" + href).show();
-					 return false;
-                 });
-				
-				//Team Select Dropdown
-				$('#teamSelect').on('change', function(){
-					var selectedTeam = $(this).val();
-					$('.teamBtns').hide();
-					$('.teamMembers').empty();
-					$('.teamSupervisor').empty();
-					$('.teamReviewer1').empty();
-					$('.teamReviewer2').empty();
-					for (var i = 0; i < teamData.length; i++) {
-						if (teamData[i].teamName === selectedTeam) {
-							var team = teamData[i];
-							$('.teamMembers').append(
-								$(document.createElement('div'))
-									.addClass('memberList')
-									.append(function() {
-											var memberSpans = new Array();
-											for (var j = 0; j < team.members.length; j++) {
-												memberSpans.push($(document.createElement('span')).addClass('memberName').html(team.members[j].name));
-											}
-											return memberSpans;
-										}
-									)
-							);
-							$('.teamSupervisor').append(team.supervisor.name);
-							$('.teamReviewer1').append(team.reviewer1.name);
-							$('.teamReviewer2').append(team.reviewer2.name);
-							$('.teamBtns').show();
-							return false;
-						}
-					}
+				$('body').on('click', '.usersNav li a', function(){
+					var href = $(this).attr('href').split('#')[1];
+					$(".tab-pane, .nav-tabs li").removeClass('active');
+					$(".tab-pane").hide();
+					$(".tab-pane #" + href).addClass('active');
+					$(".nav-tabs ." + href).addClass('active');
+					$("#" + href).show();
 					return false;
 				});
 				
 				//Team Name Link
 				$('body').on('click', '.studentTeamLink', function(){
 					$('.modal').modal('hide');
-					$('#teamSelect').closest('tr').effect('highlight', {}, 1500);
-					$('#teamSelect').val($(this).text()).change();
+					var team = $(this).text();
+					 $('.usersNav li.studentTeams').children('a').trigger('click');
+					 $('#teamsTable tr').each(function(){
+						 var $tr = $(this);
+						 var $td = $(this).children('td.teamName');
+						 if ($td.text() === team) {
+							 $('body').animate({scrollTop: $tr.offset().top - $tr.height()}, 500);
+							 $tr.effect('highlight', {}, 1500);
+						 }
+					 });
 					return false;
 				});
 				
-				//Faculty Teams Link
-				$('body').on('click', '.facultyTeamsLink', function(){
-					var username = $(this).attr('id').split("_")[1];
-					var faculty = null;
-					for (var i = 0; i < facultyData.length; i++) {
-						if (facultyData[i].username === username) {
-							faculty = facultyData[i];
-							break;
-						}
-					}
-					bootbox.alert({
-						title: 'Teams of ' + faculty.name,
-						message: function() {
-							return $(document.createElement('table')).addClass('modalTable').append(function(){
-								if ($.isEmptyObject(faculty.myTeams)) {
-									return $(document.createElement('tr')).append($(document.createElement('td')).html('No teams assigned!'));
-								}
-								var $trs = new Array();
-								$trs.push(
-									$(document.createElement('tr'))
-										.append($(document.createElement('th')).html('Team'))
-										.append($(document.createElement('th')).html('Role'))
-								);
-								for (var key in faculty.myTeams) {
-									if (faculty.myTeams.hasOwnProperty(key)) {
-										$trs.push(
-											$(document.createElement('tr'))
-												.append(
-													$(document.createElement('td')).append(
-														$(document.createElement('a'))
-															.addClass('studentTeamLink')
-															.html(key)
-													)
-												)
-												.append(
-													$(document.createElement('td')).append(function(){
-														var roles = '';
-														var myRoles = faculty.myTeams[key].myRoles;
-														for (var i = 0; i < myRoles.length; i++) {
-															roles += myRoles[i] + ', ';
-														};
-														return roles.substring(0, roles.length - 2);
-													})
-												)
-										);
-									}
-								}
-								return $trs;
-							});
-						}
-					});
+				//Student Name Link
+				$('body').on('click', '.teamStudentLink', function(){
+					$('.modal').modal('hide');
+					var student = $(this).text();
+					 $('.usersNav li.students').children('a').trigger('click');
+					 $('#studentUsersTable tr').each(function(){
+						 var $tr = $(this);
+						 var $td = $(this).children('td.fullName');
+						 if ($td.text() === student) {
+							 $('body').animate({scrollTop: $tr.offset().top - $tr.height()}, 500);
+							 $tr.effect('highlight', {}, 1500);
+						 }
+					 });
+					return false;
+				});
+				
+				//Team Name Link
+				$('body').on('click', '.teamFacultyLink', function(){
+					$('.modal').modal('hide');
+					var faculty = $(this).text();
+					 $('.usersNav li.faculty').children('a').trigger('click');
+					 $('#facultyUsersTable tr').each(function(){
+						 var $tr = $(this);
+						 var $td = $(this).children('td.fullName');
+						 if ($td.text() === faculty) {
+							 $('body').animate({scrollTop: $tr.offset().top - $tr.height()}, 500);
+							 $tr.effect('highlight', {}, 1500);
+						 }
+					 });
 					return false;
 				});
 				
@@ -556,7 +548,7 @@
 				});
 				
 				/****************/
-				/*  BUTTONS    */
+				/* BUTTONS  */
 				/***************/
 				
 				$('body').on('click', '.modBtn', function(){
@@ -629,7 +621,7 @@
 				});
 				
 				/*******************/
-				/*  ACTIONS        */
+				/* ACTIONS    */
 				/*******************/
 				
 				function addUser(userType, addableFields) {
@@ -686,7 +678,7 @@
 						callback: function(result) {
 							if (result) {
 								var formData = $('.modalForm').serializeArray();
-								var submitData  = {
+								var submitData = {
 									action: 'add',
 									type: userType === 'cc'?'COURSE_COORDINATOR':userType === 'admin'?'ADMINISTRATOR':userType.toUpperCase(),
 									termId: termId
@@ -788,7 +780,7 @@
 						callback: function(result) {
 							if (result) {
 								var formData = $('.modalForm').serializeArray();
-								var submitData  = {
+								var submitData = {
 									action: 'edit',
 									type: userType === 'cc'?'COURSE_COORDINATOR':userType === 'admin'?'ADMINISTRATOR':userType.toUpperCase(),
 									userId: user.id,
@@ -1132,7 +1124,7 @@
 				}
 				
 				/*******************/
-				/*  NOTIFICATIONS  */
+				/* NOTIFICATIONS */
 				/*******************/
 
 				/** Notification **/
@@ -1148,8 +1140,8 @@
 						animate_speed: "fast",
 						before_open: function(pnotify) {
 							pnotify.css({
-							   top: "52px",
-							   left: ($(window).width() / 2) - (pnotify.width() / 2)
+							  top: "52px",
+							  left: ($(window).width() / 2) - (pnotify.width() / 2)
 							});
 						}
 					};
@@ -1180,6 +1172,6 @@
 			};
 			
 			addLoadEvent(manageUsersLoad);
-        </script>
-    </body> 
+    </script>
+  </body> 
 </html>
