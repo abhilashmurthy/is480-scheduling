@@ -52,18 +52,19 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			em.getTransaction().begin();
 			
 			//God I wish they had switch-case for Strings (Java 7!)
+			boolean result = false;
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
-				addEditUser(actionType, dataObj);
+				result = addEditUser(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
-				deleteUser();
+				result = deleteUser();
 			} else {
 				json.put("success", false);
 				json.put("message", "Unknown action. Options: add/edit/delete");
 				return SUCCESS;
 			}
 			
-			//Committing transaction
-			em.getTransaction().commit();
+			//Committing transaction if result = true
+			if (result) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -84,7 +85,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to add a new user to the system
-	public void	addEditUser(String actionType, JsonObject dataObj) {
+	public boolean addEditUser(String actionType, JsonObject dataObj) {
 		try {
 			//Getting the role of the user object to be created
 			JsonElement roleInfo = dataObj.get("type");
@@ -115,9 +116,11 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			}
 			
 			json = UserManager.addEditUser(em, role, termId, username, fullName, teamId, existingUserId);
+			return true;
 		} catch (CustomException e) {
 			json.put("success", false);
 			json.put("message", e.getMessage());
+			return false;
 		} catch (Exception e) {
 			logger.error("Exception: " + e.getMessage());
 			for (StackTraceElement s : e.getStackTrace()) {
@@ -127,17 +130,13 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			}
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong. Please try again!");
+			return false;
 		}
 	}
 	
-	//Method to edit an existing user in the system
-	public void	editUser() {
-		
-	}
-	
 	//Method to delete an existing user from the system
-	public void	deleteUser() {
-		
+	public boolean deleteUser() {
+		return false;
 	}
 
 	public HashMap<String, Object> getJson() {
