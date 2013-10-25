@@ -49,19 +49,19 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			//Beginning transaction
 			em.getTransaction().begin();
 			
-			//God I wish they had switch-case for Strings (Java 7!)
+			boolean result;
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a team
-				addEditTeam(actionType, dataObj);
+				result = addEditTeam(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing team
-				deleteTeam();
+				result = deleteTeam();
 			} else {
 				json.put("success", false);
 				json.put("message", "Unknown action. Options: add/edit/delete");
 				return SUCCESS;
 			}
 			
-			//Committing transaction
-			em.getTransaction().commit();
+			//Committing transaction if result = true
+			if (result) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -77,13 +77,13 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to add a new team to the system
-	public void	addEditTeam(String actionType, JsonObject dataObj) {
-		
+	public boolean addEditTeam(String actionType, JsonObject dataObj) {
+		return false;
 	}
 	
 	//Method to delete an existing team from the system
-	public void	deleteTeam() {
-		
+	public boolean deleteTeam() {
+		return false;
 	}
 
 	public HashMap<String, Object> getJson() {

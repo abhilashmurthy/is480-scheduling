@@ -51,8 +51,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			//Beginning transaction
 			em.getTransaction().begin();
 			
-			//God I wish they had switch-case for Strings (Java 7!)
-			boolean result = false;
+			boolean result;
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
 				result = addEditUser(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
