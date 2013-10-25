@@ -5,6 +5,7 @@
 package userAction;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
@@ -12,10 +13,13 @@ import constant.Role;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import manager.UserManager;
+import model.Team;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.CustomException;
 import util.MiscUtil;
 
 /**
@@ -78,7 +82,33 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 	
 	//Method to add a new team to the system
 	public boolean addEditTeam(String actionType, JsonObject dataObj) {
-		return false;
+		try {
+			long existingTeamId = 0;
+			if (actionType.equalsIgnoreCase("edit")) {
+				JsonElement userIdInfo = dataObj.get("userId");
+				if (userIdInfo == null) throw new CustomException("Please specify the user ID for editing!");
+				else existingTeamId = userIdInfo.getAsLong();
+			}
+			
+			String teamName = dataObj.get("teamName").getAsString();
+			String wiki = dataObj.get("wiki").getAsString();
+			Team team = new Team();
+			return true;
+		} catch (CustomException e) {
+			json.put("success", false);
+			json.put("message", e.getMessage());
+			return false;
+		} catch (Exception e) {
+			logger.error("Exception: " + e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				if (s.getClassName().equals(this.getClass().getName())) {
+					logger.error(s.toString());
+				}
+			}
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong. Please try again!");
+			return false;
+		}
 	}
 	
 	//Method to delete an existing team from the system
