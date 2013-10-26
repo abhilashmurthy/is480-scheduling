@@ -162,9 +162,8 @@ public class UserManager {
             q.setParameter("term", term);
             q.setParameter("username", username);
             user = (User) q.getSingleResult();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+        } catch (NoResultException ignore) {}
+		
         return user;
     }
 
@@ -192,6 +191,24 @@ public class UserManager {
 		catch (NoResultException e) { cc = null; }
 		return cc;
     }
+	
+	/**
+	 * Gets the faculty object for a term for the course coordinator. Creates one if it doesn't already exist
+	 * @param em
+	 * @param term The term for which the object is to be retrieved
+	 * @return 
+	 */
+	public static Faculty getFacultyObjForCCForTerm(EntityManager em, Term term) {
+		Faculty f;
+		User cc = getCourseCoordinator(em);
+		f = (Faculty) findByRoleTermUsername(em, Role.FACULTY, term, cc.getUsername());
+		
+		if (f == null) { //CC is not yet faculty for the chosen term. Create on the fly
+			f = new Faculty(cc.getUsername(), cc.getFullName(), null, term);
+			em.persist(f);
+		}
+		return f;
+	}
 	
 	public static <T extends User> T getUser(User user) {
 		return (T) getUser(user.getId(), user.getRole().getBaseClassType());
