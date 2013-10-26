@@ -34,6 +34,7 @@ public class Team implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String teamName;
+	private String wiki;
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private Term term;
@@ -56,6 +57,14 @@ public class Team implements Serializable {
 
 	public void setTeamName(String teamName) {
 		this.teamName = teamName;
+	}
+
+	public String getWiki() {
+		return wiki;
+	}
+
+	public void setWiki(String wiki) {
+		this.wiki = wiki;
 	}
 
 	public Term getTerm() {
