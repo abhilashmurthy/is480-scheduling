@@ -7,14 +7,16 @@ package userAction;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
-import manager.UserManager;
-import model.Team;
+import manager.TeamManager;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ import util.MiscUtil;
 public class ManageTeamAction extends ActionSupport implements ServletRequestAware {
 	
 	private HttpServletRequest request;
-	private HashMap<String, Object> json;
+	private HashMap<String, Object> json = new HashMap<String, Object>();
 	private Logger logger = LoggerFactory.getLogger(ManageTeamAction.class);
 	private EntityManager em = null;
 
@@ -85,12 +87,12 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 		try {
 			long existingTeamId = 0;
 			if (actionType.equalsIgnoreCase("edit")) {
-				JsonElement userIdInfo = dataObj.get("userId");
-				if (userIdInfo == null) throw new CustomException("Please specify the user ID for editing!");
-				else existingTeamId = userIdInfo.getAsLong();
+				JsonElement teamIdInfo = dataObj.get("teamId");
+				if (teamIdInfo == null) throw new CustomException("Please specify the team ID for editing!");
+				else existingTeamId = teamIdInfo.getAsLong();
 			}
 			
-			String teamName = dataObj.get("teamName").getAsString();
+			String teamName = dataObj.get("name").getAsString();
 			String wiki = dataObj.get("wiki").getAsString();
 			
 			long supervisorId = 0;
@@ -107,6 +109,10 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			
 			long termId = dataObj.get("termId").getAsLong();
 			
+			Type collectionType = new TypeToken<ArrayList<Long>>(){}.getType();
+			ArrayList<Long> memberIds = new Gson().fromJson(dataObj.get("members"), collectionType);
+		
+			json = TeamManager.addEditTeam(em, teamName, wiki, termId, memberIds, supervisorId, reviewer1Id, reviewer2Id, existingTeamId);
 			return true;
 		} catch (CustomException e) {
 			json.put("success", false);
@@ -115,9 +121,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 		} catch (Exception e) {
 			logger.error("Exception: " + e.getMessage());
 			for (StackTraceElement s : e.getStackTrace()) {
-				if (s.getClassName().equals(this.getClass().getName())) {
-					logger.error(s.toString());
-				}
+				logger.error(s.toString());
 			}
 			json.put("success", false);
 			json.put("message", "Oops. Something went wrong. Please try again!");

@@ -11,6 +11,7 @@ import javax.persistence.Query;
 import model.Team;
 import model.Term;
 import model.role.Faculty;
+import model.role.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.CustomException;
@@ -24,7 +25,7 @@ public class TeamManager {
 	private static Logger logger = LoggerFactory.getLogger(TeamManager.class);
 	
 	public static HashMap<String, Object> addEditTeam
-			(EntityManager em, String teamName, String wiki, long termId,
+			(EntityManager em, String teamName, String wiki, long termId, List<Long> memberIds,
 			long supervisorId, long reviewer1Id, long reviewer2Id, long existingTeamId)
 			throws Exception
 	{
@@ -105,23 +106,42 @@ public class TeamManager {
 		//Supervisor setting
 		//Checking if the new supervisor is the same as the previous one
 		if (team.getSupervisor() != null && !team.getSupervisor().equals(supervisor)) { //New supervisor is different from the previous one
-			
+			//TODO REFRESH PENDING BOOKINGS!
 		}
 		team.setSupervisor(supervisor); //Setting the new guy as the supervisor
 		
 		//Reviewer1 setting
 		//Checking if the new reviewer1 is the same as the previous one
 		if (team.getReviewer1() != null && !team.getReviewer1().equals(reviewer1)) { //New reviewer1 is different from the previous one
-			
+			//TODO REFRESH PENDING BOOKINGS!
 		}
-		team.setReviewer1(reviewer1); //Setting the new guy as the supervisor
+		team.setReviewer1(reviewer1); //Setting the new guy as reviewer1
 		
 		//Reviewer2 setting
-		//Checking if the new reviewer1 is the same as the previous one
+		//Checking if the new reviewer2 is the same as the previous one
 		if (team.getReviewer2() != null && !team.getReviewer2().equals(reviewer2)) { //New reviewer2 is different from the previous one
-			
+			//TODO REFRESH PENDING BOOKINGS!
 		}
-		team.setReviewer2(reviewer2); //Setting the new guy as the supervisor
+		team.setReviewer2(reviewer2); //Setting the new guy as reviewer2
+		
+		if (team.getId() == null) { //ADD operation
+			em.persist(team);
+		}
+		
+		//Removing student-team relationship from existing members
+		for (Student s : team.getMembers()) {
+			s.setTeam(null);
+		}
+		
+		//Adding the new members to the team
+		for (Long studentId : memberIds) {
+			Student stu = em.find(Student.class, studentId);
+			if (stu == null) throw new CustomException("Student(s) not found");
+			else stu.setTeam(team);
+		}
+		
+		json.put("success", true);
+		json.put("teamId", team.getId());
 		
 		return json;
 	}
