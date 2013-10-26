@@ -21,7 +21,7 @@
                 <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
                 <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
                 <!-- Testing: It will run every minute -->
-                <cron-expression>0 * * * * ?</cron-expression>
+                <cron-expression>0 * * * *</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -42,7 +42,7 @@
                 <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
                 <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
                 <!-- Testing: It will run every 10 minutes -->
-                <cron-expression>0 */10 * * * ?</cron-expression>
+                <cron-expression>0 * * * *</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -63,7 +63,7 @@
                 <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
                 <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
                 <!-- Testing: It will run every minute -->
-                <cron-expression>0 * * * * ?</cron-expression>
+                <cron-expression>0 * * * *</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -77,7 +77,7 @@
                 <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
                 <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
                 <!-- Testing: It will run every minute -->
-                <cron-expression>0 * * * * ?</cron-expression>
+                <cron-expression>0 * * * *</cron-expression>
             </cron>
         </trigger>
     </schedule>

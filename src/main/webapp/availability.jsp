@@ -315,20 +315,92 @@
                     var scheduleDataDates = datesSet.values().sort();
                     return scheduleDataDates;
                 }
+				
+				String.prototype.contains = function(substr) {
+				return this.indexOf(substr) > -1;
+			  }
+				
+				$('body').on('change', '.checkBoxClass', function(){
+					var $checkbox = $(this);
+					console.log('selected ' + $checkbox.attr('id') + ': ' + $checkbox.is(':checked'));
+
+					if($checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+									
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+							//console.log(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]);
+						}
+					}else if(!$checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+									
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+							//console.log(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]);
+						}
+					
+					
+					}
+					
+				});
 
                 function makeTimeslotTable(tableClass, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
                     var minTime = 9;
                     var maxTime = 19;
+					
+					var difference = maxTime - minTime;
 
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                        th.html(headerVal);
+						//console.log((dateArray[i]).toString('dd MMM yyyy'));
+                        th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
                         thead.append(th);
-                    }
+                    }					
+					
                     //Inserting constructed table header into table
                     $("." + tableClass).append($(document.createElement('thead')).append(thead));
 
@@ -341,7 +413,7 @@
                         var timeVal = Date.parse(i + ":00:00");
                         timesArray.push(timeVal.toString("HH:mm"));
                         timeVal.addMinutes(30);
-                        timesArray.push(timeVal.toString("HH:mm"));
+                        timesArray.push(timeVal.toString("HH:mm") + "<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + i.toString() + "' id='" + i.toString() + "'/>");
                     }
 
                     //Constructing table body
@@ -366,6 +438,7 @@
                                 }
 								td.addClass('markable border-top');
 								td.attr("value", "timeslot_" + timeslot.id);
+								td.attr("id",j);
                             }
 							td.addClass('border-left');
                             tr.append(td);
