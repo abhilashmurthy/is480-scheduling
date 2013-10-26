@@ -75,7 +75,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
             }
             json.put("success", false);
             json.put("exception", true);
-            json.put("message", "Error with ManageUsers: Escalate to developers!");
+            json.put("message", "Error with ManageUser: Escalate to developers!");
         } finally {
             if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
             if (em != null && em.isOpen()) em.close();

@@ -59,7 +59,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a team
 				result = addEditTeam(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing team
-				result = deleteTeam();
+				result = deleteTeam(dataObj);
 			} else {
 				json.put("success", false);
 				json.put("message", "Unknown action. Options: add/edit/delete");
@@ -77,7 +77,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
             }
             json.put("success", false);
             json.put("exception", true);
-            json.put("message", "Error with ManageUsers: Escalate to developers!");
+            json.put("message", "Error with ManageTeam: Escalate to developers!");
         }
         return SUCCESS;
 	}
@@ -130,8 +130,21 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to delete an existing team from the system
-	public boolean deleteTeam() {
-		return false;
+	public boolean deleteTeam(JsonObject dataObj) {
+		try {
+			long deleteTeamId = dataObj.get("teamId").getAsLong();
+			TeamManager.deleteTeam(em, deleteTeamId);
+			json.put("success", true);
+			return true;
+		} catch (Exception e) {
+			logger.error("Exception: " + e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				logger.error(s.toString());
+			}
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong. Please try again!");
+			return false;
+		}
 	}
 
 	public HashMap<String, Object> getJson() {

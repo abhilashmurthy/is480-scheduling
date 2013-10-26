@@ -35,20 +35,15 @@ public class Team implements Serializable {
 	private Long id;
 	private String teamName;
 	private String wiki;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Faculty supervisor;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Faculty reviewer1;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Faculty reviewer2;
-	@OneToMany(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@OneToMany(mappedBy = "team")
 	private Set<Student> members = new HashSet<Student>();
 
 	public String getTeamName() {

@@ -4,12 +4,15 @@
  */
 package manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import model.Booking;
 import model.Team;
 import model.Term;
+import model.Timeslot;
 import model.role.Faculty;
 import model.role.Student;
 import org.slf4j.Logger;
@@ -136,7 +139,7 @@ public class TeamManager {
 		//Adding the new members to the team
 		for (Long studentId : memberIds) {
 			Student stu = em.find(Student.class, studentId);
-			if (stu == null) throw new CustomException("Student(s) not found");
+			if (stu == null || !stu.getTerm().equals(term)) throw new CustomException("Student(s) not found/part of the current term");
 			else stu.setTeam(team);
 		}
 		
@@ -167,6 +170,32 @@ public class TeamManager {
 		} else {
 			return true;
 		}
+	}
+
+	public static void deleteTeam(EntityManager em, long teamId) throws Exception {
+		Team team = em.find(Team.class, teamId);
+		if (team == null) throw new CustomException("Team not found");
+		
+		//Removing team - student link for all members
+		for (Student s : team.getMembers()) {
+			s.setTeam(null);
+		}
+		
+		//Removing all bookings related to this team
+		ArrayList<Booking> bookings = BookingManager.getBookingsByTeam(em, team);
+		for (Booking b : bookings) {
+			Timeslot t = b.getTimeslot();
+			Booking currentBooking = t.getCurrentBooking();
+			if (currentBooking != null && currentBooking.equals(b)) t.setCurrentBooking(null);
+			b.setRequiredAttendees(null);
+			b.setSubscribedUsers(null);
+			em.remove(b);
+		}
+		em.flush(); //Forcing write to DB
+		
+		//Deleting team
+		em.remove(team);
+		em.flush();
 	}
 	
 }

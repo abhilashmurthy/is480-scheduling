@@ -91,4 +91,19 @@ public class BookingManager {
 		return list;
 	}
 	
+	public static ArrayList<Booking> getBookingsByTeam (EntityManager em, Team team) {
+		logger.trace("Getting all bookings by team");
+		ArrayList<Booking> list;
+		try {
+			Query q = em.createQuery("select b from Booking b where b.team = :team");
+			q.setParameter("team", team);
+			list = (ArrayList<Booking>) q.getResultList();
+		} catch (Exception e) {
+			logger.error("Error in getBookingsByTeam()");
+			logger.error(e.getMessage());
+			return null;
+		}
+		return list;
+	}
+	
 }
