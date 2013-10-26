@@ -161,8 +161,10 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					studentMap.put("name", student.getFullName());
 					studentMap.put("username", student.getUsername());
 					studentMap.put("mobileNumber", (student.getMobileNumber() != null?student.getMobileNumber():"-"));
-					studentMap.put("teamId", student.getTeam().getId());
-					studentMap.put("teamName", student.getTeam().getTeamName());
+					if (student.getTeam() != null) {
+						studentMap.put("teamId", student.getTeam().getId());
+						studentMap.put("teamName", student.getTeam().getTeamName());
+					}
 					studentData.add(studentMap);
 				}
 				
