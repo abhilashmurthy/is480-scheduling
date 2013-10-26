@@ -267,6 +267,12 @@
 			</result>
         </action>
 		
+		<action name="manageTeam" class="userAction.ManageTeamAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
 	</package>
 
 </struts>
