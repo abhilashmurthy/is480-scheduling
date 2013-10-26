@@ -381,8 +381,6 @@ public class UserManager {
 			em.persist(user);
 			json.put("success", true);
 			json.put("userId", user.getId());
-
-			return json;
 		} else { //EDIT operation
 			user.setUsername(username);
 			user.setFullName(fullName);
@@ -390,8 +388,8 @@ public class UserManager {
 			if (role == Role.STUDENT) ((Student)user).setTeam(team);
 			
 			json.put("success", true);
-			return json;
 		}
 		
+		return json;
 	}
 }

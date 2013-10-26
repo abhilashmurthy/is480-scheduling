@@ -92,7 +92,21 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			
 			String teamName = dataObj.get("teamName").getAsString();
 			String wiki = dataObj.get("wiki").getAsString();
-			Team team = new Team();
+			
+			long supervisorId = 0;
+			JsonElement supervisorInfo = dataObj.get("supervisor");
+			if (supervisorInfo != null && supervisorInfo.getAsLong() != -1L) supervisorId = supervisorInfo.getAsLong();
+			
+			long reviewer1Id = 0;
+			JsonElement reviewer1Info = dataObj.get("reviewer1");
+			if (reviewer1Info != null && reviewer1Info.getAsLong() != -1L) reviewer1Id = reviewer1Info.getAsLong();
+			
+			long reviewer2Id = 0;
+			JsonElement reviewer2Info = dataObj.get("reviewer2");
+			if (reviewer2Info != null && reviewer2Info.getAsLong() != -1L) reviewer2Id = reviewer2Info.getAsLong();
+			
+			long termId = dataObj.get("termId").getAsLong();
+			
 			return true;
 		} catch (CustomException e) {
 			json.put("success", false);
