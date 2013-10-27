@@ -16,6 +16,7 @@
     <head>
         <%@include file="header.jsp" %>
         <title>IS480 Scheduling System | Approve</title>
+		</style>
     </head>
     <body>
         <%@include file="navbar.jsp" %>
@@ -72,6 +73,7 @@
 					</li>  
 				</ul>
 			</div>
+			
 			<div id="my-tab-content" class="tab-content">
 				<div class="tab-pane active" id="pendingBookingSection">
 				<s:if test="%{pendingData != null && pendingData.size() > 0}"> 
@@ -156,7 +158,7 @@
 
 			<div class="tab-pane" id="confirmedBookingSection">
 				<s:if test="%{confirmedData != null && confirmedData.size() > 0}"> 
-						<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
+						<table id="confirmTable" class="table table-hover" style="font-size: 13px;">
 							<thead>
 								<tr>
 									<th>Team Name</th>
@@ -172,11 +174,11 @@
 								<s:iterator value="confirmedData">
 									<tr class="success" style="height:50px">
 										<td style="vertical-align: middle"><s:property value="teamName"/></td>
-										<td style="width:50px; vertical-align: middle;"><s:property value="milestone"/></td>
-										<td style="width:50px; vertical-align: middle"><s:property value="userRole"/></td>
-										<td style="width:100px; vertical-align: middle"><s:property value="date"/> <s:property value="time"/></td>
-										<td style="width:80px; vertical-align: middle"><s:property value="venue"/></td>
-										<td style="width:50px; vertical-align: middle">
+										<td style="width: 50px; vertical-align: middle"><s:property value="milestone"/></td>
+										<td style="width: 50px; vertical-align: middle"><s:property value="userRole"/></td>
+										<td style="width: 100px; vertical-align: middle"><s:property value="date"/> <s:property value="time"/></td>
+										<td style="width: 80px; vertical-align: middle"><s:property value="venue"/></td>
+										<td style="width: 50px; vertical-align: middle">
 											<s:property value="myStatus"/>
 										</td>
 										<td style="width:30px; vertical-align: middle">
@@ -237,7 +239,30 @@
 //					$('#tabs').tab();
 //				});
 				var activeBtn = null;
-				
+					
+					$('#confirmTable').dataTable({
+						"aLengthMenu": [
+							[5, 10, 20, -1],[5, 10, 20, "All"]], 
+						"iDisplayLength" : -1,
+//						"bPaginate": false,
+		//				"bLengthChange": false,
+		//				"bFilter": false,
+		//				"bSort": false,
+						"bInfo": false,
+		//				"bAutoWidth": false,
+		//				"asStripClasses": null,
+						//To prevent highlighing of sorted column
+						"bSortClasses": false,
+						"fnDrawCallback": function() {
+							if ($("#confirmTable").find("tr:not(.ui-widget-header)").length <= 5) {
+								  $('div.dataTables_paginate')[0].style.display = "none";
+							} 
+							else {
+								  $('div.dataTables_paginate')[0].style.display = "block";
+							}
+						}
+					});
+					
 					$('#approveRejectTable').dataTable({
 						"aLengthMenu": [
 							[5, 10, 20, -1],[5, 10, 20, "All"]], 
@@ -250,7 +275,15 @@
 		//				"bAutoWidth": false,
 		//				"asStripClasses": null,
 						//To prevent highlighing of sorted column
-						"bSortClasses": false
+						"bSortClasses": false,
+						"fnDrawCallback": function() {
+							if ($("#approveRejectTable").find("tr:not(.ui-widget-header)").length <= 5) {
+								  $('div.dataTables_paginate')[0].style.display = "none";
+							} 
+							else {
+								  $('div.dataTables_paginate')[0].style.display = "block";
+							}
+						}
 					});
 
 					$('.dataTables_filter input').attr("placeholder", "e.g. Acceptance");
