@@ -40,12 +40,12 @@
 							</td>
 						</tr>
 					</table>
-						<button type='button' id='add_team' class='addBtn pull-right btn btn-primary'><i class='icon-plus icon-white'></i> Add Team</button>
+						<button type='button' id='add_team' class='addBtn pull-right btn btn-primary'><i class='fa fa fa-plus fa-white'></i> Add Team</button>
 						<ul class='usersNav nav nav-tabs' id='myTab'>
-							<li class='teams active'><a href='#teams'><h4>Teams</h4></a></li>
-							<li class='students'><a href='#students'><h4>Students</h4></a></li>
-							<li class='faculty'><a href='#faculty'><h4>Faculty</h4></a></li>
-							<li class='tas'><a href='#tas'><h4>TAs</h4></a></li>
+							<li class='fa teams active'><a href='#teams'><h4>Teams</h4></a></li>
+							<li class='fa students'><a href='#students'><h4>Students</h4></a></li>
+							<li class='fa faculty'><a href='#faculty'><h4>Faculty</h4></a></li>
+							<li class='fa tas'><a href='#tas'><h4>TAs</h4></a></li>
 						</ul>
 						<div class='tab-content'>
 							<div class='tab-pane active' id='teams'>
@@ -58,7 +58,7 @@
 										<s:if test="%{teamData != null && teamData.size() > 0}">
 											<s:iterator var="team" value="teamData">
 												<tr id='team_<s:property value="id"/>' class='teamRow'>
-													<td><i class='icon-globe icon-black'></i></td>
+													<td><i class='fa fa fa-globe fa-black'></i></td>
 													<td class='teamName'><s:property value="teamName"/></td>
 													<td class='members'>
 														<div class='memberList'>
@@ -74,12 +74,12 @@
 													<td class='reviewer2'><a class='teamFacultyLink' id='teamReviewer2_<s:property value="#team.id"/>' href='reviewer2_<s:property value="#team.teamName"/>'><s:property value="reviewer2.name"/></a></td>
 													<td>
 														<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
-															<i class='icon-pencil icon-white'></i>
+															<i class='fa fa fa-pencil fa-white'></i>
 														</button>
 													</td>
 													<td>
 														<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
-															<i class='icon-trash icon-white'></i>
+															<i class='fa fa fa-trash-o fa-white'></i>
 														</button>
 													</td>
 												</tr>
@@ -101,19 +101,19 @@
 										<s:if test="%{studentData != null && studentData.size() > 0}">
 											<s:iterator value="studentData">
 												<tr id='user_<s:property value="id"/>' class='studentRow'>
-													<td><i class='icon-user icon-black'></i></td>
+													<td><i class='fa fa fa-user fa-black'></i></td>
 													<td class='fullName'><s:property value="name"/></td>
 													<td class='username'><s:property value="username"/></td>
 													<td class='mobileNumber'><s:property value="mobileNumber"/></td>
 													<td class='teamName'><a class='studentTeamLink' id='teams_<s:property value="teamId"/>' href='team_<s:property value="teamName"/>'><s:property value="teamName"/></a></td>
 													<td class='editTd'>
 														<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
-															<i class='icon-pencil icon-white'></i>
+															<i class='fa fa fa-pencil fa-white'></i>
 														</button>
 													</td>
 													<td class='deleteTd'>
 														<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
-															<i class='icon-trash icon-white'></i>
+															<i class='fa fa fa-trash-o fa-white'></i>
 														</button>
 													</td>
 												</tr>
@@ -135,7 +135,7 @@
 										<s:if test="%{facultyData != null && facultyData.size() > 0}">
 											<s:iterator var="faculty" value="facultyData">
 												<tr id='user_<s:property value="id"/>' class='facultyRow'>
-													<td><i class='icon-user icon-black'></i></td>
+													<td><i class='fa fa fa-user fa-black'></i></td>
 													<td class='fullName'><s:property value="name"/></td>
 													<td class='username'><s:property value="username"/></td>
 													<td class='mobileNumber'><s:property value="mobileNumber"/></td>
@@ -180,12 +180,12 @@
 													</td>
 													<td>
 														<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
-															<i class='icon-pencil icon-white'></i>
+															<i class='fa fa fa-pencil fa-white'></i>
 														</button>
 													</td>
 													<td>
 														<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
-															<i class='icon-trash icon-white'></i>
+															<i class='fa fa fa-trash-o fa-white'></i>
 														</button>
 													</td>
 												</tr>
@@ -207,7 +207,7 @@
 										<s:if test="%{taData != null && taData.size() > 0}">
 											<s:iterator var="ta" value="taData">
 												<tr id='user_<s:property value="id"/>' class='taRow'>
-													<td><i class='icon-user icon-black'></i></td>
+													<td><i class='fa fa fa-user fa-black'></i></td>
 													<td class='fullName'><s:property value="name"/></td>
 													<td class='username'><s:property value="username"/></td>
 													<td class='mobileNumber'><s:property value="mobileNumber"/></td>
@@ -216,12 +216,12 @@
 													</td>
 													<td>
 														<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
-															<i class='icon-pencil icon-white'></i>
+															<i class='fa fa fa-pencil fa-white'></i>
 														</button>
 													</td>
 													<td>
 														<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
-															<i class='icon-trash icon-white'></i>
+															<i class='fa fa fa-trash-o fa-white'></i>
 														</button>
 													</td>
 												</tr>
@@ -248,13 +248,13 @@
 							<s:if test="%{ccData != null && ccData.size() > 0}">
 								<s:iterator value="ccData">
 									<tr id='user_<s:property value="id"/>' class='ccRow'>
-										<td><i class='icon-user icon-black'></i></td>
+										<td><i class='fa fa fa-user fa-black'></i></td>
 										<td class='fullName'><s:property value="name"/></td>
 										<td class='username'><s:property value="username"/></td>
 										<td class='mobileNumber'><s:property value="mobileNumber"/></td>
 										<td>
 											<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
-												<i class='icon-pencil icon-white'></i>
+												<i class='fa fa fa-pencil fa-white'></i>
 											</button>
 										</td>
 									</tr>
@@ -279,18 +279,18 @@
 							<s:if test="%{adminData != null && adminData.size() > 0}">
 								<s:iterator value="adminData">
 									<tr id='user_<s:property value="id"/>' class='adminRow'>
-										<td><i class='icon-user icon-black'></i></td>
+										<td><i class='fa fa fa-user fa-black'></i></td>
 										<td class='fullName'><s:property value="name"/></td>
 										<td class='username'><s:property value="username"/></td>
 										<td class='mobileNumber'><s:property value="mobileNumber"/></td>
 										<td>
 											<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
-												<i class='icon-pencil icon-white'></i>
+												<i class='fa fa fa-pencil fa-white'></i>
 											</button>
 										</td>
 										<td>
 											<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
-												<i class='icon-trash icon-white'></i>
+												<i class='fa fa fa-trash-o fa-white'></i>
 											</button>
 										</td>
 									</tr>
@@ -928,7 +928,7 @@
 									.append(
 										$(document.createElement('td'))
 											.append(
-												$(document.createElement('i')).addClass('icon-user icon-black')
+												$(document.createElement('i')).addClass('fa-user fa-black')
 											)
 									)
 									.append(
@@ -993,7 +993,7 @@
 													.attr('title', 'Edit')
 													.addClass('modBtn editBtn btn btn-info')
 													.append(
-														$(document.createElement('i')).addClass('icon-pencil icon-white')
+														$(document.createElement('i')).addClass('fa-pencil fa-white')
 													)
 											)
 									)
@@ -1005,7 +1005,7 @@
 													.attr('title', 'Delete')
 													.addClass('modBtn delBtn btn btn-danger')
 													.append(
-														$(document.createElement('i')).addClass('icon-trash icon-white')
+														$(document.createElement('i')).addClass('fa-trash-o fa-white')
 													)
 											)
 									)

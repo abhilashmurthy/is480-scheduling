@@ -239,10 +239,10 @@
 												<input id="yearInput" type="text" class="spinner-input"/>
 												<div class="spinner-buttons  btn-group btn-group-vertical">
 													<button class="btn spinner-up" type="button">
-														<i class="icon-chevron-up"></i>
+														<i class="fa fa-chevron-up"></i>
 													</button>
 													<button class="btn spinner-down" type="button">
-														<i class="icon-chevron-down"></i>
+														<i class="fa fa-chevron-down"></i>
 													</button>
 												</div>
 											</div>
@@ -344,7 +344,7 @@
 				//Term name availability check
 				$("#semesterInput").on('keyup', function(){
 					var $this = $(this);
-					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('icon-refresh icon-spin'));
+					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('fa fa-refresh fa-spin'));
 					setTimeout(function(){$this.trigger('change');}, 500);
 					return false;
 				});
@@ -359,11 +359,11 @@
 					}
 					for (var i = 0; i < termNames.length; i++) {
 						if (yearVal === termNames[i].year && semName.toLowerCase() === termNames[i].term.toLowerCase()) {
-							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('icon-remove')).append(' Term name already exists');
+							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('fa fa-times')).append(' Term name already exists');
 							return false;
 						}
 					}
-					$("#semesterNameAvailabilityChecker").css('color', 'green').html($(document.createElement('span')).addClass('icon-ok'));
+					$("#semesterNameAvailabilityChecker").css('color', 'green').html($(document.createElement('span')).addClass('fa fa-check'));
 					return false;
 				});
 				
@@ -719,7 +719,7 @@
 					});
 					$(".make-switch").bootstrapSwitch('setActive', false);
 					$(".pillbox ul").off('click');
-					$("#createScheduleTitle").css('display', 'inline').after($(document.createElement('div')).addClass('statusText').css('color', 'green').html($(document.createElement('span')).addClass('icon-ok')).append(' Please Create Timeslots'));
+					$("#createScheduleTitle").css('display', 'inline').after($(document.createElement('div')).addClass('statusText').css('color', 'green').html($(document.createElement('span')).addClass('fa fa-check')).append(' Please Create Timeslots'));
 				}
 
                 /*----------------------------------------
@@ -764,7 +764,7 @@
 						//If schedule is created, don't let them create again
                         $("#createTimeslotsSubmitBtn").button('loading');
                         $("#venueInput").attr('disabled', true);
-                        $(this).after($(document.createElement('div')).addClass('statusText').css('color', 'green').html($(document.createElement('span')).addClass('icon-ok')).append(' Timeslots created already'));
+                        $(this).after($(document.createElement('div')).addClass('statusText').css('color', 'green').html($(document.createElement('span')).addClass('fa fa-check')).append(' Timeslots created already'));
                     }
                     $(".timeslotsTable").show();
                     return false; 

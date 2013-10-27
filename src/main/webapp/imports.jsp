@@ -12,7 +12,7 @@
 <link href="css/token-input-facebook.css" rel="stylesheet">
 <link href="css/bootstrap-formhelpers.css" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.min.css" rel="stylesheet">
 <link href="css/bootstrap-switch.css" rel="stylesheet">
 <link href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet">
 <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">

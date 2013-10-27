@@ -55,8 +55,8 @@
 				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
 					<input type="checkbox" checked>
 				</div>
-				<span id="previousWeek" class="traverseWeek icon-circle-arrow-left" style="color: #5bc0de; display: none; cursor: pointer"></span>
-				<span id="nextWeek" class="traverseWeek icon-circle-arrow-right" style="color: #5bc0de; display: none; cursor: pointer"></span>
+				<i id='previousWeek' class='traverseWeek fa fa-circle-arrow-left' style='color: #5bc0de; display: none; cursor: pointer'></i>
+				<i id='nextWeek' class='traverseWeek fa fa-circle-arrow-right' style='color: #5bc0de; display: none; cursor: pointer'></i>
             </div>
 			<br/><br/>
 			
@@ -370,7 +370,7 @@
 						Faculty: function(){
 							var facultyList = '';
 							for (var i = 0; i < timeslot.faculties.length; i++) {
-								facultyList += (timeslot.faculties[i].name + " (" + timeslot.faculties[i].status.toLowerCase() + ")" + "<br/>");
+								facultyList += (timeslot.faculties[i].name + " " + (timeslot.faculties[i].status.toLowerCase() ==='pending'?$(document.createElement('i')).addClass('fa fa-cog fa-spin muted').outerHTML():$(document.createElement('i')).addClass('fa fa-check').css('color', '#A9DBA9').outerHTML()) + "<br/>");
 							}
 							return facultyList;
 						},
@@ -384,14 +384,14 @@
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
 								.addClass('popoverBtn btn btn-danger')
-								.append($(document.createElement('i')).addClass('icon-trash icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-trash-o fa-white'))
 								.append('Delete')
 								.outerHTML()
 							+
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
 								.addClass('popoverBtn btn btn-info')
-								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append('Save')
 								.css('float', 'right')
 								.attr('disabled', true)
@@ -405,7 +405,7 @@
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
 								.addClass('popoverBtn btn btn-info')
-								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append('Save')
 								.css('float', 'right')
 								.attr('disabled', true)
@@ -442,14 +442,14 @@
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
 								.addClass('popoverBtn btn btn-danger')
-								.append($(document.createElement('i')).addClass('icon-trash icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-trash-o fa-white'))
 								.append("Delete")
 								.outerHTML()
 							+
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
 								.addClass('popoverBtn btn btn-info')
-								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append("Save")
 								.attr('disabled', true)
 								.outerHTML()
@@ -465,7 +465,7 @@
 //										$(document.createElement('button'))
 //											.attr('id', 'unsubsribeBtn')
 //											.addClass('popoverBtn btn btn-info')
-//											.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+//											.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 //											.append("Unsubscribe")
 //											.outerHTML()
 //									);
@@ -474,7 +474,7 @@
 										$(document.createElement('button'))
 											.attr('id', 'unsubscribeBtn')
 											.addClass('popoverBtn btn')
-											.append($(document.createElement('i')).addClass('icon-calendar-empty icon-black'))
+											.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
 											.append("Unsubscribe")
 											.outerHTML()
 									);
@@ -488,7 +488,7 @@
 //										$(document.createElement('button'))
 //											.attr('id', 'subscribeBtn')
 //											.addClass('popoverBtn btn btn-info')
-//											.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+//											.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 //											.append("Subscribe")
 //											.outerHTML()
 //									);
@@ -497,7 +497,7 @@
 										$(document.createElement('button'))
 											.attr('id', 'subscribeBtn')
 											.addClass('popoverBtn btn')
-											.append($(document.createElement('i')).addClass('icon-calendar icon-black'))
+											.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
 											.append("Subscribe")
 											.outerHTML()
 									);
@@ -549,7 +549,7 @@
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
 								.addClass('popoverBtn btn btn-primary')
-								.append($(document.createElement('i')).addClass('icon-plus-sign  icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-plus-circle  fa-white'))
 								.append("Book")
 								.outerHTML()
 							+
@@ -557,7 +557,7 @@
 								.attr('id', 'updateTimeslotBtn')
 								.css('float', 'right')
 								.addClass('popoverBtn btn btn-info')
-								.append($(document.createElement('i')).addClass('icon-edit icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append("Save")
 								.attr('disabled', true)
 								.outerHTML();
@@ -577,7 +577,7 @@
 							$(document.createElement('button'))
 								.attr('id', 'createAnywayBookingBtn')
 								.addClass('popoverBtn btn btn-warning')
-								.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 								.append("Book Anyway")
 								.outerHTML();
 					   } else {
@@ -585,7 +585,7 @@
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
 								.addClass('popoverBtn btn btn-primary')
-								.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+								.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 								.append("Book")
 								.outerHTML();
 					   }	
@@ -618,7 +618,7 @@
 										.attr('id', 'availableTimeslotBtn')
 										.addClass('popoverBtn btn btn-primary')
 										.css('float', 'right')
-										.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+										.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 										.append("Available")
 										.outerHTML();
 						} else {
@@ -626,7 +626,7 @@
 										.attr('id', 'unavailableTimeslotBtn')
 										.addClass('popoverBtn btn btn-primary')
 										.css('float', 'right')
-										.append($(document.createElement('i')).addClass('icon-minus-sign icon-white'))
+										.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
 										.append("Unavailable")
 										.outerHTML();
 						}
@@ -662,7 +662,7 @@
 											.attr('id', 'signupTimeslotBtn')
 											.addClass('popoverBtn btn btn-primary')
 											.css('float', 'right')
-											.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+											.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 											.append("Swap")
 											.outerHTML();
 						};
@@ -677,7 +677,7 @@
 											.attr('id', 'unsignupTimeslotBtn')
 											.addClass('popoverBtn btn btn-primary')
 											.css('float', 'right')
-											.append($(document.createElement('i')).addClass('icon-minus-sign icon-white'))
+											.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
 											.append("Cancel")
 											.outerHTML();
 							} else {
@@ -685,7 +685,7 @@
 											.attr('id', 'signupTimeslotBtn')
 											.addClass('popoverBtn btn btn-primary')
 											.css('float', 'right')
-											.append($(document.createElement('i')).addClass('icon-plus-sign icon-white'))
+											.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 											.append("Sign Up")
 											.outerHTML();
 							}
@@ -1011,7 +1011,7 @@
 											self.remove();
 											var deletedDiv = $(document.createElement('div'))
 												.addClass('deletedBookingOnTimeslot')
-												.addClass('icon-info-sign');
+												.addClass('fa fa-info-circle');
 											makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
 											$timeslot.append(deletedDiv);
 											appendCreateBookingPopover($timeslot);
@@ -1178,7 +1178,7 @@
 								$(document.createElement('button'))
 									.attr('id', 'unsubscribeBtn')
 									.addClass('popoverBtn btn')
-									.append($(document.createElement('i')).addClass('icon-calendar-empty icon-black'))
+									.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
 									.append("Unsubscribe")
 							);
 							self.find('#subscribeBtn').remove();
@@ -1203,7 +1203,7 @@
 								$(document.createElement('button'))
 									.attr('id', 'subscribeBtn')
 									.addClass('popoverBtn btn')
-									.append($(document.createElement('i')).addClass('icon-calendar icon-black'))
+									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
 									.append("Subscribe")
 							);
 							self.find('#unsubscribeBtn').remove();
@@ -1719,7 +1719,7 @@
 																	$removedDiv.addClass('rejectedBooking');
 																	makeTooltip($td, 'Removed by ' + timeslot.lastBookingEditedBy);
 																} else {
-																	$removedDiv.addClass('deletedBookingOnTimeslot').addClass('icon-info-sign');
+																	$removedDiv.addClass('deletedBookingOnTimeslot').addClass('fa fa-info-circle');
 																	makeTooltip($removedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
 																}
 																return $removedDiv;
@@ -1848,7 +1848,7 @@
 					$(".booking").each(function(){
 						if ($(this).data('draggable')) $(this).draggable('destroy');
 						if ($(this).children('i').length) $(this).children('i').remove();
-						$(this).append($(document.createElement('i')).addClass('moveIcon icon-move icon-black'));
+						$(this).append($(document.createElement('i')).addClass('moveIcon fa fa-move fa-black'));
 					});
 					$(".booking").draggable({
 						start: function(event, ui) {
@@ -1881,7 +1881,7 @@
 										$.trim($(this).children().remove().end().text())
 									)
 									.append(
-										$(document.createElement('i')).addClass('moveIcon icon-move icon-black')
+										$(document.createElement('i')).addClass('moveIcon fa fa-move fa-black')
 									);
 						},
 						appendTo: 'body',
@@ -1985,7 +1985,7 @@
                     trigger: 'manual',
                     html: true,
                     title: function(){
-						return title + $(document.createElement('button')).addClass('close').append($(document.createElement('i')).addClass('icon-remove icon-black')).outerHTML();
+						return title + $(document.createElement('button')).addClass('close').append($(document.createElement('i')).addClass('fa fa-times fa-black')).outerHTML();
 						
                     },
                     content: content,

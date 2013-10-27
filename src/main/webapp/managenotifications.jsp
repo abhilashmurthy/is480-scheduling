@@ -44,7 +44,7 @@
 					<% String eStatusClear = (String) request.getAttribute("emailClearStatus");%>
 					<thead>
 					<tr style="color:blue">
-						<th style="float:left;border:none"><i class="icon-white icon-envelope"></i>Email Reminders:</td></th>
+						<th style="float:left;border:none"><i class="fa fa-white fa-envelope"></i>Email Reminders:</td></th>
 					</thead>
 					<tr><td style="float:left;">
 
@@ -118,7 +118,7 @@
 					<thead>
 					<tr>
 						<th style="color:blue;">
-							<i class="icon-white icon-comment"></i>SMS Reminders:
+							<i class="fa fa-white fa-comment"></i>SMS Reminders:
 						</th>
 					</tr>
 					</thead>

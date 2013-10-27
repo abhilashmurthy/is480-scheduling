@@ -46,14 +46,14 @@
 						<tbody> 
 							<s:iterator value="data">
 								<tr class="success" style="height:40px">
-									<td style="vertical-align: middle"><i class="icon-ok"></i></td>
+									<td style="vertical-align: middle"><i class="fa fa-check"></i></td>
 									<td style="vertical-align: middle"><s:property value="teamName"/></td>
 									<td style="vertical-align: middle"><s:property value="time"/></td>
 									<td style="vertical-align: middle"><s:property value="venue"/></td>
 									<td style="vertical-align: middle"><s:property value="wikiLink"/></td>
 									<td style="width:90px; text-align:center;vertical-align: middle"> 
 										<button type="button" class="unsubscribeBtn updateStatusBtn btn btn-danger" value="<s:property value="bookingId"/>"
-												name="Unsubscribe!"><i class="icon-trash icon-white"></i>
+												name="Unsubscribe!"><i class="fa fa-trash-o fa-white"></i>
 										</button>
 									</td>
 								</tr>
