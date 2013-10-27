@@ -60,91 +60,182 @@
 					</select>
 				</form>
 			</div>-->
-						
-			<s:if test="%{data != null && data.size() > 0}"> 
-					<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
-						<thead>
-							<tr>
-								<th>Team Name</th>
-								<th>Presentation</th>
-								<th>My Role</th>
-								<th>Date & Time</th>
-								<th>Venue</th>
-								<th>My Status</th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody> 
-							<s:iterator value="data">
-								<tr class="warning" style="height:50px">
-									<td style="vertical-align: middle"><s:property value="teamName"/></td>
-									<td style="vertical-align: middle"><s:property value="milestone"/></td>
-									<td style="vertical-align: middle"><s:property value="userRole"/></td>
-									<td style="vertical-align: middle"><s:property value="date"/> <s:property value="time"/></td>
-									<td style="vertical-align: middle"><s:property value="venue"/></td>
-									<td style="vertical-align: middle">
-										<s:property value="myStatus"/>
-									</td>
-									<td style="vertical-align: middle">
-										<button type="button" class="approveBookingBtn updateStatusBtn btn btn-success" value="<s:property value="bookingId"/>" name="approve">
-											Approve
-										</button>
-										<span class="button-divider">
-										<button type="button" class="rejectBookingBtn updateStatusBtn btn btn-danger" value="<s:property value="bookingId"/>" name="reject">
-											Reject
-										</button>
-										</span>
-									</td>
-									<br/><br/>
-								</tr>
-							</s:iterator>
-							</tbody>
-						</table>
-						<br/><br/>
-				<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-						<h3 id="myModalLabel">Information Required</h3>
-					</div>
-					<div class="modal-body">
-						<form id="rejectForm">
-						<table>
-							<tr>
-								<td width="150px">
-									Reason for Rejecting <br/>
-									<i style="font-size: 13px;">(55 characters max.)</i>
-								</td>
-								<!--<th>Add Proxy</th>-->
-								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
-											  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
-								</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td>
-									<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
-								</td>
-							</tr>
-						</table>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-						<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
-					</div>
-				</div>
-			</s:if><s:else>
-				<div style="clear: both;">
-				<h4>No pending bookings available!</h4>
-				</div>
-			</s:else>
+			<!-- For switching between Pending and Confirmed Tabs -->
+			<div class="tabbable" style="clear: both;">
+				<br/>
+				<ul id="tabs" class="nav nav-tabs" data-tab="tabs">  
+					<li class="active">
+						<a href="#pendingBookingSection" data-toggle="tab">Pending Bookings</a>
+					</li>     
+					<li>
+						<a href="#confirmedBookingSection" data-toggle="tab">Confirmed Bookings</a>
+					</li>  
+				</ul>
 			</div>
-		<h4 id="approveRejectMessage"></h4>
-		 
+			<div id="my-tab-content" class="tab-content">
+				<div class="tab-pane active" id="pendingBookingSection">
+				<s:if test="%{pendingData != null && pendingData.size() > 0}"> 
+						<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
+							<thead>
+								<tr>
+									<th>Team Name</th>
+									<th>Presentation</th>
+									<th>My Role</th>
+									<th>Date & Time</th>
+									<th>Venue</th>
+									<th>My Status</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody> 
+								<s:iterator value="pendingData">
+									<tr class="warning" style="height:50px">
+										<td style="vertical-align: middle"><s:property value="teamName"/></td>
+										<td style="vertical-align: middle"><s:property value="milestone"/></td>
+										<td style="vertical-align: middle"><s:property value="userRole"/></td>
+										<td style="vertical-align: middle"><s:property value="date"/> <s:property value="time"/></td>
+										<td style="vertical-align: middle"><s:property value="venue"/></td>
+										<td style="vertical-align: middle">
+											<s:property value="myStatus"/>
+										</td>
+										<td style="vertical-align: middle">
+											<button type="button" class="approveBookingBtn updateStatusBtn btn btn-success" value="<s:property value="bookingId"/>" name="approve">
+												Approve
+											</button>
+											<span class="button-divider">
+											<button type="button" class="rejectBookingBtn updateStatusBtn btn btn-danger" value="<s:property value="bookingId"/>" name="reject">
+												Reject
+											</button>
+											</span>
+										</td>
+										<br/><br/>
+									</tr>
+								</s:iterator>
+								</tbody>
+							</table>
+							<br/><br/>
+					<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h3 id="myModalLabel">Information Required</h3>
+						</div>
+						<div class="modal-body">
+							<form id="rejectForm">
+							<table>
+								<tr>
+									<td width="150px">
+										Reason for Rejecting <br/>
+										<i style="font-size: 13px;">(55 characters max.)</i>
+									</td>
+									<!--<th>Add Proxy</th>-->
+									<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
+												  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td>
+										<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
+									</td>
+								</tr>
+							</table>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+							<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
+						</div>
+					</div>
+				</s:if><s:else>
+					<div style="clear: both;">
+					<h4>No pending bookings available!</h4>
+					</div>
+				</s:else>
+			<h4 id="approveRejectMessage"></h4>
+			</div>
+
+			<div class="tab-pane" id="confirmedBookingSection">
+				<s:if test="%{confirmedData != null && confirmedData.size() > 0}"> 
+						<table id="approveRejectTable" class="table table-hover" style="font-size: 13px;">
+							<thead>
+								<tr>
+									<th>Team Name</th>
+									<th>Presentation</th>
+									<th>My Role</th>
+									<th>Date & Time</th>
+									<th>Venue</th>
+									<th>My Status</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody> 
+								<s:iterator value="confirmedData">
+									<tr class="success" style="height:50px">
+										<td style="vertical-align: middle"><s:property value="teamName"/></td>
+										<td style="width:50px; vertical-align: middle;"><s:property value="milestone"/></td>
+										<td style="width:50px; vertical-align: middle"><s:property value="userRole"/></td>
+										<td style="width:100px; vertical-align: middle"><s:property value="date"/> <s:property value="time"/></td>
+										<td style="width:80px; vertical-align: middle"><s:property value="venue"/></td>
+										<td style="width:50px; vertical-align: middle">
+											<s:property value="myStatus"/>
+										</td>
+										<td style="width:30px; vertical-align: middle">
+											<button type="button" class="rejectBookingBtn updateStatusBtn btn btn-danger" value="<s:property value="bookingId"/>" name="reject">
+												<i class="icon-remove">&nbsp; Revoke</i>
+											</button>
+										</td>
+										<br/><br/>
+									</tr>
+								</s:iterator>
+								</tbody>
+							</table>
+							<br/><br/>
+					<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h3 id="myModalLabel">Information Required</h3>
+						</div>
+						<div class="modal-body">
+							<form id="rejectForm">
+							<table>
+								<tr>
+									<td width="150px">
+										Reason for Rejecting <br/>
+										<i style="font-size: 13px;">(55 characters max.)</i>
+									</td>
+									<!--<th>Add Proxy</th>-->
+									<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
+												  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td>
+										<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
+									</td>
+								</tr>
+							</table>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+							<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
+						</div>
+					</div>
+				</s:if><s:else>
+					<div style="clear: both;">
+					<h4>No bookings have yet been confirmed!</h4>
+					</div>
+				</s:else>
+			</div>
+		</div>
 		<%@include file="footer.jsp"%>
 		
 		<script type='text/javascript'>
 			approveRejectLoad = function() {
+//				jQuery(document).ready(function($) {
+//					$('#tabs').tab();
+//				});
 				var activeBtn = null;
 				
 					$('#approveRejectTable').dataTable({
