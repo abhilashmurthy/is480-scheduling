@@ -519,12 +519,12 @@ input, button, select, textarea {
 	vertical-align: bottom;
 }
 
-.termUsers {
+.usersPage {
 	padding-top: 20px;
 	overflow: hidden;
 }
 
-.termUsers > .users {
+.usersPage > .users {
 	border-radius: 10px;
 	float: left;
 	padding: 10px;
@@ -536,10 +536,6 @@ input, button, select, textarea {
 
 .memberName {
 	display: block;
-}
-
-#teamSelectHeader {
-	color: grey;
 }
 
 teamBtn {
@@ -567,4 +563,20 @@ teamBtn {
 
 .taSignupsTable {
 	width: 450px;
+}
+
+select {
+	margin-bottom: 0 !important;
+}
+
+.selectTermTable {
+	margin: 20px 0 20px 0;
+}
+
+.formLabelTd {
+	padding-right: 20px
+}
+
+.addBtn {
+	margin: 15px 20px 0 0;
 }
