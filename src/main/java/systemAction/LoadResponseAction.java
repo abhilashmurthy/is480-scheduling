@@ -77,9 +77,27 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 					}
 				}
 
-				//Putting all the booking details for the user in a hash map to display it 
+				//First sorting the list and then displaying it
 				if (pendingBookingList.size() > 0) {
-					for (Booking b : pendingBookingList) {
+					//Sort the pending bookings list in ascending order
+					ArrayList<Booking> pendingBookings = new ArrayList<Booking>();
+					Long[] ts = new Long[pendingBookingList.size()];
+					int i = 0;
+					for (Booking b: pendingBookingList) {
+						ts[i] = b.getCreatedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: pendingBookingList) {
+							if (b.getCreatedAt().getTime() == ts[j]) {
+								pendingBookings.add(b);
+								break;
+							}
+						}
+					}
+					
+					for (Booking b : pendingBookings) {
 						Timeslot timeslot = b.getTimeslot();
 						
 						//Getting all the timeslot and booking details
@@ -122,7 +140,25 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 				
 				//Putting all the confirmed booking details for the user in a hash map to display it 
 				if (confirmedBookingList.size() > 0) {
-					for (Booking b : confirmedBookingList) {
+					//Sort the pending bookings list in ascending order
+					ArrayList<Booking> confirmedBookings = new ArrayList<Booking>();
+					Long[] ts = new Long[confirmedBookingList.size()];
+					int i = 0;
+					for (Booking b: confirmedBookingList) {
+						ts[i] = b.getCreatedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: confirmedBookingList) {
+							if (b.getCreatedAt().getTime() == ts[j]) {
+								confirmedBookings.add(b);
+								break;
+							}
+						}
+					}
+					
+					for (Booking b : confirmedBookings) {
 						Timeslot timeslot = b.getTimeslot();
 						
 						//Getting all the timeslot and booking details
@@ -182,6 +218,21 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 			if (em != null && em.isOpen()) em.close();
 		}
     }
+	
+	//Sorting timestamps by ascending order to sort bookings 
+	private static Long[] sortTimestamps(Long[] ts) {
+		for (int i = 0; i < ts.length - 1; i++) {
+			for (int j = 1; j < ts.length; j++) {
+				if (ts[j] < ts[i]) {
+					long temp = 0;
+					temp = ts[i];
+					ts[i] = ts[j];
+					ts[j] = temp;
+				}
+			}
+		}
+		return ts;
+	}
 	
 	//Load the appropriate faculty object based on the chosen/active term
 	private Faculty loadFacultyMemberForTerm(EntityManager em, User user) {

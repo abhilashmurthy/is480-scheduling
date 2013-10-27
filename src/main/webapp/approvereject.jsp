@@ -253,6 +253,7 @@
 		//				"asStripClasses": null,
 						//To prevent highlighing of sorted column
 						"bSortClasses": false,
+						"aaSorting":[],
 						"fnDrawCallback": function() {
 							if ($("#confirmTable").find("tr:not(.ui-widget-header)").length <= 5) {
 								  $('div.dataTables_paginate')[0].style.display = "none";
@@ -276,6 +277,7 @@
 		//				"asStripClasses": null,
 						//To prevent highlighing of sorted column
 						"bSortClasses": false,
+						"aaSorting":[],
 						"fnDrawCallback": function() {
 							if ($("#approveRejectTable").find("tr:not(.ui-widget-header)").length <= 5) {
 								  $('div.dataTables_paginate')[0].style.display = "none";
