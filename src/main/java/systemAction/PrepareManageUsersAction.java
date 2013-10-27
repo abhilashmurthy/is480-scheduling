@@ -116,6 +116,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					HashMap<String, Object> teamMap = new HashMap<String, Object>();
 					teamMap.put("id", team.getId());
 					teamMap.put("teamName", team.getTeamName());
+					teamMap.put("wiki", team.getWiki());
 					Set<Student> students = team.getMembers();
 					List<HashMap<String, Object>> memberList = new ArrayList<HashMap<String, Object>>();
 					for (Student student : students) {
@@ -157,6 +158,8 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 						studentMap.put("teamId", student.getTeam().getId());
 						studentMap.put("teamName", student.getTeam().getTeamName());
 					}
+					studentMap.put("label", student.getFullName());
+					studentMap.put("value", student.getId());
 					studentData.add(studentMap);
 				}
 				
@@ -183,6 +186,8 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					facultyMap.put("supervisorTeams", supervisorTeamsList);
 					facultyMap.put("reviewer1Teams", reviewer1TeamsList);
 					facultyMap.put("reviewer2Teams", reviewer2TeamsList);
+					facultyMap.put("label", faculty.getFullName());
+					facultyMap.put("value", faculty.getId());
 					facultyData.add(facultyMap);
 				}
 				

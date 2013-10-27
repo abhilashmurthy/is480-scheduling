@@ -551,10 +551,13 @@ teamBtn {
 	width: 300px;
 }
 
+.modalTeamTable {
+	width: 400px;
+}
+
 .modalTable td, .modalTable th {
 	padding: 5px;
 	border: 1px solid #dddddd;
-	width: 300px;
 }
 
 .taSignupsTable {
@@ -573,10 +576,14 @@ select, input {
 	padding-right: 20px
 }
 
-.addBtn, .editAdminBtn {
+.addBtn, .addTeamBtn, .editAdminBtn {
 	margin: 15px 20px 0 0;
 }
 
 .assignTeamsLink {
 	color: red;
+}
+
+.teamUserSelectBtn {
+	text-align: left !important;
 }

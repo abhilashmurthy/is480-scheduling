@@ -45,8 +45,11 @@
 						</tr>
 					</table>
 				</form>
-				<button type='button' id='add_team' class='addBtn pull-right btn btn-primary'>
+				<button type='button' id='add_team' class='addTeamBtn pull-right btn btn-primary'>
 					<i class='fa fa fa-plus fa-white'></i> Add Team
+				</button>
+				<button type='button' id='add_student' class='addBtn pull-right btn btn-primary' style='display:none'>
+					<i class='fa fa fa-plus fa-white'></i> Add Student
 				</button>
 				<button type='button' title="Edit Course Coordinator" class='editAdminBtn pull-right editBtn btn btn-info' style='display:none'>
 					<i class='fa fa fa-pencil fa-white'></i> Edit Course Coordinator
@@ -85,12 +88,12 @@
 											<td class='reviewer1'><a class='teamFacultyLink teamReviewer1_<s:property value="#team.reviewer1.id"/>' href='reviewer1_<s:property value="#team.teamName"/>'><s:property value="reviewer1.name"/></a></td>
 											<td class='reviewer2'><a class='teamFacultyLink teamReviewer2_<s:property value="#team.reviewer2.id"/>' href='reviewer2_<s:property value="#team.teamName"/>'><s:property value="reviewer2.name"/></a></td>
 											<td>
-												<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
+												<button type='button' title="Edit" class='editTeamBtn btn btn-info'>
 													<i class='fa fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
+												<button type='button' title="Delete User" class='delTeamBtn btn btn-danger'>
 													<i class='fa fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
@@ -322,7 +325,7 @@
 				var studentData = null;
 				var facultyData = null;
 				var taData = null;
-				var termId = parseInt('<s:property value="termId"/>') !== 0? parseInt('<s:property value="termId"/>') : parseInt("<%= ((Term) session.getAttribute("currentActiveTerm")).getId() %>");
+				var termId = parseInt('<s:property value="selectedTermId"/>') !== 0? parseInt('<s:property value="selectedTermId"/>') : parseInt("<%= ((Term) session.getAttribute("currentActiveTerm")).getId() %>");
 				
 				loadUsers();
 				
@@ -354,9 +357,10 @@
 					$(".nav-tabs ." + href).addClass('active');
 					$("#" + href).show();
 					var userType = (href.slice(-1) === 's'?href.slice(0, -1):href);
-					if (userType !== 'cc') {
-						$('.addBtn').show();
+					if (userType !== 'cc' && userType !== 'team') {
+						$('.addTeamBtn').hide();
 						$('.editAdminBtn').hide();
+						$('.addBtn').show();
 						$('.addBtn')
 								.attr('id', 'add_' + userType)
 								.html(
@@ -364,9 +368,14 @@
 									(userType === 'ta'?userType.toUpperCase()
 									:userType.charAt(0).toUpperCase() + userType.slice(1))
 								);
-					} else {
+					} else if (userType === 'cc') {
 						$('.addBtn').hide();
+						$('.addTeamBtn').hide();
 						$('.editAdminBtn').show();
+					} else if (userType === 'team') {
+						$('.addTeamBtn').show();
+						$('.addBtn').hide();
+						$('.editAdminBtn').hide();
 					}
 					return false;
 				});
@@ -541,6 +550,7 @@
 					}
 					editableFields.push({order: 1, key: "Username", name:"username", value: user.username});
 					editableFields.push({order: 2, key: "Full Name", name:"fullName", value: user.name});
+					editableFields.sort(compare);
 					if ($this.hasClass('editBtn')) editUser(user, userType, editableFields);
 					else if ($this.hasClass('delBtn')) {
 						deleteUser(user, userType);
@@ -549,14 +559,263 @@
 				
 				$('body').on('click', '.addBtn', function(){
 					var userType = $(this).attr('id').split('_')[1];
-					var addableFields = [{key: "Username", name:"username"}, {key: "Full Name", name: "fullName"}];
-					if (userType === 'student') addableFields.push({key: "Team", name: "teamId"});
+					var addableFields = [{key: "Username", name:"username", order: 1}, {key: "Full Name", name: "fullName", order: 2}];
+					if (userType === 'student') addableFields.push({key: "Team", name: "teamId", order: 3});
+					addableFields.sort(compare);
 					addUser(userType, addableFields);
+				});
+				
+				$('body').on('click', '.addTeamBtn, .editTeamBtn', function(){
+					var action = $(this).hasClass('addTeamBtn')?'add':'edit';
+					var team = null;
+					var $tr = null;
+					if (action === 'edit') {
+						var $tr = $(this).closest('tr');
+						for (var i = 0; i < teamData.length; i++) {
+							if (parseInt(teamData[i].id) === parseInt($tr.attr('id').split('_')[1])) {
+								team = teamData[i];
+								break;
+							}
+						}
+					}
+					bootbox.confirm({
+						title: action.charAt(0).toUpperCase() + action.slice(1) + " Team",
+						message: function() {
+							return $(document.createElement('form')).addClass('modalForm').append($(document.createElement('table')).addClass('modalTable modalTeamTable').append(function(){
+									var $trs = new Array();
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-group fa-black'))
+												.append(' Team Name'))
+											.append(
+												$(document.createElement('td'))
+												.append(
+													$(document.createElement('input'))
+														.attr('type', 'text')
+														.attr('id', 'teamName')
+														.attr('name', 'name')
+														.val(action === 'edit'?team.teamName:'').change()
+												)
+											)
+									);
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-vk fa-black'))
+												.append(' Wiki'))
+											.append(
+												$(document.createElement('td'))
+												.append(
+													$(document.createElement('input'))
+														.attr('type', 'text')
+														.attr('id', 'wiki')
+														.attr('name', 'wiki')
+														.val(action === 'edit'?team.wiki:'').change()
+												)
+											)
+									);
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-user fa-black'))
+												.append(' Members'))
+											.append(
+												$(document.createElement('td'))
+												.addClass('student')
+												.append(
+													$(document.createElement('select'))
+														.addClass('membersMultiselect multiselect multiselect-search')
+														.attr('multiple', 'multiple')
+														.attr('id', 'members')
+														.attr('name', 'members')
+												)
+											)
+									);
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-briefcase fa-black'))
+												.append(' Supervisor'))
+											.append(
+												$(document.createElement('td'))
+												.addClass('faculty')
+												.append(
+													$(document.createElement('select'))
+														.addClass('supervisorMultiSelect multiselect multiselect-search')
+														.attr('multiple', 'multiple')
+														.attr('id', 'supervisor')
+														.attr('name', 'supervisor')
+												)
+											)
+									);
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-briefcase fa-black'))
+												.append(' Reviewer 1'))
+											.append(
+												$(document.createElement('td'))
+												.addClass('faculty')
+												.append(
+													$(document.createElement('select'))
+														.addClass('reviewer1MultiSelect multiselect multiselect-search')
+														.attr('multiple', 'multiple')
+														.attr('id', 'reviewer1')
+														.attr('name', 'reviewer1')
+												)
+											)
+									);
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-briefcase fa-black'))
+												.append(' Reviewer 2'))
+											.append(
+												$(document.createElement('td'))
+												.addClass('faculty')
+												.append(
+													$(document.createElement('select'))
+														.addClass('reviewer2MultiSelect multiselect multiselect-search')
+														.attr('multiple', 'multiple')
+														.attr('id', 'reviewer2')
+														.attr('name', 'reviewer2')
+												)
+											)
+									);
+									return $trs;
+								})
+							);
+						},
+						callback: function(result) {
+							if (result) {
+								var formData = $('.modalForm').serializeArray();
+								var submitData = {
+									action: action,
+									termId: termId,
+									teamId: action === 'edit'?$tr.attr('id').split('_')[1]:null
+								};
+								for (var i = 0; i < formData.length; i++) {
+									if (formData[i].name === 'members') submitData['members'] = $('.multiselect').val();
+									else submitData[formData[i].name] = formData[i].value;
+								}
+								console.log('Submitting ' + action + ' team data: ' + JSON.stringify(submitData));
+								$.ajax({
+									type: 'POST',
+									url: 'manageTeam',
+									data: {jsonData: JSON.stringify(submitData)},
+									async: false,
+									cache: false
+								}).done(function(response) {
+									if (response.success) {
+										setTimeout(function(){showNotification("SUCCESS", action.charAt(0).toUpperCase() + action.slice(1) + 'ed successfully');}, 500);
+//										updateTeamJsonData();
+//										updateTeamPage();
+									} else {
+										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
+									}
+									return true;
+								}).fail(function(error){
+									var eid = btoa(response.message);
+									window.location = "error.jsp?eid=" + eid;
+								});
+							}
+						}
+					});
+					//Multiselect options
+					$('.multiselect').each(function(){
+						var $this = $(this);
+						if ($this.parent().hasClass('student')) {
+							$this.multiselect({
+								buttonText: function(options, select) {
+									if (options.length === 0) {
+										return 'Select Students <b class="caret"></b>';
+									} else {
+										var selected = '';
+										options.each(function(){
+											selected += $(this).text() + "<br/>";
+										});
+										return selected + ' <b class="caret"></b>';
+									}
+								},
+								enableCaseInsensitiveFiltering: true,
+								filterPlaceholder: 'Search',
+								buttonClass: 'btn btn-link teamUserSelectBtn'
+							});
+							$this.multiselect('dataprovider', studentData);
+							if (action === 'edit') {
+								var valArray = new Array();
+								for (var i = 0; i < team.members.length; i++) {
+									valArray.push(parseInt(team.members[i].id));
+								};
+								$this.multiselect('select', valArray);
+							}
+						} else if ($this.parent().hasClass('faculty')) {
+							$this.multiselect({
+								buttonText: function(options, select) {
+									if (options.length === 0) {
+										return 'Select Faculty <b class="caret"></b>';
+									} else {
+										var selected = '';
+										options.each(function(){
+											selected += $(this).text();
+										});
+										return selected + ' <b class="caret"></b>';
+									}
+								},
+								onChange: function($option, checked) {
+									if ($this.val() !== null && checked) {
+										var vals = $this.val();
+										if (vals.length > 1) {
+											for (var i = 0; i < vals.length; i++) {
+												if (vals[i] !== $option.attr('value')) $this.multiselect('deselect', vals[i]);
+											}
+										}
+									}
+								},
+								enableCaseInsensitiveFiltering: true,
+								filterPlaceholder: 'Search',
+								buttonClass: 'btn btn-link teamUserSelectBtn'
+							});
+							$this.multiselect('dataprovider', facultyData);
+							if (action === 'edit') {
+								switch ($this.attr('id')) {
+									case 'supervisor':
+										$this.multiselect('select', team.supervisor.id);
+										break;
+									case 'reviewer1':
+										$this.multiselect('select', team.reviewer1.id);
+										break;
+									case 'reviewer2':
+										$this.multiselect('select', team.reviewer2.id);
+										break;
+									default:
+										showNotification('ERROR', 'Unknown faculty in multiselect');
+										return false;
+								}
+							}
+						} else {
+							showNotification('ERROR', 'Multiselect error');
+							return false;
+						}
+					});
+					return false;
 				});
 				
 				/*******************/
 				/* ACTIONS    */
 				/*******************/
+				
+				//Order comparator
+				function compare(a, b) {
+					if (a.order < b.order) {
+						return -1;
+					} else if (a.order > b.order) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
 				
 				function addUser(userType, addableFields) {
 					bootbox.confirm({
@@ -654,24 +913,13 @@
 				}
 				
 				function editUser(user, userType, editableFields) {
-					//Order comparator
-					function compare(a, b) {
-						if (a.order < b.order) {
-							return -1;
-						} else if (a.order > b.order) {
-							return 1;
-						} else {
-							return 0;
-						}
-					}
 					bootbox.confirm({
-						title: "Edit " + (userType === 'ta'?'TA':userType.charAt(0).toUpperCase() + userType.slice(1)),
+						title: "Edit " + (userType === 'ta'?'TA':userType === 'cc'?'Course Coordinator':userType.charAt(0).toUpperCase() + userType.slice(1)),
 						message: function() {
 							return $(document.createElement('form')).addClass('modalForm').append($(document.createElement('table')).addClass('modalTable').append(function(){
 									if (editableFields.length === 0) {
 										return $(document.createElement('tr')).append($(document.createElement('td')).html('Not editable user!'));
 									}
-									editableFields.sort(compare); //Sort by order first
 									var $trs = new Array();
 									for (var i = 0; i < editableFields.length; i++) {
 											$trs.push(
@@ -823,7 +1071,9 @@
 								teamId: submitData.teamId?submitData.teamId:false,
 								teamName: submitData.teamName?submitData.teamName:false,
 								myTeams: {},
-								mySignups: {}
+								mySignups: {},
+								label: submitData.fullName,
+								value: user.id
 							});
 							//Add to team data
 							if (submitData.teamName) {
@@ -868,6 +1118,8 @@
 									roleData[i].username = submitData.username;
 									roleData[i].teamId = submitData.teamId?submitData.teamId:false;
 									roleData[i].teamName = submitData.teamName?submitData.teamName:false;
+									roleData[i].label = submitData.fullName;
+									roleData[i].value = user.id;
 									break;
 								}
 							}
@@ -1164,8 +1416,47 @@
 				}
 				
 				/*******************/
-				/* NOTIFICATIONS */
+				/* PLUGINS          */
 				/*******************/
+				
+                /* TOKEN INPUT */
+                function appendTokenInput($input, userType, action){
+                    $input.tokenInput('destroy');
+                    var opts = {
+                        preventDuplicates: true,
+                        theme: "facebook",
+                        allowTabOut: true,
+                        propertyToSearch: "fullName",
+                        resultsLimit: 4,
+                        hintText: "Enter name...",
+                        noResultsText: function(){
+							return userType.toUpperCase() + ' does not exist';
+						}
+                    };
+                    switch (action) {
+						case 'add':
+							break;
+						case 'edit':
+							//Prepopulate
+							break;
+						default:
+							showNotification('Team action does not exist');
+							return false;
+					}
+                    $input.tokenInput(function() {
+						switch (userType.toUpperCase()) {
+							case 'STUDENT':
+								return studentData;
+								break;
+							case 'FACULTY':
+								return facultyData;
+								break;
+							default:
+								showNotification('Team userType does not exist');
+								return false;
+						}
+					}, opts);
+                }
 
 				/** Notification **/
 				function showNotification(action, notificationMessage) {
