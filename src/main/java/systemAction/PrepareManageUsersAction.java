@@ -177,21 +177,20 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					facultyMap.put("name", faculty.getFullName());
 					facultyMap.put("username", faculty.getUsername());
 					facultyMap.put("mobileNumber", (faculty.getMobileNumber() != null?faculty.getMobileNumber():"-"));
-					List<HashMap<String, Object>> myTeamsList = new ArrayList<HashMap<String, Object>>();
+					List<HashMap<String, Object>> supervisorTeamsList = new ArrayList<HashMap<String, Object>>();
+					List<HashMap<String, Object>> reviewer1TeamsList = new ArrayList<HashMap<String, Object>>();
+					List<HashMap<String, Object>> reviewer2TeamsList = new ArrayList<HashMap<String, Object>>();
 					for (Team team : teams) {
-						List<String> myRoles = new ArrayList<String>();
-						if (faculty.equals(team.getSupervisor())) myRoles.add("Supervisor"); //TODO: Fix equals() method in User class
-						if (faculty.equals(team.getReviewer1())) myRoles.add("Reviewer1");
-						if (faculty.equals(team.getReviewer2())) myRoles.add("Reviewer2");
-						if (myRoles.size() > 0) {
-							HashMap<String, Object> teamMap = new HashMap<String, Object>();
-							teamMap.put("id", team.getId());
-							teamMap.put("teamName", team.getTeamName());
-							teamMap.put("myRoles", myRoles);
-							myTeamsList.add(teamMap);
-						}
+						HashMap<String, Object> teamMap = new HashMap<String, Object>();
+						teamMap.put("teamId", team.getId());
+						teamMap.put("teamName", team.getTeamName());
+						if (faculty.equals(team.getSupervisor())) supervisorTeamsList.add(teamMap);
+						if (faculty.equals(team.getReviewer1())) reviewer1TeamsList.add(teamMap);
+						if (faculty.equals(team.getReviewer2())) reviewer2TeamsList.add(teamMap);
 					}
-					facultyMap.put("myTeams", myTeamsList);
+					facultyMap.put("supervisorTeams", supervisorTeamsList);
+					facultyMap.put("reviewer1Teams", reviewer1TeamsList);
+					facultyMap.put("reviewer2Teams", reviewer2TeamsList);
 					facultyData.add(facultyMap);
 				}
 				

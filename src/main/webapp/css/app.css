@@ -546,10 +546,6 @@ teamBtn {
 	padding-top: 20px;
 }
 
-.usersTable {
-	width: 50% !important;
-}
-
 .modalTable {
 	text-align: left;
 	width: 300px;
@@ -565,7 +561,7 @@ teamBtn {
 	width: 450px;
 }
 
-select {
+select, input {
 	margin-bottom: 0 !important;
 }
 
@@ -577,6 +573,10 @@ select {
 	padding-right: 20px
 }
 
-.addBtn {
+.addBtn, .editAdminBtn {
 	margin: 15px 20px 0 0;
+}
+
+.assignTeamsLink {
+	color: red;
 }
