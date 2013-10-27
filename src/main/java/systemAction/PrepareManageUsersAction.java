@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.ScheduleManager;
 import manager.SettingsManager;
+import manager.TermManager;
 import manager.UserManager;
 import model.Schedule;
 import model.Settings;
@@ -41,7 +42,7 @@ import util.MiscUtil;
  */
 public class PrepareManageUsersAction extends ActionSupport implements ServletRequestAware {
 	
-	private long termId;
+	private long selectedTermId;
 	private ArrayList<HashMap<String, Object>> adminData = new ArrayList<HashMap<String, Object>>();
 	private ArrayList<HashMap<String, Object>> ccData = new ArrayList<HashMap<String, Object>>();
 	private ArrayList<HashMap<String, Object>> teamData = new ArrayList<HashMap<String, Object>>();
@@ -74,26 +75,14 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 				em.getTransaction().begin();
 				
 				//TERM MANAGEMENT
-				Term currentActiveTerm = (Term) session.getAttribute("currentActiveTerm");
 				Term term = (Term) session.getAttribute("currentActiveTerm");
-				ArrayList<Term> allActiveTerms = SettingsManager.getActiveTerms(em);
-				allActiveTerms.remove(currentActiveTerm);
-				if (allActiveTerms.size() > 0) {
-					for (Term activeTerm : allActiveTerms) {
-						HashMap<String, Object> map = new HashMap<String, Object>();
-						map.put("termName", term.getDisplayName());
-						map.put("termId", String.valueOf(term.getId()));
-						termData.add(map);
-					}
-				}
-				if (termId != 0) {
-					for (Term activeTerm : allActiveTerms) {
-						if (term.getId() == termId) {
-							term = activeTerm;
-							UserManager.initializeUser(em, session, user.getUsername(), user.getFullName(), term);
-							break;
-						}
-					}
+				if (selectedTermId != 0) term = TermManager.findTermById(em, selectedTermId);
+				ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
+				for (Term activeTerm : activeTerms) {
+					HashMap<String, Object> termMap = new HashMap<String, Object>();
+					termMap.put("termName", activeTerm.getDisplayName());
+					termMap.put("termId", activeTerm.getId());
+					termData.add(termMap);
 				}
 				
 				//ADMIN MANAGEMENT
@@ -262,12 +251,12 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
         this.request = hsr;
     }
 	
-	public long getTermId() {
-		return termId;
+	public long getSelectedTermId() {
+		return selectedTermId;
 	}
 
-	public void setTermId(long termId) {
-		this.termId = termId;
+	public void setSelectedTermId(long selectedTermId) {
+		this.selectedTermId = selectedTermId;
 	}
 	
 	public ArrayList<HashMap<String, Object>> getAdminData() {
@@ -373,4 +362,5 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 	public void setTaJson(String taJson) {
 		this.taJson = taJson;
 	}
+	
 }

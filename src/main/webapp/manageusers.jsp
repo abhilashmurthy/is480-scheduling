@@ -26,19 +26,25 @@
 
 			<section id='users'>
 				<h3>Users</h3>
-				<table class="selectTermTable">
-					<tr>
-						<td class="formLabelTd">Select Term</td>
-						<td>
-							<select class="termPicker" name="termId" onchange="this.form.submit()">
-								<option value='<%= ((Term) session.getAttribute("currentActiveTerm")).getId()%>'><%= ((Term) session.getAttribute("currentActiveTerm")).getDisplayName()%></option>
-								<s:iterator value="termData">
-									<option value="<s:property value="termId"/>"><s:property value="termName"/></option>
-								</s:iterator>
-							</select>
-						</td>
-					</tr>
-				</table>
+				<form method="POST">
+					<table class="selectTermTable">
+						<tr>
+							<td class="formLabelTd">Select Term</td>
+							<td>
+								<select class="termPicker" name="selectedTermId" onchange="this.form.submit()">
+									<s:iterator var="term" value="termData">
+										<s:if test="%{selectedTermId > 0 && selectedTermId == #term.termId}">
+											<option value="<s:property value="#term.termId"/>" selected><s:property value="#term.termName"/></option>
+										</s:if>
+										<s:else>
+											<option value="<s:property value="#term.termId"/>"><s:property value="#term.termName"/></option>
+										</s:else>
+									</s:iterator>
+								</select>
+							</td>
+						</tr>
+					</table>
+				</form>
 				<button type='button' id='add_team' class='addBtn pull-right btn btn-primary'>
 					<i class='fa fa fa-plus fa-white'></i> Add Team
 				</button>
@@ -92,7 +98,7 @@
 									</s:iterator>
 								</s:if>
 								<s:else>
-									<tr><h3 class='noUsersMsg'>No Team set!</h3></tr>
+									<tr><td colspan="8"><h3 class='noUsersMsg'>No Team set!</h3></td></tr>
 								</s:else>
 							</tbody>
 						</table>
