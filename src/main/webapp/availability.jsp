@@ -340,7 +340,8 @@
 										}
 									}
 								});
-							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] === dateTime){
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]
+									+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
 								$('.timeslotcell').each(function(){
 									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
 										if(($(this).attr('class')).indexOf("chosen") > 0) {
@@ -367,7 +368,8 @@
 										}
 									}
 								});
-							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] === dateTime){
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] 
+										+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
 								$('.timeslotcell').each(function(){
 									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
 										if(($(this).attr('class')).indexOf("available") > 0) {
@@ -388,8 +390,6 @@
                     var thead = $(document.createElement("tr"));
                     var minTime = 9;
                     var maxTime = 19;
-					
-					var difference = maxTime - minTime;
 
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
@@ -413,16 +413,31 @@
                         var timeVal = Date.parse(i + ":00:00");
                         timesArray.push(timeVal.toString("HH:mm"));
                         timeVal.addMinutes(30);
-                        timesArray.push(timeVal.toString("HH:mm") + "<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + i.toString() + "' id='" + i.toString() + "'/>");
-                    }
-
+                        timesArray.push(timeVal.toString("HH:mm"));
+					}
+					
+					var slotSize = scheduleData.duration / 30;
+					var counter = 1;
+					
+					var startTime = 0;
+					
                     //Constructing table body
                     for (i = 0; i < timesArray.length; i++) {
+						
+						if(counter===1){
+							startTime = Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[0]
+											+Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[1];
+						}
+						if(counter===slotSize){
+							console.log(timesArray[i]);
+							tr.append("<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>");
+							counter = 0;
+						}
                         var tr = $(document.createElement("tr"));
                         var timeTd = $(document.createElement("td"));
                         timeTd.html(timesArray[i]);
                         tr.append(timeTd);
-
+						
                         for (var j = 0; j < dateArray.length; j++) {
                             var td = $(document.createElement("td"));
                             td.addClass("timeslotcell");
@@ -430,6 +445,7 @@
                             date = new Date(date).toString("yyyy-MM-dd");
                             var datetimeString = date + " " + timesArray[i] + ":00";
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
+							
                             if (timeslot) {
                                 if (timeslot.isMyTeam) {
                                     td.html("<span class='teamName'>" + timeslot.team + "</span>");
@@ -443,7 +459,12 @@
 							td.addClass('border-left');
                             tr.append(td);
                         }
-                        $("." + tableClass).append(tr);
+						counter++;
+                        
+						
+						
+						
+						$("." + tableClass).append(tr);
                     }
                 }
 
