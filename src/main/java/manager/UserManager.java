@@ -412,7 +412,7 @@ public class UserManager {
 		return json;
 	}
 	
-	public static void deleteUser(EntityManager em, long userId) throws Exception {
+	public static void deleteUser(EntityManager em, long userId, long loggedInUserId) throws Exception {
 		User user = em.find(User.class, userId);
 		if (user == null) throw new CustomException("User not found");
 		
@@ -433,6 +433,11 @@ public class UserManager {
 			Faculty replacement = getFacultyObjForCCForTerm(em, user.getTerm());
 			TeamManager.swapFaculty(em, faculty, replacement);
 			user = faculty;
+		} else if (user.getRole() == Role.COURSE_COORDINATOR) {
+			throw new CustomException("Course Coordinator cannot be removed. Only editing of details allowed!");
+		} else if (user.getRole() == Role.ADMINISTRATOR) {
+			//Admin cannot delete himself/herself. Another administrator will have to do it for him/her
+			if (user.getId() == loggedInUserId) throw new CustomException("You cannot delete yourself! Please ask another administrator to perform this task");
 		}
 		
 		//Removing user from required attendees for all bookings

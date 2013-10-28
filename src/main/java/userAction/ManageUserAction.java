@@ -55,7 +55,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
 				result = addEditUser(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
-				result = deleteUser(dataObj);
+				result = deleteUser(dataObj, user.getId());
 			} else {
 				json.put("success", false);
 				json.put("message", "Unknown action. Options: add/edit/delete");
@@ -134,12 +134,12 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to delete an existing user from the system
-	public boolean deleteUser(JsonObject dataObj) {
+	public boolean deleteUser(JsonObject dataObj, long loggedInUserId) {
 		try {
 			long deleteUserId = 0;
 			JsonElement userIdInfo = dataObj.get("userId");
 			if (userIdInfo != null) deleteUserId = userIdInfo.getAsLong();
-			UserManager.deleteUser(em, deleteUserId);
+			UserManager.deleteUser(em, deleteUserId, loggedInUserId);
 			
 			json.put("success", true);
 			return true;
