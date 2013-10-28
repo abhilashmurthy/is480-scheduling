@@ -804,7 +804,7 @@
 							self.find('ul').remove();
 							appendTokenInput(self); //Optional attendees
 						} else if ($(e.target).attr('id') === 'wikiLink') {
-							window.location.href = $(e.target).attr('href');
+							window.open($(e.target).attr('href'), '_blank');
 						}
                         return false;
                     });
