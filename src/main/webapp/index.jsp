@@ -168,6 +168,7 @@
                 
                 //Student-specific variables
                 var teamName = "<%= team != null ? team.getTeamName() : null%>"; //Student's active team name
+				if (teamName === "null") teamName = null;
                 
                 //Admin specific variables
                 var teams = JSON.parse('<%= session.getAttribute("allTeams")%>'); //All teams JSON
@@ -379,7 +380,7 @@
 					};
 
                     //Allow team to edit booking
-                    if (timeslot.team === teamName) {
+                    if (timeslot.team !== null && timeslot.team === teamName) {
                         outputData[""] = (
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
@@ -518,7 +519,7 @@
 					}
 
                     //Popover
-                    makePopover($td.children('.booking'), timeslot.team === teamName?"<b>Your Booking</b>":"<b>Team Booking</b>", $bookingDetailsTable);
+                    makePopover($td.children('.booking'), timeslot.team !== null && timeslot.team === teamName?"<b>Your Booking</b>":"<b>Team Booking</b>", $bookingDetailsTable);
                 }
                 
                 function appendCreateBookingPopover($td) {
@@ -814,7 +815,11 @@
                             var timeslot = scheduleData.timeslots[self.attr('value')];
                             var refreshData = refreshScheduleData();
                             if (<%= activeRole.equals(Role.STUDENT) %>) {
-                                if (refreshData.bookingExists !== 0) {
+                                if (teamName === null) {
+                                    showNotification("WARNING", self, "You don't have a team for this term!");
+                                    return false;
+								}
+								if (refreshData.bookingExists !== 0) {
                                     showNotification("WARNING", refreshData.existingTimeslot, "You already have a booking!");
                                     return false;
                                 }
