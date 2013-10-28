@@ -178,8 +178,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 
                 String TA = "-";
                 map.put("TA", TA);
-                String teamWiki = "-";
-                map.put("teamWiki", teamWiki);
+                map.put("wiki", booking.getTeam().getWiki());
                 
                 //Return if no change detected
                 if ((oldTimeslot.getStartTime().equals(newBookingTimestamp)

@@ -1059,11 +1059,10 @@
 									if (response.success) {
 										setTimeout(function(){showNotification("SUCCESS", 'Deleted successfully');}, 500);
 										updateUserJsonData(user, userType.toUpperCase(), submitData);
-//										updateUserPage(user, userType.toUpperCase(), submitData);
+										updateUserPage(user, userType.toUpperCase(), submitData);
 									} else {
 										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
 									}
-									updateUserPage(user, userType.toUpperCase(), submitData);
 									return true;
 								}).fail(function(error){
 									var eid = btoa(response.message);
