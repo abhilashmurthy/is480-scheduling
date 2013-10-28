@@ -131,18 +131,10 @@ public class UserManager {
      */
     public static ArrayList<User> findActiveRolesByUsername(EntityManager em, String username, Term activeTerm) {
         logger.trace("Finding active roles for: " + username);
-        ArrayList<User> users = new ArrayList<User>();
-        try {
-            em.getTransaction().begin();
-            Query q = em.createQuery("select o from User o where o.username = :username and (term.id = :termId or term is null)");
-            q.setParameter("username", username);
-            q.setParameter("termId", activeTerm.getId());
-            users = (ArrayList<User>) q.getResultList();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            logger.error("Database Operation Error");
-            em.getTransaction().rollback();
-        }
+		Query q = em.createQuery("select o from User o where o.username = :username and (term.id = :termId or term is null)");
+		q.setParameter("username", username);
+		q.setParameter("termId", activeTerm.getId());
+		ArrayList<User> users = (ArrayList<User>) q.getResultList();
         return users;
     }
 
