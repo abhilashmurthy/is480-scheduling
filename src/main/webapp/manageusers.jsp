@@ -699,8 +699,7 @@
 								}).done(function(response) {
 									if (response.success) {
 										setTimeout(function(){showNotification("SUCCESS", action.charAt(0).toUpperCase() + action.slice(1) + 'ed successfully');}, 500);
-//										updateTeamJsonData(action === 'add'?{id: response.teamId}:null, submitData);
-										updateTeamPage(action === 'add'?{id: response.teamId}:null, submitData);
+										setTimeout(function(){window.location.reload();}, 1000);
 									} else {
 										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
 									}
@@ -723,14 +722,27 @@
 									} else {
 										var selected = '';
 										options.each(function(){
-											selected += $(this).text() + "<br/>";
+											selected += 
+													$(document.createElement('div'))
+														.addClass('selectedMember')
+														.append($(this).text()).outerHTML()
 										});
 										return selected + ' <b class="caret"></b>';
 									}
 								},
+								onChange: function($option, checked){
+									setTimeout(function(){$('.modal-body').find('input.multiselect-search').val('').change().keydown().focus();}, 50);
+									if ($option.attr('value') === 'reset') {
+										var vals = $(this).val();
+										for (var i = 0; i < vals.length; i++) {
+											$this.multiselect('deselect', vals[i]);
+										}
+									}
+									return false;
+								},
 								enableCaseInsensitiveFiltering: true,
 								filterPlaceholder: 'Search',
-								buttonClass: 'btn btn-link teamUserSelectBtn'
+								buttonClass: 'btn btn-link userSelectBtn'
 							});
 							$this.multiselect('dataprovider', convertMultiselectOptionData(studentData));
 							if (action === 'edit') {
@@ -762,10 +774,11 @@
 											}
 										}
 									}
+									setTimeout(function(){$('.modal-body').find('input.multiselect-search').val('').change().focus();}, 50);
 								},
 								enableCaseInsensitiveFiltering: true,
 								filterPlaceholder: 'Search',
-								buttonClass: 'btn btn-link teamUserSelectBtn'
+								buttonClass: 'btn btn-link userSelectBtn facultyUserSelectBtn'
 							});
 							$this.multiselect('dataprovider', convertMultiselectOptionData(facultyData));
 							if (action === 'edit') {
@@ -790,6 +803,18 @@
 						}
 					});
 					return false;
+				});				
+				
+				//Modal specific
+				$('body').on('shown', '.modal', function(){
+					$('input[type="text"]:first').focus();
+					return false;
+				});
+				$('body').on('click', '.userSelectBtn', function(e){
+					setTimeout(function(){$('.modal-body').find('input.multiselect-search').focus();}, 50);
+				});
+				$('body').on('click', '.facultyUserSelectBtn', function(){
+					$('.modal-body').animate({scrollTop: $('.modal-body').height()}, 'slow');
 				});
 				
 				/*******************/
@@ -1062,9 +1087,7 @@
 								teamId: submitData.teamId?submitData.teamId:false,
 								teamName: submitData.teamName?submitData.teamName:false,
 								myTeams: {},
-								mySignups: {},
-								label: submitData.fullName,
-								value: user.id
+								mySignups: {}
 							};
 							//Add to team data
 							if (submitData.teamName) {
@@ -1101,12 +1124,11 @@
 							}
 							//Edit Role-based Json
 							roleData[user.id] = {
+								id: user.id,
 								name: submitData.fullName,
 								username: submitData.username,
 								teamId: submitData.teamId?submitData.teamId:false,
-								teamName: submitData.teamName?submitData.teamName:false,
-								label: submitData.fullName,
-								value: user.id
+								teamName: submitData.teamName?submitData.teamName:false
 							};
 							//Edit Team-based Json
 							for (var key in teamData) {
@@ -1343,11 +1365,11 @@
 									}
 								}
 							}
+							//Change member in Teams Table
+							$('#teamsTable').find('#member_' + submitData.userId).fadeOut('slow', function(){
+								$(this).remove();
+							});
 							if (submitData.teamName) {
-								//Change member in Teams Table
-								$('#teamsTable').find('#member_' + submitData.userId).fadeOut('slow', function(){
-									$(this).remove();
-								});
 								var $newTr = getTrFromTable('teamsTable', 'teamName', submitData.teamName);
 								$newTr.find('.memberList').append(
 									$(document.createElement('span'))
@@ -1397,315 +1419,6 @@
 							}
 							break;
 						case 'delete':
-							break;
-						default:
-							console.log('Action: ' + submitData.action);
-							showNotification('ERROR', 'Unknown action');
-							return false;
-					}
-				}
-				
-				function updateTeamJsonData(team, submitData) {
-					if (submitData.action === 'add' || submitData.action === 'edit') {
-						//Add/Edit to team and user data
-						var teamId = submitData.action === 'add'?team.id:submitData.teamId;
-						var newMemberArray = new Array();
-						for (var i = 0; submitData.members.length; i++) {
-							newMemberArray.push({id: submitData.members[i]});
-						}
-						var supervisor = facultyData[submitData.supervisor];
-						supervisor.supervisorTeams.push({
-							teamId: teamId,
-							teamName: submitData.name
-						});
-						var reviewer1 = facultyData[submitData.reviewer1];
-						reviewer1.reviewer1Teams.push({
-							teamId: teamId,
-							teamName: submitData.name
-						});
-						var reviewer2 = facultyData[submitData.reviewer2];
-						reviewer2.reviewer2Teams.push({
-							teamId: teamId,
-							teamName: submitData.name
-						});
-						teamData[teamId] = {
-							id: teamId,
-							teamName: submitData.name,
-							wiki: submitData.wiki,
-							members: newMemberArray,
-							supervisor: supervisor,
-							reviewer1: reviewer1,
-							reviewer2: reviewer2
-						};
-						console.log('New team data: ' + JSON.stringify(teamData[teamId]));
-					} else if (submitData.action === 'delete') {
-						delete teamData[submitData.teamId];
-						for (var key in studentData) {
-							if (studentData.hasOwnProperty(key)) {
-								var student = studentData[key];
-								if (parseInt(student.teamId) === submitData.teamId) {
-									delete student.teamId;
-									delete student.teamName;
-								}
-							}
-						}
-						for (var key in facultyData) {
-							if (facultyData.hasOwnProperty(key)) {
-								var faculty = facultyData[key];
-								for (var i = 0; i < faculty.supervisorTeams.length; i++) {
-									if (parseInt(faculty.supervisorTeams[i].teamId) === parseInt(submitData.teamId)) {
-										delete faculty.supervisorTeams[i];
-									}
-								}
-								for (var i = 0; i < faculty.reviewer1Teams.length; i++) {
-									if (parseInt(faculty.reviewer1Teams[i].teamId) === parseInt(submitData.teamId)) {
-										delete faculty.reviewer1Teams[i];
-									}
-								}
-								for (var i = 0; i < faculty.reviewer2Teams.length; i++) {
-									if (parseInt(faculty.reviewer2Teams[i].teamId) === parseInt(submitData.teamId)) {
-										delete faculty.reviewer2Teams[i];
-									}
-								}
-							}
-						}
-					} else {
-						console.log('Action: ' + submitData.action);
-						showNotification('ERROR', 'Unknown team action');
-					}
-					return false;
-				}
-				
-				function updateTeamPage(team, submitData) {
-					switch (submitData.action) {
-						case 'add':
-							//Remove members from other teams
-							for (var i = 0; i < submitData.members.length; i++) {
-								var student = studentData[submitData.members[i]];
-								$('#teamsTable').find('#member_' + student.id).fadeOut('slow', function(){
-									$(this).remove();
-								});
-							}
-							//Add to team table
-							var $lastTr = $('#teamsTable tr:last');
-							$lastTr.after(
-								$(document.createElement('tr'))
-									.addClass('teamRow')
-									.attr('id', 'team_' + team.id)
-									.append(
-										$(document.createElement('td'))
-											.append(
-												$(document.createElement('i')).addClass('fa fa-group fa-black')
-											)
-									)
-									.append(
-										$(document.createElement('td'))
-											.addClass('teamName')
-											.append(
-												submitData.name
-											)
-									)
-									.append(
-										$(document.createElement('td'))
-											.addClass('members')
-											.append(
-												$(document.createElement('div'))
-													.addClass('memberList')
-													.append(function(){
-														var $spanArray = new Array();
-														for (var i = 0; i < submitData.members.length; i++) {
-															var student = studentData[submitData.members[i]];
-															$spanArray.push(
-																$(document.createElement('span'))
-																	.addClass('memberName')
-																	.attr('id', 'member_' + student.id)
-																	.append(
-																		$(document.createElement('a'))
-																			.addClass('teamStudentLink')
-																			.attr('id', 'teamStudent_' + student.id)
-																			.attr('href', 'member_' + student.username)
-																			.html(student.name)
-																	)
-															);
-														}
-														return $spanArray;
-													})
-											)
-									)
-									.append(
-										$(document.createElement('td'))
-											.addClass('supervisor')
-											.append(function(){
-												var supervisor = facultyData[submitData.supervisor];
-												return $(document.createElement('a'))
-													.addClass('teamFacultyLink')
-													.attr('id', 'teamSupervisor_' + supervisor.id)
-													.attr('href', 'supervisor_' + submitData.teamName)
-													.html(supervisor.name);
-											})
-									)
-									.append(
-										$(document.createElement('td'))
-											.addClass('reviewer1')
-											.append(function(){
-												var reviewer1 = facultyData[submitData.reviewer1];
-												return $(document.createElement('a'))
-													.addClass('teamFacultyLink')
-													.attr('id', 'teamReviewer1_' + reviewer1.id)
-													.attr('href', 'reviewer1_' + submitData.teamName)
-													.html(reviewer1.name);
-											})
-									)
-									.append(
-										$(document.createElement('td'))
-											.addClass('reviewer2')
-											.append(function(){
-												var reviewer2 = facultyData[submitData.reviewer2];
-												return $(document.createElement('a'))
-													.addClass('teamFacultyLink')
-													.attr('id', 'teamReviewer2_' + reviewer2.id)
-													.attr('href', 'reviewer2_' + submitData.teamName)
-													.html(reviewer2.name);
-											})
-									)
-									.append(
-										$(document.createElement('td'))
-											.append(
-												$(document.createElement('button'))
-													.attr('type', 'button')
-													.attr('title', 'Edit')
-													.addClass('editTeamBtn btn btn-info')
-													.append(
-														$(document.createElement('i')).addClass('fa fa-pencil fa-white')
-													)
-											)
-									)
-									.append(
-										$(document.createElement('td'))
-											.append(
-												$(document.createElement('button'))
-													.attr('type', 'button')
-													.attr('title', 'Delete')
-													.addClass('modBtn delBtn btn btn-danger')
-													.append(
-														$(document.createElement('i')).addClass('fa fa-trash-o fa-white')
-													)
-											)
-									)
-							);
-							//Add team to student table
-							for (var i = 0; i < submitData.members.length; i++) {
-								var student = studentData[submitData.members[i]];
-								$('#studentUsersTable').find('#user_' + student.id)
-									.children('.teamName')
-									.empty()
-									.append(
-										$(document.createElement('a'))
-											.addClass('studentTeamLink')
-											.attr('id', 'teams_' + team.id)
-											.attr('href', 'teams_' + submitData.name)
-											.html(submitData.name)
-									);
-							}
-							//Add team to faculty table
-							console.log($('#facultyUsersTable').find('#user_' + submitData.supervisor));
-							$('#facultyUsersTable').find('#user_' + submitData.supervisor)
-								.find('.supervisorMyTeams > .memberList')
-								.append(
-									$(document.createElement('span'))
-										.addClass('memberName')
-										.attr('id', 'supervisorMyTeam_' + team.id)
-										.append(
-										$(document.createElement('a'))
-											.addClass('studentTeamLink')
-											.attr('id', 'teams_' + team.id)
-											.attr('href', 'teams_' + submitData.name)
-											.html(submitData.name)
-										)
-								);
-							$('#facultyUsersTable').find('#user_' + submitData.reviewer1)
-								.find('.reviewer1MyTeams > .memberList')
-								.append(
-									$(document.createElement('span'))
-										.addClass('memberName')
-										.attr('id', 'reviewer1MyTeam_' + team.id)
-										.append(
-										$(document.createElement('a'))
-											.addClass('studentTeamLink')
-											.attr('id', 'teams_' + team.id)
-											.attr('href', 'teams_' + submitData.name)
-											.html(submitData.name)
-										)
-								);
-							$('#facultyUsersTable').find('#user_' + submitData.reviewer2)
-								.find('.reviewer2MyTeams > .memberList')
-								.append(
-									$(document.createElement('span'))
-										.addClass('memberName')
-										.attr('id', 'reviewer2MyTeam_' + team.id)
-										.append(
-										$(document.createElement('a'))
-											.addClass('studentTeamLink')
-											.attr('id', 'teams_' + team.id)
-											.attr('href', 'teams_' + submitData.name)
-											.html(submitData.name)
-										)
-								);
-							break;
-						case 'edit':
-							//Edit in team table
-							var $teamTr = $('#teamsTable').find('#team_' + submitData.teamId);
-							$teamTr.children('.teamName').empty().append(submitData.name);
-							$teamTr.find('.memberList').empty().append(function(){
-								var $spanArray = new Array();
-								for (var i = 0; i < submitData.members.length; i++) {
-									var student = studentData[submitData.members[i]];
-									$spanArray.push(
-										$(document.createElement('span'))
-											.addClass('memberName')
-											.attr('id', 'member_' + student.id)
-											.append(
-												$(document.createElement('a'))
-													.addClass('teamStudentLink')
-													.attr('id', 'teamStudent_' + student.id)
-													.attr('href', 'member_' + student.username)
-													.html(student.name)
-											)
-									);
-								}
-								return $spanArray;
-							});
-							$teamTr.children('.supervisor').empty().append(function(){
-								var supervisor = facultyData[submitData.supervisor];
-								return $(document.createElement('a'))
-									.addClass('teamFacultyLink')
-									.attr('id', 'teamSupervisor_' + supervisor.id)
-									.attr('href', 'supervisor_' + submitData.teamName)
-									.html(supervisor.name);
-							});
-							$teamTr.children('.reviewer1').empty().append(function(){
-								var reviewer1 = facultyData[submitData.reviewer1];
-								return $(document.createElement('a'))
-									.addClass('teamFacultyLink')
-									.attr('id', 'teamSupervisor_' + reviewer1.id)
-									.attr('href', 'supervisor_' + submitData.teamName)
-									.html(reviewer1.name);
-							});
-							$teamTr.children('.reviewer2').empty().append(function(){
-								var reviewer2 = facultyData[submitData.reviewer2];
-								return $(document.createElement('a'))
-									.addClass('teamFacultyLink')
-									.attr('id', 'teamSupervisor_' + reviewer2.id)
-									.attr('href', 'supervisor_' + submitData.teamName)
-									.html(reviewer2.name);
-							});
-							//Edit in student table
-							//Edit in faculty table
-							break;
-						case 'delete':
-							//Delete from student table
-							//Delete from faculty table
-							//Delete from team table
 							break;
 						default:
 							console.log('Action: ' + submitData.action);
