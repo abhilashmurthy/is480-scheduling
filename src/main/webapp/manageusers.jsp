@@ -4,18 +4,18 @@
   Author   : Abhilash
 --%>
 
-<%@page import="model.Term"%>
-<%@ taglib prefix="s" uri="/struts-tags" %>
+<%@page import= "model.Term"%>
+<%@ taglib prefix= "s" uri= "/struts-tags" %>
 
 <!DOCTYPE html>
 <html>
 	<head>
-		<%@include file="header.jsp" %>
+		<%@include file= "header.jsp" %>
 		<title>IS480 Scheduling System | Users </title>
 	</head>
 	<body>
-		<%@include file="navbar.jsp" %>
-		<div class="container usersPage">
+		<%@include file= "navbar.jsp" %>
+		<div class= "container usersPage">
 			<!-- Kick unauthorized user -->
 			<% if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
 					request.setAttribute("error", "Oops. You are not authorized to access this page!");
@@ -26,18 +26,18 @@
 
 			<section id='users'>
 				<h3>Users</h3>
-				<form method="POST">
-					<table class="selectTermTable">
+				<form method= "POST">
+					<table class= "selectTermTable">
 						<tr>
-							<td class="formLabelTd">Select Term</td>
+							<td class= "formLabelTd">Select Term</td>
 							<td>
-								<select class="termPicker" name="selectedTermId" onchange="this.form.submit()">
-									<s:iterator var="term" value="termData">
-										<s:if test="%{selectedTermId > 0 && selectedTermId == #term.termId}">
-											<option value="<s:property value="#term.termId"/>" selected><s:property value="#term.termName"/></option>
+								<select class= "termPicker" name= "selectedTermId">
+									<s:iterator var= "term" value= "termData">
+										<s:if test= "%{selectedTermId > 0 && selectedTermId == #term.termId}">
+											<option value= "<s:property value= "#term.termId"/>" selected><s:property value= "#term.termName"/></option>
 										</s:if>
 										<s:else>
-											<option value="<s:property value="#term.termId"/>"><s:property value="#term.termName"/></option>
+											<option value= "<s:property value= "#term.termId"/>"><s:property value= "#term.termName"/></option>
 										</s:else>
 									</s:iterator>
 								</select>
@@ -51,7 +51,7 @@
 				<button type='button' id='add_student' class='addBtn pull-right btn btn-primary' style='display:none'>
 					<i class='fa fa fa-plus fa-white'></i> Add Student
 				</button>
-				<button type='button' title="Edit Course Coordinator" class='editAdminBtn pull-right editBtn btn btn-info' style='display:none'>
+				<button type='button' title= "Edit Course Coordinator" class='editAdminBtn pull-right editBtn btn btn-info' style='display:none'>
 					<i class='fa fa fa-pencil fa-white'></i> Edit Course Coordinator
 				</button>
 				<ul class='usersNav nav nav-tabs' id='myTab'>
@@ -70,30 +70,30 @@
 								<tr><th></th><th>Name</th><th>Members</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
-								<s:if test="%{teamData != null && teamData.size() > 0}">
-									<s:iterator var="team" value="teamData">
-										<tr id='team_<s:property value="id"/>' class='teamRow'>
+								<s:if test= "%{teamData != null && teamData.size() > 0}">
+									<s:iterator var= "team" value= "teamData">
+										<tr id='team_<s:property value= "id"/>' class='teamRow'>
 											<td><i class='fa fa fa-group fa-black'></i></td>
-											<td class='teamName'><s:property value="teamName"/></td>
+											<td class='teamName'><s:property value= "teamName"/></td>
 											<td class='members'>
 												<div class='memberList'>
-													<s:iterator var="member" value="members">
-														<span id='member_<s:property value="#member.id"/>' class='memberName'>
-															<a class='teamStudentLink' id='teamStudent_<s:property value="#member.id"/>' href='member_<s:property value="#member.username"/>'><s:property value="#member.name"/></a>
+													<s:iterator var= "member" value= "members">
+														<span id='member_<s:property value= "#member.id"/>' class='memberName'>
+															<a class='teamStudentLink' id='teamStudent_<s:property value= "#member.id"/>' href='member_<s:property value= "#member.username"/>'><s:property value= "#member.name"/></a>
 														</span>
 													</s:iterator>
 												</div>
 											</td>
-											<td class='supervisor'><a class='teamFacultyLink teamSupervisor_<s:property value="#team.supervisor.id"/>' href='supervisor_<s:property value="#team.teamName"/>'><s:property value="supervisor.name"/></a></td>
-											<td class='reviewer1'><a class='teamFacultyLink teamReviewer1_<s:property value="#team.reviewer1.id"/>' href='reviewer1_<s:property value="#team.teamName"/>'><s:property value="reviewer1.name"/></a></td>
-											<td class='reviewer2'><a class='teamFacultyLink teamReviewer2_<s:property value="#team.reviewer2.id"/>' href='reviewer2_<s:property value="#team.teamName"/>'><s:property value="reviewer2.name"/></a></td>
+											<td class='supervisor'><a class='teamFacultyLink teamSupervisor_<s:property value= "#team.supervisor.id"/>' href='supervisor_<s:property value= "#team.teamName"/>'><s:property value= "supervisor.name"/></a></td>
+											<td class='reviewer1'><a class='teamFacultyLink teamReviewer1_<s:property value= "#team.reviewer1.id"/>' href='reviewer1_<s:property value= "#team.teamName"/>'><s:property value= "reviewer1.name"/></a></td>
+											<td class='reviewer2'><a class='teamFacultyLink teamReviewer2_<s:property value= "#team.reviewer2.id"/>' href='reviewer2_<s:property value= "#team.teamName"/>'><s:property value= "reviewer2.name"/></a></td>
 											<td>
-												<button type='button' title="Edit" class='editTeamBtn btn btn-info'>
+												<button type='button' title= "Edit" class='editTeamBtn btn btn-info'>
 													<i class='fa fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title="Delete User" class='delTeamBtn btn btn-danger'>
+												<button type='button' title= "Delete User" class='delTeamBtn btn btn-danger'>
 													<i class='fa fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
@@ -101,7 +101,7 @@
 									</s:iterator>
 								</s:if>
 								<s:else>
-									<tr><td colspan="8"><h3 class='noUsersMsg'>No Team set!</h3></td></tr>
+									<tr><td colspan= "8"><h3 class='noUsersMsg'>No Team set!</h3></td></tr>
 								</s:else>
 							</tbody>
 						</table>
@@ -113,26 +113,26 @@
 								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Team</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
-								<s:if test="%{studentData != null && studentData.size() > 0}">
-									<s:iterator var="student" value="studentData">
-										<tr id='user_<s:property value="id"/>' class='studentRow'>
+								<s:if test= "%{studentData != null && studentData.size() > 0}">
+									<s:iterator var= "student" value= "studentData">
+										<tr id='user_<s:property value= "id"/>' class='studentRow'>
 											<td><i class='fa fa fa-user fa-black'></i></td>
-											<td class='fullName'><s:property value="name"/></td>
-											<td class='username'><s:property value="username"/></td>
-											<td class='mobileNumber'><s:property value="mobileNumber"/></td>
-											<s:if test="%{#student.teamName!=null}">
-												<td class='teamName'><a class='studentTeamLink' id='teams_<s:property value="teamId"/>' href='team_<s:property value="teamName"/>'><s:property value="teamName"/></a></td>
+											<td class='fullName'><s:property value= "name"/></td>
+											<td class='username'><s:property value= "username"/></td>
+											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
+											<s:if test= "%{#student.teamName!=null}">
+												<td class='teamName'><a class='studentTeamLink' id='teams_<s:property value= "teamId"/>' href='team_<s:property value= "teamName"/>'><s:property value= "teamName"/></a></td>
 												</s:if>
 												<s:else>
-												<td class='teamName'><a class='assignTeamsLink' id='assignTeams_<s:property value="id"/>' href='assignTeams_<s:property value="id"/>'>- Assign Team</a></td>
+												<td class='teamName'><a class='assignTeamsLink' id='assignTeams_<s:property value= "id"/>' href='assignTeams_<s:property value= "id"/>'>- Assign Team</a></td>
 												</s:else>
 											<td class='editTd'>
-												<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
 													<i class='fa fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td class='deleteTd'>
-												<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
+												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
 													<i class='fa fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
@@ -152,62 +152,62 @@
 								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
-								<s:if test="%{facultyData != null && facultyData.size() > 0}">
-									<s:iterator var="faculty" value="facultyData">
-										<tr id='user_<s:property value="id"/>' class='facultyRow'>
+								<s:if test= "%{facultyData != null && facultyData.size() > 0}">
+									<s:iterator var= "faculty" value= "facultyData">
+										<tr id='user_<s:property value= "id"/>' class='facultyRow'>
 											<td><i class='fa fa-briefcase fa-black'></i></td>
-											<td class='fullName'><s:property value="name"/></td>
-											<td class='username'><s:property value="username"/></td>
-											<td class='mobileNumber'><s:property value="mobileNumber"/></td>
+											<td class='fullName'><s:property value= "name"/></td>
+											<td class='username'><s:property value= "username"/></td>
+											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
 											<td class='supervisorMyTeams'>
-												<s:if test="%{#faculty.supervisorTeams.size() > 0}">
+												<s:if test= "%{#faculty.supervisorTeams.size() > 0}">
 													<div class='memberList'>
-														<s:iterator var="supervisorTeam" value="supervisorTeams">
-															<span id='supervisorMyTeam_<s:property value="#supervisorTeam.teamId"/>' class='memberName'>
-																<a class='studentTeamLink' id='supervisorMyTeam_<s:property value="#supervisorTeam.teamId"/>' href='team_<s:property value="#supervisorTeam.teamId"/>'><s:property value="#supervisorTeam.teamName"/></a>
+														<s:iterator var= "supervisorTeam" value= "supervisorTeams">
+															<span id='supervisorMyTeam_<s:property value= "#supervisorTeam.teamId"/>' class='memberName'>
+																<a class='studentTeamLink' id='supervisorMyTeam_<s:property value= "#supervisorTeam.teamId"/>' href='team_<s:property value= "#supervisorTeam.teamId"/>'><s:property value= "#supervisorTeam.teamName"/></a>
 															</span>
 														</s:iterator>
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>- Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Team</a>
 												</s:else>
 											</td>
 											<td class='reviewer1MyTeams'>
-												<s:if test="%{#faculty.reviewer1Teams.size() > 0}">
+												<s:if test= "%{#faculty.reviewer1Teams.size() > 0}">
 													<div class='memberList'>
-														<s:iterator var="reviewer1Team" value="reviewer1Teams">
-															<span id='reviewer1Team_<s:property value="#reviewer1Team.teamId"/>' class='memberName'>
-																<a class='studentTeamLink' id='reviewer1MyTeam_<s:property value="#reviewer1Team.teamId"/>' href='team_<s:property value="#reviewer1Team.teamId"/>'><s:property value="#reviewer1Team.teamName"/></a>
+														<s:iterator var= "reviewer1Team" value= "reviewer1Teams">
+															<span id='reviewer1Team_<s:property value= "#reviewer1Team.teamId"/>' class='memberName'>
+																<a class='studentTeamLink' id='reviewer1MyTeam_<s:property value= "#reviewer1Team.teamId"/>' href='team_<s:property value= "#reviewer1Team.teamId"/>'><s:property value= "#reviewer1Team.teamName"/></a>
 															</span>
 														</s:iterator>
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>- Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Team</a>
 												</s:else>
 											</td>
 											<td class='reviewer2MyTeams'>
-												<s:if test="%{#faculty.reviewer2Teams.size() > 0}">
+												<s:if test= "%{#faculty.reviewer2Teams.size() > 0}">
 													<div class='memberList'>
-														<s:iterator var="reviewer2Team" value="reviewer2Teams">
-															<span id='reviewer2Team_<s:property value="#reviewer2Team.teamId"/>' class='memberName'>
-																<a class='studentTeamLink' id='reviewer2MyTeam_<s:property value="#reviewer2Team.teamId"/>' href='team_<s:property value="#reviewer2Team.teamId"/>'><s:property value="#reviewer2Team.teamName"/></a>
+														<s:iterator var= "reviewer2Team" value= "reviewer2Teams">
+															<span id='reviewer2Team_<s:property value= "#reviewer2Team.teamId"/>' class='memberName'>
+																<a class='studentTeamLink' id='reviewer2MyTeam_<s:property value= "#reviewer2Team.teamId"/>' href='team_<s:property value= "#reviewer2Team.teamId"/>'><s:property value= "#reviewer2Team.teamName"/></a>
 															</span>
 														</s:iterator>
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>- Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Team</a>
 												</s:else>
 											</td>
 											<td>
-												<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
 													<i class='fa fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
+												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
 													<i class='fa fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
@@ -227,23 +227,23 @@
 								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Signups</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
-								<s:if test="%{taData != null && taData.size() > 0}">
-									<s:iterator var="ta" value="taData">
-										<tr id='user_<s:property value="id"/>' class='taRow'>
+								<s:if test= "%{taData != null && taData.size() > 0}">
+									<s:iterator var= "ta" value= "taData">
+										<tr id='user_<s:property value= "id"/>' class='taRow'>
 											<td><i class='fa fa-video-camera fa-black'></i></td>
-											<td class='fullName'><s:property value="name"/></td>
-											<td class='username'><s:property value="username"/></td>
-											<td class='mobileNumber'><s:property value="mobileNumber"/></td>
+											<td class='fullName'><s:property value= "name"/></td>
+											<td class='username'><s:property value= "username"/></td>
+											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
 											<td>
-												<a class='taSignupsLink' id='signups_<s:property value="id"/>' href='ta_<s:property value="username"/>'><s:property value="%{#ta.mySignups.size()}"/></a>
+												<a class='taSignupsLink' id='signups_<s:property value= "id"/>' href='ta_<s:property value= "username"/>'><s:property value= "%{#ta.mySignups.size()}"/></a>
 											</td>
 											<td>
-												<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
 													<i class='fa fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
+												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
 													<i class='fa fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
@@ -263,20 +263,20 @@
 								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
-								<s:if test="%{adminData != null && adminData.size() > 0}">
-									<s:iterator var="admin" value="adminData">
-										<tr id='user_<s:property value="id"/>' class='adminRow'>
+								<s:if test= "%{adminData != null && adminData.size() > 0}">
+									<s:iterator var= "admin" value= "adminData">
+										<tr id='user_<s:property value= "id"/>' class='adminRow'>
 											<td><i class='fa fa fa-eye fa-black'></i></td>
-											<td class='fullName'><s:property value="name"/></td>
-											<td class='username'><s:property value="username"/></td>
-											<td class='mobileNumber'><s:property value="mobileNumber"/></td>
+											<td class='fullName'><s:property value= "name"/></td>
+											<td class='username'><s:property value= "username"/></td>
+											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
 											<td>
-												<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
 													<i class='fa fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title="Delete User" class='modBtn delBtn btn btn-danger'>
+												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
 													<i class='fa fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
@@ -296,13 +296,13 @@
 								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th></tr>
 							</thead>
 							<tbody>
-								<s:if test="%{ccData != null && ccData.size() > 0}">
-									<s:iterator var="cc" value="ccData">
-										<tr id='user_<s:property value="id"/>' class='ccRow'>
+								<s:if test= "%{ccData != null && ccData.size() > 0}">
+									<s:iterator var= "cc" value= "ccData">
+										<tr id='user_<s:property value= "id"/>' class='ccRow'>
 											<td><i class='fa fa fa-coffee fa-black'></i></td>
-											<td class='fullName'><s:property value="name"/></td>
-											<td class='username'><s:property value="username"/></td>
-											<td class='mobileNumber'><s:property value="mobileNumber"/></td>
+											<td class='fullName'><s:property value= "name"/></td>
+											<td class='username'><s:property value= "username"/></td>
+											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
 										</tr>
 									</s:iterator>
 								</s:if>
@@ -316,8 +316,8 @@
 			</section>
 		</div>
 
-		<%@include file="footer.jsp"%>
-		<script type="text/javascript">
+		<%@include file= "footer.jsp"%>
+		<script type= "text/javascript">
 			manageUsersLoad = function() {
 				var adminData = null;
 				var ccData = null;
@@ -325,17 +325,17 @@
 				var studentData = null;
 				var facultyData = null;
 				var taData = null;
-				var termId = parseInt('<s:property value="selectedTermId"/>') !== 0? parseInt('<s:property value="selectedTermId"/>') : parseInt("<%= ((Term) session.getAttribute("currentActiveTerm")).getId() %>");
+				var termId = parseInt('<s:property value= "selectedTermId"/>') !== 0? parseInt('<s:property value= "selectedTermId"/>') : parseInt("<%= ((Term) session.getAttribute("currentActiveTerm")).getId() %>");
 				
 				loadUsers();
 				
 				function loadUsers() {
-					adminData = convertUserData(JSON.parse('<s:property escape="false" value="adminJson"/>'));
-					ccData = convertUserData(JSON.parse('<s:property escape="false" value="ccJson"/>'));
-					teamData = convertUserData(JSON.parse('<s:property escape="false" value="teamJson"/>'));
-					studentData = convertUserData(JSON.parse('<s:property escape="false" value="studentJson"/>'));
-					facultyData = convertUserData(JSON.parse('<s:property escape="false" value="facultyJson"/>'));
-					taData = convertUserData(JSON.parse('<s:property escape="false" value="taJson"/>'));
+					adminData = convertUserData(JSON.parse('<s:property escape= "false" value= "adminJson"/>'));
+					ccData = convertUserData(JSON.parse('<s:property escape= "false" value= "ccJson"/>'));
+					teamData = convertUserData(JSON.parse('<s:property escape= "false" value= "teamJson"/>'));
+					studentData = convertUserData(JSON.parse('<s:property escape= "false" value= "studentJson"/>'));
+					facultyData = convertUserData(JSON.parse('<s:property escape= "false" value= "facultyJson"/>'));
+					taData = convertUserData(JSON.parse('<s:property escape= "false" value= "taJson"/>'));
 					console.log('\n\nAdmin data: ' + JSON.stringify(adminData));
 					console.log('\n\nCC data: ' + JSON.stringify(ccData));
 					console.log('\n\nTeam data: ' + JSON.stringify(teamData));
@@ -368,7 +368,7 @@
 					if (userType === 'student') {
 						for (var key in jsonData) {
 							if (jsonData.hasOwnProperty(key)) {
-								if (!jsonData[key].teamId) {
+								if (!jsonData[key].teamName) {
 									multiselectOptionArray.push({
 										label: jsonData[key].name + ' (No Team)',
 										value: jsonData[key].id,
@@ -545,6 +545,18 @@
 				/****************/
 				/* BUTTONS  */
 				/***************/
+				
+				$('.termPicker').on('change', function(){
+					if (oTables.length > 0) {
+						console.log('oTables: ' + oTables.length);
+						for (var i = 0; i < oTables.length; i++) {
+							oTables[i].fnDestroy();
+						}
+					}
+					$(".userTable").empty();
+					window.location = "users?selectedTermId=" + $(this).val();
+					return false;
+				});
 				
 				$('body').on('click', '.editAdminBtn', function(){
 					var $this = $(this);
@@ -749,14 +761,14 @@
 								}).done(function(response) {
 									if (response.success) {
 										setTimeout(function(){showNotification("SUCCESS", action.charAt(0).toUpperCase() + action.slice(1) + 'ed successfully');}, 500);
-										setTimeout(function(){window.location.reload();}, 1000);
+										setTimeout(function(){window.location = "users?selectedTermId=" + termId;}, 1000);
 									} else {
 										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
 									}
 									return true;
 								}).fail(function(error){
 									var eid = btoa(response.message);
-									window.location = "error.jsp?eid=" + eid;
+									window.location = "error.jsp?eid= " + eid;
 								});
 							}
 						}
@@ -786,14 +798,14 @@
 								}).done(function(response) {
 									if (response.success) {
 										setTimeout(function(){showNotification("SUCCESS", 'Deleted team successfully');}, 500);
-										setTimeout(function(){window.location.reload();}, 1000);
+										setTimeout(function(){window.location = "users?selectedTermId=" + termId;}, 1000);
 									} else {
 										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
 									}
 									return true;
 								}).fail(function(error){
 									var eid = btoa(response.message);
-									window.location = "error.jsp?eid=" + eid;
+									window.location = "error.jsp?eid= " + eid;
 								});
 							}
 						}
@@ -803,7 +815,7 @@
 				
 				//Modal specific
 				$('body').on('shown', '.modal', function(){
-					$('input[type="text"]:first').focus();
+					$('input[type= "text"]:first').focus();
 					return false;
 				});
 				$('body').on('click', '.userSelectBtn', function(e){
@@ -935,7 +947,7 @@
 									return true;
 								}).fail(function(error){
 									var eid = btoa(response.message);
-									window.location = "error.jsp?eid=" + eid;
+									window.location = "error.jsp?eid= " + eid;
 								});
 							}
 						}
@@ -1032,7 +1044,7 @@
 									return true;
 								}).fail(function(error){
 									var eid = btoa(response.message);
-									window.location = "error.jsp?eid=" + eid;
+									window.location = "error.jsp?eid= " + eid;
 								});
 							}
 						}
@@ -1066,7 +1078,7 @@
 									return true;
 								}).fail(function(error){
 									var eid = btoa(response.message);
-									window.location = "error.jsp?eid=" + eid;
+									window.location = "error.jsp?eid= " + eid;
 								});
 							}
 						}
@@ -1105,7 +1117,9 @@
 								username: submitData.username,
 								teamId: submitData.teamId?submitData.teamId:false,
 								teamName: submitData.teamName?submitData.teamName:false,
-								myTeams: {},
+								supervisorTeams: [],
+								reviewer1Teams: [],
+								reviewer2Teams: [],
 								mySignups: {}
 							};
 							//Add to team data
@@ -1473,7 +1487,7 @@
 							$this.multiselect({
 								buttonText: function(options, select) {
 									if (options.length === 0) {
-										return 'Select Students <b class="caret"></b>';
+										return 'Select Students <b class= "caret"></b>';
 									} else {
 										var selected = '';
 										options.each(function(){
@@ -1482,7 +1496,7 @@
 														.addClass('selectedMember')
 														.append($(this).text()).outerHTML()
 										});
-										return selected + ' <b class="caret"></b>';
+										return selected + ' <b class= "caret"></b>';
 									}
 								},
 								onChange: function($option, checked){
@@ -1506,13 +1520,13 @@
 							$this.multiselect({
 								buttonText: function(options, select) {
 									if (options.length === 0) {
-										return 'Select Faculty <b class="caret"></b>';
+										return 'Select Faculty <b class= "caret"></b>';
 									} else {
 										var selected = '';
 										options.each(function(){
 											selected += $(this).text();
 										});
-										return selected + ' <b class="caret"></b>';
+										return selected + ' <b class= "caret"></b>';
 									}
 								},
 								onChange: function($option, checked) {
@@ -1597,14 +1611,21 @@
 				}
 				
 				/** DataTables **/
-				$('.usersTable').dataTable({
-					aaSorting: [[1, "asc"]],
-					bPaginate: false,
-					bJqueryUI: false,
-					bLengthChange: true,
-					bFilter: false,
-					bSort: true,
-					sDom: '<lfti>'
+				var oTables = new Array();
+				$('.usersTable').each(function(){
+					if ($(this).find('tbody tr').length > 1) {
+						oTables.push(
+							$(this).dataTable({
+								aaSorting: [[1, "asc"]],
+								bPaginate: false,
+								bJqueryUI: false,
+								bLengthChange: true,
+								bFilter: false,
+								bSort: true,
+								sDom: '<lfti>'
+							})
+						);
+					}
 				});
 				
 				function updateRowCount(tableId) {

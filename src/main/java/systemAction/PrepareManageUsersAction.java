@@ -78,7 +78,6 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 				Term term = (Term) session.getAttribute("currentActiveTerm");
 				if (selectedTermId != 0) {
 					term = TermManager.findTermById(em, selectedTermId);
-					//UserManager.initializeUser(em, session, user.getUsername(), user.getFullName(), term); SURESH PLEASE TAKE A LOOK - fionalee becoming guest for new term
 				}
 				ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
 				for (Term activeTerm : activeTerms) {
