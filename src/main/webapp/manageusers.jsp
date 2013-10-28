@@ -124,7 +124,7 @@
 												<td class='teamName'><a class='studentTeamLink' id='teams_<s:property value="teamId"/>' href='team_<s:property value="teamName"/>'><s:property value="teamName"/></a></td>
 												</s:if>
 												<s:else>
-												<td class='teamName'><a class='assignTeamsLink' id='assignTeams_<s:property value="id"/>' href='assignTeams_<s:property value="id"/>'>Assign Team</a></td>
+												<td class='teamName'><a class='assignTeamsLink' id='assignTeams_<s:property value="id"/>' href='assignTeams_<s:property value="id"/>'>- Assign Team</a></td>
 												</s:else>
 											<td class='editTd'>
 												<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
@@ -170,7 +170,7 @@
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>- Assign Team</a>
 												</s:else>
 											</td>
 											<td class='reviewer1MyTeams'>
@@ -184,7 +184,7 @@
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>- Assign Team</a>
 												</s:else>
 											</td>
 											<td class='reviewer2MyTeams'>
@@ -198,7 +198,7 @@
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value="username"/>' href='assignTeams_<s:property value="username"/>'>- Assign Team</a>
 												</s:else>
 											</td>
 											<td>
@@ -344,6 +344,17 @@
 					console.log('\n\nTA data: ' + JSON.stringify(taData));
 				}
 				
+				//Order comparator
+				function compare(a, b) {
+					if (a.order < b.order) {
+						return -1;
+					} else if (a.order > b.order) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+				
 				function convertUserData(arrayData) {
 					var jsonData = {};
 					for (var i = 0; i < arrayData.length; i++) {
@@ -352,16 +363,46 @@
 					return jsonData;
 				}
 				
-				function convertMultiselectOptionData(jsonData) {
+				function convertMultiselectOptionData(jsonData, userType) {
 					var multiselectOptionArray = new Array();
-					for (var key in jsonData) {
-						if (jsonData.hasOwnProperty(key)) {
-							multiselectOptionArray.push({
-								label: jsonData[key].name,
-								value: jsonData[key].id
-							});
+					if (userType === 'student') {
+						for (var key in jsonData) {
+							if (jsonData.hasOwnProperty(key)) {
+								if (!jsonData[key].teamId) {
+									multiselectOptionArray.push({
+										label: jsonData[key].name + ' (No Team)',
+										value: jsonData[key].id,
+										order: 0
+									});
+								} else {
+									multiselectOptionArray.push({
+										label: jsonData[key].name,
+										value: jsonData[key].id,
+										order: 1
+									});
+								}
+							}
+						}
+					} else {
+						for (var key in jsonData) {
+							if (jsonData.hasOwnProperty(key)) {
+								if (jsonData[key].supervisorTeams.length === 0 && jsonData[key].reviewer1Teams.length === 0 && jsonData[key].reviewer2Teams.length === 0) {
+									multiselectOptionArray.push({
+										label: jsonData[key].name + ' (No Teams)',
+										value: jsonData[key].id,
+										order: 0
+									});
+								} else {
+									multiselectOptionArray.push({
+										label: jsonData[key].name,
+										value: jsonData[key].id,
+										order: 1
+									});
+								}
+							}
 						}
 					}
+					multiselectOptionArray.sort(compare);
 					return multiselectOptionArray;
 				}
 				
@@ -401,7 +442,7 @@
 					return false;
 				});
 				
-				//Assign Team Link
+				//- Assign Team Link
 				$('body').on('click', '.assignTeamsLink', function(){
 					$('.usersNav li.teams').children('a').trigger('click');
 					$('body').animate({scrollTop: 0}, 500);
@@ -423,7 +464,7 @@
 					$('.modal').modal('hide');
 					$('.usersNav li.students').children('a').trigger('click');
 					var $tr = getTrFromTable('studentUsersTable', 'fullName', $(this).text());
-					$('body').animate({scrollTop: $tr.offset().top - $tr.height()}, 500);
+					$('body').animate({scrollTop: $tr.offset().top - 40 - $tr.height()}, 500);
 					$tr.effect('highlight', {color: "#ffff99 !important"}, 1500);
 					return false;
 				});
@@ -808,17 +849,6 @@
 				/* ACTIONS    */
 				/*******************/
 				
-				//Order comparator
-				function compare(a, b) {
-					if (a.order < b.order) {
-						return -1;
-					} else if (a.order > b.order) {
-						return 1;
-					} else {
-						return 0;
-					}
-				}
-				
 				function addUser(userType, addableFields) {
 					bootbox.confirm({
 						title: "Add " + (userType === 'ta'?'TA':userType.charAt(0).toUpperCase() + userType.slice(1)),
@@ -848,12 +878,14 @@
 																				.attr('value', '-1')
 																				.html('No Team')
 																		);
-																		for (var i = 0; i < teamData.length; i++) {
-																			$options.push(
-																				$(document.createElement('option'))
-																					.attr('value', teamData[i].id)
-																					.html(teamData[i].teamName)
-																			);
+																		for (var key in teamData) {
+																			if (teamData.hasOwnProperty(key)) {
+																				$options.push(
+																					$(document.createElement('option'))
+																						.attr('value', teamData[key].id)
+																						.html(teamData[key].teamName)
+																				);
+																			}
 																		}
 																		return $options;
 																	});
@@ -1236,7 +1268,7 @@
 																		.addClass('assignTeamsLink')
 																		.attr('id', 'assignTeams_' + submitData.username)
 																		.attr('href', 'assignTeams_' + submitData.username)
-																		.html('Assign Team');
+																		.html('- Assign Team');
 																}
 															})
 													);
@@ -1249,7 +1281,7 @@
 																.addClass('assignTeamsLink')
 																.attr('id', 'assignTeams_' + submitData.username)
 																.attr('href', 'assignTeams_' + submitData.username)
-																.html('Assign Teams')
+																.html('- Assign Teams')
 														)
 												);
 												$roleSpecificTds.push(
@@ -1259,7 +1291,7 @@
 																.addClass('assignTeamsLink')
 																.attr('id', 'assignTeams_' + submitData.username)
 																.attr('href', 'assignTeams_' + submitData.username)
-																.html('Assign Teams')
+																.html('- Assign Teams')
 														)
 												);
 												$roleSpecificTds.push(
@@ -1269,7 +1301,7 @@
 																.addClass('assignTeamsLink')
 																.attr('id', 'assignTeams_' + submitData.username)
 																.attr('href', 'assignTeams_' + submitData.username)
-																.html('Assign Teams')
+																.html('- Assign Teams')
 														)
 												);
 												break;
@@ -1338,13 +1370,13 @@
 						case 'edit':
 							var $tr = $('tr#user_' + user.id);
 							if (!submitData.teamName && submitData.teamId) {
-								//Assign Team Link
+								//- Assign Team Link
 								$tr.find('td.teamName').empty().append(
 									$(document.createElement('a'))
 										.addClass('assignTeamsLink')
 										.attr('id', 'assignTeams_' + submitData.username)
 										.attr('href', 'assignTeams_' + submitData.username)
-										.html('Assign Teams')
+										.html('- Assign Teams')
 								);
 							}
 							for (var key in submitData) {
@@ -1463,7 +1495,7 @@
 								filterPlaceholder: 'Search',
 								buttonClass: 'btn btn-link userSelectBtn'
 							});
-							$this.multiselect('dataprovider', convertMultiselectOptionData(studentData));
+							$this.multiselect('dataprovider', convertMultiselectOptionData(studentData, 'student'));
 							if (action === 'edit') {
 								var valArray = new Array();
 								for (var i = 0; i < team.members.length; i++) {
@@ -1499,7 +1531,7 @@
 								filterPlaceholder: 'Search',
 								buttonClass: 'btn btn-link userSelectBtn facultyUserSelectBtn'
 							});
-							$this.multiselect('dataprovider', convertMultiselectOptionData(facultyData));
+							$this.multiselect('dataprovider', convertMultiselectOptionData(facultyData, 'faculty'));
 							if (action === 'edit') {
 								switch ($this.attr('id')) {
 									case 'supervisor':
