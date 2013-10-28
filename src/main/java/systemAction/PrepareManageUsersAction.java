@@ -158,8 +158,6 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 						studentMap.put("teamId", student.getTeam().getId());
 						studentMap.put("teamName", student.getTeam().getTeamName());
 					}
-					studentMap.put("label", student.getFullName());
-					studentMap.put("value", student.getId());
 					studentData.add(studentMap);
 				}
 				
@@ -186,8 +184,6 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					facultyMap.put("supervisorTeams", supervisorTeamsList);
 					facultyMap.put("reviewer1Teams", reviewer1TeamsList);
 					facultyMap.put("reviewer2Teams", reviewer2TeamsList);
-					facultyMap.put("label", faculty.getFullName());
-					facultyMap.put("value", faculty.getId());
 					facultyData.add(facultyMap);
 				}
 				

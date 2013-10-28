@@ -235,7 +235,7 @@
 											<td class='username'><s:property value="username"/></td>
 											<td class='mobileNumber'><s:property value="mobileNumber"/></td>
 											<td>
-												<a class='taSignupsLink' id='signups_<s:property value="username"/>' href='ta_<s:property value="username"/>'><s:property value="%{#ta.mySignups.size()}"/></a>
+												<a class='taSignupsLink' id='signups_<s:property value="id"/>' href='ta_<s:property value="username"/>'><s:property value="%{#ta.mySignups.size()}"/></a>
 											</td>
 											<td>
 												<button type='button' title="Edit" class='modBtn editBtn btn btn-info'>
@@ -330,18 +330,39 @@
 				loadUsers();
 				
 				function loadUsers() {
-					adminData = JSON.parse('<s:property escape="false" value="adminJson"/>');
-					ccData = JSON.parse('<s:property escape="false" value="ccJson"/>');
-					teamData = JSON.parse('<s:property escape="false" value="teamJson"/>');
-					studentData = JSON.parse('<s:property escape="false" value="studentJson"/>');
-					facultyData = JSON.parse('<s:property escape="false" value="facultyJson"/>');
-					taData = JSON.parse('<s:property escape="false" value="taJson"/>');
+					adminData = convertUserData(JSON.parse('<s:property escape="false" value="adminJson"/>'));
+					ccData = convertUserData(JSON.parse('<s:property escape="false" value="ccJson"/>'));
+					teamData = convertUserData(JSON.parse('<s:property escape="false" value="teamJson"/>'));
+					studentData = convertUserData(JSON.parse('<s:property escape="false" value="studentJson"/>'));
+					facultyData = convertUserData(JSON.parse('<s:property escape="false" value="facultyJson"/>'));
+					taData = convertUserData(JSON.parse('<s:property escape="false" value="taJson"/>'));
 					console.log('\n\nAdmin data: ' + JSON.stringify(adminData));
 					console.log('\n\nCC data: ' + JSON.stringify(ccData));
 					console.log('\n\nTeam data: ' + JSON.stringify(teamData));
 					console.log('\n\nStudent data: ' + JSON.stringify(studentData));
 					console.log('\n\nFaculty data: ' + JSON.stringify(facultyData));
 					console.log('\n\nTA data: ' + JSON.stringify(taData));
+				}
+				
+				function convertUserData(arrayData) {
+					var jsonData = {};
+					for (var i = 0; i < arrayData.length; i++) {
+						jsonData[arrayData[i].id] = arrayData[i];
+					}
+					return jsonData;
+				}
+				
+				function convertMultiselectOptionData(jsonData) {
+					var multiselectOptionArray = new Array();
+					for (var key in jsonData) {
+						if (jsonData.hasOwnProperty(key)) {
+							multiselectOptionArray.push({
+								label: jsonData[key].name,
+								value: jsonData[key].id
+							});
+						}
+					}
+					return multiselectOptionArray;
 				}
 				
 				/****************/
@@ -432,14 +453,7 @@
 				
 				//TA Signups Link
 				$('body').on('click', '.taSignupsLink', function(){
-					var username = $(this).attr('id').split("_")[1];
-					var ta = null;
-					for (var i = 0; i < taData.length; i++) {
-						if (taData[i].username === username) {
-							ta = taData[i];
-							break;
-						}
-					}
+					var ta = taData[$(this).attr('id').split("_")[1]];
 					bootbox.alert({
 						title: 'Signups of ' + ta.name,
 						message: function() {
@@ -510,39 +524,19 @@
 					var editableFields = new Array();
 					switch (userType) {
 						case 'student':
-							for (var i = 0; i < studentData.length; i++) {
-								if (parseInt(studentData[i].id) === parseInt(id)) {
-									user = studentData[i];
-									if ($this.hasClass('editBtn')) {
-										editableFields.push({order: 3, key: "Team", name:"teamId", value: user.teamId});
-									}
-									break;
-								}
+							user = studentData[id];
+							if ($this.hasClass('editBtn')) {
+								editableFields.push({order: 3, key: "Team", name:"teamId", value: user.teamId});
 							}
 							break;
 						case 'faculty':
-							for (var i = 0; i < facultyData.length; i++) {
-								if (parseInt(facultyData[i].id) === parseInt(id)) {
-									user = facultyData[i];
-									break;
-								}
-							}
+							user = facultyData[id];
 							break;
 						case 'ta':
-							for (var i = 0; i < taData.length; i++) {
-								if (parseInt(taData[i].id) === parseInt(id)) {
-									user = taData[i];
-									break;
-								}
-							}
+							user = taData[id];
 							break;
 						case 'admin':
-							for (var i = 0; i < adminData.length; i++) {
-								if (parseInt(adminData[i].id) === parseInt(id)) {
-									user = adminData[i];
-									break;
-								}
-							}
+							user = adminData[id];
 							break;
 						default:
 							showNotification("ERROR", 'Usertype not found!');
@@ -571,14 +565,10 @@
 					var $tr = null;
 					if (action === 'edit') {
 						var $tr = $(this).closest('tr');
-						for (var i = 0; i < teamData.length; i++) {
-							if (parseInt(teamData[i].id) === parseInt($tr.attr('id').split('_')[1])) {
-								team = teamData[i];
-								break;
-							}
-						}
+						team = teamData[$tr.attr('id').split('_')[1]];
 					}
 					bootbox.confirm({
+						className: 'manageTeamModal',
 						title: action.charAt(0).toUpperCase() + action.slice(1) + " Team",
 						message: function() {
 							return $(document.createElement('form')).addClass('modalForm').append($(document.createElement('table')).addClass('modalTable modalTeamTable').append(function(){
@@ -709,8 +699,8 @@
 								}).done(function(response) {
 									if (response.success) {
 										setTimeout(function(){showNotification("SUCCESS", action.charAt(0).toUpperCase() + action.slice(1) + 'ed successfully');}, 500);
-//										updateTeamJsonData();
-//										updateTeamPage();
+//										updateTeamJsonData(action === 'add'?{id: response.teamId}:null, submitData);
+										updateTeamPage(action === 'add'?{id: response.teamId}:null, submitData);
 									} else {
 										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
 									}
@@ -742,7 +732,7 @@
 								filterPlaceholder: 'Search',
 								buttonClass: 'btn btn-link teamUserSelectBtn'
 							});
-							$this.multiselect('dataprovider', studentData);
+							$this.multiselect('dataprovider', convertMultiselectOptionData(studentData));
 							if (action === 'edit') {
 								var valArray = new Array();
 								for (var i = 0; i < team.members.length; i++) {
@@ -777,7 +767,7 @@
 								filterPlaceholder: 'Search',
 								buttonClass: 'btn btn-link teamUserSelectBtn'
 							});
-							$this.multiselect('dataprovider', facultyData);
+							$this.multiselect('dataprovider', convertMultiselectOptionData(facultyData));
 							if (action === 'edit') {
 								switch ($this.attr('id')) {
 									case 'supervisor':
@@ -879,12 +869,8 @@
 								for (var i = 0; i < formData.length; i++) {
 									submitData[formData[i].name] = formData[i].value;
 									if (userType === 'student' && formData[i].name === 'teamId') {
-										for (var j = 0; j < teamData.length; j++) {
-											if (parseInt(teamData[j].id) === parseInt(formData[i].value)) {
-												submitData['teamName'] = teamData[j].teamName;
-												break;
-											}
-										}
+										submitData['teamName'] = teamData[formData[i].value].teamName;
+										break;
 									}
 								}
 								console.log('Submitting add user data: ' + JSON.stringify(submitData));
@@ -935,12 +921,21 @@
 																	.attr('name', editableFields[i].name)
 																	.append(function(){
 																		var $options = new Array();
-																		for (var i = 0; i < teamData.length; i++) {
-																			$options.push(
-																				$(document.createElement('option'))
-																					.attr('value', teamData[i].id)
-																					.html(teamData[i].teamName)
-																			);
+																		$options.push(
+																			$(document.createElement('option'))
+																				.attr('id', 'teamSelectHeader')
+																				.attr('value', '-1')
+																				.html('No Team')
+																		);
+																		for (var key in teamData) {
+																			if (teamData.hasOwnProperty(key)) {
+																				var team = teamData[key];
+																				$options.push(
+																					$(document.createElement('option'))
+																						.attr('value', team.id)
+																						.html(team.teamName)
+																				);
+																			}
 																		}
 																		return $options;
 																	})
@@ -970,13 +965,9 @@
 								};
 								for (var i = 0; i < formData.length; i++) {
 									submitData[formData[i].name] = formData[i].value;
-									if (userType === 'student' && formData[i].name === 'teamId') {
-										for (var j = 0; j < teamData.length; j++) {
-											if (parseInt(teamData[j].id) === parseInt(formData[i].value)) {
-												submitData['teamName'] = teamData[j].teamName;
-												break;
-											}
-										}
+									if (userType === 'student' && formData[i].name === 'teamId' && formData[i].value > 0) {
+										submitData['teamName'] = teamData[formData[i].value].teamName;
+										break;
 									}
 								}
 								console.log('Submitting edit user data: ' + JSON.stringify(submitData));
@@ -1064,7 +1055,7 @@
 					switch(submitData.action) {
 						case 'add':
 							//Add to role data
-							roleData.push({
+							roleData[user.id] = {
 								id: user.id,
 								name: submitData.fullName, 
 								username: submitData.username,
@@ -1074,115 +1065,98 @@
 								mySignups: {},
 								label: submitData.fullName,
 								value: user.id
-							});
+							};
 							//Add to team data
 							if (submitData.teamName) {
-								for (var i = 0; i < teamData.length; i++) {
-									if (parseInt(teamData[i].id) === parseInt(submitData.teamId)) {
-										teamData[i].members.push({
-											id: user.id,
-											name: submitData.fullName,
-											username: submitData.username
-										});
-										break;
-									}
-								}
+								teamData[submitData.teamId].members.push({
+									id: user.id,
+									name: submitData.fullName,
+									username: submitData.username
+								});
 							}
 							break;
 						case 'edit':
 							//Modify teamData
 							if (submitData.teamId && parseInt(user.teamId) !== parseInt(submitData.teamId)) {
-								for (var i = 0; i < teamData.length; i++) {
-									var members = teamData[i].members;
-									for (var j = 0; j < members.length; j++) {
-										if (parseInt(user.id) === parseInt(members[j].id)) {
-											//Remove from old team
-											members.splice(members.indexOf(members[j]), 1);
-											break;
+								for (var key in teamData) {
+									if (teamData.hasOwnProperty(key)) {
+										var team = teamData[key];
+										for (var j = 0; j < team.members.length; j++) {
+											if (parseInt(user.id) === parseInt(team.members[j].id)) {
+												//Remove from old team
+												team.members.splice(team.members.indexOf(team.members[j]), 1);
+												break;
+											}
 										}
 									}
-									if (parseInt(submitData.teamId) === parseInt(teamData[i].id)) {
-										//Add to new team
-										teamData[i].members.push({
-											id: user.id,
-											name: user.name,
-											username: user.username
-										});
-									}
+								}
+								//Add to new team
+								if (submitData.teamName) {
+									teamData[submitData.teamId].members.push({
+										id: user.id,
+										name: user.name,
+										username: user.username
+									});
 								}
 							}
 							//Edit Role-based Json
-							for (var i = 0; i < roleData.length; i++) {
-								if (parseInt(roleData[i].id) === parseInt(user.id)) {
-									roleData[i].name = submitData.fullName;
-									roleData[i].username = submitData.username;
-									roleData[i].teamId = submitData.teamId?submitData.teamId:false;
-									roleData[i].teamName = submitData.teamName?submitData.teamName:false;
-									roleData[i].label = submitData.fullName;
-									roleData[i].value = user.id;
-									break;
-								}
-							}
+							roleData[user.id] = {
+								name: submitData.fullName,
+								username: submitData.username,
+								teamId: submitData.teamId?submitData.teamId:false,
+								teamName: submitData.teamName?submitData.teamName:false,
+								label: submitData.fullName,
+								value: user.id
+							};
 							//Edit Team-based Json
-							for (var i = 0; i < teamData.length; i++) {
-								var members = teamData[i].members;
-								for (var j = 0; j < members.length; j++) {
-									if (parseInt(members[j].id) === parseInt(user.id)) {
-										members[j].name = submitData.fullName;
-										members[j].username = submitData.username;
-										break;
+							for (var key in teamData) {
+								if (teamData.hasOwnProperty(key)) {
+									var team = teamData[key];
+									for (var j = 0; j < team.members.length; j++) {
+										if (parseInt(user.id) === parseInt(team.members[j].id)) {
+											//Team member
+											team.members[j].name = submitData.fullName;
+											team.members[j].username = submitData.username;
+										}
 									}
-								}
-								if (parseInt(teamData[i].supervisor.id) === user.id) {
-									teamData[i].supervisor.name = submitData.fullName;
-									teamData[i].supervisor.username = submitData.username;
-								}
-								if (parseInt(teamData[i].reviewer1.id) === user.id) {
-									teamData[i].reviewer1.name = submitData.fullName;
-									teamData[i].reviewer1.username = submitData.username;
-								}
-								if (parseInt(teamData[i].reviewer2.id) === user.id) {
-									teamData[i].reviewer2.name = submitData.fullName;
-									teamData[i].reviewer2.username = submitData.username;
+									if (parseInt(team.supervisor.id) === user.id) {
+										team.supervisor.name = submitData.fullName;
+										team.supervisor.username = submitData.username;
+									}
+									if (parseInt(team.reviewer1.id) === user.id) {
+										team.reviewer1.name = submitData.fullName;
+										team.reviewer1.username = submitData.username;
+									}
+									if (parseInt(team.reviewer2.id) === user.id) {
+										team.reviewer2.name = submitData.fullName;
+										team.reviewer2.username = submitData.username;
+									}
 								}
 							}
 							break;
 						case 'delete':
-							//Delete from teamData
-							for (var i = 0; i < teamData.length; i++) {
-								var members = teamData[i].members;
-								for (var j = 0; j < members.length; j++) {
-									if (parseInt(members[j].id) === parseInt(user.id)) {
-										members.splice(members.indexOf(members[j]), 1);
-										break;
+							//Delete Team-based Json
+							for (var key in teamData) {
+								if (teamData.hasOwnProperty(key)) {
+									var team = teamData[key];
+									for (var j = 0; j < team.members.length; j++) {
+										if (parseInt(user.id) === parseInt(team.members[j].id)) {
+											//Team member
+											delete team.members[j];
+										}
+									}
+									if (parseInt(team.supervisor.id) === user.id) {
+										delete team.supervisor;
+									}
+									if (parseInt(team.reviewer1.id) === user.id) {
+										delete team.reviewer1;
+									}
+									if (parseInt(team.reviewer2.id) === user.id) {
+										delete team.reviewer2;
 									}
 								}
-								if (parseInt(teamData[i].supervisor.id) === user.id) {
-									delete teamData[i].supervisor;
-									//Replace with CC
-									var cc = ccData[0];
-									teamData[i].supervisor = cc;
-								}
-								if (parseInt(teamData[i].reviewer1.id) === user.id) {
-									delete teamData[i].reviewer1;
-									//Replace with CC
-									var cc = ccData[0];
-									teamData[i].reviewer1 = cc;
-								}
-								if (parseInt(teamData[i].reviewer2.id) === user.id) {
-									delete teamData[i].reviewer2;
-									//Replace with CC
-									var cc = ccData[0];
-									teamData[i].reviewer2 = cc;
-								}
 							}
-							//Delete from roleData
-							for (var i = 0; i < roleData.length; i++) {
-								if (parseInt(roleData[i].id) === parseInt(user.id)) {
-									delete roleData[i];
-									break;
-								}
-							}
+							delete roleData[user.id]; //Delete from roleData
 							break;
 						default:
 							console.log('Action: ' + submitData.action);
@@ -1289,7 +1263,7 @@
 														.append(
 															$(document.createElement('a'))
 																.addClass('taSignupsLink')
-																.attr('id', 'signups_' + submitData.username)
+																.attr('id', 'signups_' + user.id)
 																.attr('href', 'ta_' + submitData.username)
 																.html('0')
 														)
@@ -1344,11 +1318,27 @@
 							break;
 						case 'edit':
 							var $tr = $('tr#user_' + user.id);
+							if (!submitData.teamName && submitData.teamId) {
+								//Assign Team Link
+								$tr.find('td.teamName').empty().append(
+									$(document.createElement('a'))
+										.addClass('assignTeamsLink')
+										.attr('id', 'assignTeams_' + submitData.username)
+										.attr('href', 'assignTeams_' + submitData.username)
+										.html('Assign Teams')
+								);
+							}
 							for (var key in submitData) {
 								if (submitData.hasOwnProperty(key)) {
 									var $td = $tr.find('td.' + key);
 									if ($td.length) {
-										if (key === 'teamName') $td.children('a').html(submitData[key]);
+										if (key === 'teamName') $td.empty().append(
+											$(document.createElement('a'))
+												.addClass('studentTeamLink')
+												.attr('id', 'teams_' + submitData.teamId)
+												.attr('href', 'teams_' + submitData.teamName)
+												.html(submitData[key])
+										);
 										else $td.html(submitData[key]);
 									}
 								}
@@ -1407,6 +1397,315 @@
 							}
 							break;
 						case 'delete':
+							break;
+						default:
+							console.log('Action: ' + submitData.action);
+							showNotification('ERROR', 'Unknown action');
+							return false;
+					}
+				}
+				
+				function updateTeamJsonData(team, submitData) {
+					if (submitData.action === 'add' || submitData.action === 'edit') {
+						//Add/Edit to team and user data
+						var teamId = submitData.action === 'add'?team.id:submitData.teamId;
+						var newMemberArray = new Array();
+						for (var i = 0; submitData.members.length; i++) {
+							newMemberArray.push({id: submitData.members[i]});
+						}
+						var supervisor = facultyData[submitData.supervisor];
+						supervisor.supervisorTeams.push({
+							teamId: teamId,
+							teamName: submitData.name
+						});
+						var reviewer1 = facultyData[submitData.reviewer1];
+						reviewer1.reviewer1Teams.push({
+							teamId: teamId,
+							teamName: submitData.name
+						});
+						var reviewer2 = facultyData[submitData.reviewer2];
+						reviewer2.reviewer2Teams.push({
+							teamId: teamId,
+							teamName: submitData.name
+						});
+						teamData[teamId] = {
+							id: teamId,
+							teamName: submitData.name,
+							wiki: submitData.wiki,
+							members: newMemberArray,
+							supervisor: supervisor,
+							reviewer1: reviewer1,
+							reviewer2: reviewer2
+						};
+						console.log('New team data: ' + JSON.stringify(teamData[teamId]));
+					} else if (submitData.action === 'delete') {
+						delete teamData[submitData.teamId];
+						for (var key in studentData) {
+							if (studentData.hasOwnProperty(key)) {
+								var student = studentData[key];
+								if (parseInt(student.teamId) === submitData.teamId) {
+									delete student.teamId;
+									delete student.teamName;
+								}
+							}
+						}
+						for (var key in facultyData) {
+							if (facultyData.hasOwnProperty(key)) {
+								var faculty = facultyData[key];
+								for (var i = 0; i < faculty.supervisorTeams.length; i++) {
+									if (parseInt(faculty.supervisorTeams[i].teamId) === parseInt(submitData.teamId)) {
+										delete faculty.supervisorTeams[i];
+									}
+								}
+								for (var i = 0; i < faculty.reviewer1Teams.length; i++) {
+									if (parseInt(faculty.reviewer1Teams[i].teamId) === parseInt(submitData.teamId)) {
+										delete faculty.reviewer1Teams[i];
+									}
+								}
+								for (var i = 0; i < faculty.reviewer2Teams.length; i++) {
+									if (parseInt(faculty.reviewer2Teams[i].teamId) === parseInt(submitData.teamId)) {
+										delete faculty.reviewer2Teams[i];
+									}
+								}
+							}
+						}
+					} else {
+						console.log('Action: ' + submitData.action);
+						showNotification('ERROR', 'Unknown team action');
+					}
+					return false;
+				}
+				
+				function updateTeamPage(team, submitData) {
+					switch (submitData.action) {
+						case 'add':
+							//Remove members from other teams
+							for (var i = 0; i < submitData.members.length; i++) {
+								var student = studentData[submitData.members[i]];
+								$('#teamsTable').find('#member_' + student.id).fadeOut('slow', function(){
+									$(this).remove();
+								});
+							}
+							//Add to team table
+							var $lastTr = $('#teamsTable tr:last');
+							$lastTr.after(
+								$(document.createElement('tr'))
+									.addClass('teamRow')
+									.attr('id', 'team_' + team.id)
+									.append(
+										$(document.createElement('td'))
+											.append(
+												$(document.createElement('i')).addClass('fa fa-group fa-black')
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('teamName')
+											.append(
+												submitData.name
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('members')
+											.append(
+												$(document.createElement('div'))
+													.addClass('memberList')
+													.append(function(){
+														var $spanArray = new Array();
+														for (var i = 0; i < submitData.members.length; i++) {
+															var student = studentData[submitData.members[i]];
+															$spanArray.push(
+																$(document.createElement('span'))
+																	.addClass('memberName')
+																	.attr('id', 'member_' + student.id)
+																	.append(
+																		$(document.createElement('a'))
+																			.addClass('teamStudentLink')
+																			.attr('id', 'teamStudent_' + student.id)
+																			.attr('href', 'member_' + student.username)
+																			.html(student.name)
+																	)
+															);
+														}
+														return $spanArray;
+													})
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('supervisor')
+											.append(function(){
+												var supervisor = facultyData[submitData.supervisor];
+												return $(document.createElement('a'))
+													.addClass('teamFacultyLink')
+													.attr('id', 'teamSupervisor_' + supervisor.id)
+													.attr('href', 'supervisor_' + submitData.teamName)
+													.html(supervisor.name);
+											})
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('reviewer1')
+											.append(function(){
+												var reviewer1 = facultyData[submitData.reviewer1];
+												return $(document.createElement('a'))
+													.addClass('teamFacultyLink')
+													.attr('id', 'teamReviewer1_' + reviewer1.id)
+													.attr('href', 'reviewer1_' + submitData.teamName)
+													.html(reviewer1.name);
+											})
+									)
+									.append(
+										$(document.createElement('td'))
+											.addClass('reviewer2')
+											.append(function(){
+												var reviewer2 = facultyData[submitData.reviewer2];
+												return $(document.createElement('a'))
+													.addClass('teamFacultyLink')
+													.attr('id', 'teamReviewer2_' + reviewer2.id)
+													.attr('href', 'reviewer2_' + submitData.teamName)
+													.html(reviewer2.name);
+											})
+									)
+									.append(
+										$(document.createElement('td'))
+											.append(
+												$(document.createElement('button'))
+													.attr('type', 'button')
+													.attr('title', 'Edit')
+													.addClass('editTeamBtn btn btn-info')
+													.append(
+														$(document.createElement('i')).addClass('fa fa-pencil fa-white')
+													)
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.append(
+												$(document.createElement('button'))
+													.attr('type', 'button')
+													.attr('title', 'Delete')
+													.addClass('modBtn delBtn btn btn-danger')
+													.append(
+														$(document.createElement('i')).addClass('fa fa-trash-o fa-white')
+													)
+											)
+									)
+							);
+							//Add team to student table
+							for (var i = 0; i < submitData.members.length; i++) {
+								var student = studentData[submitData.members[i]];
+								$('#studentUsersTable').find('#user_' + student.id)
+									.children('.teamName')
+									.empty()
+									.append(
+										$(document.createElement('a'))
+											.addClass('studentTeamLink')
+											.attr('id', 'teams_' + team.id)
+											.attr('href', 'teams_' + submitData.name)
+											.html(submitData.name)
+									);
+							}
+							//Add team to faculty table
+							console.log($('#facultyUsersTable').find('#user_' + submitData.supervisor));
+							$('#facultyUsersTable').find('#user_' + submitData.supervisor)
+								.find('.supervisorMyTeams > .memberList')
+								.append(
+									$(document.createElement('span'))
+										.addClass('memberName')
+										.attr('id', 'supervisorMyTeam_' + team.id)
+										.append(
+										$(document.createElement('a'))
+											.addClass('studentTeamLink')
+											.attr('id', 'teams_' + team.id)
+											.attr('href', 'teams_' + submitData.name)
+											.html(submitData.name)
+										)
+								);
+							$('#facultyUsersTable').find('#user_' + submitData.reviewer1)
+								.find('.reviewer1MyTeams > .memberList')
+								.append(
+									$(document.createElement('span'))
+										.addClass('memberName')
+										.attr('id', 'reviewer1MyTeam_' + team.id)
+										.append(
+										$(document.createElement('a'))
+											.addClass('studentTeamLink')
+											.attr('id', 'teams_' + team.id)
+											.attr('href', 'teams_' + submitData.name)
+											.html(submitData.name)
+										)
+								);
+							$('#facultyUsersTable').find('#user_' + submitData.reviewer2)
+								.find('.reviewer2MyTeams > .memberList')
+								.append(
+									$(document.createElement('span'))
+										.addClass('memberName')
+										.attr('id', 'reviewer2MyTeam_' + team.id)
+										.append(
+										$(document.createElement('a'))
+											.addClass('studentTeamLink')
+											.attr('id', 'teams_' + team.id)
+											.attr('href', 'teams_' + submitData.name)
+											.html(submitData.name)
+										)
+								);
+							break;
+						case 'edit':
+							//Edit in team table
+							var $teamTr = $('#teamsTable').find('#team_' + submitData.teamId);
+							$teamTr.children('.teamName').empty().append(submitData.name);
+							$teamTr.find('.memberList').empty().append(function(){
+								var $spanArray = new Array();
+								for (var i = 0; i < submitData.members.length; i++) {
+									var student = studentData[submitData.members[i]];
+									$spanArray.push(
+										$(document.createElement('span'))
+											.addClass('memberName')
+											.attr('id', 'member_' + student.id)
+											.append(
+												$(document.createElement('a'))
+													.addClass('teamStudentLink')
+													.attr('id', 'teamStudent_' + student.id)
+													.attr('href', 'member_' + student.username)
+													.html(student.name)
+											)
+									);
+								}
+								return $spanArray;
+							});
+							$teamTr.children('.supervisor').empty().append(function(){
+								var supervisor = facultyData[submitData.supervisor];
+								return $(document.createElement('a'))
+									.addClass('teamFacultyLink')
+									.attr('id', 'teamSupervisor_' + supervisor.id)
+									.attr('href', 'supervisor_' + submitData.teamName)
+									.html(supervisor.name);
+							});
+							$teamTr.children('.reviewer1').empty().append(function(){
+								var reviewer1 = facultyData[submitData.reviewer1];
+								return $(document.createElement('a'))
+									.addClass('teamFacultyLink')
+									.attr('id', 'teamSupervisor_' + reviewer1.id)
+									.attr('href', 'supervisor_' + submitData.teamName)
+									.html(reviewer1.name);
+							});
+							$teamTr.children('.reviewer2').empty().append(function(){
+								var reviewer2 = facultyData[submitData.reviewer2];
+								return $(document.createElement('a'))
+									.addClass('teamFacultyLink')
+									.attr('id', 'teamSupervisor_' + reviewer2.id)
+									.attr('href', 'supervisor_' + submitData.teamName)
+									.html(reviewer2.name);
+							});
+							//Edit in student table
+							//Edit in faculty table
+							break;
+						case 'delete':
+							//Delete from student table
+							//Delete from faculty table
+							//Delete from team table
 							break;
 						default:
 							console.log('Action: ' + submitData.action);
