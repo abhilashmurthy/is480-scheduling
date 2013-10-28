@@ -416,24 +416,6 @@ public class UserManager {
 		User user = em.find(User.class, userId);
 		if (user == null) throw new CustomException("User not found");
 		
-		//Removing user from required attendees for all bookings
-		Query requiredAttendeeBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE :user MEMBER OF b.requiredAttendees");
-		requiredAttendeeBookingQuery.setParameter("user", user);
-		ArrayList<Booking> requiredAttendeeBookings = (ArrayList<Booking>) requiredAttendeeBookingQuery.getResultList();
-		for (Booking b : requiredAttendeeBookings) {
-			Set<User> requiredAttendees = b.getRequiredAttendees();
-			requiredAttendees.remove(user);
-			b.setRequiredAttendees(requiredAttendees);
-		}
-		
-		//Removing user from subscribed users for all bookings
-		Query subscribedBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE :user MEMBER OF b.subscribedUsers");
-		subscribedBookingQuery.setParameter("user", user);
-		ArrayList<Booking> subscribedBookings = (ArrayList<Booking>) subscribedBookingQuery.getResultList();
-		for (Booking b : subscribedBookings) {
-			b.getSubscribedUsers().remove(user);
-		}
-		
 		//Role specific actions
 		if (user.getRole() == Role.STUDENT) {
 			((Student)user).setTeam(null);
@@ -445,6 +427,28 @@ public class UserManager {
 			for (Timeslot t : signUps) {
 				t.setTA(null);
 			}
+		} else if (user.getRole() == Role.FACULTY) {
+			Faculty faculty = em.find(Faculty.class, user.getId());
+			faculty.setUnavailableTimeslots(null);
+			Faculty replacement = getFacultyObjForCCForTerm(em, user.getTerm());
+			TeamManager.swapFaculty(em, faculty, replacement);
+			user = faculty;
+		}
+		
+		//Removing user from required attendees for all bookings
+		Query requiredAttendeeBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE :user MEMBER OF b.requiredAttendees");
+		requiredAttendeeBookingQuery.setParameter("user", user);
+		ArrayList<Booking> requiredAttendeeBookings = (ArrayList<Booking>) requiredAttendeeBookingQuery.getResultList();
+		for (Booking b : requiredAttendeeBookings) {
+			b.getRequiredAttendees().remove(user);
+		}
+		
+		//Removing user from subscribed users for all bookings
+		Query subscribedBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE :user MEMBER OF b.subscribedUsers");
+		subscribedBookingQuery.setParameter("user", user);
+		ArrayList<Booking> subscribedBookings = (ArrayList<Booking>) subscribedBookingQuery.getResultList();
+		for (Booking b : subscribedBookings) {
+			b.getSubscribedUsers().remove(user);
 		}
 		
 		em.flush(); //Forcing write to DB
