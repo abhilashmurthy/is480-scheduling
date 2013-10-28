@@ -108,6 +108,10 @@
             <result name="success">/uploadfile.jsp</result>
         </action>
 		
+		<action name="viewGenerateReport" class="systemAction.GetTermsAction" method="execute">
+            <result name="success">/reportgeneration.jsp</result>
+        </action>
+		
 		<action name="uploadFileToBackend" class="userAction.UploadFileAction" method="execute">
 			 <result name="success" type="redirect">
                 <param name="location">/uploadFile</param>
