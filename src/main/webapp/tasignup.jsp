@@ -300,6 +300,117 @@
                     var scheduleDataDates = datesSet.values().sort();
                     return scheduleDataDates;
                 }
+				
+				//ADDED FOR SELECT/DESELECT ALL
+				$('body').on('change', '.checkBoxClass', function(){
+					var $checkbox = $(this);
+					console.log('selected ' + $checkbox.attr('id') + ': ' + $checkbox.is(':checked'));
+
+					if(!$checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+									
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[0].text;
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val(valtest);
+										}
+			
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+												triggerTimeslot($(this));
+											}
+										}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]
+									+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+										
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[0].text;
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val(valtest);
+										}
+			
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+						}
+					}else if($checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+										
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+										
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[valtest.selectedIndex].text;
+											//console.log(valtest);
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val("You");
+										}
+						
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] 
+										+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+										
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[0].text;
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val("You");
+										}	
+			
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+						}
+					
+					
+					}
+					
+				});
 
                 function makeTimeslotTable(tableClass, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
@@ -311,7 +422,7 @@
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                        th.html(headerVal);
+                        th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
                         thead.append(th);
                     }
                     //Inserting constructed table header into table
@@ -330,13 +441,33 @@
                     }
 
 					var slotSize = scheduleData.duration / 30;
+					var counter = 1;
+					var startTime = 0;
 
                     //Constructing table body
                     for (i = 0; i < timesArray.length; i++) {
-                        var tr = $(document.createElement("tr"));
-                        var timeTd = $(document.createElement("td"));
-                        timeTd.html(timesArray[i]);
-                        tr.append(timeTd);
+						
+						if(counter===1){
+							startTime = Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[0]
+											+Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[1];
+						}
+						if(counter===slotSize){
+							console.log(timesArray[i]);
+							//tr.append("<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>");
+							counter = 0;
+							var tr = $(document.createElement("tr"));
+							var timeTd = $(document.createElement("td"));
+							timeTd.html(timesArray[i] + "<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>" );
+							tr.append(timeTd);
+						}else{
+							var tr = $(document.createElement("tr"));
+							var timeTd = $(document.createElement("td"));
+							timeTd.html(timesArray[i]);
+							tr.append(timeTd);
+							
+						}
+						
+                       
 
                         for (var j = 0; j < dateArray.length; j++) {
                             var td = $(document.createElement("td"));
@@ -370,6 +501,7 @@
 							td.addClass('border-left');
                             tr.append(td);
                         }
+						counter++;
                         $("." + tableClass).append(tr);
                     }
                 }
