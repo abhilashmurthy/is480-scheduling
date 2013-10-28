@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import model.Booking;
 import model.Team;
 import model.Term;
+import model.Timeslot;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
@@ -436,6 +437,14 @@ public class UserManager {
 		//Role specific actions
 		if (user.getRole() == Role.STUDENT) {
 			((Student)user).setTeam(null);
+		} else if (user.getRole() == Role.TA) {
+			//Removing the timeslots chosen by this TA
+			Query signUpQuery = em.createQuery("SELECT t FROM Timeslot t WHERE t.TA = :ta");
+			signUpQuery.setParameter("ta", user);
+			ArrayList<Timeslot> signUps = (ArrayList<Timeslot>) signUpQuery.getResultList();
+			for (Timeslot t : signUps) {
+				t.setTA(null);
+			}
 		}
 		
 		em.flush(); //Forcing write to DB
