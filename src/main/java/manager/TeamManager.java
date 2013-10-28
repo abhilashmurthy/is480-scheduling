@@ -113,21 +113,21 @@ public class TeamManager {
 		//Supervisor setting
 		//Checking if the new supervisor is the same as the previous one
 		if (team.getSupervisor() != null && !team.getSupervisor().equals(supervisor)) { //New supervisor is different from the previous one
-			//TODO REFRESH PENDING BOOKINGS!
+			swapFacultyForTeam(em, team.getSupervisor(), supervisor, team, "Supervisor");
 		}
 		team.setSupervisor(supervisor); //Setting the new guy as the supervisor
 		
 		//Reviewer1 setting
 		//Checking if the new reviewer1 is the same as the previous one
 		if (team.getReviewer1() != null && !team.getReviewer1().equals(reviewer1)) { //New reviewer1 is different from the previous one
-			//TODO REFRESH PENDING BOOKINGS!
+			swapFacultyForTeam(em, team.getReviewer1(), reviewer1, team, "Reviewer1");
 		}
 		team.setReviewer1(reviewer1); //Setting the new guy as reviewer1
 		
 		//Reviewer2 setting
 		//Checking if the new reviewer2 is the same as the previous one
 		if (team.getReviewer2() != null && !team.getReviewer2().equals(reviewer2)) { //New reviewer2 is different from the previous one
-			//TODO REFRESH PENDING BOOKINGS!
+			swapFacultyForTeam(em, team.getReviewer2(), reviewer2, team, "Reviewer2");
 		}
 		team.setReviewer2(reviewer2); //Setting the new guy as reviewer2
 		
