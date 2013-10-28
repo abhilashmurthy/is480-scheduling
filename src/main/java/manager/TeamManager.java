@@ -4,15 +4,19 @@
  */
 package manager;
 
+import constant.Response;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import model.Booking;
 import model.Team;
 import model.Term;
 import model.Timeslot;
+import model.User;
 import model.role.Faculty;
 import model.role.Student;
 import org.slf4j.Logger;
@@ -196,6 +200,45 @@ public class TeamManager {
 		//Deleting team
 		em.remove(team);
 		em.flush();
+	}
+	
+	public static void swapFaculty(EntityManager em, Faculty oldFac, Faculty newFac) throws Exception {
+		Query findTeams = em.createQuery("SELECT t FROM Team t WHERE t.supervisor = :faculty OR t.reviewer1 = :faculty OR t.reviewer2 = :faculty");
+		findTeams.setParameter("faculty", oldFac);
+		ArrayList<Team> teams = (ArrayList<Team>) findTeams.getResultList();
+		
+		for (Team t : teams) {
+			String role = null;
+			if (t.getSupervisor().equals(oldFac)) role = "Supervisor";
+			else if (t.getReviewer1().equals(oldFac)) role = "Reviewer1";
+			else if (t.getReviewer2().equals(oldFac)) role = "Reviewer2";
+			swapFacultyForTeam(em, oldFac, newFac, t, role);
+		}
+	}
+	
+	public static void swapFacultyForTeam(EntityManager em, Faculty oldFac, Faculty newFac, Team team, String role) throws Exception {
+		Query oldBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE b.team = :team AND :faculty MEMBER OF b.requiredAttendees");
+		oldBookingQuery.setParameter("team", team);
+		oldBookingQuery.setParameter("faculty", oldFac);
+		ArrayList<Booking> oldBookings = (ArrayList<Booking>) oldBookingQuery.getResultList();
+		for (Booking b : oldBookings) {
+			Set<User> requiredAttendees = b.getRequiredAttendees();
+			//Swapping in required attendees list
+			requiredAttendees.add(newFac);
+			requiredAttendees.remove(oldFac);
+			b.setRequiredAttendees(requiredAttendees);
+
+			//Swapping in response list
+			HashMap<User, Response> responseList = b.getResponseList();
+			Response r = responseList.get(oldFac);
+			responseList.remove(oldFac);
+			responseList.put(newFac, r);
+			b.setResponseList(responseList);
+		}
+		
+		//Setting the new faculty in the specified role for the team
+		Method roleSetter = Team.class.getDeclaredMethod("set" + role, Faculty.class);
+		roleSetter.invoke(team, newFac);
 	}
 	
 }

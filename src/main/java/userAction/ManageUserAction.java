@@ -55,7 +55,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
 				result = addEditUser(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
-				result = deleteUser();
+				result = deleteUser(dataObj);
 			} else {
 				json.put("success", false);
 				json.put("message", "Unknown action. Options: add/edit/delete");
@@ -134,8 +134,29 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to delete an existing user from the system
-	public boolean deleteUser() {
-		return false;
+	public boolean deleteUser(JsonObject dataObj) {
+		try {
+			long deleteUserId = 0;
+			JsonElement userIdInfo = dataObj.get("userId");
+			if (userIdInfo != null) deleteUserId = userIdInfo.getAsLong();
+			UserManager.deleteUser(em, deleteUserId);
+			
+			json.put("success", true);
+			return true;
+		} catch (CustomException e) {
+			json.put("success", false);
+			json.put("message", e.getMessage());
+			return false;
+		} catch (Exception e) {
+			logger.error("Exception: " + e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				logger.error(s.toString());
+			}
+			json.put("success", false);
+			json.put("message", "Oops. Something went wrong. Please try again!");
+			return false;
+		}
+		
 	}
 
 	public HashMap<String, Object> getJson() {
