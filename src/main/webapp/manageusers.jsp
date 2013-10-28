@@ -1063,7 +1063,7 @@
 									} else {
 										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
 									}
-									updateUserPage(user, userType.toUpperCase(), submitData);
+									updateUserPage(user, userType.toUpperCase(), submitData); //TODO - Remove once Delete User is functional
 									return true;
 								}).fail(function(error){
 									var eid = btoa(response.message);

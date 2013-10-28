@@ -187,8 +187,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 					TA ta = timeslot.getTA();
 					String TA = (ta != null) ? ta.getFullName() : "-";
 					map.put("TA", TA);
-					String teamWiki = "-";
-					map.put("teamWiki", teamWiki);
+					map.put("wiki", team.getWiki());
 
 					json.put("booking", map);
 

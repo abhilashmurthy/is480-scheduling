@@ -142,6 +142,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         Date endDate = new Date(t.getEndTime().getTime());
 						map.put("bookingId", b.getId());
                         map.put("team", b.getTeam().getTeamName());
+						map.put("wiki", b.getTeam().getWiki());
 
                         //View start date (DDD, dd MMM YYYY)
                         map.put("startDate", viewDateFormat.format(startDate));
@@ -199,9 +200,6 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         map.put("faculties", faculties);
                         map.put("optionals", optionals);
 						map.put("subscribedUsers", subscribedUsers);
-
-                        String teamWiki = "-";
-                        map.put("teamWiki", teamWiki);
                         if (user.getRole() == Role.FACULTY) {
                             map.put("isMyTeam", isMyTeam);
                         }
@@ -219,7 +217,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         Team team = student.getTeam();
 						boolean available = true;
 						ArrayList<String> unavailable = new ArrayList<String>();
-						if (team != null) {
+						if (team != null) {							
 							Milestone m = activeSchedule.getMilestone();
 							ArrayList<String> requiredAttendees = m.getRequiredAttendees();
 							for (String roleName : requiredAttendees) {

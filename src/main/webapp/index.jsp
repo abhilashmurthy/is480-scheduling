@@ -356,7 +356,7 @@
                     var $bookingDetailsTable = $(document.createElement('table'));
                     $bookingDetailsTable.attr('id', 'viewTimeslotTable');
 					var outputData = {
-						Team: timeslot.team,
+						Team: timeslot.wiki ? '<a id="wikiLink" href="' + timeslot.wiki + '">' + timeslot.team + '</a>':timeslot.team,
 						Status: timeslot.status,
 						Date: timeslot.startDate,
 						Time: timeslot.time,
@@ -803,6 +803,8 @@
 							self.find("#updateFormStartTime").val(timeslot.time).change();
 							self.find('ul').remove();
 							appendTokenInput(self); //Optional attendees
+						} else if ($(e.target).attr('id') === 'wikiLink') {
+							window.location.href = $(e.target).attr('href');
 						}
                         return false;
                     });
