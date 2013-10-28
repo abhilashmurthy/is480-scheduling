@@ -509,7 +509,13 @@
 					var $this = $(this);
 					var userType = 'cc';
 					var id = $('#ccUsersTable tr:last').attr('id').split('_')[1];
-					var user = ccData[0];
+					var user = null;
+					for (var key in ccData) {
+						if (ccData.hasOwnProperty(key)) {
+							user = ccData[key];
+							break;
+						}
+					}
 					var editableFields = new Array();
 					editableFields.push({order: 1, key: "Username", name:"username", value: user.username});
 					editableFields.push({order: 2, key: "Full Name", name:"fullName", value: user.name});
@@ -803,7 +809,42 @@
 						}
 					});
 					return false;
-				});				
+				});
+				
+				$('body').on('click', '.delTeamBtn', function(){
+					var team = teamData[$(this).closest('tr').attr('id').split('_')[1]];
+					bootbox.confirm({
+						title: "Remove Team ",
+						message: "Are you sure you want to remove Team <b>" + team.teamName + "</b>?",
+						callback: function(result) {
+							if (result) {
+								var submitData = {
+									action: 'delete',
+									teamId: team.id
+								};
+								$.ajax({
+									type: 'POST',
+									url: 'manageTeam',
+									data: {jsonData: JSON.stringify(submitData)},
+									async: false,
+									cache: false
+								}).done(function(response) {
+									if (response.success) {
+										setTimeout(function(){showNotification("SUCCESS", 'Deleted team successfully');}, 500);
+										setTimeout(function(){window.location.reload();}, 1000);
+									} else {
+										setTimeout(function(){showNotification("ERROR", response.message);}, 500);
+									}
+									return true;
+								}).fail(function(error){
+									var eid = btoa(response.message);
+									window.location = "error.jsp?eid=" + eid;
+								});
+							}
+						}
+					});
+					return false;
+				});
 				
 				//Modal specific
 				$('body').on('shown', '.modal', function(){
@@ -893,7 +934,7 @@
 								};
 								for (var i = 0; i < formData.length; i++) {
 									submitData[formData[i].name] = formData[i].value;
-									if (userType === 'student' && formData[i].name === 'teamId') {
+									if (userType === 'student' && formData[i].name === 'teamId' && formData[i].value > 0) {
 										submitData['teamName'] = teamData[formData[i].value].teamName;
 										break;
 									}
@@ -1022,8 +1063,8 @@
 				
 				function deleteUser(user, userType) {
 					bootbox.confirm({
-						title: "Remove User",
-						message: "Are you sure you want to remove " + user.name + "?",
+						title: "Remove " + userType.charAt(0).toUpperCase() + userType.slice(1),
+						message: "Are you sure you want to remove <b>" + user.name + "</b>?",
 						callback: function(result) {
 							if (result) {
 								var submitData = {
