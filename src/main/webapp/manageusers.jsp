@@ -130,7 +130,7 @@
 												<td class='teamName'><a class='studentTeamLink' id='teams_<s:property value= "teamId"/>' href='team_<s:property value= "teamName"/>'><s:property value= "teamName"/></a></td>
 												</s:if>
 												<s:else>
-												<td class='teamName'><a class='assignTeamsLink' id='assignTeams_<s:property value= "id"/>' href='assignTeams_<s:property value= "id"/>'>- Assign Team</a></td>
+												<td class='teamName'>-</td>
 												</s:else>
 											<td class='emailTd'>
 												<button type='button' title= "Email" class='emailBtn btn btn-small'>
@@ -176,7 +176,7 @@
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Teams</a>
 												</s:else>
 											</td>
 											<td class='reviewer1MyTeams'>
@@ -190,7 +190,7 @@
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Teams</a>
 												</s:else>
 											</td>
 											<td class='reviewer2MyTeams'>
@@ -204,7 +204,7 @@
 													</div>
 												</s:if>
 												<s:else>
-													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Team</a>
+													<a class='assignTeamsLink' id='assignTeams_<s:property value= "username"/>' href='assignTeams_<s:property value= "username"/>'>- Assign Teams</a>
 												</s:else>
 											</td>
 											<td>
@@ -471,7 +471,7 @@
 					return false;
 				});
 				
-				//- Assign Team Link
+				//- Assign Teams Link
 				$('body').on('click', '.assignTeamsLink', function(){
 					$('.usersNav li.teams').children('a').trigger('click');
 					$('body').animate({scrollTop: 0}, 500);
@@ -1396,11 +1396,7 @@
 																		.attr('href', 'teams_' + submitData.teamName)
 																		.html(submitData.teamName);
 																} else {
-																	return $(document.createElement('a'))
-																		.addClass('assignTeamsLink')
-																		.attr('id', 'assignTeams_' + submitData.username)
-																		.attr('href', 'assignTeams_' + submitData.username)
-																		.html('- Assign Team');
+																	return '-';
 																}
 															})
 													);
@@ -1502,14 +1498,7 @@
 						case 'edit':
 							var $tr = $('tr#user_' + user.id);
 							if (!submitData.teamName && submitData.teamId) {
-								//- Assign Team Link
-								$tr.find('td.teamName').empty().append(
-									$(document.createElement('a'))
-										.addClass('assignTeamsLink')
-										.attr('id', 'assignTeams_' + submitData.username)
-										.attr('href', 'assignTeams_' + submitData.username)
-										.html('- Assign Teams')
-								);
+								$tr.find('td.teamName').html('-');
 							}
 							for (var key in submitData) {
 								if (submitData.hasOwnProperty(key)) {
