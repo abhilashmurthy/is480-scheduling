@@ -110,7 +110,6 @@
 											</button>
 											</span>
 										</td>
-										<br/><br/>
 									</tr>
 								</s:iterator>
 								</tbody>
