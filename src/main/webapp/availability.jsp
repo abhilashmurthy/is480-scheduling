@@ -388,8 +388,8 @@
 
                 function makeTimeslotTable(tableClass, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
-                    var minTime = 9;
-                    var maxTime = 19;
+                    var minTime = scheduleData.dayStartTime;
+                    var maxTime = scheduleData.dayEndTime;
 
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
