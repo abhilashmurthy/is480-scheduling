@@ -475,7 +475,8 @@
 											.attr('id', 'unsubscribeBtn')
 											.addClass('popoverBtn btn')
 											.append($(document.createElement('i')).addClass('icon-calendar-empty icon-black'))
-											.append("Unsubscribe")
+											.append(" ")
+											.append("Cancel RSVP")
 											.outerHTML()
 									);
 //								}
@@ -498,7 +499,8 @@
 											.attr('id', 'subscribeBtn')
 											.addClass('popoverBtn btn')
 											.append($(document.createElement('i')).addClass('icon-calendar icon-black'))
-											.append("Subscribe")
+											.append(" ")
+											.append("RSVP")
 											.outerHTML()
 									);
 //								}
@@ -1179,7 +1181,8 @@
 									.attr('id', 'unsubscribeBtn')
 									.addClass('popoverBtn btn')
 									.append($(document.createElement('i')).addClass('icon-calendar-empty icon-black'))
-									.append("Unsubscribe")
+									.append(" ")
+									.append("Cancel RSVP")
 							);
 							self.find('#subscribeBtn').remove();
 							timeslot.subscribedUsers.push(myEmail);
@@ -1204,7 +1207,8 @@
 									.attr('id', 'subscribeBtn')
 									.addClass('popoverBtn btn')
 									.append($(document.createElement('i')).addClass('icon-calendar icon-black'))
-									.append("Subscribe")
+									.append(" ")
+									.append("RSVP")
 							);
 							self.find('#unsubscribeBtn').remove();
 							if (timeslot.subscribedUsers.indexOf(myEmail) !== -1) timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
