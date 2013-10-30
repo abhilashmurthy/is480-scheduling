@@ -73,12 +73,12 @@
 						<!-- Teams -->
 						<table id='teamsTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Members</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Members</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Email</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{teamData != null && teamData.size() > 0}">
 									<s:iterator var= "team" value= "teamData">
-										<tr id='team_<s:property value= "id"/>' class='teamRow'>
+										<tr id='team_<s:property value= "id"/>' class='teamRow editTeamBtn'>
 											<td><i class='fa fa-group fa-black'></i></td>
 											<td class='teamName'><s:property value= "teamName"/></td>
 											<td class='members'>
@@ -99,11 +99,6 @@
 												</button>
 											</td>
 											<td>
-												<button type='button' title= "Edit" class='editTeamBtn btn btn-info btn-small'>
-													<i class='fa fa-pencil fa-white'></i>
-												</button>
-											</td>
-											<td>
 												<button type='button' title= "Delete" class='delTeamBtn btn btn-danger btn-small'>
 													<i class='fa fa-trash-o fa-white'></i>
 												</button>
@@ -121,12 +116,12 @@
 						<!-- Students -->
 						<table id='studentUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Team</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Team</th><th>Email</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{studentData != null && studentData.size() > 0}">
 									<s:iterator var= "student" value= "studentData">
-										<tr id='user_<s:property value= "id"/>' class='studentRow'>
+										<tr id='user_<s:property value= "id"/>' class='studentRow modBtn editBtn'>
 											<td><i class='fa fa-user fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
@@ -140,11 +135,6 @@
 											<td class='emailTd'>
 												<button type='button' title= "Email" class='emailBtn btn btn-small'>
 													<i class='fa fa-envelope fa-black'></i>
-												</button>
-											</td>
-											<td class='editTd'>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
-													<i class='fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td class='deleteTd'>
@@ -165,12 +155,12 @@
 						<!-- Faculty -->
 						<table id='facultyUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Email</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{facultyData != null && facultyData.size() > 0}">
 									<s:iterator var= "faculty" value= "facultyData">
-										<tr id='user_<s:property value= "id"/>' class='facultyRow'>
+										<tr id='user_<s:property value= "id"/>' class='facultyRow modBtn editBtn'>
 											<td><i class='fa fa-briefcase fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
@@ -223,11 +213,6 @@
 												</button>
 											</td>
 											<td>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
-													<i class='fa fa-pencil fa-white'></i>
-												</button>
-											</td>
-											<td>
 												<button type='button' title= "Delete" class='modBtn delBtn btn btn-danger btn-small'>
 													<i class='fa fa-trash-o fa-white'></i>
 												</button>
@@ -245,12 +230,12 @@
 						<!-- TAs -->
 						<table id='taUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Signups</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Signups</th><th>Email</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{taData != null && taData.size() > 0}">
 									<s:iterator var= "ta" value= "taData">
-										<tr id='user_<s:property value= "id"/>' class='taRow'>
+										<tr id='user_<s:property value= "id"/>' class='taRow modBtn editBtn'>
 											<td><i class='fa fa-video-camera fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
@@ -261,11 +246,6 @@
 											<td>
 												<button type='button' title= "Email" class='emailBtn btn btn-small'>
 													<i class='fa fa-envelope fa-black'></i>
-												</button>
-											</td>
-											<td>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
-													<i class='fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td>
@@ -286,12 +266,12 @@
 						<!-- Admins -->
 						<table id='adminUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{adminData != null && adminData.size() > 0}">
 									<s:iterator var= "admin" value= "adminData">
-										<tr id='user_<s:property value= "id"/>' class='adminRow'>
+										<tr id='user_<s:property value= "id"/>' class='adminRow modBtn editBtn'>
 											<td><i class='fa fa-eye fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
@@ -299,11 +279,6 @@
 											<td>
 												<button type='button' title= "Email" class='emailBtn btn btn-small'>
 													<i class='fa fa-envelope fa-black'></i>
-												</button>
-											</td>
-											<td>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
-													<i class='fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td>
@@ -322,7 +297,7 @@
 					</div>
 					<div class='tab-pane' id='cc'>
 						<!-- Course Coordinator -->
-						<table id='ccUsersTable' class='usersTable table table-hover zebra-striped'>
+						<table id='ccUsersTable' class='usersTable table zebra-striped'>
 							<thead>
 								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th></tr>
 							</thead>
@@ -627,6 +602,7 @@
 					editableFields.push({order: 1, key: "Username", name:"username", value: user.username});
 					editableFields.push({order: 2, key: "Full Name", name:"fullName", value: user.name});
 					editUser(user, userType, editableFields);
+					return false;
 				});
 				
 				$('body').on('click', '.emailBtn, .emailAllBtn', function(){
@@ -674,6 +650,7 @@
 					}
 					body += ',%0D%0A%0D%0A';
 					window.location.href = 'mailto:' + to + '?body=' + body;
+					return false;
 				});
 				
 				$('body').on('click', '.modBtn', function(){
@@ -709,6 +686,7 @@
 					else if ($this.hasClass('delBtn')) {
 						deleteUser(user, userType);
 					}
+					return false;
 				});
 				
 				$('body').on('click', '.addBtn', function(){
@@ -717,6 +695,7 @@
 					if (userType === 'student') addableFields.push({key: "Team", name: "teamId", order: 3});
 					addableFields.sort(compare);
 					addUser(userType, addableFields);
+					return false;
 				});
 				
 				$('body').on('click', '.addTeamBtn, .editTeamBtn', function(){
@@ -899,6 +878,7 @@
 					}
 					body += ',%0D%0A%0D%0A';
 					window.location.href = 'mailto:' + to + '?cc=' + cc + '&body=' + body;
+					return false;
 				});
 				
 				$('body').on('click', '.emailTeamBtn', function(){
@@ -913,6 +893,7 @@
 					mailto += '?cc=' + team.supervisor.username + '@smu.edu.sg';
 					mailto += '&body=Hi ' + team.teamName + ',%0D%0A%0D%0A';
 					window.location.href = 'mailto:' + mailto;
+					return false;
 				});
 				
 				$('body').on('click', '.delTeamBtn', function(){
@@ -1365,6 +1346,7 @@
 							$lastTr.after(
 								$(document.createElement('tr'))
 									.addClass(userType + 'Row')
+									.addClass('modBtn editBtn')
 									.attr('id', 'user_' + user.id)
 									.append(
 										$(document.createElement('td'))
@@ -1481,18 +1463,6 @@
 													.addClass('emailBtn btn btn-small')
 													.append(
 														$(document.createElement('i')).addClass('fa fa-envelope fa-black')
-													)
-											)
-									)
-									.append(
-										$(document.createElement('td'))
-											.append(
-												$(document.createElement('button'))
-													.attr('type', 'button')
-													.attr('title', 'Edit')
-													.addClass('modBtn editBtn btn btn-info btn-small')
-													.append(
-														$(document.createElement('i')).addClass('fa fa-pencil fa-white')
 													)
 											)
 									)
