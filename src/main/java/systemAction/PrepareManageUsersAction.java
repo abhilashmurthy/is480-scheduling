@@ -10,6 +10,8 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -126,6 +128,11 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 						memberMap.put("username", student.getUsername());
 						memberList.add(memberMap);
 					}
+					Collections.sort(memberList, new Comparator<HashMap<String, Object>>(){
+						public int compare(HashMap<String, Object> o1, HashMap<String, Object> o2) {
+							return String.valueOf(o1.get("name")).compareToIgnoreCase(String.valueOf(o2.get("name")));
+						}
+					});
 					teamMap.put("members", memberList);
 					HashMap<String, Object> supervisorMap = new HashMap<String, Object>();
 					supervisorMap.put("id", team.getSupervisor().getId());

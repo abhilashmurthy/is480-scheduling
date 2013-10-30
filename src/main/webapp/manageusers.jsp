@@ -45,14 +45,20 @@
 						</tr>
 					</table>
 				</form>
-				<button type='button' id='add_team' class='addTeamBtn pull-right btn btn-primary'>
-					<i class='fa fa fa-plus fa-white'></i> Add Team
+				<button type='button' id='add_team' class='addTeamBtn topBtn pull-right btn btn-primary'>
+					<i class='fa fa-plus fa-white'></i> Add Team
 				</button>
-				<button type='button' id='add_student' class='addBtn pull-right btn btn-primary' style='display:none'>
-					<i class='fa fa fa-plus fa-white'></i> Add Student
+				<button type='button' id='email_teams' class='emailAllTeamsBtn topBtn pull-right btn'>
+					<i class='fa fa-envelope fa-black'></i> Email Teams
 				</button>
-				<button type='button' title= "Edit Course Coordinator" class='editAdminBtn pull-right editBtn btn btn-info' style='display:none'>
-					<i class='fa fa fa-pencil fa-white'></i> Edit Course Coordinator
+				<button type='button' id='add_student' class='addBtn topBtn pull-right btn btn-primary' style='display:none'>
+					<i class='fa fa-plus fa-white'></i> Add Student
+				</button>
+				<button type='button' id='email_all_student' class='emailAllBtn topBtn pull-right btn' style='display:none'>
+					<i class='fa fa-envelope fa-black'></i> Email Students
+				</button>
+				<button type='button' title= "Edit Course Coordinator" class='editAdminBtn topBtn pull-right editBtn btn btn-info' style='display:none'>
+					<i class='fa fa-pencil fa-white'></i> Edit Course Coordinator
 				</button>
 				<ul class='usersNav nav nav-tabs' id='myTab'>
 					<li class='teams active'><a href='#teams'><h4>Teams</h4></a></li>
@@ -67,13 +73,13 @@
 						<!-- Teams -->
 						<table id='teamsTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Members</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Members</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{teamData != null && teamData.size() > 0}">
 									<s:iterator var= "team" value= "teamData">
 										<tr id='team_<s:property value= "id"/>' class='teamRow'>
-											<td><i class='fa fa fa-group fa-black'></i></td>
+											<td><i class='fa fa-group fa-black'></i></td>
 											<td class='teamName'><s:property value= "teamName"/></td>
 											<td class='members'>
 												<div class='memberList'>
@@ -88,13 +94,18 @@
 											<td class='reviewer1'><a class='teamFacultyLink teamReviewer1_<s:property value= "#team.reviewer1.id"/>' href='reviewer1_<s:property value= "#team.teamName"/>'><s:property value= "reviewer1.name"/></a></td>
 											<td class='reviewer2'><a class='teamFacultyLink teamReviewer2_<s:property value= "#team.reviewer2.id"/>' href='reviewer2_<s:property value= "#team.teamName"/>'><s:property value= "reviewer2.name"/></a></td>
 											<td>
-												<button type='button' title= "Edit" class='editTeamBtn btn btn-info'>
-													<i class='fa fa fa-pencil fa-white'></i>
+												<button type='button' title= "Email" class='emailTeamBtn btn btn-small'>
+													<i class='fa fa-envelope fa-black'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title= "Delete User" class='delTeamBtn btn btn-danger'>
-													<i class='fa fa fa-trash-o fa-white'></i>
+												<button type='button' title= "Edit" class='editTeamBtn btn btn-info btn-small'>
+													<i class='fa fa-pencil fa-white'></i>
+												</button>
+											</td>
+											<td>
+												<button type='button' title= "Delete" class='delTeamBtn btn btn-danger btn-small'>
+													<i class='fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
 										</tr>
@@ -110,13 +121,13 @@
 						<!-- Students -->
 						<table id='studentUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Team</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Team</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{studentData != null && studentData.size() > 0}">
 									<s:iterator var= "student" value= "studentData">
 										<tr id='user_<s:property value= "id"/>' class='studentRow'>
-											<td><i class='fa fa fa-user fa-black'></i></td>
+											<td><i class='fa fa-user fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
 											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
@@ -126,14 +137,19 @@
 												<s:else>
 												<td class='teamName'><a class='assignTeamsLink' id='assignTeams_<s:property value= "id"/>' href='assignTeams_<s:property value= "id"/>'>- Assign Team</a></td>
 												</s:else>
+											<td class='emailTd'>
+												<button type='button' title= "Email" class='emailBtn btn btn-small'>
+													<i class='fa fa-envelope fa-black'></i>
+												</button>
+											</td>
 											<td class='editTd'>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
-													<i class='fa fa fa-pencil fa-white'></i>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
+													<i class='fa fa-pencil fa-white'></i>
 												</button>
 											</td>
 											<td class='deleteTd'>
-												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
-													<i class='fa fa fa-trash-o fa-white'></i>
+												<button type='button' title= "Delete" class='modBtn delBtn btn btn-danger btn-small'>
+													<i class='fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
 										</tr>
@@ -149,7 +165,7 @@
 						<!-- Faculty -->
 						<table id='facultyUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Supervisor</th><th>Reviewer 1</th><th>Reviewer 2</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{facultyData != null && facultyData.size() > 0}">
@@ -202,13 +218,18 @@
 												</s:else>
 											</td>
 											<td>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
-													<i class='fa fa fa-pencil fa-white'></i>
+												<button type='button' title= "Email" class='emailBtn btn btn-small'>
+													<i class='fa fa-envelope fa-black'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
-													<i class='fa fa fa-trash-o fa-white'></i>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
+													<i class='fa fa-pencil fa-white'></i>
+												</button>
+											</td>
+											<td>
+												<button type='button' title= "Delete" class='modBtn delBtn btn btn-danger btn-small'>
+													<i class='fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
 										</tr>
@@ -224,7 +245,7 @@
 						<!-- TAs -->
 						<table id='taUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Signups</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Signups</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{taData != null && taData.size() > 0}">
@@ -238,13 +259,18 @@
 												<a class='taSignupsLink' id='signups_<s:property value= "id"/>' href='ta_<s:property value= "username"/>'><s:property value= "%{#ta.mySignups.size()}"/></a>
 											</td>
 											<td>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
-													<i class='fa fa fa-pencil fa-white'></i>
+												<button type='button' title= "Email" class='emailBtn btn btn-small'>
+													<i class='fa fa-envelope fa-black'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
-													<i class='fa fa fa-trash-o fa-white'></i>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
+													<i class='fa fa-pencil fa-white'></i>
+												</button>
+											</td>
+											<td>
+												<button type='button' title= "Delete" class='modBtn delBtn btn btn-danger btn-small'>
+													<i class='fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
 										</tr>
@@ -260,24 +286,29 @@
 						<!-- Admins -->
 						<table id='adminUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Edit</th><th>Delete</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Email</th><th>Edit</th><th>Delete</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{adminData != null && adminData.size() > 0}">
 									<s:iterator var= "admin" value= "adminData">
 										<tr id='user_<s:property value= "id"/>' class='adminRow'>
-											<td><i class='fa fa fa-eye fa-black'></i></td>
+											<td><i class='fa fa-eye fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
 											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
 											<td>
-												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info'>
-													<i class='fa fa fa-pencil fa-white'></i>
+												<button type='button' title= "Email" class='emailBtn btn btn-small'>
+													<i class='fa fa-envelope fa-black'></i>
 												</button>
 											</td>
 											<td>
-												<button type='button' title= "Delete User" class='modBtn delBtn btn btn-danger'>
-													<i class='fa fa fa-trash-o fa-white'></i>
+												<button type='button' title= "Edit" class='modBtn editBtn btn btn-info btn-small'>
+													<i class='fa fa-pencil fa-white'></i>
+												</button>
+											</td>
+											<td>
+												<button type='button' title= "Delete" class='modBtn delBtn btn btn-danger btn-small'>
+													<i class='fa fa-trash-o fa-white'></i>
 												</button>
 											</td>
 										</tr>
@@ -299,7 +330,7 @@
 								<s:if test= "%{ccData != null && ccData.size() > 0}">
 									<s:iterator var= "cc" value= "ccData">
 										<tr id='user_<s:property value= "id"/>' class='ccRow'>
-											<td><i class='fa fa fa-coffee fa-black'></i></td>
+											<td><i class='fa fa-coffee fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
 											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
@@ -355,6 +386,17 @@
 					}
 				}
 				
+				//label comparator
+				function compareLabel(a, b) {
+					if (a.label.trim() < b.label.trim()) {
+						return -1;
+					} else if (a.label.trim() > b.label.trim()) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+				
 				function convertUserData(arrayData) {
 					var jsonData = {};
 					for (var i = 0; i < arrayData.length; i++) {
@@ -364,21 +406,20 @@
 				}
 				
 				function convertMultiselectOptionData(jsonData, userType) {
-					var multiselectOptionArray = new Array();
+					var multiselectOptionPriorityArray = new Array();
+					var multiselectOptionOthersArray = new Array();
 					if (userType === 'student') {
 						for (var key in jsonData) {
 							if (jsonData.hasOwnProperty(key)) {
 								if (!jsonData[key].teamName) {
-									multiselectOptionArray.push({
+									multiselectOptionPriorityArray.push({
 										label: jsonData[key].name + ' (No Team)',
-										value: jsonData[key].id,
-										order: 0
+										value: jsonData[key].id
 									});
 								} else {
-									multiselectOptionArray.push({
+									multiselectOptionOthersArray.push({
 										label: jsonData[key].name,
-										value: jsonData[key].id,
-										order: 1
+										value: jsonData[key].id
 									});
 								}
 							}
@@ -387,23 +428,22 @@
 						for (var key in jsonData) {
 							if (jsonData.hasOwnProperty(key)) {
 								if (jsonData[key].supervisorTeams.length === 0 && jsonData[key].reviewer1Teams.length === 0 && jsonData[key].reviewer2Teams.length === 0) {
-									multiselectOptionArray.push({
+									multiselectOptionPriorityArray.push({
 										label: jsonData[key].name + ' (No Teams)',
-										value: jsonData[key].id,
-										order: 0
+										value: jsonData[key].id
 									});
 								} else {
-									multiselectOptionArray.push({
+									multiselectOptionOthersArray.push({
 										label: jsonData[key].name,
-										value: jsonData[key].id,
-										order: 1
+										value: jsonData[key].id
 									});
 								}
 							}
 						}
 					}
-					multiselectOptionArray.sort(compare);
-					return multiselectOptionArray;
+					multiselectOptionPriorityArray.sort(compareLabel);
+					multiselectOptionOthersArray.sort(compareLabel);
+					return jQuery.merge(multiselectOptionPriorityArray, multiselectOptionOthersArray);
 				}
 				
 				/****************/
@@ -421,6 +461,7 @@
 					var userType = (href.slice(-1) === 's'?href.slice(0, -1):href);
 					if (userType !== 'cc' && userType !== 'team') {
 						$('.addTeamBtn').hide();
+						$('.emailAllTeamsBtn').hide();
 						$('.editAdminBtn').hide();
 						$('.addBtn').show();
 						$('.addBtn')
@@ -430,13 +471,26 @@
 									(userType === 'ta'?userType.toUpperCase()
 									:userType.charAt(0).toUpperCase() + userType.slice(1))
 								);
+						$('.emailAllBtn').show();
+						$('.emailAllBtn')
+								.attr('id', 'email_all_' + userType)
+								.html(
+									$('.emailAllBtn').children('i').outerHTML() + ' Email ' + 
+									(userType === 'ta'?userType.toUpperCase()
+									:userType === 'faculty'?'Facultie'
+									:userType.charAt(0).toUpperCase() + userType.slice(1)) + 's'
+								);
 					} else if (userType === 'cc') {
 						$('.addBtn').hide();
+						$('.emailAllBtn').hide();
 						$('.addTeamBtn').hide();
+						$('.emailAllTeamsBtn').hide();
 						$('.editAdminBtn').show();
 					} else if (userType === 'team') {
 						$('.addTeamBtn').show();
+						$('.emailAllTeamsBtn').show();
 						$('.addBtn').hide();
+						$('.emailAllBtn').hide();
 						$('.editAdminBtn').hide();
 					}
 					return false;
@@ -573,6 +627,53 @@
 					editableFields.push({order: 1, key: "Username", name:"username", value: user.username});
 					editableFields.push({order: 2, key: "Full Name", name:"fullName", value: user.name});
 					editUser(user, userType, editableFields);
+				});
+				
+				$('body').on('click', '.emailBtn, .emailAllBtn', function(){
+					var $this = $(this);
+					var userType = $this.is('.emailAllBtn')?$this.attr('id').substring(10):$this.closest('tr').attr('class').split('Row')[0];
+					var id = $this.is('.emailAllBtn')?'':$this.closest('tr').attr('id').split('_')[1];
+					var user = null;
+					var roleData = null;
+					switch (userType) {
+						case 'student':
+							user = studentData[id];
+							roleData = studentData;
+							break;
+						case 'faculty':
+							user = facultyData[id];
+							roleData = facultyData;
+							break;
+						case 'ta':
+							user = taData[id];
+							roleData = taData;
+							break;
+						case 'admin':
+							user = adminData[id];
+							roleData = adminData;
+							break;
+						default:
+							showNotification("ERROR", 'Usertype not found!');
+							return false;
+					}
+					var to = '';
+					var body = 'Hi ';
+					if ($this.is('.emailAllBtn')) {
+						body += 'IS480 ';
+						for (var key in roleData) {
+							if (roleData.hasOwnProperty(key)) {
+								to += roleData[key].username + '@smu.edu.sg; ';
+							}
+						}
+						body += (userType === 'ta'?userType.toUpperCase()
+										:userType === 'faculty'?'Facultie'
+										:userType.charAt(0).toUpperCase() + userType.slice(1)) + 's';
+					} else {
+						to += roleData[id].username + '@smu.edu.sg; ';
+						body += roleData[id].name;
+					}
+					body += ',%0D%0A%0D%0A';
+					window.location.href = 'mailto:' + to + '?body=' + body;
 				});
 				
 				$('body').on('click', '.modBtn', function(){
@@ -776,6 +877,42 @@
 					//Multiselect options
 					initializeMultiselect(action, team);
 					return false;
+				});
+				
+				$('body').on('click', '.emailAllTeamsBtn', function(){
+					var $this = $(this);
+					var to = '';
+					var body = 'Hi IS480 Teams';
+					var cc = '';
+					for (var key in teamData) {
+						if (teamData.hasOwnProperty(key)) {
+							var team = teamData[key];
+							for (var i = 0; i < team.members.length; i++) {
+								to += team.members[i].username + '@smu.edu.sg; ';
+							}
+						}
+					}
+					for (var key in facultyData) {
+						if (facultyData.hasOwnProperty(key)) {
+							cc += facultyData[key].username + '@smu.edu.sg; ';
+						}
+					}
+					body += ',%0D%0A%0D%0A';
+					window.location.href = 'mailto:' + to + '?cc=' + cc + '&body=' + body;
+				});
+				
+				$('body').on('click', '.emailTeamBtn', function(){
+					var $this = $(this);
+					var userType = $this.closest('tr').attr('class').split('Row')[0];
+					var id = $this.closest('tr').attr('id').split('_')[1];
+					var team = teamData[id];
+					var mailto = '';
+					for (var i = 0 ; i < team.members.length; i++) {
+						mailto += team.members[i].username + '@smu.edu.sg; ';
+					}
+					mailto += '?cc=' + team.supervisor.username + '@smu.edu.sg';
+					mailto += '&body=Hi ' + team.teamName + ',%0D%0A%0D%0A';
+					window.location.href = 'mailto:' + mailto;
 				});
 				
 				$('body').on('click', '.delTeamBtn', function(){
@@ -1340,8 +1477,20 @@
 											.append(
 												$(document.createElement('button'))
 													.attr('type', 'button')
+													.attr('title', 'Email')
+													.addClass('emailBtn btn btn-small')
+													.append(
+														$(document.createElement('i')).addClass('fa fa-envelope fa-black')
+													)
+											)
+									)
+									.append(
+										$(document.createElement('td'))
+											.append(
+												$(document.createElement('button'))
+													.attr('type', 'button')
 													.attr('title', 'Edit')
-													.addClass('modBtn editBtn btn btn-info')
+													.addClass('modBtn editBtn btn btn-info btn-small')
 													.append(
 														$(document.createElement('i')).addClass('fa fa-pencil fa-white')
 													)
@@ -1353,7 +1502,7 @@
 												$(document.createElement('button'))
 													.attr('type', 'button')
 													.attr('title', 'Delete')
-													.addClass('modBtn delBtn btn btn-danger')
+													.addClass('modBtn delBtn btn btn-danger btn-small')
 													.append(
 														$(document.createElement('i')).addClass('fa fa-trash-o fa-white')
 													)
@@ -1506,7 +1655,7 @@
 								maxHeight: 150,
 								enableCaseInsensitiveFiltering: true,
 								filterPlaceholder: 'Search',
-								buttonClass: 'btn btn-link userSelectBtn'
+								buttonClass: 'btn userSelectBtn'
 							});
 							$this.multiselect('dataprovider', convertMultiselectOptionData(studentData, 'student'));
 							if (action === 'edit') {
@@ -1542,7 +1691,7 @@
 								},
 								enableCaseInsensitiveFiltering: true,
 								filterPlaceholder: 'Search',
-								buttonClass: 'btn btn-link userSelectBtn facultyUserSelectBtn'
+								buttonClass: 'btn userSelectBtn facultyUserSelectBtn'
 							});
 							$this.multiselect('dataprovider', convertMultiselectOptionData(facultyData, 'faculty'));
 							if (action === 'edit') {
