@@ -186,7 +186,6 @@
 												<i class="icon-remove">&nbsp; Revoke</i>
 											</button>
 										</td>
-										<br/><br/>
 									</tr>
 								</s:iterator>
 								</tbody>
