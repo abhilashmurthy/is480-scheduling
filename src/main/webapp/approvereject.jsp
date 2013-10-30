@@ -110,7 +110,6 @@
 											</button>
 											</span>
 										</td>
-										<br/><br/>
 									</tr>
 								</s:iterator>
 								</tbody>
@@ -186,7 +185,6 @@
 												<i class="icon-remove">&nbsp; Revoke</i>
 											</button>
 										</td>
-										<br/><br/>
 									</tr>
 								</s:iterator>
 								</tbody>
