@@ -4,6 +4,7 @@
  */
 package manager;
 
+import constant.BookingStatus;
 import constant.Response;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.servlet.ServletContext;
 import model.Booking;
 import model.Team;
 import model.Term;
@@ -32,8 +34,9 @@ public class TeamManager {
 	private static Logger logger = LoggerFactory.getLogger(TeamManager.class);
 	
 	public static HashMap<String, Object> addEditTeam
-			(EntityManager em, String teamName, String wiki, long termId, List<Long> memberIds,
-			long supervisorId, long reviewer1Id, long reviewer2Id, long existingTeamId)
+			(EntityManager em, User doer, String teamName, String wiki, long termId,
+			List<Long> memberIds, long supervisorId, long reviewer1Id, long reviewer2Id, long existingTeamId,
+			ServletContext ctx)
 			throws Exception
 	{
 		HashMap<String, Object> json = new HashMap<String, Object>();
@@ -113,21 +116,21 @@ public class TeamManager {
 		//Supervisor setting
 		//Checking if the new supervisor is the same as the previous one
 		if (team.getSupervisor() != null && !team.getSupervisor().equals(supervisor)) { //New supervisor is different from the previous one
-			swapFacultyForTeam(em, team.getSupervisor(), supervisor, team, "Supervisor");
+			swapFacultyForTeam(em, doer, team.getSupervisor(), supervisor, team, "Supervisor", ctx);
 		}
 		team.setSupervisor(supervisor); //Setting the new guy as the supervisor
 		
 		//Reviewer1 setting
 		//Checking if the new reviewer1 is the same as the previous one
 		if (team.getReviewer1() != null && !team.getReviewer1().equals(reviewer1)) { //New reviewer1 is different from the previous one
-			swapFacultyForTeam(em, team.getReviewer1(), reviewer1, team, "Reviewer1");
+			swapFacultyForTeam(em, doer, team.getReviewer1(), reviewer1, team, "Reviewer1", ctx);
 		}
 		team.setReviewer1(reviewer1); //Setting the new guy as reviewer1
 		
 		//Reviewer2 setting
 		//Checking if the new reviewer2 is the same as the previous one
 		if (team.getReviewer2() != null && !team.getReviewer2().equals(reviewer2)) { //New reviewer2 is different from the previous one
-			swapFacultyForTeam(em, team.getReviewer2(), reviewer2, team, "Reviewer2");
+			swapFacultyForTeam(em, doer, team.getReviewer2(), reviewer2, team, "Reviewer2", ctx);
 		}
 		team.setReviewer2(reviewer2); //Setting the new guy as reviewer2
 		
@@ -202,7 +205,7 @@ public class TeamManager {
 		em.flush();
 	}
 	
-	public static void swapFaculty(EntityManager em, Faculty oldFac, Faculty newFac) throws Exception {
+	public static void swapFaculty(EntityManager em, User doer, Faculty oldFac, Faculty newFac, ServletContext ctx) throws Exception {
 		Query findTeams = em.createQuery("SELECT t FROM Team t WHERE t.supervisor = :faculty OR t.reviewer1 = :faculty OR t.reviewer2 = :faculty");
 		findTeams.setParameter("faculty", oldFac);
 		ArrayList<Team> teams = (ArrayList<Team>) findTeams.getResultList();
@@ -212,28 +215,36 @@ public class TeamManager {
 			if (t.getSupervisor().equals(oldFac)) role = "Supervisor";
 			else if (t.getReviewer1().equals(oldFac)) role = "Reviewer1";
 			else if (t.getReviewer2().equals(oldFac)) role = "Reviewer2";
-			swapFacultyForTeam(em, oldFac, newFac, t, role);
+			swapFacultyForTeam(em, doer, oldFac, newFac, t, role, ctx);
 		}
 	}
 	
-	public static void swapFacultyForTeam(EntityManager em, Faculty oldFac, Faculty newFac, Team team, String role) throws Exception {
-		Query oldBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE b.team = :team AND :faculty MEMBER OF b.requiredAttendees");
-		oldBookingQuery.setParameter("team", team);
-		oldBookingQuery.setParameter("faculty", oldFac);
-		ArrayList<Booking> oldBookings = (ArrayList<Booking>) oldBookingQuery.getResultList();
-		for (Booking b : oldBookings) {
-			Set<User> requiredAttendees = b.getRequiredAttendees();
-			//Swapping in required attendees list
-			requiredAttendees.add(newFac);
-			requiredAttendees.remove(oldFac);
-			b.setRequiredAttendees(requiredAttendees);
+	public static void swapFacultyForTeam(EntityManager em, User doer, Faculty oldFac, Faculty newFac, Team team, String role, ServletContext ctx) throws Exception {
+		Query existingBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE b.team = :team AND :faculty MEMBER OF b.requiredAttendees");
+		existingBookingQuery.setParameter("team", team);
+		existingBookingQuery.setParameter("faculty", oldFac);
+		ArrayList<Booking> existingBookings = (ArrayList<Booking>) existingBookingQuery.getResultList();
+		for (Booking b : existingBookings) {
+			if (b.getBookingStatus() == BookingStatus.PENDING 
+					|| b.getBookingStatus() == BookingStatus.APPROVED) {
+				//Active booking. Delete and recreate at the same spot
+				
+			} else {
+				//Old booking. Just do the sneaky swap.
+				//Replace the old guy with the new guy in the response list (approve/reject HashMap) and required attendees list.
+				Set<User> requiredAttendees = b.getRequiredAttendees();
+				//Swapping in required attendees list
+				requiredAttendees.add(newFac);
+				requiredAttendees.remove(oldFac);
+				b.setRequiredAttendees(requiredAttendees);
 
-			//Swapping in response list
-			HashMap<User, Response> responseList = b.getResponseList();
-			Response r = responseList.get(oldFac);
-			responseList.remove(oldFac);
-			responseList.put(newFac, r);
-			b.setResponseList(responseList);
+				//Swapping in response list
+				HashMap<User, Response> responseList = b.getResponseList();
+				Response r = responseList.get(oldFac);
+				responseList.remove(oldFac);
+				responseList.put(newFac, r);
+				b.setResponseList(responseList);	
+			}
 		}
 		
 		//Setting the new faculty in the specified role for the team

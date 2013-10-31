@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import model.Booking;
 import model.Team;
@@ -404,7 +404,7 @@ public class UserManager {
 		return json;
 	}
 	
-	public static void deleteUser(EntityManager em, long userId, long loggedInUserId) throws Exception {
+	public static void deleteUser(EntityManager em, User doer, long userId, long loggedInUserId, ServletContext ctx) throws Exception {
 		User user = em.find(User.class, userId);
 		if (user == null) throw new CustomException("User not found");
 		
@@ -423,7 +423,7 @@ public class UserManager {
 			Faculty faculty = em.find(Faculty.class, user.getId());
 			faculty.setUnavailableTimeslots(null);
 			Faculty replacement = getFacultyObjForCCForTerm(em, user.getTerm());
-			TeamManager.swapFaculty(em, faculty, replacement);
+			TeamManager.swapFaculty(em, doer, faculty, replacement, ctx);
 			user = faculty;
 		} else if (user.getRole() == Role.COURSE_COORDINATOR) {
 			throw new CustomException("Course Coordinator cannot be removed. Only editing of details allowed!");

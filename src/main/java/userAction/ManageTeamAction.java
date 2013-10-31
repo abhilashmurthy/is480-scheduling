@@ -15,6 +15,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import manager.TeamManager;
 import model.User;
@@ -57,7 +58,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			
 			boolean result;
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a team
-				result = addEditTeam(actionType, dataObj);
+				result = addEditTeam(user, actionType, dataObj, request.getSession().getServletContext());
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing team
 				result = deleteTeam(dataObj);
 			} else {
@@ -83,7 +84,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to add a new team to the system
-	public boolean addEditTeam(String actionType, JsonObject dataObj) {
+	public boolean addEditTeam(User user, String actionType, JsonObject dataObj, ServletContext ctx) {
 		try {
 			long existingTeamId = 0;
 			if (actionType.equalsIgnoreCase("edit")) {
@@ -112,7 +113,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			Type collectionType = new TypeToken<ArrayList<Long>>(){}.getType();
 			ArrayList<Long> memberIds = new Gson().fromJson(dataObj.get("members"), collectionType);
 		
-			json = TeamManager.addEditTeam(em, teamName, wiki, termId, memberIds, supervisorId, reviewer1Id, reviewer2Id, existingTeamId);
+			json = TeamManager.addEditTeam(em, user, teamName, wiki, termId, memberIds, supervisorId, reviewer1Id, reviewer2Id, existingTeamId, ctx);
 			return true;
 		} catch (CustomException e) {
 			json.put("success", false);

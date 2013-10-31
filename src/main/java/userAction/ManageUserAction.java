@@ -12,6 +12,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import manager.UserManager;
 import model.User;
@@ -55,7 +56,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
 				result = addEditUser(actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
-				result = deleteUser(dataObj, user.getId());
+				result = deleteUser(user, dataObj, user.getId(), request.getSession().getServletContext());
 			} else {
 				json.put("success", false);
 				json.put("message", "Unknown action. Options: add/edit/delete");
@@ -134,12 +135,12 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to delete an existing user from the system
-	public boolean deleteUser(JsonObject dataObj, long loggedInUserId) {
+	public boolean deleteUser(User user, JsonObject dataObj, long loggedInUserId, ServletContext ctx) {
 		try {
 			long deleteUserId = 0;
 			JsonElement userIdInfo = dataObj.get("userId");
 			if (userIdInfo != null) deleteUserId = userIdInfo.getAsLong();
-			UserManager.deleteUser(em, deleteUserId, loggedInUserId);
+			UserManager.deleteUser(em, user, deleteUserId, loggedInUserId, ctx);
 			
 			json.put("success", true);
 			return true;
