@@ -95,7 +95,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			em.getTransaction().begin();
 			json = BookingManager.createBooking(em, timeslot, user, team, overrideApproval);
 			em.getTransaction().commit();
-			return SUCCESS;
+			return SUCCESS; 
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
