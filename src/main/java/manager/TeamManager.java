@@ -112,27 +112,30 @@ public class TeamManager {
 		team.setTeamName(teamName);
 		team.setWiki(wiki);
 		team.setTerm(term);
+		Faculty oldSup = team.getSupervisor();
+		team.setSupervisor(supervisor);
+		Faculty oldRev1 = team.getReviewer1();
+		team.setReviewer1(reviewer1);
+		Faculty oldRev2 = team.getReviewer2();
+		team.setReviewer2(reviewer2);
 		
 		//Supervisor setting
 		//Checking if the new supervisor is the same as the previous one
-		if (team.getSupervisor() != null && !team.getSupervisor().equals(supervisor)) { //New supervisor is different from the previous one
-			swapFacultyForTeam(em, doer, team.getSupervisor(), supervisor, team, "Supervisor", ctx);
+		if (oldSup != null && !oldSup.equals(supervisor)) { //New supervisor is different from the previous one
+			swapFacultyForTeam(em, doer, oldSup, supervisor, team, "Supervisor", ctx);
 		}
-		team.setSupervisor(supervisor); //Setting the new guy as the supervisor
 		
 		//Reviewer1 setting
 		//Checking if the new reviewer1 is the same as the previous one
-		if (team.getReviewer1() != null && !team.getReviewer1().equals(reviewer1)) { //New reviewer1 is different from the previous one
-			swapFacultyForTeam(em, doer, team.getReviewer1(), reviewer1, team, "Reviewer1", ctx);
+		if (oldRev1 != null && !oldRev1.equals(reviewer1)) { //New reviewer1 is different from the previous one
+			swapFacultyForTeam(em, doer, oldRev1, reviewer1, team, "Reviewer1", ctx);
 		}
-		team.setReviewer1(reviewer1); //Setting the new guy as reviewer1
 		
 		//Reviewer2 setting
 		//Checking if the new reviewer2 is the same as the previous one
-		if (team.getReviewer2() != null && !team.getReviewer2().equals(reviewer2)) { //New reviewer2 is different from the previous one
-			swapFacultyForTeam(em, doer, team.getReviewer2(), reviewer2, team, "Reviewer2", ctx);
+		if (oldRev2 != null && !oldRev2.equals(reviewer2)) { //New reviewer2 is different from the previous one
+			swapFacultyForTeam(em, doer, oldRev2, reviewer2, team, "Reviewer2", ctx);
 		}
-		team.setReviewer2(reviewer2); //Setting the new guy as reviewer2
 		
 		if (team.getId() == null) { //ADD operation
 			em.persist(team);
@@ -220,15 +223,34 @@ public class TeamManager {
 	}
 	
 	public static void swapFacultyForTeam(EntityManager em, User doer, Faculty oldFac, Faculty newFac, Team team, String role, ServletContext ctx) throws Exception {
+		//Setting the new faculty in the specified role for the team
+		Method roleSetter = Team.class.getDeclaredMethod("set" + role, Faculty.class);
+		roleSetter.invoke(team, newFac);
+		
+		//Retrieving all bookings that correspond to this team
 		Query existingBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE b.team = :team AND :faculty MEMBER OF b.requiredAttendees");
 		existingBookingQuery.setParameter("team", team);
 		existingBookingQuery.setParameter("faculty", oldFac);
+		
 		ArrayList<Booking> existingBookings = (ArrayList<Booking>) existingBookingQuery.getResultList();
 		for (Booking b : existingBookings) {
+			//Check if we need to act on this booking. We'll see if faculty affected is part of the required attendees for the milestone
+			if (!b.getTimeslot().getSchedule().getMilestone().getRequiredAttendees().contains(role)) {
+				//Affected faculty member is not part of the required attendees for this booking. Move onto next booking.
+				continue;
+			}
 			if (b.getBookingStatus() == BookingStatus.PENDING 
 					|| b.getBookingStatus() == BookingStatus.APPROVED) {
 				//Active booking. Delete and recreate at the same spot
+				HashMap<String, Object> deleteResult = BookingManager.deleteBooking(em, b.getTimeslot(), doer, ctx);
+				if (!deleteResult.containsKey("success") && Boolean.parseBoolean(deleteResult.get("success").toString()) == false) {
+					throw new CustomException("Oops. Could not update faculty. Please try again!");
+				}
 				
+				HashMap<String, Object> createResult = BookingManager.createBooking(em, b.getTimeslot(), doer, team, false);
+				if (!createResult.containsKey("success") && Boolean.parseBoolean(createResult.get("success").toString()) == false) {
+					throw new CustomException("Oops. Could not update faculty. Please try again!");
+				}
 			} else {
 				//Old booking. Just do the sneaky swap.
 				//Replace the old guy with the new guy in the response list (approve/reject HashMap) and required attendees list.
@@ -246,10 +268,6 @@ public class TeamManager {
 				b.setResponseList(responseList);	
 			}
 		}
-		
-		//Setting the new faculty in the specified role for the team
-		Method roleSetter = Team.class.getDeclaredMethod("set" + role, Faculty.class);
-		roleSetter.invoke(team, newFac);
 	}
 	
 }
