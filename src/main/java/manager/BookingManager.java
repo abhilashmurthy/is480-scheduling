@@ -4,7 +4,6 @@
  */
 package manager;
 
-import static com.opensymphony.xwork2.Action.SUCCESS;
 import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
@@ -23,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.servlet.ServletContext;
 import model.Booking;
 import model.Milestone;
 import model.Schedule;
@@ -34,11 +34,12 @@ import model.role.Faculty;
 import model.role.Student;
 import model.role.TA;
 import notification.email.ConfirmedBookingEmail;
+import notification.email.DeletedBookingEmail;
 import notification.email.NewBookingEmail;
 import notification.email.RespondToBookingEmail;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import userAction.CreateBookingAction;
 import util.MiscUtil;
 
 /**
@@ -292,6 +293,54 @@ public class BookingManager {
 
 			json.put("success", true);
 			json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees.");
+		} catch (Exception e) {
+			logger.error("Exception caught: " + e.getMessage());
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
+            json.put("success", false);
+			json.put("message", "Oops. Something went wrong on our end. Please try again!");
+		}
+		
+		return json;
+	}
+	
+	public synchronized static HashMap<String, Object> deleteBooking
+			(EntityManager em, Timeslot ts,
+			User user, ServletContext ctx)
+			throws Exception
+	{
+		HashMap<String, Object> json = new HashMap<String, Object>();
+		try {
+			//set the current booking's status to deleted
+			Booking b = ts.getCurrentBooking();
+			b.setBookingStatus(BookingStatus.DELETED);
+			b.setLastEditedBy(user.getFullName());
+			b.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+
+			//set the current booking to null
+			ts.setCurrentBooking(null);
+
+			em.persist(b);
+			em.persist(ts);
+
+			//Forcing initialization for sending email
+			Hibernate.initialize(b.getTeam().getMembers());
+			Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
+
+			QuartzManager.deleteSMSReminder(b, ctx);
+
+			//Sending email
+			DeletedBookingEmail deletedEmail = new DeletedBookingEmail(b, user);
+			deletedEmail.sendEmail();
+
+			//if the booking has been removed successfully
+			json.put("message", "Booking deleted successfully! All attendees have been notified via email.");
+			json.put("success", true);
+
+			MiscUtil.logActivity(logger, user, b.toString() + " deleted");	
 		} catch (Exception e) {
 			logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {

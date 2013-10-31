@@ -6,20 +6,16 @@ package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
-//import constant.Status;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import manager.BookingManager;
 import manager.TimeslotManager;
-import manager.UserManager;
 import model.Booking;
 import model.Timeslot;
 import model.User;
@@ -28,7 +24,6 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.hibernate.Hibernate;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -59,50 +54,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
             Timeslot ts = TimeslotManager.findById(em, chosenID);
-
-            try {
-                em.getTransaction().begin();
-				
-                //set the current booking's status to deleted
-                Booking b = ts.getCurrentBooking();
-                b.setBookingStatus(BookingStatus.DELETED);
-                b.setLastEditedBy(user.getFullName());
-                b.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
-
-                //set the current booking to null
-                ts.setCurrentBooking(null);
-
-                em.persist(b);
-                em.persist(ts);
-
-                em.getTransaction().commit();
-				
-				//Forcing initialization for sending email
-				Hibernate.initialize(b.getTeam().getMembers());
-				Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
-				
-				deleteSMSReminder(b);
-
-				//Sending email
-				DeletedBookingEmail deletedEmail = new DeletedBookingEmail(b, (User)request.getSession().getAttribute("user"));
-				deletedEmail.sendEmail();
-				
-                //if the booking has been removed successfully
-                json.put("message", "Booking deleted successfully! All attendees have been notified via email.");
-
-				MiscUtil.logActivity(logger, user, b.toString() + " deleted");
-            } catch (Exception e) {
-                logger.error("Exception caught: " + e.getMessage());
-                if (MiscUtil.DEV_MODE) {
-                    for (StackTraceElement s : e.getStackTrace()) {
-                        logger.debug(s.toString());
-                    }
-                }
-                json.put("success", false);
-                json.put("exception", true);
-                json.put("message", "Error with persisting timeslot object: Escalate to developers!");
-            }
-
+			json = BookingManager.deleteBooking(em, ts, user, request.getSession().getServletContext());
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -119,16 +71,6 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 		}
         return SUCCESS;
     }
-	
-	//Deleting the scheduled job to send SMS reminders
-	private void deleteSMSReminder(Booking b) throws Exception {
-		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
-				.getServletContext()
-				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
-		Scheduler scheduler = factory.getScheduler();
-		
-		scheduler.deleteJob(new JobKey(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS));
-	}
 
     public HttpServletRequest getRequest() {
         return request;
