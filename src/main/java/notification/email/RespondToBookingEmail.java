@@ -4,7 +4,6 @@
  */
 package notification.email;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +25,7 @@ public class RespondToBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Approve Booking";
+		return "[Action] " + b.getTeam().getTeamName() + " - Approve Booking";
 	}
 
 	@Override

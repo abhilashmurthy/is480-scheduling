@@ -64,12 +64,12 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 						}
 					}
 					b.setSubscribedUsers(subscribedUsers);
-					json.put("message", "You have successfully unsubscribed!");
+					json.put("message", "You have successfully cancelled your RSVP!");
 				} else if (status.equalsIgnoreCase("Subscribe")) {
 					Set<User> subscribedUsers = b.getSubscribedUsers();
 					subscribedUsers.add(user);
 					b.setSubscribedUsers(subscribedUsers);
-					json.put("message", "You have successfully subscribed!");
+					json.put("message", "Your RSVP was successful!");
 				}
 				em.persist(b);
 				em.getTransaction().commit();

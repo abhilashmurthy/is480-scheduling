@@ -4,13 +4,10 @@
  */
 package notification.email;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import manager.UserManager;
 import model.Booking;
 import model.User;
@@ -30,7 +27,7 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Booking Confirmed";
+		return b.getTeam().getTeamName() + " - Booking Confirmed";
 	}
 
 	@Override

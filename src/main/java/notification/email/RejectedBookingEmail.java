@@ -4,7 +4,6 @@
  */
 package notification.email;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +26,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Booking Rejection";
+		return b.getTeam().getTeamName() + " - Booking Rejected";
 	}
 
 	@Override

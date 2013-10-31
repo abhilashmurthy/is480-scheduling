@@ -91,7 +91,7 @@
 						<option value="6">Booking Status</option>
 					<% } %>
 					<% if (!activeRole.equals(Role.TA) && !activeRole.equals(Role.FACULTY)) { %>
-						<option value="7">Subscribed Users</option>
+						<option value="7">People Attending</option>
 					<% } %>
 					<% if (!activeRole.equals(Role.TA)) { %>
 						<option value="8">Reason for Rejection</option>
@@ -125,7 +125,7 @@
 							<th>Venue</th>
 							<th>Response</th>
 							<th>Booking Status</th>
-							<th style="width:50px; text-align:center">Subscribed Users</th>
+							<th style="width:50px; text-align:center">People Attending</th>
 							<th style="text-align:center">Reason for Rejection</th>
 							<th>Last Modified</th>
 						</tr>
@@ -293,7 +293,11 @@
 				 style="width:450px" aria-hidden="true">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-					<h4 id="myModalLabel">This presentation has been subscribed by:</h4>
+					<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
+						<h4 id="myModalLabel">This presentation will be attended by:</h4>
+					<% } else { %>
+						<h4 id="myModalLabel">Your presentation will be attended by:</h4>
+					<% } %>
 				</div>
 				<div class="modal-body">
 					<div id="sUsersList"></div>

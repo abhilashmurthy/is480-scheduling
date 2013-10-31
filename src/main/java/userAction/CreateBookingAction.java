@@ -13,7 +13,6 @@ import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -94,7 +93,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             }
 
             //Validating information provided by the front end
-            if (!validateInformation(em, team, timeslot)) {
+            if (!validateInformation(em, team, timeslot, user)) {
                 return SUCCESS;
             }
             
@@ -231,7 +230,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         return SUCCESS;
     }
 
-    private boolean validateInformation(EntityManager em, Team team, Timeslot timeslot) {
+    private boolean validateInformation(EntityManager em, Team team, Timeslot timeslot, User user) {
         // Checking if team information is found
         if (team == null) {
             logger.error("Team information not found or unauthorized user role");
@@ -256,14 +255,16 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             return false;
 		}
 		
-		//Check if the timeslot has already passed
-		Calendar now = Calendar.getInstance();
-		if (timeslot.getStartTime().before(now.getTime())) {
-			json.put("success", false);
-            json.put("message", "You cannot book a timeslot that has already passed!");
-            return false;
+		//Check if the timeslot has already passed (Not applicable for Administrator and Course Coordinator)
+		if (user.getRole() != Role.ADMINISTRATOR && user.getRole() != Role.COURSE_COORDINATOR) {
+			Calendar now = Calendar.getInstance();
+			if (timeslot.getStartTime().before(now.getTime())) {
+				json.put("success", false);
+				json.put("message", "You cannot book a timeslot that has already passed!");
+				return false;
+			}	
 		}
-
+		
         //Check if the timeslot is free
         if (timeslot.getCurrentBooking() != null) { //Slot is full
             json.put("success", false);

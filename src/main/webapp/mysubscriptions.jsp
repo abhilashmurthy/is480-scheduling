@@ -30,7 +30,7 @@
          %>
 		 
         <div class="container">
-			<h3 style="float: left; margin-right: 50px;">My Subscriptions</h3>
+			<h3 style="float: left; margin-right: 50px;">My RSVP's</h3>
 			<s:if test="%{data != null && data.size() > 0}"> 
 					<table id="mySubscriptionsTable" class="table table-hover" style="font-size: 13px;">
 						<thead>
@@ -40,7 +40,7 @@
 								<th>Date of Presentation</th>
 								<th>Venue</th>
 								<th>More Information</th>
-								<th style="width:90px">Unsubscribe</th>
+								<th style="width:110px">Cancel RSVP</th>
 							</tr>
 						</thead>
 						<tbody> 
@@ -63,7 +63,7 @@
 						<br/><br/>
 			</s:if><s:else>
 				<div style="clear: both;">
-					<h4>You haven't subscribed to any presentations yet!</h4>
+					<h4>You are yet to RSVP to any presentations!</h4>
 				</div>
 			</s:else>
 		</div>
