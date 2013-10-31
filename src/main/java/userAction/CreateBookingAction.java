@@ -50,6 +50,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     private static Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
     private Long timeslotId;
     private Long teamId;
+	private boolean overrideApproval = false;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     public HttpServletRequest getRequest() {
@@ -91,124 +92,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             if (timeslotId != null) {
                 timeslot = em.find(Timeslot.class, timeslotId);
             }
-
-            //Validating information provided by the front end
-            if (!validateInformation(em, team, timeslot, user)) {
-                return SUCCESS;
-            }
-            
-            //JSON Return for create booking
-            HashMap<String, Object> map = new HashMap<String, Object>();
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat viewDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
-            SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm");
-            
-            try {
-				synchronized(CreateBookingAction.class) {
-					em.getTransaction().begin();
-
-					Booking booking = new Booking();
-
-					//Assign information to booking
-					booking.setTimeslot(timeslot); 
-					booking.setTeam(team);
-					Timestamp currentTime = new Timestamp(Calendar.getInstance().getTimeInMillis());
-					booking.setCreatedAt(currentTime);
-					
-					if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) booking.setBookingStatus(BookingStatus.APPROVED);
-
-					//Add team members to attendees
-					HashSet<User> reqAttendees = new HashSet<User>();
-					reqAttendees.addAll(team.getMembers());
-
-					//Create booking response entries based on required attendees for milestone
-					HashMap<User, Response> responseList = new HashMap<User, Response>();
-					Milestone milestone = timeslot.getSchedule().getMilestone();
-					ArrayList<String> requiredAttendees = milestone.getRequiredAttendees();
-					for (String roleName : requiredAttendees) {
-						Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
-						Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
-						Response response = (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) ? Response.PENDING : Response.APPROVED ;
-						responseList.put(roleUser, response);
-						reqAttendees.add(roleUser);
-					}
-
-					booking.setResponseList(responseList);
-					booking.setRequiredAttendees(reqAttendees);
-					booking.setLastEditedBy(user.getFullName());
-					booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
-					if (activeRole != Role.ADMINISTRATOR && activeRole != Role.COURSE_COORDINATOR) { //Emails to be sent if the Administrator is not creating a booking
-						NewBookingEmail newEmail = new NewBookingEmail(booking);
-						RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
-						newEmail.sendEmail();
-						responseEmail.sendEmail();
-					} else { //Booking is automatically approved by all if the Administrator creates a booking
-						ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
-						confirmationEmail.sendEmail();
-					}
-					
-					em.persist(booking);
-
-					//Setting the current active booking in the timeslot object
-					timeslot.setCurrentBooking(booking);
-					em.persist(timeslot);
-
-					map.put("id", timeslot.getId());
-					map.put("datetime", dateFormat.format(timeslot.getStartTime()) + " " + timeFormat.format(timeslot.getStartTime()));
-					map.put("time", viewTimeFormat.format(timeslot.getStartTime()) + " - " + viewTimeFormat.format(timeslot.getEndTime()));
-					map.put("venue", timeslot.getVenue());
-					map.put("team", team.getTeamName());
-					map.put("startDate", viewDateFormat.format(new Date(timeslot.getStartTime().getTime())));
-					map.put("status", booking.getBookingStatus().toString());
-
-					//Adding all students
-					List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>();
-					Set<Student> teamMembers = team.getMembers();
-					for (User studentUser : teamMembers) {
-						HashMap<String, String> studentMap = new HashMap<String, String>();
-						studentMap.put("name", studentUser.getFullName());
-						students.add(studentMap);
-					}
-					map.put("students", students);
-
-					//Adding all faculty and their status
-					List<HashMap<String, String>> faculties = new ArrayList<HashMap<String, String>>();
-					HashMap<User, Response> statusList = responseList;
-					for (User facultyUser : statusList.keySet()) {
-						HashMap<String, String> facultyMap = new HashMap<String, String>();
-						facultyMap.put("name", facultyUser.getFullName());
-						facultyMap.put("status", statusList.get(facultyUser).toString());
-						faculties.add(facultyMap);
-					}
-					 map.put("faculties", faculties);
-
-					TA ta = timeslot.getTA();
-					String TA = (ta != null) ? ta.getFullName() : "-";
-					map.put("TA", TA);
-					map.put("wiki", team.getWiki());
-
-					json.put("booking", map);
-
-					em.getTransaction().commit();
-					MiscUtil.logActivity(logger, user, booking.toString() + " created");
-				}
-            } catch (Exception e) {
-                //Rolling back write operations
-                logger.error("Exception caught: " + e.getMessage());
-                if (MiscUtil.DEV_MODE) {
-                    for (StackTraceElement s : e.getStackTrace()) {
-                        logger.debug(s.toString());
-                    }
-                }
-                em.getTransaction().rollback();
-                json.put("success", false);
-                json.put("message", "Oops. Something went wrong on our end. Please try again!");
-                return SUCCESS;
-            }
-
-            json.put("success", true);
-            json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees.");
+			em.getTransaction().begin();
+			json = BookingManager.createBooking(em, timeslot, user, team, overrideApproval);
+			em.getTransaction().commit();
+			return SUCCESS;
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
