@@ -31,7 +31,7 @@ public class EditBookingEmail extends EmailTemplate {
 
 	@Override
 	public String generateEmailSubject() {
-		return "Update: " + b.getTimeslot().getSchedule().getMilestone().getName() + " Presentation";
+		return b.getTeam().getTeamName() + " - Booking Updated";
 	}
 
 	@Override

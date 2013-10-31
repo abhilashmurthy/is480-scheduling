@@ -4,9 +4,6 @@
  */
 package notification.email;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +27,7 @@ public class FacultyReminderEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return "Reminder: Booking Approval";
+		return "[Reminder] " + b.getTeam().getTeamName();
 	}
 
 	@Override

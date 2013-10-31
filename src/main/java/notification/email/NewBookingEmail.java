@@ -4,20 +4,11 @@
  */
 package notification.email;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.EntityManager;
-import manager.SettingsManager;
 import model.Booking;
-import model.Settings;
 import model.User;
-import util.MiscUtil;
 
 /**
  *
@@ -34,7 +25,7 @@ public class NewBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - New Booking";
+		return b.getTeam().getTeamName() + " - New Booking";
 	}
 
 	@Override
