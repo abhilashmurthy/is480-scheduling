@@ -264,6 +264,7 @@ public class BookingManager {
 			em.persist(timeslot);
 
 			map.put("id", timeslot.getId());
+			map.put("bookingId", booking.getId());
 			map.put("datetime", dateFormat.format(timeslot.getStartTime()) + " " + timeFormat.format(timeslot.getStartTime()));
 			map.put("time", viewTimeFormat.format(timeslot.getStartTime()) + " - " + viewTimeFormat.format(timeslot.getEndTime()));
 			map.put("venue", timeslot.getVenue());
@@ -331,14 +332,14 @@ public class BookingManager {
 
 			//set the current booking to null
 			ts.setCurrentBooking(null);
-
+			
 			em.persist(b);
 			em.persist(ts);
 
 			//Forcing initialization for sending email
 			Hibernate.initialize(b.getTeam().getMembers());
 			Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
-
+			
 			QuartzManager.deleteSMSReminder(b, ctx);
 
 			//Sending email

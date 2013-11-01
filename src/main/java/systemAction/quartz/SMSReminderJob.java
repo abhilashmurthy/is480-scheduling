@@ -31,7 +31,7 @@ import util.MiscUtil;
  */
 public class SMSReminderJob implements Job {
 
-    private static Logger logger = LoggerFactory.getLogger(ClearPendingBookingJob.class);
+    private static Logger logger = LoggerFactory.getLogger(SMSReminderJob.class);
     //private int noOfDaysToRespond1;
     //private int noOfDaysToRespond2;
 
@@ -57,7 +57,7 @@ public class SMSReminderJob implements Job {
             Booking booking = em.find(Booking.class, bookingId);
 
             //Block SMSs if system is in Dev Mode
-            if (false) {
+            if (false) { //TODO: Change to MiscUtil.DEV_MODE after testing
                 logItem.setSuccess(true);
                 logItem.setMessage("Job triggered with Booking ID: " + booking.getId() + ". SMS not sent.");
                 return;
@@ -68,18 +68,13 @@ public class SMSReminderJob implements Job {
                 logger.debug("Booking: " + booking + ". SMS sending..");
                 StringBuilder msg = new StringBuilder();
                 msg
-                    .append("From: IS480 Scheduling System. ")
-                    .append("Team ")
-                    .append(booking.getTeam().getTeamName())
-                    .append(" is presenting on ")
-                    .append(smsDateFormat.format(booking.getTimeslot().getStartTime()))
-                    .append(" ")
-                    .append(smsTimeFormat.format(booking.getTimeslot().getStartTime()))
-                    .append(" at ")
-                    .append(booking.getTimeslot().getVenue())
-                    .append(" for FYP ")
-                    .append(booking.getTimeslot().getSchedule().getMilestone().getName())
-                    .append(". See you there!");
+                    .append("Reminder from IS480 Scheduling System").append("[NEWLINE][NEWLINE]")
+                    .append("Team: ").append(booking.getTeam().getTeamName()).append("[NEWLINE]")
+                    .append("Date: ").append(smsDateFormat.format(booking.getTimeslot().getStartTime())).append("[NEWLINE]")
+                    .append("Time: ").append(smsTimeFormat.format(booking.getTimeslot().getStartTime())).append("[NEWLINE]")
+                    .append("Venue: ").append(booking.getTimeslot().getVenue()).append("[NEWLINE][NEWLINE]")
+					.append("Milestone: ").append(booking.getTimeslot().getSchedule().getMilestone().getName()).append("[NEWLINE]")
+                    .append("See you there!");
 
                 String countryCode = "65";
                 StringBuilder phoneNums = new StringBuilder();
@@ -89,22 +84,24 @@ public class SMSReminderJob implements Job {
                     if (user.getMobileNumber() != null) {
                         phoneNums.append(countryCode)
                                     .append(user.getMobileNumber())
-                                    .append(";");
+                                    .append(",");
                     }
                 }
                 
                 //Builds RESTful URL
+				if (phoneNums.length() == 0) return;
                 StringBuilder url = new StringBuilder("");
-                url.append("http://smsc.vianett.no/v3/send.ashx?")
-                        .append("tel=")
-                        .append(phoneNums.toString().substring(0, phoneNums.length() - 1))
-                        .append("&username=")
-                        .append(MiscUtil.getProperty("General", "SMS_USERNAME"))
-                        .append("&msg=")
-                        .append(msg.toString().replaceAll("\\s+", "+"))
-                        .append("&password=")
-                        .append(MiscUtil.getProperty("General", "SMS_PASSWORD"));
+				url
+					.append("http://sgp.transmitsms.com/api-wrapper/messages.single?")
+					.append("apikey=").append(MiscUtil.getProperty("General", "SMS_USERNAME"))
+					.append("&apisecret=").append(MiscUtil.getProperty("General", "SMS_PASSWORD"))
+					.append("&mobile=").append(phoneNums.toString().substring(0, phoneNums.length() - 1))
+					.append("&message=").append(msg.toString().replace(" ", "%20").replace("[NEWLINE]", "%0A"))
+					.append("&caller_id=")
+					.append("IS480");
 
+				//http://sgp.transmitsms.com/api-wrapper/messages.single?apikey=ca83b2ef57c5f75c8a846405f13eb5d0&apisecret=123321123321&mobile=6583870164&message=Hello%20there%0A%0AHow%20are%20you?&caller_id=IS480
+				
                 logger.debug("Sending to URL: " + url.toString());
 
                 //Sends RESTful SMS

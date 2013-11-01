@@ -47,6 +47,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
         try {
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
+			em.getTransaction().begin();
             HttpSession session = request.getSession();
             
             User user = (User) session.getAttribute("user");
@@ -55,6 +56,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
             long chosenID = Long.parseLong(timeslotId);
             Timeslot ts = TimeslotManager.findById(em, chosenID);
 			json = BookingManager.deleteBooking(em, ts, user, request.getSession().getServletContext());
+			em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
