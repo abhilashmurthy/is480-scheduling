@@ -467,7 +467,7 @@
 //											.attr('id', 'unsubsribeBtn')
 //											.addClass('popoverBtn btn btn-info')
 //											.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
-//											.append("Unsubscribe")
+//											.append("Cancel RSVP")
 //											.outerHTML()
 //									);
 //								} else {
@@ -476,7 +476,7 @@
 											.attr('id', 'unsubscribeBtn')
 											.addClass('popoverBtn btn')
 											.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-											.append("Unsubscribe")
+											.append("Cancel RSVP")
 											.outerHTML()
 									);
 //								}
@@ -490,7 +490,7 @@
 //											.attr('id', 'subscribeBtn')
 //											.addClass('popoverBtn btn btn-info')
 //											.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
-//											.append("Subscribe")
+//											.append("RSVP")
 //											.outerHTML()
 //									);
 //								} else {
@@ -499,7 +499,7 @@
 											.attr('id', 'subscribeBtn')
 											.addClass('popoverBtn btn')
 											.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
-											.append("Subscribe")
+											.append("RSVP")
 											.outerHTML()
 									);
 //								}
@@ -1186,7 +1186,7 @@
 									.attr('id', 'unsubscribeBtn')
 									.addClass('popoverBtn btn')
 									.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-									.append("Unsubscribe")
+									.append("Cancel RSVP")
 							);
 							self.find('#subscribeBtn').remove();
 							timeslot.subscribedUsers.push(myEmail);
@@ -1211,7 +1211,7 @@
 									.attr('id', 'subscribeBtn')
 									.addClass('popoverBtn btn')
 									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
-									.append("Subscribe")
+									.append("RSVP")
 							);
 							self.find('#unsubscribeBtn').remove();
 							if (timeslot.subscribedUsers.indexOf(myEmail) !== -1) timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
