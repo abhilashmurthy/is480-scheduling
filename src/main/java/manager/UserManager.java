@@ -314,6 +314,7 @@ public class UserManager {
 	/**
 	 * Method to add a new user or edit an existing one in the database. This method can be used for all roles in the system.
 	 * @param em
+	 * @param doer Person who performs the action
 	 * @param role
 	 * @param termId
 	 * @param username
@@ -324,7 +325,7 @@ public class UserManager {
 	 * @throws Exception Throws CustomException with a descriptive error message in case of validation errors. To be handled by the caller.
 	 */
 	public static HashMap<String, Object> addEditUser
-			(EntityManager em, Role role, long termId,
+			(EntityManager em, User doer, Role role, long termId,
 			String username, String fullName, long teamId, long existingUserId)
 			throws Exception
 	{
@@ -349,6 +350,7 @@ public class UserManager {
 		if (existingUserId != 0) {
 			user = em.find(role.getBaseClassType(), existingUserId);
 			if (user == null || user.getRole() != role) throw new CustomException("User not found");
+			if (user.equals(doer)) throw new CustomException("You cannot edit your own details!");
 		} else { //Checks specific to an ADD operation
 			//There can be only 1 course coordinator!
 			if (role == Role.COURSE_COORDINATOR) {

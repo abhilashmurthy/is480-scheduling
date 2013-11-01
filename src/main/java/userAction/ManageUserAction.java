@@ -54,7 +54,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			
 			boolean result;
 			if (actionType.equalsIgnoreCase("add") || actionType.equalsIgnoreCase("edit")) { //Add or edit a user
-				result = addEditUser(actionType, dataObj);
+				result = addEditUser(user, actionType, dataObj);
 			} else if (actionType.equalsIgnoreCase("delete")) { //Delete an existing user
 				result = deleteUser(user, dataObj, user.getId(), request.getSession().getServletContext());
 			} else {
@@ -85,7 +85,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 	}
 	
 	//Method to add a new user to the system
-	public boolean addEditUser(String actionType, JsonObject dataObj) {
+	public boolean addEditUser(User user, String actionType, JsonObject dataObj) {
 		try {
 			//Getting the role of the user object to be created
 			JsonElement roleInfo = dataObj.get("type");
@@ -115,7 +115,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 				else existingUserId = userIdInfo.getAsLong();
 			}
 			
-			json = UserManager.addEditUser(em, role, termId, username, fullName, teamId, existingUserId);
+			json = UserManager.addEditUser(em, user, role, termId, username, fullName, teamId, existingUserId);
 			return true;
 		} catch (CustomException e) {
 			json.put("success", false);
