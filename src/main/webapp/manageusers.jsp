@@ -57,19 +57,16 @@
 				<button type='button' id='email_all_student' class='emailAllBtn topBtn pull-right btn' style='display:none'>
 					<i class='fa fa-envelope fa-black'></i> Email Students
 				</button>
-				<button type='button' title= "Edit Course Coordinator" class='editAdminBtn topBtn pull-right editBtn btn btn-info' style='display:none'>
-					<i class='fa fa-pencil fa-white'></i> Edit Course Coordinator
-				</button>
 				<ul class='usersNav nav nav-tabs' id='myTab'>
-					<li class='teams active'><a href='#teams'><h4>Teams</h4></a></li>
-					<li class='students'><a href='#students'><h4>Students</h4></a></li>
+					<li class='team active'><a href='#team'><h4>Teams</h4></a></li>
+					<li class='student'><a href='#student'><h4>Students</h4></a></li>
 					<li class='faculty'><a href='#faculty'><h4>Faculty</h4></a></li>
-					<li class='tas'><a href='#tas'><h4>TAs</h4></a></li>
-					<li class='admins'><a href='#admins'><h4>Administrators</h4></a></li>
+					<li class='ta'><a href='#ta'><h4>TAs</h4></a></li>
+					<li class='admin'><a href='#admin'><h4>Administrators</h4></a></li>
 					<li class='cc'><a href='#cc'><h4>Course Coordinator</h4></a></li>
 				</ul>
 				<div class='tab-content'>
-					<div class='tab-pane active' id='teams'>
+					<div class='tab-pane active' id='team'>
 						<!-- Teams -->
 						<table id='teamsTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
@@ -112,7 +109,7 @@
 							</tbody>
 						</table>
 					</div>
-					<div class='tab-pane' id='students'>
+					<div class='tab-pane' id='student'>
 						<!-- Students -->
 						<table id='studentUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
@@ -226,7 +223,7 @@
 							</tbody>
 						</table>
 					</div>
-					<div class='tab-pane' id='tas'>
+					<div class='tab-pane' id='ta'>
 						<!-- TAs -->
 						<table id='taUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
@@ -262,7 +259,7 @@
 							</tbody>
 						</table>
 					</div>
-					<div class='tab-pane' id='admins'>
+					<div class='tab-pane' id='admin'>
 						<!-- Admins -->
 						<table id='adminUsersTable' class='usersTable table table-hover zebra-striped'>
 							<thead>
@@ -297,18 +294,23 @@
 					</div>
 					<div class='tab-pane' id='cc'>
 						<!-- Course Coordinator -->
-						<table id='ccUsersTable' class='usersTable table zebra-striped'>
+						<table id='ccUsersTable' class='usersTable table zebra-striped table-hover'>
 							<thead>
-								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th></tr>
+								<tr><th></th><th>Name</th><th>Username</th><th>Phone</th><th>Email</th></tr>
 							</thead>
 							<tbody>
 								<s:if test= "%{ccData != null && ccData.size() > 0}">
 									<s:iterator var= "cc" value= "ccData">
-										<tr id='user_<s:property value= "id"/>' class='ccRow'>
+										<tr id='user_<s:property value= "id"/>' class='ccRow modBtn editBtn'>
 											<td><i class='fa fa-coffee fa-black'></i></td>
 											<td class='fullName'><s:property value= "name"/></td>
 											<td class='username'><s:property value= "username"/></td>
 											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
+											<td>
+												<button type='button' title= "Email" class='emailBtn btn btn-small'>
+													<i class='fa fa-envelope fa-black'></i>
+												</button>
+											</td>
 										</tr>
 									</s:iterator>
 								</s:if>
@@ -334,6 +336,7 @@
 				var termId = parseInt('<s:property value= "selectedTermId"/>') !== 0? parseInt('<s:property value= "selectedTermId"/>') : parseInt("<%= ((Term) session.getAttribute("currentActiveTerm")).getId() %>");
 				
 				loadUsers();
+				window.location = '#team';
 				
 				function loadUsers() {
 					adminData = convertUserData(JSON.parse('<s:property escape= "false" value= "adminJson"/>'));
@@ -437,7 +440,6 @@
 					if (userType !== 'cc' && userType !== 'team') {
 						$('.addTeamBtn').hide();
 						$('.emailAllTeamsBtn').hide();
-						$('.editAdminBtn').hide();
 						$('.addBtn').show();
 						$('.addBtn')
 								.attr('id', 'add_' + userType)
@@ -460,28 +462,35 @@
 						$('.emailAllBtn').hide();
 						$('.addTeamBtn').hide();
 						$('.emailAllTeamsBtn').hide();
-						$('.editAdminBtn').show();
 					} else if (userType === 'team') {
 						$('.addTeamBtn').show();
 						$('.emailAllTeamsBtn').show();
 						$('.addBtn').hide();
 						$('.emailAllBtn').hide();
-						$('.editAdminBtn').hide();
 					}
+					window.location = '#' + userType;
 					return false;
+				});
+				
+				//Manual hash navigation
+				$(window).on('hashchange', function(){
+					if (window.location.hash) {
+						$('.usersNav li.' + window.location.hash.substring(1)).children('a').trigger('click');
+						if ($('tr').is(':animated')) return false;
+						else $('body').animate({scrollTop: 0}, 0);
+					}
 				});
 				
 				//- Assign Teams Link
 				$('body').on('click', '.assignTeamsLink', function(){
-					$('.usersNav li.teams').children('a').trigger('click');
-					$('body').animate({scrollTop: 0}, 500);
+					$('.usersNav li.team').children('a').trigger('click');
 					return false;
 				});
 				
 				//Team Name Link
 				$('body').on('click', '.studentTeamLink', function(){
 					$('.modal').modal('hide');
-					$('.usersNav li.teams').children('a').trigger('click');
+					$('.usersNav li.team').children('a').trigger('click');
 					var $tr = getTrFromTable('teamsTable', 'teamName', $(this).text());
 					$('body').animate({scrollTop: $tr.offset().top - $tr.height()}, 500);
 					$tr.effect('highlight', {color: "#ffff99 !important"}, 1500);
@@ -491,7 +500,7 @@
 				//Student Name Link
 				$('body').on('click', '.teamStudentLink', function(){
 					$('.modal').modal('hide');
-					$('.usersNav li.students').children('a').trigger('click');
+					$('.usersNav li.student').children('a').trigger('click');
 					var $tr = getTrFromTable('studentUsersTable', 'fullName', $(this).text());
 					$('body').animate({scrollTop: $tr.offset().top - 40 - $tr.height()}, 500);
 					$tr.effect('highlight', {color: "#ffff99 !important"}, 1500);
@@ -628,6 +637,10 @@
 							user = adminData[id];
 							roleData = adminData;
 							break;
+						case 'cc':
+							user = ccData[id];
+							roleData = ccData;
+							break;
 						default:
 							showNotification("ERROR", 'Usertype not found!');
 							return false;
@@ -674,6 +687,9 @@
 							break;
 						case 'admin':
 							user = adminData[id];
+							break;
+						case 'cc':
+							user = ccData[id];
 							break;
 						default:
 							showNotification("ERROR", 'Usertype not found!');
