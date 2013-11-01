@@ -6,11 +6,14 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import model.SystemActivityLog;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONObject;
@@ -30,12 +33,23 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("User Preferences: Update");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
 			//Getting user object from session
-			HttpSession session = request.getSession();
 			User userFromSession = (User) session.getAttribute("user");
 			
 			//Getting user object from db
@@ -56,12 +70,14 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
 					json.put("success", false);
 					return SUCCESS;
 				}
+				
 				//Storing the users mobile number
 				em.getTransaction().begin();
 				userToUpdate.setMobileNumber(number);
 				em.persist(userToUpdate);
 				em.getTransaction().commit();
 				MiscUtil.logActivity(logger, userToUpdate, "User preferences updated");
+				
 			} else {
 				//Deleting user's mobile number
 				em.getTransaction().begin();
@@ -70,6 +86,8 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
 				em.getTransaction().commit();
 			}
 			
+			logItem.setMessage("User Preferences were updated successfully for " + userToUpdate.toString());
+			
 			//Setting the updated user object in the session
 			User user = em.find(User.class, userToUpdate.getId());
 			session.setAttribute("user", user);
@@ -77,6 +95,11 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
 			json.put("success", true);
 			json.put("message", "Your settings have been updated!");
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -86,12 +109,15 @@ public class UpdateUserPreferencesAction extends ActionSupport implements Servle
             json.put("exception", true);
             json.put("message", "Error with UpdateUserPreferencesAction: Escalate to developers!");
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+            if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
 		return SUCCESS;
     }

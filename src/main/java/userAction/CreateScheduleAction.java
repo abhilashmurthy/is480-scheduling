@@ -13,12 +13,15 @@ import java.util.Calendar;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
 import manager.TermManager;
 import model.Milestone;
 import model.Schedule;
 import model.Settings;
+import model.SystemActivityLog;
 import model.Term;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +42,18 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Schedule: Create");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             json.put("exception", false);
@@ -87,7 +102,26 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
             em.getTransaction().commit();
             json.put("schedules", scheduleList);
             json.put("success", true);
+			
+			StringBuilder logMessage = new StringBuilder();
+			logMessage.append("Schedule was created successfully. ScheduleId:");
+			for (HashMap<String, Object> map: scheduleList) {
+				logMessage.append(map.get("scheduleId"));
+				logMessage.append(",");
+			}
+			logMessage.append(" MilestoneId:");
+			for (Milestone mil: milestones) {
+				logMessage.append(mil.getId());
+				logMessage.append(",");
+			}
+			logItem.setMessage(logMessage.toString());
+			
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -97,8 +131,15 @@ public class CreateScheduleAction extends ActionSupport implements ServletReques
             json.put("success", false);
             json.put("message", "Error with CreateSchedule: Escalate to developers!");
         } finally {
-            if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+             if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
         return SUCCESS;
     }

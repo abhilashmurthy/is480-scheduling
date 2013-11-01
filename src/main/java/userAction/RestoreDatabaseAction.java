@@ -15,8 +15,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import model.SystemActivityLog;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -67,8 +71,17 @@ public class RestoreDatabaseAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
-        Process p = null;
+        SystemActivityLog logItem = new SystemActivityLog();
+        logItem.setActivity("Database Restore");
+        Calendar cal = Calendar.getInstance();
+        Timestamp now = new Timestamp(cal.getTimeInMillis());
+        logItem.setRunTime(now);
+		logItem.setMessage("Database restore started " + now);
+		
+		EntityManager em = null;
+		Process p = null;
         try {
+			em = MiscUtil.getEntityManagerInstance();
 			//Drop and recreate database
             logger.trace("DB Creation started");
             resetDB();
@@ -101,11 +114,18 @@ public class RestoreDatabaseAction extends ActionSupport implements ServletReque
 			if (p.waitFor() == 0) {
 				json.put("success", true);
 				json.put("message", "Database Restore Complete");
+				logItem.setSuccess(true);
+				logItem.setMessage("Database restore complete: " + now);
 			} else {
 				json.put("success", false);
 				json.put("message", "Error with Database Restore");
+				logItem.setSuccess(false);
+				logItem.setMessage("Database restore failure: " + now);
 			}
         } catch (Exception e) {
+			logItem.setSuccess(false);
+            logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -114,7 +134,23 @@ public class RestoreDatabaseAction extends ActionSupport implements ServletReque
             }
             json.put("exception", true);
             json.put("message", "Error with RestoreDatabaseAction: Escalate to developers!");
-        }
+        } finally {
+            if (em != null) {
+                //Saving job log in database
+                if (!em.getTransaction().isActive()) {
+                    em.getTransaction().begin();
+                }
+                em.persist(logItem);
+                em.getTransaction().commit();
+
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (em.isOpen()) {
+                    em.close();
+                }
+            }
+		}
 		return SUCCESS;
     }
 	

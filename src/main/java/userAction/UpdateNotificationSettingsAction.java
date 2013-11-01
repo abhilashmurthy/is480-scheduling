@@ -9,6 +9,8 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 //import constant.Status;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
 import model.Settings;
+import model.SystemActivityLog;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
@@ -37,11 +40,22 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 
     @Override
     public String execute() throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Administrator: Update Notification Settings");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
         try {
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
-            HttpSession session = request.getSession();
             
             User user = (User) session.getAttribute("user");
 			
@@ -69,7 +83,7 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 				clearEmail.put("emailClearStatus",setArr[7]);
 				clearEmail.put("emailClearFrequency",setArr[8]);
 
-				try{	
+				try {	
 					//set to the updated list                				
 					em.getTransaction().begin();
 					currentSettings.setValue(notificationArray.toString());
@@ -81,7 +95,14 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 					json.put("success",true);
 					json.put("message", "Settings saved successfully!");
 					MiscUtil.logActivity(logger, user, "Notification settings updated");
-				} catch (Exception e) {   
+					
+					logItem.setMessage("Notification settings were updated successfully");
+				} catch (Exception e) {  
+					logItem.setSuccess(false);
+					User userForLog = (User) session.getAttribute("user");
+					logItem.setUser(userForLog);
+					logItem.setMessage("Error: " + e.getMessage());
+			
 					if (MiscUtil.DEV_MODE) {
 						for (StackTraceElement s : e.getStackTrace()) {
 						}
@@ -90,13 +111,18 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 					json.put("exception", true);
 					json.put("message", "Error with persisting settings object: Escalate to developers!");
 				}
-			}else {
+			} else {
 				//Incorrect user role
 				json.put("error", true);
 				json.put("message", "You are not authorized to access this page!");
 			}
 
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
                 }
@@ -105,8 +131,15 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
             json.put("exception", true);
             json.put("message", "Error with changing notification settings");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
         return SUCCESS;
     }

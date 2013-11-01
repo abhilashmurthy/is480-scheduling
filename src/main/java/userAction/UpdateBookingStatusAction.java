@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
 import model.Booking;
+import model.SystemActivityLog;
 import model.Timeslot;
 import model.User;
 import model.role.Faculty;
@@ -54,6 +55,18 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Booking: Approve/Reject");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
         try {
 			em = MiscUtil.getEntityManagerInstance();
@@ -76,7 +89,6 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				return SUCCESS;
 			}
 
-			HttpSession session = request.getSession();
 			User user = (User) session.getAttribute("user");
 
 			//Getting the faculty object for the user. Cannot proceed if the user is not a faculty member.
@@ -173,12 +185,19 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				}
 				
 				MiscUtil.logActivity(logger, user, booking.toString() + " " + response.toString());
+				
+				logItem.setMessage("Booking was " + response.toString() + " successfully for " + booking.toString());
 			} else {
 				request.setAttribute("error", "No timeslot selected!");
 				logger.error("User hasn't selected a timeslot to approve/reject!");
 				return SUCCESS;
 			}
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -189,8 +208,15 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			json.put("exception", true);
             json.put("message", "Error with UpdateBookingStatus: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
 		return SUCCESS;
     }

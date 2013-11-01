@@ -4,18 +4,14 @@
  */
 package systemAction.quartz;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import model.Booking;
-import model.CronLog;
+import model.SystemActivityLog;
 import model.User;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -38,12 +34,13 @@ public class SMSReminderJob implements Job {
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         logger.debug("Started SMSReminderJob");
         //Initializing run log to be stored in database
-        CronLog logItem = new CronLog();
-        logItem.setJobName("SMS Reminders");
+        SystemActivityLog logItem = new SystemActivityLog();
+        logItem.setActivity ("SMS Reminders");
         Calendar cal = Calendar.getInstance();
         Timestamp now = new Timestamp(cal.getTimeInMillis());
         logItem.setRunTime(now);
-
+		logItem.setMessage("Sending SMS Reminders to users started " + now);
+		
         SimpleDateFormat smsDateFormat = new SimpleDateFormat("EEE, dd MMM");
         SimpleDateFormat smsTimeFormat = new SimpleDateFormat("HH:mm");
         

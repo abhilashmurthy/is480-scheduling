@@ -23,8 +23,8 @@ import javax.persistence.Query;
 import manager.SettingsManager;
 import manager.UserManager;
 import model.Booking;
-import model.CronLog;
 import model.Settings;
+import model.SystemActivityLog;
 import model.User;
 import model.role.Faculty;
 import notification.email.FacultyReminderEmail;
@@ -50,10 +50,10 @@ public class RemindPendingBookingJob implements Job {
 		Calendar nowCal = Calendar.getInstance();
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 		
-		CronLog logItem = new CronLog();
-		logItem.setJobName("Faculty Booking Reminder");
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Faculty Booking Reminder");
 		logItem.setRunTime(now);
-		
+		logItem.setMessage("Sending reminders to faculty started " + now);
 		
         EntityManager em = null;
         

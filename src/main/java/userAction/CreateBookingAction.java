@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 import manager.BookingManager;
 import model.Booking;
 import model.Milestone;
+import model.SystemActivityLog;
 import model.Team;
 import model.Timeslot;
 import model.User;
@@ -62,11 +63,22 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Booking: Create");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
-            HttpSession session = request.getSession();
             Map parameters = request.getParameterMap();
 
             User user = (User) session.getAttribute("user");
@@ -192,9 +204,17 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 					json.put("booking", map);
 
 					em.getTransaction().commit();
+
 					MiscUtil.logActivity(logger, user, booking.toString() + " created");
+					
+					logItem.setMessage("Booking was created successfully: " + booking.toString());
 				}
             } catch (Exception e) {
+				logItem.setSuccess(false);
+				User userForLog = (User) session.getAttribute("user");
+				logItem.setUser(userForLog);
+				logItem.setMessage("Error: " + e.getMessage());
+				
                 //Rolling back write operations
                 logger.error("Exception caught: " + e.getMessage());
                 if (MiscUtil.DEV_MODE) {
@@ -211,6 +231,11 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("success", true);
             json.put("message", "Booking created successfully! Confirmation email has been sent to all attendees.");
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -221,12 +246,15 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("exception", true);
             json.put("message", "Error with CreateBooking: Escalate to developers!");
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+           if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
         return SUCCESS;
     }

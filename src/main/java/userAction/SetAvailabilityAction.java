@@ -6,19 +6,20 @@ package userAction;
 
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
-import manager.ScheduleManager;
-import model.Milestone;
+import javax.servlet.http.HttpSession;
 import model.Schedule;
+import model.SystemActivityLog;
 import model.Timeslot;
 import model.User;
 import model.role.Faculty;
@@ -39,6 +40,18 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Faculty Availability: Update");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
@@ -94,7 +107,15 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
                 json.put("success", true);
                 json.put("message", "Your availability has been updated successfully!");
 				MiscUtil.logActivity(logger, user, "Updated availability for " + dealingWithSchedule.toString());
+				
+				logItem.setMessage("Faculty Availability was updated successfully for " + dealingWithSchedule.toString());
+				
             } catch (NullPointerException n) {
+				logItem.setSuccess(false);
+				User userForLog = (User) session.getAttribute("user");
+				logItem.setUser(userForLog);
+				logItem.setMessage("Error: " + n.getMessage());
+				
 				logger.error(n.getMessage());
 				if (MiscUtil.DEV_MODE) {
 					for (StackTraceElement s : n.getStackTrace()) {
@@ -106,6 +127,11 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
             }
             
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error(e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -115,12 +141,15 @@ public class SetAvailabilityAction extends ActionSupport implements ServletReque
             json.put("success", false);
             json.put("message", "Error with SetAvailability: Escalate to developers!");
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+          if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
         return SUCCESS;
     }

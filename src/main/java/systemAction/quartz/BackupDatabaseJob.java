@@ -4,29 +4,17 @@
  */
 package systemAction.quartz;
 
-import constant.BookingStatus;
-import constant.Role;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import manager.UserManager;
-import model.Booking;
-import model.CronLog;
-import model.Timeslot;
-import model.User;
-import notification.email.RejectedBookingEmail;
+import model.SystemActivityLog;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -97,11 +85,12 @@ public class BackupDatabaseJob implements Job {
 
 	public void execute(JobExecutionContext jec) throws JobExecutionException {
 		logger.trace("Beginning Database Backup");
-        CronLog logItem = new CronLog();
-        logItem.setJobName("Database Backup");
+		SystemActivityLog logItem = new SystemActivityLog();
+        logItem.setActivity("Database Backup");
         Calendar cal = Calendar.getInstance();
         Timestamp now = new Timestamp(cal.getTimeInMillis());
         logItem.setRunTime(now);
+		logItem.setMessage("Database backup started " + now);
 		
 		EntityManager em = null;
 		Process process = null;
