@@ -94,6 +94,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             }
 			em.getTransaction().begin();
 			json = BookingManager.createBooking(em, timeslot, user, team, overrideApproval);
+			
+			//Test SMS
+			BookingManager.testSMS((Long) json.get("bookingId"), request);
+			
 			em.getTransaction().commit();
 			return SUCCESS; 
         } catch (Exception e) {

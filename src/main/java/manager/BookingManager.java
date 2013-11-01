@@ -23,6 +23,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import model.Booking;
 import model.Milestone;
 import model.Schedule;
@@ -38,8 +39,16 @@ import notification.email.DeletedBookingEmail;
 import notification.email.NewBookingEmail;
 import notification.email.RespondToBookingEmail;
 import org.hibernate.Hibernate;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.ee.servlet.QuartzInitializerListener;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import systemAction.quartz.SMSReminderJob;
 import util.MiscUtil;
 
 /**
@@ -339,6 +348,7 @@ public class BookingManager {
 			//if the booking has been removed successfully
 			json.put("message", "Booking deleted successfully! All attendees have been notified via email.");
 			json.put("success", true);
+			json.put("bookingId", b.getId());
 
 			MiscUtil.logActivity(logger, user, b.toString() + " deleted");	
 		} catch (Exception e) {
@@ -354,4 +364,21 @@ public class BookingManager {
 		
 		return json;
 	}
+	
+	public static void testSMS(long bookingId, HttpServletRequest request) throws Exception {
+		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
+				.getServletContext()
+				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
+		Scheduler scheduler = factory.getScheduler();
+		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
+				.usingJobData("bookingId", bookingId)
+				.withIdentity(String.valueOf(bookingId), MiscUtil.SMS_REMINDER_JOBS).build();
+		//Calculating the time to trigger the job
+		Calendar scheduledTime = Calendar.getInstance();
+		scheduledTime.add(Calendar.SECOND, 10); //For testing
+		Trigger tr = TriggerBuilder.newTrigger().withIdentity(String.valueOf(bookingId), MiscUtil.SMS_REMINDER_JOBS)
+						.startAt(scheduledTime.getTime()).build();
+		scheduler.scheduleJob(jd, tr);
+	}
+	
 }
