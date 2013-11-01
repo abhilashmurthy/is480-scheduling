@@ -488,7 +488,7 @@
 					}
 					for (var i = 0; i < termNames.length; i++) {
 						if (parseInt(activeAcademicYearStr) === parseInt(termNames[i].year) && semName.toLowerCase() === termNames[i].term.toLowerCase()) {
-							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('fa-remove')).append(' Term name already exists');
+							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('fa-times')).append(' Term name already exists');
 							return false;
 						}
 					}

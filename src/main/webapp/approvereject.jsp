@@ -182,7 +182,7 @@
 										</td>
 										<td style="width:30px; vertical-align: middle">
 											<button type="button" class="rejectBookingBtn updateStatusBtn btn btn-danger" value="<s:property value="bookingId"/>" name="reject">
-												<i class="icon-remove">&nbsp; Revoke</i>
+												<i class="fa fa-times">&nbsp; Revoke</i>
 											</button>
 										</td>
 									</tr>
