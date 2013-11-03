@@ -116,6 +116,11 @@ public class UserManager {
             em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
             em.getTransaction().rollback();
         }
     }
@@ -171,6 +176,11 @@ public class UserManager {
             em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
             em.getTransaction().rollback();
         }
         return result;
@@ -219,6 +229,11 @@ public class UserManager {
             em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
             em.getTransaction().rollback();
         } finally {
             if (em != null && em.getTransaction().isActive()) {
@@ -253,6 +268,11 @@ public class UserManager {
             if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
             em.getTransaction().rollback();
         }
         return users;
@@ -273,6 +293,11 @@ public class UserManager {
             if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
             em.getTransaction().rollback();
         }
         return teams;

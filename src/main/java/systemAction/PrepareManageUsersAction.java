@@ -81,6 +81,8 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 				if (selectedTermId != 0) {
 					term = TermManager.findTermById(em, selectedTermId);
 					UserManager.initializeUser(em, session, user.getUsername(), user.getFullName(), term); //SURESH PLEASE TAKE A LOOK - fionalee becoming guest for new term
+				} else {
+					selectedTermId = term.getId();
 				}
 				ArrayList<Term> activeTerms = SettingsManager.getActiveTerms(em);
 				for (Term activeTerm : activeTerms) {
@@ -89,6 +91,11 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					termMap.put("termId", activeTerm.getId());
 					termData.add(termMap);
 				}
+				Collections.sort(termData, new Comparator<HashMap<String, Object>>(){
+					public int compare(HashMap<String, Object> o1, HashMap<String, Object> o2) {
+						return String.valueOf(o1.get("termName")).compareToIgnoreCase(String.valueOf(o2.get("termName")));
+					}
+				});
 				
 				//ADMIN MANAGEMENT
 				List<User> adminUsers = UserManager.findByTermAndRole(em, null, Role.ADMINISTRATOR);
@@ -233,6 +240,8 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 				studentJson = gson.toJson(studentData);
 				facultyJson = gson.toJson(facultyData);
 				taJson = gson.toJson(taData);
+				
+				logger.debug("selectedTermId: " + selectedTermId);
 				
 				em.getTransaction().commit();
 			}

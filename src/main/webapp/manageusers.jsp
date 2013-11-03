@@ -23,28 +23,33 @@
 					rd.forward(request, response);
 				}%>		
 			<!-- USERS AND TEAMS -->
-
-			<section id='users'>
-				<h3>Users</h3>
-				<form method= "POST">
-					<table class= "selectTermTable">
-						<tr>
-							<td class= "formLabelTd">Select Term</td>
-							<td>
-								<select class= "termPicker" name= "selectedTermId">
-									<s:iterator var= "term" value= "termData">
-										<s:if test= "%{selectedTermId > 0 && selectedTermId == #term.termId}">
-											<option value= "<s:property value= "#term.termId"/>" selected><s:property value= "#term.termName"/></option>
-										</s:if>
-										<s:else>
-											<option value= "<s:property value= "#term.termId"/>"><s:property value= "#term.termName"/></option>
-										</s:else>
-									</s:iterator>
-								</select>
-							</td>
-						</tr>
-					</table>
-				</form>
+			
+			<h3>Users</h3>
+			<form method= "POST">
+				<table class= "selectTermTable">
+					<tr>
+						<td class= "formLabelTd">Select Term</td>
+						<td>
+							<select class= "termPicker" name= "selectedTermId">
+								<s:iterator var= "term" value= "termData">
+									<s:if test= "%{selectedTermId > 0 && selectedTermId == #term.termId}">
+										<option value= "<s:property value= "#term.termId"/>" selected><s:property value= "#term.termName"/></option>
+									</s:if>
+									<s:else>
+										<option value= "<s:property value= "#term.termId"/>"><s:property value= "#term.termName"/></option>
+									</s:else>
+								</s:iterator>
+							</select>
+						</td>
+					</tr>
+				</table>
+			</form>
+			
+			<div id='usersProgressBar' class="progress progress-striped active" style="width: 50%; margin: 50px auto 0 auto;">
+				<div class="bar" style="width: 100%;"></div>
+			</div>
+			
+			<section id='users' style='display: none;'>
 				<button type='button' id='add_team' class='addTeamBtn topBtn pull-right btn btn-primary'>
 					<i class='fa fa-plus fa-white'></i> Add Team
 				</button>
@@ -1751,6 +1756,8 @@
 						);
 					}
 				});
+				$('section').show();
+				$('#usersProgressBar').hide();
 				
 				function updateRowCount(tableId) {
 					$('#' + tableId + '_info')
