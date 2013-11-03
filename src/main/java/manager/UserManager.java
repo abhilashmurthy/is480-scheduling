@@ -423,6 +423,12 @@ public class UserManager {
 			}
 		} else if (user.getRole() == Role.FACULTY) {
 			Faculty faculty = em.find(Faculty.class, user.getId());
+			
+			//Checking if the faculty is the course coordinator as well. If he/she is, then they cannot be deleted!
+			if (getCourseCoordinator(em).getUsername().equals(faculty.getUsername())) {
+				throw new CustomException("This faculty member is also the course coordinator. This person cannot be deleted!");
+			}
+			
 			faculty.setUnavailableTimeslots(null);
 			Faculty replacement = getFacultyObjForCCForTerm(em, user.getTerm());
 			TeamManager.swapFaculty(em, doer, faculty, replacement, ctx);
