@@ -31,23 +31,25 @@
         <div class="container page">
             <!--<h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>-->
 			<br/>
-			<div class="btn-group" style="float: left;">
-				<a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#" >
-					<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
-				</a>
-				<ul class="dropdown-menu">
-					<form id="activeTermForm" action="index" method="post">
-						<!--<select name="termId" style="float:right" onchange="this.form.submit()">--> 
-							<s:iterator value="data">
-								<li>
-									<button type="submit" class="btn btn-link" name="termId" value="<s:property value="termId"/>">
-										<s:property value="termName"/>
-									</button>
-								</li>
-							</s:iterator>
-						<!--</select>-->
-					</form>
-				</ul>
+			<div class='termPicker'>
+				<div class="btn-group" style="float: left;">
+					<a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#" >
+						<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<form id="activeTermForm" action="index" method="post">
+							<!--<select name="termId" style="float:right" onchange="this.form.submit()">--> 
+								<s:iterator value="data">
+									<li>
+										<button type="submit" class="btn btn-link" name="termId" value="<s:property value="termId"/>">
+											<s:property value="termName"/>
+										</button>
+									</li>
+								</s:iterator>
+							<!--</select>-->
+						</form>
+					</ul>
+				</div>
 			</div>
 			<br/>
 			<div class="settingsView">
@@ -171,7 +173,11 @@
 				if (teamName === "null") teamName = null;
                 
                 //Admin specific variables
-                var teams = JSON.parse('<%= session.getAttribute("allTeams")%>'); //All teams JSON
+				var teams = null;
+				if ("<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) || activeRole.equals(Role.FACULTY) %>" === "false" ? false : true) {
+					teams = JSON.parse('<s:property escape= "false" value= "allTeamsJson"/>');
+					console.log('Team data is: ' + JSON.stringify(teams));
+				}
                 var $teamDropDownSelect = null;
                 var createBookingOutputForAdmin = null;
 				
@@ -180,7 +186,7 @@
                 
                 //Booking specific variables
                 var self = null;
-                var users = JSON.parse('<%= session.getAttribute("allUsers") %>'); //All users JSON
+                var users = JSON.parse('<s:property escape= "false" value= "allUsersJson"/>');
                 
                 populateMilestones();
                 populateSchedule(milestone, year, semester);
@@ -292,8 +298,12 @@
                         //Setup mouse events
                         setupMouseEvents();
 						//Add drag and drop
-						if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>)
-						initDragNDrop();
+						if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
+							initDragNDrop();
+							initDashboards();
+						} else if (<%= activeRole.equals(Role.FACULTY)%>) {
+							initDashboards();
+						}
                     } else {
                         var eid = btoa(scheduleData.message);
                         window.location = "error.jsp?eid=" + eid;
@@ -458,51 +468,31 @@
                     } else if (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName || <%= activeRole.equals(Role.FACULTY) %> && !timeslot.isMyTeam || <%= activeRole.equals(Role.TA) %> && loggedInTa !== timeslot.taId || <%= activeRole.equals(Role.GUEST) %>) {
 						//Subscribe and Unscribe buttons
 						var subscribe = true;
-						for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
-							if (myEmail === timeslot.subscribedUsers[i]) {
-								subscribe = false;
-//								if (outputData[""] !== undefined) {
-//									outputData[""] += (
-//										$(document.createElement('button'))
-//											.attr('id', 'unsubsribeBtn')
-//											.addClass('popoverBtn btn btn-info')
-//											.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
-//											.append("Cancel RSVP")
-//											.outerHTML()
-//									);
-//								} else {
-									outputData[""] = (
-										$(document.createElement('button'))
-											.attr('id', 'unsubscribeBtn')
-											.addClass('popoverBtn btn')
-											.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-											.append("Cancel RSVP")
-											.outerHTML()
-									);
-//								}
-								break;
+						if (timeslot.subscribedUsers) {
+							for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
+								if (myEmail === timeslot.subscribedUsers[i]) {
+									subscribe = false;
+										outputData[""] = (
+											$(document.createElement('button'))
+												.attr('id', 'unsubscribeBtn')
+												.addClass('popoverBtn btn')
+												.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
+												.append("Cancel RSVP")
+												.outerHTML()
+										);
+									break;
+								}
 							}
 						}
 						if (subscribe) {
-//								if (outputData[""] !== undefined) {
-//									outputData[""] += (
-//										$(document.createElement('button'))
-//											.attr('id', 'subscribeBtn')
-//											.addClass('popoverBtn btn btn-info')
-//											.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
-//											.append("RSVP")
-//											.outerHTML()
-//									);
-//								} else {
-									outputData[""] = (
-										$(document.createElement('button'))
-											.attr('id', 'subscribeBtn')
-											.addClass('popoverBtn btn')
-											.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
-											.append("RSVP")
-											.outerHTML()
-									);
-//								}
+							outputData[""] = (
+								$(document.createElement('button'))
+									.attr('id', 'subscribeBtn')
+									.addClass('popoverBtn btn')
+									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
+									.append("RSVP")
+									.outerHTML()
+							);
 						}
 					}
 
@@ -656,21 +646,8 @@
 					var outputData = {};
 					var title = "Sign Up For Filming";
 					if ($td.is('.otherTATimeslot')) {
-						//outputData["TA"] = timeslot.TA;
-						title =  (timeslot.TA) + "'s Sign Up";
-						outputData["Filming"] = function() {
-						return $(document.createElement('button'))
-											.attr('id', 'signupTimeslotBtn')
-											.addClass('popoverBtn btn btn-primary')
-											.css('float', 'right')
-											.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
-											.append("Swap")
-											.outerHTML();
-						};
-						
-						
-						
-						
+						title = null;
+						outputData["TA"] = timeslot.TA;
 					} else {
 						outputData["Filming"] = function() {
 							if ($td.is('.taChosenTimeslot')) {
@@ -1146,12 +1123,12 @@
                         appendChangeSignupPopover(self);
 						var timeslot = scheduleData.timeslots[self.attr('value')];
 						timeslot.taId = loggedInTa;
-						if (timeslot.subscribedUsers.indexOf(myEmail) !== -1) {
+						if (timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1) {
 							subscribeBooking(self, false);
 							timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
-						} 
+						}
 						self.children('.booking').popover('destroy');
-						appendViewBookingPopover(self);
+						if (self.children('.booking').length) appendViewBookingPopover(self);
                         return false;
                     });
 					
@@ -1167,7 +1144,7 @@
 						var timeslot = scheduleData.timeslots[self.attr('value')];
 						delete timeslot.taId;
 						self.children('.booking').popover('destroy');
-						appendViewBookingPopover(self);
+						if (self.children('.booking').length) appendViewBookingPopover(self);
                         return false;
                     });
                     
@@ -1895,6 +1872,155 @@
 						scroll: false
 					});
 				}
+				
+				function initDashboards() {
+					$('div.termPicker').after(
+						$(document.createElement('div'))
+							.addClass('dashboardPicker')
+							.append(
+								$(document.createElement('select'))
+									.addClass('dashboardMultiselect multiselect')
+									.attr('id', 'dashboard')
+									.attr('multiple', 'multiple')
+									.append(function(){
+										var $optionArray = new Array();
+										$optionArray.push(
+											$(document.createElement('option'))
+												.attr('value', 'teams')
+												.attr('id', 'teams')
+												.append($(document.createElement('i')).addClass('fa fa-group fa-black'))
+												.append(' Teams')
+										);
+										if (<%= activeRole.equals(Role.ADMINISTRATOR)%>) {
+											$optionArray.push(
+												$(document.createElement('option'))
+													.attr('value', 'tas')
+													.attr('id', 'tas')
+													.append($(document.createElement('i')).addClass('fa fa-video-camera fa-black'))
+													.append(' TA Video Signups')
+											);
+										}
+										return $optionArray;
+									})
+							)
+					);
+					$('.dashboardMultiselect').each(function(){
+						var $this = $(this);
+						$this.multiselect({
+							buttonText: function(options, select) {
+								if (options.length === 0) {
+									return '<b>My Dashboard</b> <b class= "caret"></b>';
+								} else {
+									var selected = '';
+									options.each(function(){
+										selected += $(this).text();
+									});
+									return selected + ' <b class= "caret"></b>';
+								}
+							},
+							onChange: function($option, checked) {
+								if (checked) {
+									if ($option.attr('value') === 'tas') {
+										window.location = 'taAvailability'
+									} else if ($option.attr('value') === 'teams') {
+										showMyTeamsModal();
+									}
+									setTimeout(function(){$this.multiselect('deselect', $option.attr('value'));}, 50);
+								}
+							},
+							buttonClass: 'btn btn-large'
+						});
+					});
+					
+					function showMyTeamsModal() {
+						bootbox.alert({
+							title: <%=activeRole.equals(Role.FACULTY)%>?'My Teams' : 'Teams',
+							message: function() {
+								var $table =  $(document.createElement('table')).attr('id', 'myTeamsModalTable').addClass('modalTable').append(function(){
+									if ($.isEmptyObject(teams)) {
+										return $(document.createElement('tr')).append($(document.createElement('td')).html('You do not have any teams for this term'));
+									}
+									var $tParts = new Array();
+									$tParts.push(
+										$(document.createElement('thead')).append(
+											$(document.createElement('tr'))
+												.append($(document.createElement('th')).html('Team Name'))
+												.append(<%=activeRole.equals(Role.FACULTY)%>?$(document.createElement('th')).html('My Role'):false)
+												.append($(document.createElement('th')).html('Booking'))
+										)
+									);
+									$tParts.push($(document.createElement('tbody')).append(function(){
+										var $trs = new Array();
+										for (var i = 0; i < teams.length; i++) {
+											var team = teams[i];
+											var $milestoneBooking = $(document.createElement('i')).addClass('fa fa-times').css('color', 'red');
+											for (var j = 0; j < team.bookings.length; j++) {
+												if (parseInt(team.bookings[j].scheduleId) === parseInt(scheduleData.id)) {
+													$milestoneBooking = $(document.createElement('span'))
+														.addClass('memberName')
+														.append(team.bookings[j].datetime + ' ')
+														.append(team.bookings[j].bookingStatus === 'pending'?
+															$(document.createElement('i')).addClass('fa fa-cog fa-spin muted')
+															:$(document.createElement('i')).addClass('fa fa-check').css('color', '#A9DBA9'));
+												}
+											}
+											$trs.push(
+												$(document.createElement('tr'))
+													.append(
+														$(document.createElement('td'))
+															.addClass('teamName')
+															.attr('id', 'team_' + team.teamId)
+															.append(
+																$(document.createElement('a'))
+																	.attr('href', function(){
+																		var mailto = 'mailto:';
+																		for (var j = 0; j < team.memberEmails.length; j++) {
+																			mailto += team.memberEmails[j] + '; ';
+																		}
+																		mailto += '&body=Hi ' + team.teamName + ',%0D%0A%0D%0A';
+																		return mailto;
+																	})
+																	.css('color', $milestoneBooking.is('.fa-times')?'red':false)
+																	.append(team.teamName)
+															)
+													)
+													.append(<%=activeRole.equals(Role.FACULTY)%>?
+														$(document.createElement('td'))
+															.append($(document.createElement('div')).addClass('memberList').append(function(){
+																	var $spanArray = new Array();
+																	for (var j = 0; j < team.myRoles.length; j++) {
+																		$spanArray.push(
+																			$(document.createElement('span')).addClass('memberName').append(team.myRoles[j])
+																		);
+																	}
+																	return $spanArray;
+																})
+															)
+														:false
+													)
+													.append(
+														$(document.createElement('td')).append($milestoneBooking)
+													)
+											);
+										}
+										return $trs;
+									}));
+									return $tParts;
+								});
+								return $table;
+							}
+						});
+						$('.modal-body').find('#myTeamsModalTable').dataTable({
+							aaSorting: [],
+							bPaginate: false,
+							bJqueryUI: false,
+							bLengthChange: true,
+							bFilter: false,
+							bSort: true,
+							sDom: '<lft>'
+						});
+					}
+				}
                 
                 /*****************************
                  PLUGINS AND COMPONENTS
@@ -1992,6 +2118,7 @@
                     trigger: 'manual',
                     html: true,
                     title: function(){
+						if (!title) return false;
 						return title + $(document.createElement('button')).addClass('close').append($(document.createElement('i')).addClass('fa fa-times fa-black')).outerHTML();
 						
                     },

@@ -10,7 +10,10 @@ import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +29,8 @@ import model.Team;
 import model.Term;
 import model.User;
 import model.role.Faculty;
+import model.role.Student;
+import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +42,17 @@ import util.MiscUtil;
  */
 public class ShowIndexAction extends ActionSupport implements ServletRequestAware {
 
+	private String allTeamsJson;
+	private String allUsersJson;
+	private String allTAsJson;
+	private ArrayList<HashMap<String, Object>> myTeamsData;
     private long termId;   //To get the active term id user chooses
     private int pendingBookingCount;  //To display the number of pending bookings on the index page
     private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
     private HashMap<String, Object> json = new HashMap<String, Object>();
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(ShowIndexAction.class);
+	private SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm");
 
     @Override
     public String execute() throws Exception {
@@ -101,17 +111,20 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                         }
                     }
                 }
+				addMyTeamsJson(em, session, faculty);
             }  //end of outer if
 			
             //Add teams into session if user is admin/course coordinator
             if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) {
                 addTeamsJson(em, session);
             }
+			
+			if (activeRole == Role.ADMINISTRATOR) {
+				addTAsJson(em, session);
+			}
             
             //Add users into session if user is admin/course coordinator/student
-            if (activeRole != Role.TA) {
-                addUsersJson(em, session);
-            }
+			addUsersJson(em, session);
 
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
@@ -137,26 +150,53 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
     public void addTeamsJson(EntityManager em, HttpSession session) {
         //Get Teams from here and populate into session
         Term term = (Term) session.getAttribute("currentActiveTerm");
-        List<Team> teamList = null;
+        List<Team> teamList = new ArrayList<Team>();
+        List<Booking> bookingList = new ArrayList<Booking>();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
             Query q = em.createQuery("Select t from Team t where term_id = :term")
                     .setParameter("term", term);
+			Query qb = em.createQuery("Select b from Booking b where b.timeslot.schedule.milestone.term = :term")
+                    .setParameter("term", term);
             teamList = q.getResultList();
+			bookingList = qb.getResultList();
             transaction.commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
         }
         if (teamList != null) {
-            ArrayList<HashMap<String, Object>> teamJsonList = new ArrayList<HashMap<String, Object>>();
+            myTeamsData = new ArrayList<HashMap<String, Object>>();
             for (Team t : teamList) {
-                HashMap<String, Object> teamMap = new HashMap<String, Object>();
-                teamMap.put("teamName", t.getTeamName());
-                teamMap.put("teamId", t.getId());
-                teamJsonList.add(teamMap);
+				HashMap<String, Object> teamMap = new HashMap<String, Object>();
+				teamMap.put("teamName", t.getTeamName());
+				teamMap.put("teamId", t.getId());
+				List<String> memberEmailList = new ArrayList<String>();
+				for (Student s : t.getMembers()) {
+					memberEmailList.add(s.getUsername() + "@smu.edu.sg");
+				}
+				teamMap.put("memberEmails", memberEmailList);
+				List<HashMap<String, Object>> teamBookingsList = new ArrayList<HashMap<String, Object>>();
+				for (Booking b : bookingList) {
+					if (b.getTeam().equals(t) && b.getBookingStatus() != BookingStatus.DELETED && b.getBookingStatus() != BookingStatus.REJECTED) {
+						HashMap<String, Object> bookingMap = new HashMap<String, Object>();
+						bookingMap.put("datetime", viewDateFormat.format(b.getTimeslot().getStartTime()));
+						bookingMap.put("milestone", b.getTimeslot().getSchedule().getMilestone().getName().toLowerCase());
+						bookingMap.put("scheduleId", b.getTimeslot().getSchedule().getId());
+						bookingMap.put("bookingStatus", b.getBookingStatus().toString().toLowerCase());
+						teamBookingsList.add(bookingMap);
+					}
+				}
+				teamMap.put("bookings", teamBookingsList);
+				myTeamsData.add(teamMap);
             }
-            session.setAttribute("allTeams", new Gson().toJson(teamJsonList));
+			sortMyTeamsData();
+			allTeamsJson = new Gson().toJson(myTeamsData);
         }
     }
     
@@ -172,6 +212,11 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
             transaction.commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
         }
         if (userList != null) {
             ArrayList<HashMap<String, Object>> userJsonList = new ArrayList<HashMap<String, Object>>();
@@ -182,9 +227,131 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
                 userJsonList.add(userMap);
             }
             HashSet<HashMap<String, Object>> uniqueUsers = new HashSet<HashMap<String, Object>>(userJsonList);
-            session.setAttribute("allUsers", new Gson().toJson(uniqueUsers.toArray()));
+			allUsersJson = new Gson().toJson(uniqueUsers.toArray());
         }
     }
+	
+	public void addMyTeamsJson(EntityManager em, HttpSession session, Faculty me) {
+        //Get Teams from here and populate into session
+        Term term = (Term) session.getAttribute("currentActiveTerm");
+        List<Team> teamList = new ArrayList<Team>();
+		List<Booking> bookingList = new ArrayList<Booking>();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            Query q = em.createQuery("Select t from Team t where term_id = :term")
+                    .setParameter("term", term);
+			Query qb = em.createQuery("Select b from Booking b where b.timeslot.schedule.milestone.term = :term")
+                    .setParameter("term", term);
+            teamList = q.getResultList();
+			bookingList = qb.getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
+        }
+        if (teamList != null) {
+            myTeamsData = new ArrayList<HashMap<String, Object>>();
+            for (Team t : teamList) {
+				if (t.getSupervisor().equals(me) || t.getReviewer1().equals(me) || t.getReviewer2().equals(me)) {
+					HashMap<String, Object> teamMap = new HashMap<String, Object>();
+					teamMap.put("teamName", t.getTeamName());
+					teamMap.put("teamId", t.getId());
+					List<String> memberEmailList = new ArrayList<String>();
+					for (Student s : t.getMembers()) {
+						memberEmailList.add(s.getUsername() + "@smu.edu.sg");
+					}
+					teamMap.put("memberEmails", memberEmailList);
+					List<String> myRolesList = new ArrayList<String>();
+					if (t.getSupervisor().equals(me)) myRolesList.add("supervisor");
+					if (t.getReviewer1().equals(me)) myRolesList.add("reviewer1");
+					if (t.getReviewer2().equals(me)) myRolesList.add("reviewer2");
+					teamMap.put("myRoles", myRolesList);
+					List<HashMap<String, Object>> teamBookingsList = new ArrayList<HashMap<String, Object>>();
+					for (Booking b : bookingList) {
+						if (b.getTeam().equals(t) && b.getBookingStatus() != BookingStatus.DELETED && b.getBookingStatus() != BookingStatus.REJECTED) {
+							HashMap<String, Object> bookingMap = new HashMap<String, Object>();
+							bookingMap.put("datetime", viewDateFormat.format(b.getTimeslot().getStartTime()));
+							bookingMap.put("milestone", b.getTimeslot().getSchedule().getMilestone().getName().toLowerCase());
+							bookingMap.put("scheduleId", b.getTimeslot().getSchedule().getId());
+							bookingMap.put("bookingStatus", b.getBookingStatus().toString().toLowerCase());
+							teamBookingsList.add(bookingMap);
+						}
+					}
+					teamMap.put("bookings", teamBookingsList);
+					myTeamsData.add(teamMap);
+				}
+            }
+			sortMyTeamsData();
+			allTeamsJson = new Gson().toJson(myTeamsData);
+        }
+	}
+	
+	private void addTAsJson(EntityManager em, HttpSession session) {
+        Term term = (Term) session.getAttribute("currentActiveTerm");
+        List<TA> taList = new ArrayList<TA>();
+		List<Booking> bookingList = new ArrayList<Booking>();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            Query q = em.createQuery("Select u from User u where term_id = :term and role = :taRole")
+                    .setParameter("term", term)
+					.setParameter("taRole", Role.TA);
+			Query qb = em.createQuery("Select b from Booking b where b.timeslot.schedule.milestone.term = :term")
+                    .setParameter("term", term);
+            taList = q.getResultList();
+			bookingList = qb.getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Database Operation Error");
+			if (MiscUtil.DEV_MODE) {
+				for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
+				}
+			}
+        }
+        if (taList != null) {
+			List<HashMap<String, Object>> taJsonList = new ArrayList<HashMap<String, Object>>();
+            for (TA ta : taList) {
+				HashMap<String, Object> taMap = new HashMap<String, Object>();
+				taMap.put("name", ta.getFullName());
+				taMap.put("username", ta.getUsername());
+				List<HashMap<String, Object>> taBookingsList = new ArrayList<HashMap<String, Object>>();
+				for (Booking b : bookingList) {
+					if (ta.equals(b.getTimeslot().getTA()) && b.getBookingStatus() != BookingStatus.DELETED && b.getBookingStatus() != BookingStatus.REJECTED) {
+						HashMap<String, Object> bookingMap = new HashMap<String, Object>();
+						bookingMap.put("datetime", viewDateFormat.format(b.getTimeslot().getStartTime()));
+						if (b.getTeam() != null) {
+							bookingMap.put("teamName", b.getTeam().getTeamName());
+							bookingMap.put("teamId", b.getTeam().getId());
+						}
+					}
+				}
+				taMap.put("signups", taBookingsList);
+				taJsonList.add(taMap);
+            }
+			sortMyTeamsData();
+			allTAsJson = new Gson().toJson(taJsonList);
+        }
+	}
+	
+	public void sortMyTeamsData() {
+		Collections.sort(myTeamsData, new Comparator<HashMap<String, Object>>(){
+			public int compare(HashMap<String, Object> o1, HashMap<String, Object> o2) {
+				return String.valueOf(o1.get("teamName")).compareToIgnoreCase(String.valueOf(o2.get("teamName")));
+			}
+		});
+		Collections.sort(myTeamsData, new Comparator<HashMap<String, Object>>(){
+			public int compare(HashMap<String, Object> o1, HashMap<String, Object> o2) {
+				if (!((List) o1.get("bookings")).isEmpty()) return 1;
+				else return 0;
+			}
+		});
+	}
 
     public void setServletRequest(HttpServletRequest hsr) {
         request = hsr;
@@ -221,4 +388,37 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
     public void setData(ArrayList<HashMap<String, String>> data) {
         this.data = data;
     }
+	
+	public String getAllTeamsJson() {
+		return allTeamsJson;
+	}
+
+	public void setAllTeams(String allTeamsJson) {
+		this.allTeamsJson = allTeamsJson;
+	}
+
+	public String getAllUsersJson() {
+		return allUsersJson;
+	}
+
+	public void setAllUsers(String allUsersJson) {
+		this.allUsersJson = allUsersJson;
+	}
+	
+	public ArrayList<HashMap<String, Object>> getMyTeamsData() {
+		return myTeamsData;
+	}
+
+	public void setMyTeamsData(ArrayList<HashMap<String, Object>> myTeamsData) {
+		this.myTeamsData = myTeamsData;
+	}
+	
+	public String getAllTAsJson() {
+		return allTAsJson;
+	}
+
+	public void setAllTAsJson(String allTAsJson) {
+		this.allTAsJson = allTAsJson;
+	}
+	
 } //end of class

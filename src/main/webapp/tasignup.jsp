@@ -148,7 +148,7 @@
 
         <!-- Kick unauthorized user -->
         <%
-            if (activeRole != Role.TA) {
+            if (activeRole != Role.TA && activeRole != Role.ADMINISTRATOR) {
                 request.setAttribute("error", "You need to be a TA to view this page");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
@@ -159,18 +159,16 @@
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
-                <h3>Sign Up</h3>
+                <h3>TA Video Sign Up</h3>
 					<table class='availabilityLegend'>
-						<tr>
-							<!-- <td style="width:50px"><b>Legend:</b></td>-->
-							<td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td> 
-						</tr>
-						<tr>
-							<td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td> 
-						</tr>
-						<tr>
-							<td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td> 
-						</tr>
+						<% if (activeRole.equals(Role.TA)) { %>
+						<tr><td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td></tr>
+						<tr><td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td></tr>
+						<tr><td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td></tr>
+						<% } else { %>
+						<tr><td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;No TA</td></tr>
+						<tr><td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;TA Signed Up</td></tr>
+						<% } %>
 					</table>
                 <div id="timeslotsTableSection">
                     <table>
@@ -208,23 +206,23 @@
                 var scheduleData = null;
                 var selectedMilestone = null;
                 var milestones = new Array();
+				var taData = JSON.parse('<s:property escape= "false" value= "taJson"/>');
+				console.log('TA DATA: ' + JSON.stringify(taData));
 
                 loadMilestones();
                 loadSelectDropdown();
                 
                 function loadMilestones() {
-                    var milestonesData = getScheduleData(null, activeAcademicYearStr, activeSemesterStr);
-                    for (var i = 0; i < milestonesData.milestones.length; i++) {
-                        milestones.push(milestonesData.milestones[i].name);
-                    }
+                    milestones = getScheduleData(null, activeAcademicYearStr, activeSemesterStr).milestones;
                 };
                 
                 function loadSelectDropdown() {
                     for (var i = 0; i < milestones.length; i++) {
-                        var milestoneOption = $(document.createElement('option'));
-                        milestoneOption.attr('value', milestones[i]);
-                        milestoneOption.html(milestones[i]);
-                        $("#milestoneTimeslotsSelect").append(milestoneOption);
+						if (!milestones[i].bookable) continue;
+							var milestoneOption = $(document.createElement('option'));
+							milestoneOption.attr('value', milestones[i].name);
+							milestoneOption.html(milestones[i].name);
+							$("#milestoneTimeslotsSelect").append(milestoneOption);
                     }
                 }
                 
@@ -236,7 +234,7 @@
                     return false; 
                 });
                 
-                $("#milestoneTimeslotsSelect").val(milestones[0]).change(); //Select first milestone
+                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).change(); //Select first milestone
 
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableClass = "timeslotsTable";
@@ -304,7 +302,6 @@
 				//ADDED FOR SELECT/DESELECT ALL
 				$('body').on('change', '.checkBoxClass', function(){
 					var $checkbox = $(this);
-					console.log('selected ' + $checkbox.attr('id') + ': ' + $checkbox.is(':checked'));
 
 					if(!$checkbox.is(':checked')){
 						var dateTime = $checkbox.attr('id');
@@ -373,7 +370,6 @@
 										//if the TA for this timeslot is not you
 										if(valtest !==null){
 											valtest = valtest.options[valtest.selectedIndex].text;
-											//console.log(valtest);
 											var assignElement = "#" + valswitch;
 											 $(assignElement).val("You");
 										}
@@ -406,8 +402,6 @@
 								});
 							}
 						}
-					
-					
 					}
 					
 				});
@@ -422,15 +416,13 @@
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                        th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
+                        if (<%= activeRole.equals(Role.TA)%>) th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
+						else th.html(headerVal);
                         thead.append(th);
                     }
                     //Inserting constructed table header into table
                     $("." + tableClass).append($(document.createElement('thead')).append(thead));
-
-                    //Creating table body with times and empty cells
-//                    var tbody = $(document.createElement("tbody"));
-
+					
                     //Generating list of times
                     var timesArray = new Array();
                     for (var i = minTime; i < maxTime; i++) {
@@ -446,13 +438,11 @@
 
                     //Constructing table body
                     for (i = 0; i < timesArray.length; i++) {
-						
 						if(counter===1){
 							startTime = Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[0]
 											+Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[1];
 						}
-						if(counter===slotSize){
-							console.log(timesArray[i]);
+						if(counter===slotSize && <%= activeRole.equals(Role.TA)%>){
 							//tr.append("<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>");
 							counter = 0;
 							var tr = $(document.createElement("tr"));
@@ -464,10 +454,7 @@
 							var timeTd = $(document.createElement("td"));
 							timeTd.html(timesArray[i]);
 							tr.append(timeTd);
-							
 						}
-						
-                       
 
                         for (var j = 0; j < dateArray.length; j++) {
                             var td = $(document.createElement("td"));
@@ -478,7 +465,9 @@
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                             if (timeslot) {
 								td.addClass('border-top');
+								td.attr('id', 'timeslot_' + datetimeString);
 								td.attr("value", "timeslot_" + timeslot.id);
+								if (<%= activeRole.equals(Role.ADMINISTRATOR)%>) td.attr('title', 'Click to send email');
 								if (timeslot.hasOwnProperty("taId")) {
 									if (timeslot.taId === loggedInTaId) {
 										td.addClass('markable');
@@ -488,14 +477,18 @@
 										td.addClass('otherTAChosen');
 										//td.append($(document.createElement('div')).addClass('textinside').html(timeslot.TA));
 										//ADDED CODE FOR DROPDOWN
-										td.append($(document.createElement('container')).html("<select id='switch_" + timeslot.id +  "' style='width:150px;heigth:30px;'><option selected>" +
-											timeslot.TA + "</option><option>" + "You" + "</option></select>"));
+										if (<%= activeRole.equals(Role.TA)%>) {
+											td.append($(document.createElement('container')).html("<select id='switch_" + timeslot.id +  "' style='width:150px;heigth:30px;'><option selected>" +
+												timeslot.TA + "</option><option>" + "You" + "</option></select>"));
+										} else {
+											td.append($(document.createElement('div')).addClass('timeslotTA textinside').html(timeslot.TA));
+										}
 									}
 								} else {
 									td.addClass('markable');
 								}
 								if (timeslot.team) {
-									td.append($(document.createElement('div')).addClass('textinside').html(timeslot.team));
+									td.append($(document.createElement('div')).addClass('timeslotTeam textinside').html(timeslot.team));
 								}
                             }
 							td.addClass('border-left');
@@ -556,9 +549,67 @@
 					}
 					return false;
                 }
+				
+				function emailAvailable($timeslotCell) {
+                    if (!$timeslotCell.hasClass('timeslotcell')) return false;
+					var slotSize = scheduleData.duration / 30;
+					var $prevTr = $timeslotCell.closest('tr');
+					for (var i = slotSize; i > 0; i--) {
+						var $availableTd = $prevTr.children().eq($timeslotCell.index());
+						if ($availableTd.attr('id')) {
+							if ($availableTd.children('.timeslotTeam').length && !$availableTd.children('.timeslotTA').length) {
+								var mailto = 'mailto:';
+								for (var j = 0; j < taData.length; j++) {
+									mailto += taData[i].username + '@smu.edu.sg; ';
+								}
+								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
+								mailto += 'Team ' 
+										+ $availableTd.children('.timeslotTeam').text() + ' is presenting on ' 
+										+ Date.parse($availableTd.attr('id').split('_')[1]).toString('ddd, dd-MMM') 
+										+ ' at ' +  Date.parse($availableTd.attr('id').split('_')[1]).toString('HH:mm') 
+										+ ' - ' + Date.parse($availableTd.attr('id').split('_')[1]).addMinutes(scheduleData.duration).toString('HH:mm')
+										+ ' for their ' + selectedMilestone + ' presentation.'
+										+ '%0D%0A';
+								mailto += 'There is currently no TA assigned. Please sign up on the IS480 Scheduling System to record their video.';
+								window.location.href = mailto;
+							} else if (!$availableTd.children('.timeslotTA').length) {
+								var mailto = 'mailto:';
+								for (var j = 0; j < taData.length; j++) {
+									mailto += taData[j].username + '@smu.edu.sg; ';
+								}
+								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
+								mailto += 'Please sign up for timeslot ' 
+										+ Date.parse($availableTd.attr('id').split('_')[1]).toString('ddd, dd-MMM') 
+										+ ' at ' +  Date.parse($availableTd.attr('id').split('_')[1]).toString('HH:mm') 
+										+ ' - ' + Date.parse($availableTd.attr('id').split('_')[1]).addMinutes(scheduleData.duration).toString('HH:mm')
+										+ ' for the FYP ' + selectedMilestone + ' presentation'
+										+ ' on the IS480 Scheduling System.';
+								window.location.href = mailto;
+							} else if ($availableTd.children('.timeslotTA').length) {
+								var mailto = 'mailto:';
+								var ta = null;
+								for (var j = 0; j < taData.length; j++) {
+									if (taData[j].name === $availableTd.children('.timeslotTA').text()) {
+										ta = taData[j];
+										break;
+									}
+								}
+								mailto += ta.username + '@smu.edu.sg;?' + 'body=Hi ' + ta.name + ',%0D%0A%0D%0A';
+								window.location.href = mailto;
+							}
+							break;
+						}
+						$prevTr = $prevTr.prev();
+					}
+					return false;
+                }
 
-                $('body').on('click', 'td.chosen, td.available', function(e){
-                    triggerTimeslot($(this));
+                $('body').on('click', 'td.timeslotcell', function(e){
+					if ($(this).is('.chosen, .available') && <%= activeRole.equals(Role.TA) %>) {
+						triggerTimeslot($(this));
+					} else if (<%= activeRole.equals(Role.ADMINISTRATOR) %>) {
+						emailAvailable($(this));
+					}
                 });
 				
 				//Hover glow effect
@@ -714,7 +765,6 @@
 								});
                             } else {
                                 var eid = btoa(response.message);
-                                console.log(response.message);
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         } else {

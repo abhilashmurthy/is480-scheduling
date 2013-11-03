@@ -83,6 +83,11 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                     team = em.find(Team.class, teamId);
                 } catch (Exception e) {
                     logger.error("Database Operation Error");
+					if (MiscUtil.DEV_MODE) {
+						for (StackTraceElement s : e.getStackTrace()) {
+							logger.debug(s.toString());
+						}
+					}
                     throw new Exception("Unable to find team");
                 }
             }

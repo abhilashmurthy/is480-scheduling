@@ -221,10 +221,7 @@
                 loadSelectDropdown();
                 
                 function loadMilestones() {
-                    var milestonesData = getScheduleData(null, activeAcademicYearStr, activeSemesterStr);
-                    for (var i = 0; i < milestonesData.milestones.length; i++) {
-                        milestones.push(milestonesData.milestones[i].name);
-                    }
+                    milestones = getScheduleData(null, activeAcademicYearStr, activeSemesterStr).milestones;
                 };
 
                 function loadUnavailableTimeslots() {
@@ -235,10 +232,11 @@
                 
                 function loadSelectDropdown() {
                     for (var i = 0; i < milestones.length; i++) {
-                        var milestoneOption = $(document.createElement('option'));
-                        milestoneOption.attr('value', milestones[i]);
-                        milestoneOption.html(milestones[i]);
-                        $("#milestoneTimeslotsSelect").append(milestoneOption);
+						if (!milestones[i].bookable) continue;
+							var milestoneOption = $(document.createElement('option'));
+							milestoneOption.attr('value', milestones[i].name);
+							milestoneOption.html(milestones[i].name);
+							$("#milestoneTimeslotsSelect").append(milestoneOption);
                     }
                 }
                 
@@ -250,7 +248,7 @@
                     return false; 
                 });
                 
-                $("#milestoneTimeslotsSelect").val(milestones[0]).change(); //Select first milestone
+                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).change(); //Select first milestone
 
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableClass = "timeslotsTable";

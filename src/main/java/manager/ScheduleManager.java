@@ -165,6 +165,11 @@ public class ScheduleManager {
             return sourceList;
         } catch (Exception e) {
             logger.error("Database Operation Error");
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
             e.printStackTrace();
         }
         return null;
@@ -183,6 +188,11 @@ public class ScheduleManager {
             transaction.commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
             e.printStackTrace();
         }
         return schedule;
@@ -204,6 +214,11 @@ public class ScheduleManager {
             if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
             e.printStackTrace();
         }
         return schedule;

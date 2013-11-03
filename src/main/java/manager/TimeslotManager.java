@@ -21,6 +21,7 @@ import model.User;
 import model.role.Faculty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -46,6 +47,11 @@ public class TimeslotManager {
             return timeslot;
         } catch (Exception e) {
             logger.error("Database Operation Error");
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
             em.getTransaction().rollback();
         }
         return null;
@@ -67,7 +73,11 @@ public class TimeslotManager {
             return timeslots;
         } catch (Exception e) {
             logger.error("Database Operation Error");
-            logger.error(e.getMessage());
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
             em.getTransaction().rollback();
         }
         return null;
@@ -137,8 +147,12 @@ public class TimeslotManager {
             timeslot = (Timeslot) q.getSingleResult();
 			if (justHere) em.getTransaction().commit();
         } catch (Exception e) {
-            logger.error("Database Operation Error: " + e.getMessage());
-            logger.trace(e.getMessage());
+            logger.error("Database Operation Error");
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement st : e.getStackTrace()) {
+                    logger.debug(st.toString());
+                }
+            }
             em.getTransaction().rollback();
         }
         return timeslot;

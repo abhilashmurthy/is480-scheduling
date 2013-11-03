@@ -599,3 +599,12 @@ select, input {
 .multiselectFilterAddon {
 	margin-left: 7px;
 }
+
+.dashboardPicker {
+	display: inline-block;
+	margin-left: 20px;
+}
+
+#myTeamsModalTable {
+	width: 400px;
+}

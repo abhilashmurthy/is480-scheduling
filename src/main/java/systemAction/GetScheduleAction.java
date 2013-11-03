@@ -259,7 +259,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                             available = false;
                         }
                         map.put("available", available);
-                    } else if (user.getRole() == Role.TA && t.getTA() != null) {
+                    } else if (t.getTA() != null) {
                         map.put("taId", t.getTA().getId());
                     }
                     

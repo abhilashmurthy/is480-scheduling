@@ -13,6 +13,7 @@ import javax.persistence.PersistenceException;
 import model.Term;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.MiscUtil;
 
 /**
  *
@@ -57,6 +58,11 @@ public class TermManager {
             transaction.commit();
         } catch (Exception e) {
             logger.error("Database Operation Error");
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
             //em.getTransaction().rollback();
         }
         return sourceList;
@@ -76,6 +82,11 @@ public class TermManager {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Database Operation Error");
+            if (MiscUtil.DEV_MODE) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    logger.debug(s.toString());
+                }
+            }
         }
         return result;
     }
