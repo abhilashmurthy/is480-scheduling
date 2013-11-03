@@ -69,13 +69,15 @@ public class RestoreDatabaseAction extends ActionSupport implements ServletReque
     public String execute() throws Exception {
         Process p = null;
         try {
-			//Drop and recreate database
-            logger.trace("DB Creation started");
-            resetDB();
-            logger.trace("DB Creation complete");
-			
-			//Get file name and folder data
-            JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+			JSONObject inputData = new JSONObject(request.getParameter("jsonData"));
+			String restoreType = inputData.getString("restoreType");
+			if (restoreType.equals("ddl")) {
+				//Drop and recreate database
+				logger.trace("DB Creation started");
+				resetDB();
+				logger.trace("DB Creation complete");
+			}
+            //Get file name and folder data
 			restoreFileName = inputData.getString("fileName");
 			File file = new File(restorePath + restoreFileName);
 			if (!file.exists()) {
@@ -99,8 +101,8 @@ public class RestoreDatabaseAction extends ActionSupport implements ServletReque
 			errorPuker.start();
 			outputPuker.start();
 			if (p.waitFor() == 0) {
-				json.put("success", true);
-				json.put("message", "Database Restore Complete");
+					json.put("success", true);
+					json.put("message", "Database Restore Complete");
 			} else {
 				json.put("success", false);
 				json.put("message", "Error with Database Restore");

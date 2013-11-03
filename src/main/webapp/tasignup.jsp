@@ -568,7 +568,7 @@
 										+ Date.parse($availableTd.attr('id').split('_')[1]).toString('ddd, dd-MMM') 
 										+ ' at ' +  Date.parse($availableTd.attr('id').split('_')[1]).toString('HH:mm') 
 										+ ' - ' + Date.parse($availableTd.attr('id').split('_')[1]).addMinutes(scheduleData.duration).toString('HH:mm')
-										+ ' for their ' + selectedMilestone + ' presentation.'
+										+ ' for their FYP ' + selectedMilestone + ' presentation.'
 										+ '%0D%0A';
 								mailto += 'There is currently no TA assigned. Please sign up on the IS480 Scheduling System to record their video.';
 								window.location.href = mailto;

@@ -32,8 +32,8 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
         try {
 			HttpSession session = request.getSession();
 			User user = (User) session.getAttribute("user");
-			session.invalidate();
 			MiscUtil.logActivity(logger, user, "Logged out");
+			session.invalidate();
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {

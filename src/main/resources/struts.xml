@@ -72,6 +72,10 @@
             <result name="success">/manageusers.jsp</result>
         </action>
 		
+		<action name="restoreDB" class="systemAction.PrepareRestoreDBAction" method="execute">
+            <result name="success">/restoreDB.jsp</result>
+        </action>
+		
         <action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
             <result name="success">/schedule.jsp</result>
         </action>
