@@ -269,6 +269,7 @@ public class BookingManager {
 			map.put("time", viewTimeFormat.format(timeslot.getStartTime()) + " - " + viewTimeFormat.format(timeslot.getEndTime()));
 			map.put("venue", timeslot.getVenue());
 			map.put("team", team.getTeamName());
+			map.put("teamId", team.getId());
 			map.put("startDate", viewDateFormat.format(new Date(timeslot.getStartTime().getTime())));
 			map.put("status", booking.getBookingStatus().toString());
 
@@ -288,6 +289,7 @@ public class BookingManager {
 			for (User facultyUser : statusList.keySet()) {
 				HashMap<String, String> facultyMap = new HashMap<String, String>();
 				facultyMap.put("name", facultyUser.getFullName());
+				facultyMap.put("username", facultyUser.getUsername());
 				facultyMap.put("status", statusList.get(facultyUser).toString());
 				faculties.add(facultyMap);
 			}

@@ -895,6 +895,7 @@
                     $('.timeslotCell').on('click', '#createBookingBtn', function(e) {
                         var returnData = createBooking(self);
 						if (returnData && returnData.success) {
+							var booking = returnData.booking;
 							self.popover('destroy');
 							self.tooltip('destroy');
 							self.removeClass('unbookedTimeslot');
@@ -903,15 +904,30 @@
 							if ($deletedDiv) $deletedDiv.remove();
 							var bookingDiv = $(document.createElement('div'));
 							bookingDiv.addClass('booking myTeamBooking');
-							bookingDiv.addClass(<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>?'approvedBooking':'pendingBooking');
-							bookingDiv.html(returnData.booking.team);
+							bookingDiv.addClass(<%= activeRole.equals(Role.ADMINISTRATOR)%>?'approvedBooking':'pendingBooking');
+							bookingDiv.html(booking.team);
 							bookingDiv.css('display', 'none');
 							self.append(bookingDiv);
 							showNotification('SUCCESS', self, null);
-							scheduleData.timeslots[self.attr('value')] = returnData.booking;
+							scheduleData.timeslots[self.attr('value')] = booking;
 							if (<%= activeRole.equals(Role.STUDENT)%>) {
 								appendViewBookingPopover(self);
 							} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+								//Update teams JSON
+								var team = null;
+								for (var i = 0; i < teams.length; i++) {
+									if (parseInt(teams[i].teamId) === parseInt(booking.teamId)) {
+										team = teams[i];
+										break;
+									}
+								}
+								team.bookings.push({
+									datetime: Date.parse(booking.datetime).toString('dd MMM yyyy HH:mm'),
+									milestone: milestone,
+									scheduleId: scheduleData.id,
+									bookingStatus: booking.status.toLowerCase()
+								});
+								//Change page view
 								appendPopovers();
 								initDragNDrop();
 							}
@@ -985,7 +1001,6 @@
 									var $timeslot = self.parents('.timeslotCell');
 									var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
 									deleteBooking($timeslot);
-									delete timeslot.team;
 									setTimeout(function(){showNotification("ERROR", $timeslot, null);},500);
 									$timeslot.removeClass('bookedTimeslot');
 									$timeslot.addClass('unbookedTimeslot');
@@ -1003,6 +1018,23 @@
 									} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
 										self.effect('clip', 'slow', function(){
 											self.remove();
+											//Update teams json
+											var team = null;
+											for (var i = 0; i < teams.length; i++) {
+												console.log('Comparing ' + teams[i].teamName + ' and ' + timeslot.team);
+												if (teams[i].teamName === timeslot.team) {
+													team = teams[i];
+													break;
+												}
+											}
+											for (var i = 0; i < team.bookings.length; i++) {
+												if (parseInt(team.bookings[i].scheduleId) === parseInt(scheduleData.id)) {
+													team.bookings.splice(team.bookings.indexOf(team.bookings[i]), 1);
+													break;
+												}
+											}
+											delete timeslot.team;
+											//Change page view
 											refreshScheduleData();
 											appendPopovers();
 										});
@@ -1035,11 +1067,27 @@
                         }
                         var newVenue = $('#updateFormVenue').val();
                         var attendees = $(".optionalAttendees").tokenInput('get');
-                        var timeslot = self.parents('.timeslotCell');
-                        var returnData = updateBooking(timeslot, newDateTime, newVenue, attendees);
+                        var $timeslot = self.parents('.timeslotCell');
+						var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
+                        var returnData = updateBooking($timeslot, newDateTime, newVenue, attendees);
                         if (returnData && returnData.success) {
-                            showNotification("INFO", timeslot, null);
-                            if (newDateTime !== "" && newDateTime !== timeslot.attr('value')) {
+                            showNotification("INFO", $timeslot, null);
+                            if (newDateTime !== "" && newDateTime !== $timeslot.attr('value')) {
+								//Update teams json
+								var team = null;
+								for (var i = 0; i < teams.length; i++) {
+									if (teams[i].teamName === timeslot.team) {
+										team = teams[i];
+										break;
+									}
+								}
+								for (var i = 0; i < team.bookings.length; i++) {
+									if (parseInt(team.bookings[i].scheduleId) === parseInt(scheduleData.id)) {
+										team.bookings[i].datetime = Date.parse(returnData.booking.datetime).toString('dd MMM yyyy HH:mm');
+										break;
+									}
+								}
+								//Change page view
                                 var newTimeslot = $("#timeslot_" + returnData.booking.id);
                                 newTimeslot.popover('destroy');
                                 newTimeslot.removeClass();
@@ -1051,24 +1099,23 @@
                                 newTimeslot.append(bookingDiv);
                                 scheduleData.timeslots[newTimeslot.attr('value')] = returnData.booking;
                                 appendViewBookingPopover(newTimeslot);
-                                
-                                timeslot.removeClass('bookedTimeslot');
-                                timeslot.addClass('unbookedTimeslot');
-                                timeslot.popover('destroy');
+                                $timeslot.removeClass('bookedTimeslot');
+                                $timeslot.addClass('unbookedTimeslot');
+                                $timeslot.popover('destroy');
                                 self.effect('clip', 'slow', function(){
                                    self.remove(); 
                                 });
-                                delete scheduleData.timeslots[timeslot.attr('value')];
-                                scheduleData.timeslots[timeslot.attr('value')] = {id:timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
-                                appendCreateBookingPopover(timeslot);
+                                delete scheduleData.timeslots[$timeslot.attr('value')];
+                                scheduleData.timeslots[$timeslot.attr('value')] = {id:$timeslot.attr('id').split("_")[1], venue:"SIS Seminar Room 2-1", datetime: $timeslot.attr('value')}; //TODO: Change SIS Seminar Room 2-1
+                                appendCreateBookingPopover($timeslot);
                                 bookingDiv.show('clip', 'slow');
                             } else {
-                                scheduleData.timeslots[timeslot.attr('value')] = returnData.booking;
+                                scheduleData.timeslots[$timeslot.attr('value')] = returnData.booking;
                                 self.popover('destroy');
-                                appendViewBookingPopover(timeslot);
+                                appendViewBookingPopover($timeslot);
                             }
                         } else {
-                            showNotification("WARNING", timeslot, returnData.message);
+                            showNotification("WARNING", $timeslot, returnData.message);
                         }
 						refreshScheduleData();
                         return false;
@@ -1758,26 +1805,6 @@
 							var newDateTime = $(this).attr('value');
 							var venue = timeslot.venue;
 							var optionals = timeslot.optionals;
-//							var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
-//							if (returnData && returnData.success) {
-//								var $newTimeslot = $("#timeslot_" + returnData.booking.id);
-//								$newTimeslot.removeClass('unbookedTimeslot');
-//								$newTimeslot.addClass('bookedTimeslot');
-//								scheduleData.timeslots[$newTimeslot.attr('value')] = returnData.booking;
-//								$oldTimeslot.removeClass('bookedTimeslot');
-//								$oldTimeslot.addClass('unbookedTimeslot');
-//								delete scheduleData.timeslots[$oldTimeslot.attr('value')];
-//								scheduleData.timeslots[$oldTimeslot.attr('value')] = {
-//									id: $oldTimeslot.attr('id').split("_")[1],
-//									venue: venue, 
-//									datetime: $oldTimeslot.attr('value')
-//								};
-//								$booking.detach().appendTo($newTimeslot);
-//								setTimeout(function(){showNotification("INFO", $oldTimeslot, null);}, 500);
-//								initDragNDrop();
-//							} else {
-//								showNotification("INFO", $oldTimeslot, returnData.message);
-//							}
 							bootbox.confirm({
 								title: "Update Booking?",
 								message: function(){
@@ -1790,6 +1817,21 @@
 									if (result) {
 										var returnData = updateBooking($oldTimeslot, newDateTime, venue, optionals);
 										if (returnData && returnData.success) {
+											//Update teams json
+											var team = null;
+											for (var i = 0; i < teams.length; i++) {
+												if (teams[i].teamName === timeslot.team) {
+													team = teams[i];
+													break;
+												}
+											}
+											for (var i = 0; i < team.bookings.length; i++) {
+												if (parseInt(team.bookings[i].scheduleId) === parseInt(scheduleData.id)) {
+													team.bookings[i].datetime = Date.parse(returnData.booking.datetime).toString('dd MMM yyyy HH:mm');
+													break;
+												}
+											}
+											//Change page view
 											var $newTimeslot = $("#timeslot_" + returnData.booking.id);
 											$newTimeslot.removeClass('unbookedTimeslot');
 											$newTimeslot.addClass('bookedTimeslot');

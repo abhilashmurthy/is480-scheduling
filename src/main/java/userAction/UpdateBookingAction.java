@@ -147,6 +147,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 map.put("time", viewTimeFormat.format(oldTimeslot.getStartTime()) + " - " + viewTimeFormat.format(oldTimeslot.getEndTime()));
                 map.put("venue", oldTimeslot.getVenue());
                 map.put("team", booking.getTeam().getTeamName());
+                map.put("teamId", booking.getTeam().getId());
                 map.put("startDate", viewDateFormat.format(new Date(oldTimeslot.getStartTime().getTime())));
                 map.put("status", booking.getBookingStatus().toString());
                 List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>(); //Adding all students
