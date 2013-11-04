@@ -132,6 +132,13 @@
 			<artifactId>opencsv</artifactId>
 			<version>2.3</version>
 		</dependency>
+		
+		<!-- iCalendar File Handling Library -->
+		<dependency>
+			<groupId>org.mnode.ical4j</groupId>
+			<artifactId>ical4j</artifactId>
+			<version>1.0.5.2</version>
+		</dependency>
     
 	</dependencies>
 
