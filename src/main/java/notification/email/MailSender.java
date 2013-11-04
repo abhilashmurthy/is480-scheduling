@@ -109,7 +109,7 @@ public class MailSender {
 			multipart.addBodyPart(msgBody);
 			
 			//Adding the file attachment (if any)
-			if (attachFile != null) {
+			if (attachFile != null && filename != null) {
 				MimeBodyPart attachment = new MimeBodyPart();
 				DataSource file = new FileDataSource(attachFile);
 				attachment.setDataHandler(new DataHandler(file));
