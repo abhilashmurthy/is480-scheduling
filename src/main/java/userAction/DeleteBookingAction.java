@@ -87,6 +87,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
 				//Forcing initialization for sending email
 				Hibernate.initialize(b.getTeam().getMembers());
 				Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
+				Hibernate.initialize(b.getRequiredAttendees());
 				
 				deleteSMSReminder(b);
 

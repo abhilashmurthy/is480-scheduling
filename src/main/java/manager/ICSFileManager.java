@@ -4,6 +4,7 @@
  */
 package manager;
 
+import constant.BookingStatus;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,6 +55,7 @@ public class ICSFileManager {
 			fs = new FileOutputStream(icsFile);
 			CalendarOutputter calOut = new CalendarOutputter();
 			calOut.output(icsCal, fs);
+			return icsFile;
 		} catch (Exception e) {
 			logger.error("ICS File error");
 			logger.error(e.getMessage());
@@ -94,13 +96,21 @@ public class ICSFileManager {
 		end.setTimeInMillis(b.getTimeslot().getEndTime().getTime());
 
 		//Creating the calendar event (VEvent file)
-		String eventName = b.getTeam().getTeamName() + " - " + b.getTimeslot().getSchedule().getMilestone().getName() + " Presentation";
+		StringBuilder eventName = new StringBuilder();
+		if (b.getBookingStatus() == BookingStatus.PENDING) eventName.append("(Tentative) ");
+		eventName.append(b.getTeam().getTeamName()).append(" - ");
+		eventName.append(b.getTimeslot().getSchedule().getMilestone().getName());
+		eventName.append(" Presentation");
 		DateTime startTime = new DateTime(start.getTimeInMillis());
 		DateTime endTime = new DateTime(end.getTimeInMillis());
-		VEvent meeting = new VEvent(startTime, endTime, eventName);
+		VEvent meeting = new VEvent(startTime, endTime, eventName.toString());
 		meeting.getProperties().add(tz.getTimeZoneId());
 		meeting.getProperties().add(new Organizer("is480.scheduling@gmail.com"));
-		meeting.getProperties().add(Status.VEVENT_CONFIRMED);
+		Status status;
+		if (b.getBookingStatus() == BookingStatus.PENDING) { status = Status.VEVENT_TENTATIVE; }
+		else if (b.getBookingStatus() == BookingStatus.APPROVED) { status = Status.VEVENT_CONFIRMED; }
+		else { status = Status.VEVENT_CANCELLED; }
+		meeting.getProperties().add(status);
 
 		//Generate unique ID for the calendar entry based on the booking ID
 		Uid uid = new Uid("IS480-PSAS-BID" + b.getId() + "@" + InetAddress.getLocalHost().getHostName());
