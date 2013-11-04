@@ -14,7 +14,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import manager.MilestoneManager;
 import manager.TermManager;
+import model.Milestone;
 import model.Term;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
@@ -52,10 +54,31 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
                     String academicYear = Integer.toString(year) + "-" + Integer.toString(year + 1);
                     //e.g. Term 1
                     String termName = academicYear + " " + semester;
-                    map.put("termName", termName);
+                   
+					
+					String mStone = "";
+					
+					List<Milestone> milestones = MilestoneManager.findByTerm(em, term);
+					map.put("termName", termName);
                     map.put("termId", Long.toString(termId));
-
-                    dataList.add(map);
+						
+                    for(Milestone milestone: milestones){
+						
+						//for every milestone, add it to the map
+						mStone += milestone.getName() + ",";
+						map.put("milestone", mStone);
+						
+						//dataList.add(map);
+						dataList.add(map);
+						
+					}
+					
+                    
+					
+					
+					
+					
+					
                 }
             } else {
                 request.setAttribute("error", "You cannot create a schedule right now. Please create a term first!");
