@@ -37,14 +37,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Non-static Manager class. Creates ICS files.
+ *
  * @author suresh
  */
 public class ICSFileManager {
 	
 	private static Logger logger = (Logger) LoggerFactory.getLogger(ICSFileManager.class);
 	
-	public File createICSFile(Booking b) {
+	public synchronized static File createICSFile(Booking b) {
 		FileOutputStream fs = null;
 		try {
 			ArrayList<Booking> bookings = new ArrayList<Booking>();
@@ -63,7 +63,7 @@ public class ICSFileManager {
 		return null;
 	}
 	
-	private net.fortuna.ical4j.model.Calendar createICSCalendar(List<Booking> bookings) throws Exception {
+	private static net.fortuna.ical4j.model.Calendar createICSCalendar(List<Booking> bookings) throws Exception {
 		net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
 		calendar.getProperties().add(Version.VERSION_2_0);
 		calendar.getProperties().add(new ProdId("-//Events Calendar//iCal4j 1.0//EN"));
@@ -77,7 +77,7 @@ public class ICSFileManager {
 		return calendar;
 	}
 	
-	private VEvent createVEvent(Booking b) throws Exception {
+	private static VEvent createVEvent(Booking b) throws Exception {
 		//Initializing timezone settings (GMT +08:00)
 		TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 		TimeZone timezone = registry.getTimeZone("Asia/Kuala_Lumpur");
@@ -114,13 +114,13 @@ public class ICSFileManager {
 		return meeting;
 	}
 	
-	private void addRequiredAttendees(VEvent meeting, Set<User> requiredAttendees) {
+	private static void addRequiredAttendees(VEvent meeting, Set<User> requiredAttendees) {
 		for (User u : requiredAttendees) {
 			addAttendee(meeting, u.getFullName(), u.getUsername() + "@smu.edu.sg", Role.REQ_PARTICIPANT);
 		}
 	}
 	
-	private void addAttendee(VEvent meeting, String fullName, String emailAddress, Role participation) {
+	private static void addAttendee(VEvent meeting, String fullName, String emailAddress, Role participation) {
 		Attendee att = new Attendee(URI.create("mailto:" + emailAddress));
 		att.getParameters().add(participation);
 		String name = (fullName != null) ? fullName : emailAddress;
