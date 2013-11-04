@@ -68,7 +68,10 @@ public class MailSender {
 		}
 	}
 
-	public synchronized static void sendEmail(Set<String> toEmails, Set<String> ccEmails, String subject, String body, File attachFile) {
+	public synchronized static void sendEmail
+			(Set<String> toEmails, Set<String> ccEmails,
+			String subject, String body,
+			File attachFile, String filename) {
 
 		try {
 			MimeMessage message = new MimeMessage(session);
@@ -110,7 +113,7 @@ public class MailSender {
 				MimeBodyPart attachment = new MimeBodyPart();
 				DataSource file = new FileDataSource(attachFile);
 				attachment.setDataHandler(new DataHandler(file));
-				attachment.setFileName(attachFile.getName());
+				attachment.setFileName(filename);
 				multipart.addBodyPart(attachment);
 			}
 			

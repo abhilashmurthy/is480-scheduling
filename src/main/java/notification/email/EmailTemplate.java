@@ -62,7 +62,7 @@ public abstract class EmailTemplate {
 		Runnable r = new Runnable() {
 			public void run() {
 				MailSender.sendEmail(generateToAddressList(), generateCCAddressList(),
-				generateEmailSubject(), generateEmailBody(), null);
+				generateEmailSubject(), generateEmailBody(), null, null);
 			}
 		};
 		Thread t = new Thread(r, "Mail Sender");
