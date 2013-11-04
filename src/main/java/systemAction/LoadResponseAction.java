@@ -91,8 +91,16 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 					for (int j = 0; j < ts.length; j++) {
 						for (Booking b: pendingBookingList) {
 							if (b.getCreatedAt().getTime() == ts[j]) {
-								pendingBookings.add(b);
-								break;
+								//Now check that the booking is not a part of pendingBookings list already
+								if (pendingBookings.size() > 0) {
+									if (!pendingBookings.contains(b)) {
+										pendingBookings.add(b);
+										break;
+									}
+								} else {
+									pendingBookings.add(b);
+									break;
+								}
 							}
 						}
 					}
