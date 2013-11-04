@@ -4,6 +4,7 @@
  */
 package notification.email;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,6 +57,16 @@ public class ApprovedBookingEmail extends EmailTemplate{
 		map.put("[APPROVER_NAME]", approver.getFullName());
 		
 		return map;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return null;
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return null;
 	}
 	
 }

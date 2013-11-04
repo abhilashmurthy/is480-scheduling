@@ -7,6 +7,7 @@ package notification.email;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -62,7 +63,8 @@ public abstract class EmailTemplate {
 		Runnable r = new Runnable() {
 			public void run() {
 				MailSender.sendEmail(generateToAddressList(), generateCCAddressList(),
-				generateEmailSubject(), generateEmailBody(), null, null);
+				generateEmailSubject(), generateEmailBody(),
+				getFileAttachment(), getFileAttachmentName());
 			}
 		};
 		Thread t = new Thread(r, "Mail Sender");
@@ -178,5 +180,9 @@ public abstract class EmailTemplate {
 	public abstract Set<String> generateCCAddressList();
 	
 	public abstract HashMap<String, String> prepareBodyData();
+	
+	public abstract File getFileAttachment();
+	
+	public abstract String getFileAttachmentName();
 	
 }
