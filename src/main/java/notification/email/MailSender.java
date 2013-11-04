@@ -4,17 +4,23 @@
  */
 package notification.email;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -62,10 +68,11 @@ public class MailSender {
 		}
 	}
 
-	public synchronized static void sendEmail(Set<String> toEmails, Set<String> ccEmails, String subject, String body) {
+	public synchronized static void sendEmail(Set<String> toEmails, Set<String> ccEmails, String subject, String body, File attachFile) {
 
 		try {
-			Message message = new MimeMessage(session);
+			MimeMessage message = new MimeMessage(session);
+			message.setSubject(subject);
 			message.setFrom(new InternetAddress("is480.scheduling@gmail.com",
 					"IS480 Scheduling"));
 			
@@ -92,9 +99,22 @@ public class MailSender {
 				}
 			}
 			
-			message.setSubject(subject);
-			message.setContent(body, "text/html");
-
+			//Adding the message body (HTML text)
+			MimeMultipart multipart = new MimeMultipart();
+			MimeBodyPart msgBody = new MimeBodyPart();
+			msgBody.setContent(body, "text/html");
+			multipart.addBodyPart(msgBody);
+			
+			//Adding the file attachment (if any)
+			if (attachFile != null) {
+				MimeBodyPart attachment = new MimeBodyPart();
+				DataSource file = new FileDataSource(attachFile);
+				attachment.setDataHandler(new DataHandler(file));
+				attachment.setFileName(attachFile.getName());
+				multipart.addBodyPart(attachment);
+			}
+			
+			message.setContent(multipart);
 			Transport.send(message);
 			logger.info("Email sent successfully");
 		} catch (Exception e) {
