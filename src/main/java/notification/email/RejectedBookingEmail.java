@@ -4,9 +4,11 @@
  */
 package notification.email;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import manager.ICSFileManager;
 import model.Booking;
 import model.User;
 
@@ -63,6 +65,16 @@ public class RejectedBookingEmail extends EmailTemplate{
 		map.put("[REJECT_REASON]", b.getRejectReason());
 		
 		return map;
+	}
+	
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }

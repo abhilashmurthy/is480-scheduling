@@ -268,6 +268,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 				//Forcing initialization for sending email
 				Hibernate.initialize(booking.getTeam().getMembers());
 				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				Hibernate.initialize(booking.getRequiredAttendees());
 				
 				//Sending email update
 				EditBookingEmail email = new EditBookingEmail(booking, user);

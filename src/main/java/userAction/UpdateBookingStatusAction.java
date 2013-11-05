@@ -110,6 +110,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				//Forcing initialization for sending email
 				Hibernate.initialize(booking.getTeam().getMembers());
 				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				Hibernate.initialize(booking.getRequiredAttendees());
 				
 				//Retrieving the status list of the timeslot
 				HashMap<User, Response> responseList = booking.getResponseList();
