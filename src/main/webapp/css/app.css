@@ -330,9 +330,8 @@ input, button, select, textarea {
 }
 
 .pendingBookings {
-	position: absolute;
-	left:40%;
-	top:9%;
+	margin: 0 auto 0 auto;
+	line-height: 27px;
 	width: 220px;
 	text-align: left;
 }
@@ -601,6 +600,7 @@ select, input {
 }
 
 .dashboardPicker {
+	float: left;
 	display: inline-block;
 	margin-left: 20px;
 }

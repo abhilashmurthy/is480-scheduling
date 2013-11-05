@@ -51,6 +51,23 @@
 					</ul>
 				</div>
 			</div>
+					
+			<!-- To display number of pending bookings for supervisor/reviewer -->
+            <% if (activeRole.equals(Role.FACULTY)) {%>
+            <s:if test="%{pendingBookingCount > 0}">
+                <div class="pendingBookings alert">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <a href="approveReject" style="color:#B88A00;">
+                        <s:if test="%{pendingBookingCount > 1}">
+                            <u>You have <s:property value="pendingBookingCount"/> pending bookings!</u>
+                        </s:if><s:else>
+							<u>You have <s:property value="pendingBookingCount"/> pending booking!</u>
+                        </s:else>
+                    </a>
+                </div>
+            </s:if>
+            <% }%>
+			
 			<br/>
 			<div class="settingsView">
 				<span id="settingsViewLabel">Select View: </span>
@@ -90,23 +107,6 @@
 				Thanking you,<br/>
 				IS480 Scheduling Team
 			</div>-->
-			
-			<div style="clear:both"></div>
-			<!-- To display number of pending bookings for supervisor/reviewer -->
-            <% if (activeRole.equals(Role.FACULTY)) {%>
-            <s:if test="%{pendingBookingCount > 0}">
-                <div class="pendingBookings alert">
-                    <button type="button" class="close" data-dismiss="alert">×</button>
-                    <a href="approveReject" style="color:#B88A00;">
-                        <s:if test="%{pendingBookingCount > 1}">
-                            <u>You have <s:property value="pendingBookingCount"/> pending bookings!</u>
-                        </s:if><s:else>
-							<u>You have <s:property value="pendingBookingCount"/> pending booking!</u>
-                        </s:else>
-                    </a>
-                </div>
-            </s:if>
-            <% }%>
 
             <!-- To display legend for the calendar -->
             <table class="legend">
@@ -1013,6 +1013,7 @@
 												.addClass('fa fa-info-circle');
 											makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
 											$timeslot.append(deletedDiv);
+											delete timeslot.team;
 											appendCreateBookingPopover($timeslot);
 										});
 									} else if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {

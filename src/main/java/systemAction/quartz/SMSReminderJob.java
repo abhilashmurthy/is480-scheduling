@@ -5,18 +5,19 @@
 package systemAction.quartz;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Set;
 import javax.persistence.EntityManager;
+import javax.xml.bind.DatatypeConverter;
 import model.Booking;
 import model.CronLog;
 import model.User;
+import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -71,9 +72,9 @@ public class SMSReminderJob implements Job {
                     .append("Reminder from IS480 Scheduling System").append("[NEWLINE][NEWLINE]")
                     .append("Team: ").append(booking.getTeam().getTeamName()).append("[NEWLINE]")
                     .append("Date: ").append(smsDateFormat.format(booking.getTimeslot().getStartTime())).append("[NEWLINE]")
-                    .append("Time: ").append(smsTimeFormat.format(booking.getTimeslot().getStartTime())).append("[NEWLINE]")
-                    .append("Venue: ").append(booking.getTimeslot().getVenue()).append("[NEWLINE][NEWLINE]")
-					.append("Milestone: ").append(booking.getTimeslot().getSchedule().getMilestone().getName()).append("[NEWLINE]")
+                    .append("Time: ").append(smsTimeFormat.format(booking.getTimeslot().getStartTime())).append(" - ").append(smsTimeFormat.format(booking.getTimeslot().getEndTime())).append("[NEWLINE]")
+                    .append("Venue: ").append(booking.getTimeslot().getVenue()).append("[NEWLINE]")
+					.append("Milestone: ").append(booking.getTimeslot().getSchedule().getMilestone().getName()).append("[NEWLINE][NEWLINE]")
                     .append("See you there!");
 
                 String countryCode = "65";
@@ -89,29 +90,38 @@ public class SMSReminderJob implements Job {
                 }
                 
                 //Builds RESTful URL
-				if (phoneNums.length() == 0) return;
+				if (phoneNums.length() == 0) {
+					logger.debug("No numbers to send to");
+					return;
+				}
                 StringBuilder url = new StringBuilder("");
 				url
-					.append("http://sgp.transmitsms.com/api-wrapper/messages.single?")
-					.append("apikey=").append(MiscUtil.getProperty("General", "SMS_USERNAME"))
-					.append("&apisecret=").append(MiscUtil.getProperty("General", "SMS_PASSWORD"))
-					.append("&mobile=").append(phoneNums.toString().substring(0, phoneNums.length() - 1))
+					.append("https://api.transmitsms.com/send-sms.json?")
+					.append("to=").append(phoneNums.toString().substring(0, phoneNums.length() - 1))
 					.append("&message=").append(msg.toString().replace(" ", "%20").replace("[NEWLINE]", "%0A"))
-					.append("&caller_id=")
-					.append("IS480");
-
-				//http://sgp.transmitsms.com/api-wrapper/messages.single?apikey=ca83b2ef57c5f75c8a846405f13eb5d0&apisecret=123321123321&mobile=6583870164&message=Hello%20there%0A%0AHow%20are%20you?&caller_id=IS480
+					.append("&from=").append("IS480");
+				String smsUsername = MiscUtil.getProperty("General", "SMS_USERNAME");
+				String smsPassword = MiscUtil.getProperty("General", "SMS_PASSWORD");
 				
-                logger.debug("Sending to URL: " + url.toString());
-
                 //Sends RESTful SMS
                 URL myURL = new URL(url.toString());
                 connection = (HttpURLConnection) myURL.openConnection();
-                connection.connect();
+				connection.setRequestProperty("Authorization", "Basic " + new String(DatatypeConverter.printBase64Binary((smsUsername + ":" + smsPassword).getBytes())));
+				logger.debug("Sending to URL: " + url.toString());
+				
+				//Gets response
+                InputStream responseStream = connection.getInputStream();
+				BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, "UTF-8"));
+				StringBuilder responseStringBuilder = new StringBuilder();
+				String inputStr;
+				while ((inputStr = br.readLine()) != null) {
+					responseStringBuilder.append(inputStr);
+				}
+				JSONObject responseJson = new JSONObject(responseStringBuilder.toString());
+				logger.debug("Received JSON response: " + responseJson.toString());
                 if (connection.getResponseCode() != 200) {
                     throw new Exception("Error response received");
                 }
-
                 logItem.setSuccess(true);
                 logItem.setMessage("SMS Reminders sent for booking ID: " + booking.getId());
             } else {

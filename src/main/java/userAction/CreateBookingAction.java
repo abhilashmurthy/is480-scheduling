@@ -6,35 +6,20 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.BookingStatus;
-import constant.Response;
 import constant.Role;
-import java.lang.reflect.Method;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
 import model.Booking;
-import model.Milestone;
 import model.Team;
 import model.Timeslot;
 import model.User;
-import model.role.Faculty;
 import model.role.Student;
-import model.role.TA;
-import notification.email.ConfirmedBookingEmail;
-import notification.email.NewBookingEmail;
-import notification.email.RespondToBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +86,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			json = BookingManager.createBooking(em, timeslot, user, team, overrideApproval);
 			
 			//Test SMS
-			BookingManager.testSMS((Long) ((HashMap) json.get("booking")).get("bookingId"), request);
+//			BookingManager.testSMS((Long) ((HashMap) json.get("booking")).get("bookingId"), request);
 			
 			em.getTransaction().commit();
 			return SUCCESS; 
