@@ -1056,7 +1056,10 @@
 								.append('Reason to delete booking')
 						);
 						$('input.bootbox-input').on('keyup', function(){
-							if ($(this).val()) {
+							if ($(this).val() && $(this).val().length > 55) {
+								$('button[data-bb-handler="confirm"').attr('disabled', true);
+								showNotification("WARNING", $timeslot, "Please enter max 55 chars");
+							} else if ($(this).val()) {
 								$('button[data-bb-handler="confirm"').attr('disabled', false);
 							} else {
 								$('button[data-bb-handler="confirm"').attr('disabled', true);
