@@ -31,9 +31,16 @@
                 /*border-bottom: 1px solid black;*/
             }
 			
-			.timeslotsTable {
+			#timeslotsTableSection, #taStatisticsChart {
 				margin-top: 60px;
-				margin-left: 90px !important;
+				margin-left: 10px !important;
+			}
+			
+			#taStatisticsChart {
+				display: inline-block;
+				margin-left: 20px !important;
+				width: 100%;
+				height: 400px;
 			}
             
 			#milestoneTimeslotsSelect {
@@ -101,11 +108,6 @@
             .availabilityLegend {
 				float: right;
 				margin-right: 25%;
-/*                position: absolute;
-                left: 70%;
-                top: 12%;*/
-/*                left: 7%;
-                top: 35%;*/
             }
 			
 			.availabilityLegend td {
@@ -140,6 +142,7 @@
 			.dateHeader {
 				font-size: 15px;
 			}
+			
         </style>
     </head>
     <body>
@@ -155,10 +158,8 @@
             }
         %>
 
-        <!-- Edit Availability -->
-        <!-- Edit Availability -->
-        <div id="availabilityPanel" class="container">
-            <div id="editTimeslotsPanel">
+        <!-- Edit Sign ups -->
+        <div class="container">
                 <h3>TA Video Sign Up</h3>
 					<table class='availabilityLegend'>
 						<% if (activeRole.equals(Role.TA)) { %>
@@ -170,18 +171,16 @@
 						<tr><td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;TA Signed Up</td></tr>
 						<% } %>
 					</table>
-                <div id="timeslotsTableSection">
                     <table>
                         <tr>
                             <td>Milestone</td>
                             <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <% if (activeRole.equals(Role.TA)) %> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button> <% ; %></td>
                         </tr>
 					</table>
-					<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
-                </div>
-                <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
-                <br/><br/>
-            </div>
+					<div id="timeslotsTableSection" class='pull-left'>
+						<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
+					</div>
+					<div id='taStatisticsChart'></div>
         </div>
 
         <%@include file="footer.jsp" %>
@@ -226,7 +225,7 @@
                     }
                 }
                 
-                $("#milestoneTimeslotsSelect").on('change', function(e){
+                $("body").on('change', '#milestoneTimeslotsSelect', function(e){
                     $(".timeslotsTable").empty();
                     selectedMilestone = $(this).val();
                     scheduleData = getScheduleData(selectedMilestone, activeAcademicYearStr, activeSemesterStr);
@@ -234,8 +233,8 @@
                     return false; 
                 });
                 
-                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).change(); //Select first milestone
-
+                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).trigger('change');
+				
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableClass = "timeslotsTable";
                     var table = $("." + tableClass);
@@ -728,9 +727,7 @@
 							 timeslot_data.push(timeslot);
 							 swappedSlotIds.push(id);
 						}
-
                     }
-					
 					
                     timeslotsData["timeslots"] = timeslot_data;
                     timeslotsData["scheduleId"] = scheduleData.id;
@@ -743,8 +740,8 @@
                         if (!response.exception) {
                             if (response.success) {
                                 showNotification("SUCCESS", "Timeslots saved");
+								//Update page
                                 $("#editTimeslotsSubmitBtn").button('reset');
-								console.log('Unavailable: ' + JSON.stringify(response.unavailableTimeslots));
 								unavailableTimeslots = response.unavailableTimeslots;
 								$('.otherTAChosen').each(function(){
 									var $this = $(this);
@@ -763,6 +760,45 @@
 										triggerTimeslot($this);
 									}
 								});
+								//Update JSON
+								var oldTimeslotIds = [];
+								var mySignups = null;
+								for (var i = 0; i < taData.length; i++) {
+									if (parseInt(taData[i].id) === parseInt(loggedInTaId)) {
+										mySignups = taData[i].mySignups;
+										mySignupLoop: for (var j = 0; j < mySignups.length; j++) {
+											if (parseInt(mySignups[j].scheduleId) === parseInt(scheduleData.id))
+												oldTimeslotIds.push(mySignups[j].timeslotId);
+										}
+										break;
+									}
+								}
+								var newTimeslotIds = timeslot_data;
+								for (var i = 0; i < newTimeslotIds.length; i++) {
+									if (oldTimeslotIds.indexOf(newTimeslotIds[i]) === -1) {
+										//Add to mySignups
+										mySignups.push({scheduleId: scheduleData.id, timeslotId: newTimeslotIds[i]});
+									}
+								}
+								for (var i = 0; i < oldTimeslotIds.length; i++) {
+									if (newTimeslotIds.indexOf(oldTimeslotIds[i]) === -1) {
+										//Delete from my signups
+										for (var j = 0; j < mySignups.length; j++) {
+											if (parseInt(mySignups[j].timeslotId) === parseInt(oldTimeslotIds[i])) {
+												mySignups.splice(mySignups.indexOf(mySignups[j]), 1);
+												break;
+											}
+										}
+									}
+								}
+								for (var i = 0; i < taData.length; i++) {
+									if (parseInt(taData[i].id) === parseInt(loggedInTaId)) {
+										taData[i].mySignups = mySignups;
+										break;
+									}
+								}
+								console.log('New count should be: ' + mySignups.length);
+								loadTAStatistics();
                             } else {
                                 var eid = btoa(response.message);
                                 window.location = "error.jsp?eid=" + eid;
@@ -793,6 +829,74 @@
 						}
 					});
 				}
+				
+				/* JQPLOT */
+				loadTAStatistics();
+				var barGraph = null;
+				function loadTAStatistics() {
+					var taNames = getSeriesArray("username", false);
+					var signups = getSeriesArray("mySignups", true);
+					barGraph = $.jqplot('taStatisticsChart', [signups], {
+						seriesDefaults: {
+							renderer: $.jqplot.BarRenderer,
+							shadow: false,
+							rendererOptions: {
+								highlightMouseOver: false,
+								lineWidth: 5
+							},
+							pointLabels: {show: false}
+						},
+						title: 'TA Signup Statistics',
+						series: [{label: 'Signups'}],
+						axes: {
+							xaxis: {
+								renderer: $.jqplot.CategoryAxisRenderer,
+								ticks: taNames,
+								tickOptions: {
+									showGridline: false
+								}
+							},
+							yaxis: {
+								padMin: 0
+							}
+						},
+						legend: {
+							show: false,
+							location: 'e',
+							fontSize: 12,
+							border: "none",
+							marginRight: 30
+						},
+						seriesColors: ["#B8F79E"],
+						grid: {
+							drawGridLines: false,
+							background: "#ffffff",
+							borderColor: "#dddddd",
+							shadow: false
+						}
+					}).replot();
+				}
+				
+				function getSeriesArray(key, getLength) {
+				   var data = [];
+				   for (var i = 0; i < taData.length; i++) {
+					   var ta = taData[i];
+					   if (getLength) {
+						   for (var j = 0; j < ta[key].length; j++) {
+							   if (parseInt(ta[key][j].scheduleId) !== parseInt(scheduleData.id)) {
+								   ta[key].splice(ta[key][j], 1);
+								   --j;
+							   }
+						   }
+						   data.push(ta[key].length);
+					   } else {
+						   data.push(ta[key]);
+					   }
+				   }
+				   return data;
+				}
+				
+				/* NOTIFICATION */
                 
                  function showNotification(action, message) {
                      var opts = {

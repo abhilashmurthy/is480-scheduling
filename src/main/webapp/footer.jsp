@@ -29,3 +29,6 @@
 <!-- jqPlot -->
 <script type="text/javascript" src="js/plugins/jquery.jqplot.min.js"></script>
 <script type="text/javascript" src="js/plugins/jqplot.pieRenderer.min.js"></script>
+<script type="text/javascript" src="js/plugins/jqplot.barRenderer.min.js"></script>
+<script type="text/javascript" src="js/plugins/jqplot.categoryAxisRenderer.min.js"></script>
+<script type="text/javascript" src="js/plugins/jqplot.pointLabels.min.js"></script>

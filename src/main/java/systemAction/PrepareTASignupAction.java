@@ -73,6 +73,21 @@ public class PrepareTASignupAction extends ActionSupport implements ServletReque
 					taMap.put("id", ta.getId());
 					taMap.put("name", ta.getFullName());
 					taMap.put("username", ta.getUsername());
+					List<Schedule> schedules = ScheduleManager.findByTerm(em, term);
+					List<HashMap<String, Object>> mySignups = new ArrayList<HashMap<String, Object>>();
+					for (Schedule schedule : schedules) {
+						for (Timeslot timeslot : schedule.getTimeslots()) {
+							if (timeslot.getTA() != null && timeslot.getTA().equals(ta)) {
+								HashMap<String, Object> signupMap = new HashMap<String, Object>();
+								signupMap.put("datetime", sdf.format(timeslot.getStartTime()));
+								signupMap.put("milestone", schedule.getMilestone().getName());
+								signupMap.put("timeslotId", timeslot.getId());
+								signupMap.put("scheduleId", schedule.getId());
+								mySignups.add(signupMap);
+							}
+						}
+					}
+					taMap.put("mySignups", mySignups);
 					taData.add(taMap);
 				}
 				
