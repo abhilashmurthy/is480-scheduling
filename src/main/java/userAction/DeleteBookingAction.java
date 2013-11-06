@@ -50,7 +50,6 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
             em = MiscUtil.getEntityManagerInstance();
 			em.getTransaction().begin();
             HttpSession session = request.getSession();
-            
             User user = (User) session.getAttribute("user");
 
             //convert the chosen ID into long and get the corresponding Timeslot object
