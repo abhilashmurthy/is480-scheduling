@@ -993,14 +993,13 @@
                     $('.timeslotCell').off('click', '#deleteBookingBtn');
                     $('.timeslotCell').on('click', '#deleteBookingBtn', function(e) {
 						e.stopPropagation();
-						bootbox.confirm({
+						var $timeslot = self.parents('.timeslotCell');
+						var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
+						bootbox.prompt({
 							title: "Delete Booking",
-							message: "Are you sure?",
 							callback: function(result) {
 								if (result) {
-									var $timeslot = self.parents('.timeslotCell');
-									var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
-									deleteBooking($timeslot);
+									deleteBooking($timeslot, result);
 									setTimeout(function(){showNotification("ERROR", $timeslot, null);},500);
 									$timeslot.removeClass('bookedTimeslot');
 									$timeslot.addClass('unbookedTimeslot');
@@ -1013,6 +1012,9 @@
 												.addClass('fa fa-info-circle');
 											makeTooltip(deletedDiv, 'Removed by ' + "<%= user.getFullName() %>");
 											$timeslot.append(deletedDiv);
+											timeslot.lastBookingStatus = 'deleted';
+											timeslot.lastBookingComment = result;
+											timeslot.lastBookingEditedBy = "<%= user.getFullName() %>";
 											delete timeslot.team;
 											appendCreateBookingPopover($timeslot);
 										});
@@ -1022,7 +1024,6 @@
 											//Update teams json
 											var team = null;
 											for (var i = 0; i < teams.length; i++) {
-												console.log('Comparing ' + teams[i].teamName + ' and ' + timeslot.team);
 												if (teams[i].teamName === timeslot.team) {
 													team = teams[i];
 													break;
@@ -1042,6 +1043,20 @@
 									}
 								}
 							}
+						});
+						$('button[data-bb-handler="confirm"').attr('disabled', true);
+						$('.modal-body').prepend(
+							$(document.createElement('div'))
+								.addClass('customPrompt')
+								.append('Reason to delete booking')
+						);
+						$('input.bootbox-input').on('keyup', function(){
+							if ($(this).val()) {
+								$('button[data-bb-handler="confirm"').attr('disabled', false);
+							} else {
+								$('button[data-bb-handler="confirm"').attr('disabled', true);
+							}
+							return false;
 						});
                         return false;
                     });
@@ -1432,10 +1447,10 @@
                     return toReturn;
                 }
 
-                function deleteBooking(bodyTd) {
+                function deleteBooking(bodyTd, comment) {
                     //get the timeslotID for that cell and send as request
                     var cellId = $(bodyTd).attr('id').split("_")[1];
-                    var data = {timeslotId: cellId};
+                    var data = {timeslotId: cellId, comment: comment};
                     console.log("Submitting delete booking data: " + JSON.stringify(data));
                     //Delete Booking AJAX
                     $.ajax({
@@ -1747,10 +1762,10 @@
 														.append(!timeslot.team && timeslot.lastBookingWasRemoved?
 															function(){
 																var $removedDiv = $(document.createElement('div'));
-																if (timeslot.lastBookingComment) {
+																if (timeslot.lastBookingWasRemoved && timeslot.lastBookingStatus === 'rejected') {
 																	$removedDiv.addClass('rejectedBooking');
 																	makeTooltip($td, 'Removed by ' + timeslot.lastBookingEditedBy);
-																} else {
+																} else if (timeslot.lastBookingWasRemoved) {
 																	$removedDiv.addClass('deletedBookingOnTimeslot').addClass('fa fa-info-circle');
 																	makeTooltip($removedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
 																}
@@ -2071,6 +2086,7 @@
                 
                 /* PINES NOTIFY */
                 function showNotification(action, bodyTd, notificationMessage) {
+					var timeslot = scheduleData.timeslots[bodyTd.attr('value')];
                     var opts = {
                         title: "Note",
                         text: notificationMessage,
@@ -2096,7 +2112,7 @@
                             opts.type = "success";
                             break;
                         case "ERROR":
-                            if (!notificationMessage) opts.title = "Deleted"; else opts.title = "Rejected";
+                            if (!notificationMessage || notificationMessage && timeslot.lastBookingStatus === 'deleted') opts.title = "Deleted"; else opts.title = "Rejected";
                             if (!notificationMessage) opts.text = "Time: " + dateToView + " " + startTimeToView;
                             opts.type = "error";
                             break;

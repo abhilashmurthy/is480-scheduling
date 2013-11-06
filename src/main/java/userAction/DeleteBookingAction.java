@@ -39,6 +39,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(DeleteBookingAction.class);
     private String timeslotId;
+	private String comment;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     @Override
@@ -55,7 +56,7 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
             //convert the chosen ID into long and get the corresponding Timeslot object
             long chosenID = Long.parseLong(timeslotId);
             Timeslot ts = TimeslotManager.findById(em, chosenID);
-			json = BookingManager.deleteBooking(em, ts, user, request.getSession().getServletContext());
+			json = BookingManager.deleteBooking(em, ts, comment, user, request.getSession().getServletContext());
 			em.getTransaction().commit();
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
@@ -93,6 +94,14 @@ public class DeleteBookingAction extends ActionSupport implements ServletRequest
     public void setTimeslotId(String timeslotId) {
         this.timeslotId = timeslotId;
     }
+	
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 
     public HashMap<String, Object> getJson() {
         return json;

@@ -94,7 +94,7 @@
 						<option value="7">People Attending</option>
 					<% } %>
 					<% if (!activeRole.equals(Role.TA)) { %>
-						<option value="8">Reason for Rejection</option>
+						<option value="8">Comment</option>
 					<% } %>
 					<% if (!activeRole.equals(Role.TA)) { %>
 						<option value="9">Last Modified</option>
@@ -126,7 +126,7 @@
 							<th>Response</th>
 							<th>Booking Status</th>
 							<th style="width:50px; text-align:center">People Attending</th>
-							<th style="text-align:center">Reason for Rejection</th>
+							<th style="text-align:center">Comment</th>
 							<th>Last Modified</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
@@ -139,7 +139,7 @@
 							<th>Venue</th>
 							<th>My Response</th>
 							<th>Booking Status</th>
-							<th style="text-align:center">Reason for Rejection</th>
+							<th style="text-align:center">Comment</th>
 							<th>Last Modified</th>
 						</tr>
 					<% } else { %>

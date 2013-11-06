@@ -608,3 +608,13 @@ select, input {
 #myTeamsModalTable {
 	width: 400px;
 }
+
+.bootbox-input {
+	width: 90% !important;
+}
+
+.customPrompt {
+	font-size: 14px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}

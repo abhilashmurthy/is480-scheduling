@@ -323,7 +323,7 @@ public class BookingManager {
 	}
 	
 	public synchronized static HashMap<String, Object> deleteBooking
-			(EntityManager em, Timeslot ts,
+			(EntityManager em, Timeslot ts, String comment,
 			User user, ServletContext ctx)
 			throws Exception
 	{
@@ -332,6 +332,7 @@ public class BookingManager {
 			//set the current booking's status to deleted
 			Booking b = ts.getCurrentBooking();
 			b.setBookingStatus(BookingStatus.DELETED);
+			b.setComment(comment);
 			b.setLastEditedBy(user.getFullName());
 			b.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 

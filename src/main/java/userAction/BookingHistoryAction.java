@@ -295,7 +295,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					map.put("comment", comment);
 					map.put("lastModifiedAt", lastModifiedAt);
 					map.put("lastModifiedBy", lastModifiedBy);
-					
+
 
 					data.add(map);
 				}

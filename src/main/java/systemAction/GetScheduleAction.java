@@ -242,6 +242,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
 								Booking lastBooking = (Booking) bookingsQuery.getSingleResult();
 								//Add only the single last booking
 								map.put("lastBookingWasRemoved", true);
+								map.put("lastBookingStatus", lastBooking.getBookingStatus().toString().toLowerCase());
 								map.put("lastBookingEditedBy", lastBooking.getLastEditedBy());
 								map.put("lastBookingComment", lastBooking.getComment());
 							} catch (NoResultException n) {
