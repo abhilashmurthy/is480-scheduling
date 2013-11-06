@@ -242,7 +242,7 @@ public class TeamManager {
 			if (b.getBookingStatus() == BookingStatus.PENDING 
 					|| b.getBookingStatus() == BookingStatus.APPROVED) {
 				//Active booking. Delete and recreate at the same spot
-				HashMap<String, Object> deleteResult = BookingManager.deleteBooking(em, b.getTimeslot(), doer, ctx);
+				HashMap<String, Object> deleteResult = BookingManager.deleteBooking(em, b.getTimeslot(), b.getComment(), doer, ctx);
 				if (!deleteResult.containsKey("success") && Boolean.parseBoolean(deleteResult.get("success").toString()) == false) {
 					throw new CustomException("Oops. Could not update faculty. Please try again!");
 				}
