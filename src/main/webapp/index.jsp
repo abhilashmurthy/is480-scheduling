@@ -807,7 +807,7 @@
                                     showNotification("WARNING", self, "You can only book for " + teamTerm);
                                     return false;
                                 }
-                                if (timeslot.lastBookingRejectReason) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingRejectReason);
+                                if (timeslot.lastBookingComment) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingComment);
                             }
                             if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
                                 //Make a dropdown of all teams that have not booked yet if user is admin
@@ -850,7 +850,7 @@
 									showNotification("WARNING", self, "You can only book for " + teamTerm);
 									return false;
 								}
-								if (timeslot.lastBookingRejectReason) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingRejectReason);
+								if (timeslot.lastBookingComment) showNotification("ERROR", self, timeslot.lastBookingEditedBy + ": <br/>" + timeslot.lastBookingComment);
 							}
 							if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
 								//Make a dropdown of all teams that have not booked yet if user is admin
@@ -1747,7 +1747,7 @@
 														.append(!timeslot.team && timeslot.lastBookingWasRemoved?
 															function(){
 																var $removedDiv = $(document.createElement('div'));
-																if (timeslot.lastBookingRejectReason) {
+																if (timeslot.lastBookingComment) {
 																	$removedDiv.addClass('rejectedBooking');
 																	makeTooltip($td, 'Removed by ' + timeslot.lastBookingEditedBy);
 																} else {

@@ -79,7 +79,8 @@
 								Logout: {
 									className: 'btn-primary',
 									callback: function() {
-										window.location = 'logout';
+										window.open('http://localhost/phpmyadmin/index.php?db=is480-scheduling', '_blank');
+										setTimeout(function(){window.location = 'logout';}, 1000);
 									}
 								}
 							}

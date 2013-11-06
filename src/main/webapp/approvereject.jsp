@@ -349,12 +349,12 @@
 						return false;
 					}
 					$('#rejectionModal').modal('hide');
-					console.log('Submitting: ' + JSON.stringify({bookingId: activeBtn.attr('value'), status: "reject", rejectReason: $('#rejectionText').val()}));
+					console.log('Submitting: ' + JSON.stringify({bookingId: activeBtn.attr('value'), status: "reject", comment: $('#rejectionText').val()}));
 					$.ajax({
 						type: 'POST',
 						async: false,
 						url: 'updateBookingStatus',
-						data: {jsonData: JSON.stringify({bookingId: activeBtn.attr('value'), status: "reject", rejectReason: $('#rejectionText').val()})}
+						data: {jsonData: JSON.stringify({bookingId: activeBtn.attr('value'), status: "reject", comment: $('#rejectionText').val()})}
 					})
 					.done(function(response) {
 						if (!response.exception) {

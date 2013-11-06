@@ -188,7 +188,6 @@
 								<% } %>
 								</td>
 								<td style="width:70px"><s:property value="overallBookingStatus"/></td>
-								<%--<s:if test="%{rejectReason != null)}">--%> 
 								<td style="width:50px; text-align:center">
 									<s:if test="%{noOfSubscribers > 0}">
 										<button type="submit" class="getSubscribersBtn btn btn-link" value="<s:property value="bookingId"/>">
@@ -204,8 +203,8 @@
 									</div>
 								</td>
 								<td style="width:170px;">
-									<s:if test="%{rejectReason.length() > 0}">
-										<s:property value="rejectReason"/>
+									<s:if test="%{comment.length() > 0}">
+										<s:property value="comment"/>
 									</s:if><s:else>
 										<div style="text-align:center">-</div>
 									</s:else>	
@@ -239,10 +238,9 @@
 							<td style="width:130px">
 								<s:property value="overallBookingStatus"/><br/><br/>
 							</td>
-							<%--<s:if test="%{rejectReason != null)}">--%> 
 								<td style="width:200px">
-									<s:if test="%{rejectReason.length() > 0}">
-										<s:property value="rejectReason"/>
+									<s:if test="%{comment.length() > 0}">
+										<s:property value="comment"/>
 									</s:if><s:else>
 										<div style="text-align:center">-</div>
 									</s:else>	

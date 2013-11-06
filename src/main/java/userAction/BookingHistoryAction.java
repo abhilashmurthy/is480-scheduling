@@ -266,7 +266,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					}
 					
 					//Getting the reason for rejection if booking has been rejected
-					String rejectReason = b.getRejectReason();
+					String comment = b.getComment();
 					
 					//Getting the last edited by and time for the booking
 					SimpleDateFormat sdfForEdited = new SimpleDateFormat("MMM dd, HH:mm:ss");
@@ -292,7 +292,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					map.put("date", date);
 					map.put("time", time);
 					map.put("venue", venue);
-					map.put("rejectReason", rejectReason);
+					map.put("comment", comment);
 					map.put("lastModifiedAt", lastModifiedAt);
 					map.put("lastModifiedBy", lastModifiedBy);
 					

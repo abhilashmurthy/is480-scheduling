@@ -60,7 +60,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 		map.put("[REJECTOR_NAME]", rejector.getFullName());
 		
 		//Inserting the reason for rejection
-		map.put("[REJECT_REASON]", b.getRejectReason());
+		map.put("[REJECT_REASON]", b.getComment());
 		
 		return map;
 	}

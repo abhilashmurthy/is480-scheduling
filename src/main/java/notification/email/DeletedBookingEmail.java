@@ -90,6 +90,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 		
 		//Inserting approver name
 		map.put("[DELETOR_NAME]", deletor.getFullName());
+		map.put("[DELETOR_COMMENT]", b.getComment());
 		
 		return map;
 	}

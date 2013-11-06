@@ -21,6 +21,7 @@ import model.CronLog;
 import model.Settings;
 import model.Timeslot;
 import model.User;
+import notification.email.DeletedBookingEmail;
 import notification.email.RejectedBookingEmail;
 import org.hibernate.Hibernate;
 import org.json.JSONArray;
@@ -94,10 +95,10 @@ public class ClearPendingBookingJob implements Job {
                 //Delete booking is date is passed
                 if (now.after(dueDate)) {
                     logger.debug("Booking: " + pendingBooking + " passed due date. Deleting.");
-                    pendingBooking.setBookingStatus(BookingStatus.REJECTED);
+                    pendingBooking.setBookingStatus(BookingStatus.DELETED);
                     pendingBooking.setLastEditedBy("IS480 Scheduling System");
                     pendingBooking.setLastEditedAt(now);
-                    pendingBooking.setRejectReason("Faculty response overdue. Releasing timeslot.");
+                    pendingBooking.setComment("Faculty response overdue. Releasing timeslot.");
                     Timeslot ts = pendingBooking.getTimeslot();
                     ts.setCurrentBooking(null);
                     em.persist(pendingBooking);
@@ -110,8 +111,8 @@ public class ClearPendingBookingJob implements Job {
 						Hibernate.initialize(pendingBooking.getTeam().getMembers());
 						Hibernate.initialize(pendingBooking.getTimeslot().getSchedule().getMilestone());
 						
-						RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(pendingBooking, systemAsUser);
-						rejectedEmail.sendEmail();
+						DeletedBookingEmail email = new DeletedBookingEmail(pendingBooking, systemAsUser);
+						email.sendEmail();
 					}
 					remindedIds.add(pendingBooking.getId());
                 }

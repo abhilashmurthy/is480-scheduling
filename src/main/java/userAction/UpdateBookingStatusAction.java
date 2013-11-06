@@ -63,14 +63,14 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			//Status containing either approve or reject
 			String status = inputObject.getString("status");
 
-			String rejectReason = null;
+			String comment = null;
 			Response response = null;
 			if (status.equalsIgnoreCase("approve")) {
 				response = Response.APPROVED;
 			} else if (status.equalsIgnoreCase("reject")) {
 				response = Response.REJECTED;
 				//if status is rejected get the reson for rejection too (it could be blank)
-				rejectReason = inputObject.getString("rejectReason");
+				comment = inputObject.getString("comment");
 			} else {
 				logger.error("No valid response recorded from user");
 				return SUCCESS;
@@ -109,8 +109,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				}
 				
 				//Storing the reason for rejection
-				if (response == Response.REJECTED && rejectReason != null) {
-					booking.setRejectReason(rejectReason);
+				if (response == Response.REJECTED && comment != null) {
+					booking.setComment(comment);
 				}
 
 				//Computing the overall status of the booking based on the new response
