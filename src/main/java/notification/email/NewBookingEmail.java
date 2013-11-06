@@ -4,9 +4,11 @@
  */
 package notification.email;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import manager.ICSFileManager;
 import model.Booking;
 import model.User;
 
@@ -50,6 +52,16 @@ public class NewBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateCCAddressList() {
 		return null;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }

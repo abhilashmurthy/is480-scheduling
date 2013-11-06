@@ -16,7 +16,6 @@
     <head>
         <%@include file="header.jsp" %>
         <title>IS480 Scheduling System | Approve</title>
-		</style>
     </head>
     <body>
         <%@include file="navbar.jsp" %>
@@ -172,7 +171,7 @@
 							<tbody> 
 								<s:iterator value="confirmedData">
 									<tr class="success" style="height:50px">
-										<td style="vertical-align: middle"><s:property value="teamName"/></td>
+										<td style="width: 50px; vertical-align: middle"><s:property value="teamName"/></td>
 										<td style="width: 50px; vertical-align: middle"><s:property value="milestone"/></td>
 										<td style="width: 50px; vertical-align: middle"><s:property value="userRole"/></td>
 										<td style="width: 100px; vertical-align: middle"><s:property value="date"/> <s:property value="time"/></td>

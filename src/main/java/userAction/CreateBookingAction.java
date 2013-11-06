@@ -6,20 +6,36 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
+import constant.Response;
 import constant.Role;
+import java.lang.reflect.Method;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
 import model.Booking;
+import model.Milestone;
+import model.SystemActivityLog;
 import model.Team;
 import model.Timeslot;
 import model.User;
+import model.role.Faculty;
 import model.role.Student;
+import model.role.TA;
+import notification.email.ConfirmedBookingEmail;
+import notification.email.NewBookingEmail;
+import notification.email.RespondToBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +64,22 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Booking: Create");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
-            HttpSession session = request.getSession();
             Map parameters = request.getParameterMap();
 
             User user = (User) session.getAttribute("user");
@@ -89,8 +116,17 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 //			BookingManager.testSMS((Long) ((HashMap) json.get("booking")).get("bookingId"), request);
 			
 			em.getTransaction().commit();
+			//TODO Activity logging needs to be handled!
+			if (json.containsKey("success") && Boolean.parseBoolean((String) json.get("success")) == true) {
+//				logItem.setMessage("Booking was created successfully: " + booking.toString());
+			}
 			return SUCCESS; 
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -101,12 +137,15 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
             json.put("exception", true);
             json.put("message", "Error with CreateBooking: Escalate to developers!");
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+           if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
         return SUCCESS;
     }

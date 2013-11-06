@@ -6,13 +6,11 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Role;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import manager.SettingsManager;
 import manager.UserManager;
+import model.SystemActivityLog;
 import model.Term;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -69,12 +68,24 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Login");
+		logItem.setRunTime(now);
+		
 		EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
 			
 			if (request.getParameter("bypass") != null) { //BYPASS SSO LOGIN
 				initializeUser(em);
+				User userForLog = (User) session.getAttribute("user");
+				logItem.setUser(userForLog);
+				logItem.setMessage("Login successful. " + userForLog.toString());
 			} else { //CODE FOR SSO
 				//return to login
 				if (request.getParameter("oauth_callback") == null) {
@@ -123,8 +134,12 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
 				if (serverSignature.equals(generatedSignature)) {
 					initializeUser(em);
+					User userForLog = (User) session.getAttribute("user");
+					logItem.setUser(userForLog);
+					logItem.setMessage("Login successful. " + userForLog.toString());
 				} else {
 					//Login unsuccessful
+					logItem.setMessage("Login unsuccessful");
 					logger.error("Signature mismatch. SSO Login failed. ");
 					logger.info("Server signature: " + serverSignature);
 					logger.info("Client signature: " + generatedSignature);
@@ -133,6 +148,12 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 				}
 			} //END OF CODE FOR SSO
         } catch (Exception e) {
+			User userForLog = (User) session.getAttribute("user");
+			if (userForLog != null) {
+				logItem.setUser(userForLog);
+			}
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -142,8 +163,15 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             request.setAttribute("error", "Error with Login: Escalate to developers!");
             return ERROR;
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			 if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
         return SUCCESS;
     }

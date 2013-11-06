@@ -8,6 +8,7 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,9 +16,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import manager.TimeslotManager;
 import model.Schedule;
+import model.SystemActivityLog;
 import model.Timeslot;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +41,18 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Timeslot: Update");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
         try {
 			em = MiscUtil.getEntityManagerInstance();
@@ -95,6 +111,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 			boolean ignored = false;
 			Calendar schStart = Calendar.getInstance(); schStart.setTimeInMillis(s.getStartDate().getTime());
 			Calendar schEnd = Calendar.getInstance(); schEnd.setTimeInMillis(s.getEndDate().getTime());
+			ArrayList<Timeslot> timeslotsLog = new ArrayList<Timeslot>();
 			//Create timeslot objects for newly chosen times
 			for (String timestampStr : dateTimes) {
                 //Getting startTime and endTime
@@ -136,6 +153,7 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 				t.setVenue(venueToSet);
                 t.setSchedule(s);
                 em.persist(t);
+				timeslotsLog.add(t);
             } //End of timeslot creation loop
 			
 			em.flush(); //Forcing write to database
@@ -145,8 +163,18 @@ public class UpdateTimeslotsAction extends ActionSupport implements ServletReque
 			String message = "Timeslots updated successfully";
 			if (ignored) message += ". Certain timeslots were ignored as they breached the limits of the current schedule.";
             json.put("message", message);
+			
+			StringBuilder logMessage = new StringBuilder();
+			logMessage.append("Timeslots were updated successfully. TimeslotId:");
+			for (Timeslot tim: timeslotsLog) {
+				logMessage.append(tim.getId());
+				logMessage.append(",");
+			}
+			logItem.setMessage(logMessage.toString());
+			
             return SUCCESS;
         } catch (Exception e) {
+			logItem.setSuccess(false);
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {

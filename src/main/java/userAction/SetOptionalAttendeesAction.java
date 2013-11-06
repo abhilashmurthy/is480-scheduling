@@ -7,7 +7,9 @@ package userAction;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -18,8 +20,8 @@ import java.util.HashSet;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import model.Booking;
+import model.SystemActivityLog;
 import model.Timeslot;
 import model.User;
 import org.json.JSONArray;
@@ -39,11 +41,22 @@ public class SetOptionalAttendeesAction extends ActionSupport implements Servlet
 	
 	@Override
     public String execute() {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Optional Attendees: Update");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
         try {
 			json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
-			HttpSession session = request.getSession();
 			
 			//Checking whether the user setting optional attendees is student, admin or cc
 			User user = (User) session.getAttribute("user");
@@ -89,12 +102,21 @@ public class SetOptionalAttendeesAction extends ActionSupport implements Servlet
 				}
 
 				MiscUtil.logActivity(logger, user, "Optional attendees updated for " + b.toString());
+
+				logItem.setMessage("Optional Attendees for the booking were updated successfully "
+						+ "for " + b.toString());
+				
 			} else {
 				//Incorrect user role
 				json.put("error", true);
 				json.put("message", "You cannot set the attendees for this booking!");
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -105,8 +127,15 @@ public class SetOptionalAttendeesAction extends ActionSupport implements Servlet
 			json.put("exception", true);
             json.put("message", "Error with SetOptionalAttendees: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
         return SUCCESS;
 	 } //end of execute
