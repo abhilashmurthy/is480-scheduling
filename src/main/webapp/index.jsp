@@ -74,8 +74,8 @@
 				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
 					<input type="checkbox" checked>
 				</div>
-				<i id='previousWeek' class='traverseWeek fa fa-circle-arrow-left' style='color: #5bc0de; display: none; cursor: pointer'></i>
-				<i id='nextWeek' class='traverseWeek fa fa-circle-arrow-right' style='color: #5bc0de; display: none; cursor: pointer'></i>
+				<i id='previousWeek' class='traverseWeek fa fa-arrow-circle-o-left' style='color: #5bc0de; display: none; cursor: pointer'></i>
+				<i id='nextWeek' class='traverseWeek fa fa-arrow-circle-o-right' style='color: #5bc0de; display: none; cursor: pointer'></i>
             </div>
 			<br/><br/>
 			
@@ -1932,6 +1932,7 @@
 				}
 				
 				function initDashboards() {
+					if ($('body').find('.dashboardPicker').length) return false;
 					$('div.termPicker').after(
 						$(document.createElement('div'))
 							.addClass('dashboardPicker')
