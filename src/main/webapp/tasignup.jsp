@@ -846,7 +846,7 @@
 							},
 							pointLabels: {show: false}
 						},
-						title: 'TA Signup Statistics',
+						title: 'TA Signup Count',
 						series: [{label: 'Signups'}],
 						axes: {
 							xaxis: {
