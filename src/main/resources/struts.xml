@@ -269,7 +269,6 @@
 			</result>
         </action>
 		
-<<<<<<< HEAD
 		<action name="manageUser" class="userAction.ManageUserAction" method="execute">
             <result type="json">
 				  <param name="root">json</param>
@@ -283,6 +282,12 @@
         </action>
 		
 		<action name="viewScheduleReport" class="userAction.ViewScheduleReportAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+		
+		<action name="generateLoggingReport" class="userAction.GenerateLoggingReportAction" method="execute">
 			<result type="json">
                 <param name="root">json</param>
             </result>
