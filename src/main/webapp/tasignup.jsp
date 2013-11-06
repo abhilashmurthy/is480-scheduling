@@ -174,7 +174,7 @@
                     <table>
                         <tr>
                             <td>Milestone</td>
-                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button></td>
+                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <% if (activeRole.equals(Role.TA)) %> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button> <% ; %></td>
                         </tr>
 					</table>
 					<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
@@ -509,7 +509,7 @@
 						//Unchoose a timeslot
 						var $prevTr = $timeslotCell.closest('tr');
 						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+							if ($prevTr.children().eq($timeslotCell.index()).attr('id')) {
 								//Unselect this timeslot
 								var $nextTr = $prevTr;
 								for (var j = 0; j < slotSize; j++) {
@@ -525,7 +525,7 @@
 						//Choose a timeslot
 						var $prevTr = $timeslotCell.closest('tr');
 						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+							if ($prevTr.children().eq($timeslotCell.index()).attr('id')) {
 								//Unselect this timeslot
 								var $nextTr = $prevTr;
 								for (var j = 0; j < slotSize; j++) {
@@ -541,7 +541,7 @@
 						//Mark a timeslot as available
 						var $nextTr = $timeslotCell.closest('tr');
 						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
-						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
+						if (<%= activeRole.equals(Role.TA) %>) $timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
 						for (var i = 0; i < slotSize; i++) {
 							$nextTr.children().eq($timeslotCell.index()).addClass('available');
 							$nextTr = $nextTr.next();
@@ -620,7 +620,7 @@
 						//If hovering over selectable timeslot
 						var $prevTr = $td.closest('tr');
 						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($td.index()).children('div.start-marker').length) {
+							if ($prevTr.children().eq($td.index()).attr('id')) {
 								//Highlight this timeslot
 								var $nextTr = $prevTr;
 								for (var j = 0; j < slotSize; j++) {

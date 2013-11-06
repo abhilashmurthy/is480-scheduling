@@ -1027,6 +1027,7 @@
 																			$(document.createElement('option'))
 																				.attr('id', 'teamSelectHeader')
 																				.attr('value', '-1')
+																				.css('color', 'red')
 																				.html('No Team')
 																		);
 																		for (var key in teamData) {
@@ -1120,6 +1121,7 @@
 																			$(document.createElement('option'))
 																				.attr('id', 'teamSelectHeader')
 																				.attr('value', '-1')
+																				.css('color', 'red')
 																				.html('No Team')
 																		);
 																		for (var key in teamData) {
@@ -1765,18 +1767,6 @@
 							return 'Showing 1 to ' + $('#' + tableId + ' tbody tr').length + ' of ' + $('#' + tableId + ' tbody tr').length + ' entries';
 						});
 				}
-				
-				/** Sortable **/
-				$(".usersTable tbody").sortable({
-					helper: function(e, $tr) {
-						var $originals = $tr.children();
-						var $helper = $tr.clone();
-						$helper.children().each(function(index) {
-							$(this).width($originals.eq(index).width());
-						});
-						return $helper;
-					}
-				}).disableSelection();
 				
 			};
 			
