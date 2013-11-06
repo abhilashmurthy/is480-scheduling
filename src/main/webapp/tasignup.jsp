@@ -560,7 +560,7 @@
 							if ($availableTd.children('.timeslotTeam').length && !$availableTd.children('.timeslotTA').length) {
 								var mailto = 'mailto:';
 								for (var j = 0; j < taData.length; j++) {
-									mailto += taData[i].username + '@smu.edu.sg; ';
+									mailto += taData[j].username + '@smu.edu.sg; ';
 								}
 								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
 								mailto += 'Team ' 
