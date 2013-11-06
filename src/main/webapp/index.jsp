@@ -13,6 +13,9 @@
     <head>
         <%@include file="header.jsp" %>
         <title>IS480 Scheduling System</title>
+		<style>
+			 .bootbox-width {width: 480px !important;}
+		</style>
     </head>
     <body>
         <!-- Navigation -->
@@ -996,6 +999,7 @@
 						var $timeslot = self.parents('.timeslotCell');
 						var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
 						bootbox.prompt({
+							className : "bootbox-width",
 							title: "Delete Booking",
 							callback: function(result) {
 								if (result) {
@@ -1822,6 +1826,7 @@
 							var venue = timeslot.venue;
 							var optionals = timeslot.optionals;
 							bootbox.confirm({
+								className : "bootbox-width",
 								title: "Update Booking?",
 								message: function(){
 									var message = "Team: <b>" + timeslot.team + "</b><br/>";
