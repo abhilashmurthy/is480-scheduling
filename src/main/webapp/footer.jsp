@@ -26,3 +26,6 @@
 <script type="text/javascript" src="js/plugins/jquery.dataTables.min.js"></script>
 <!-- Multiselect -->
 <script type="text/javascript" src="js/plugins/bootstrap-multiselect.js"></script>
+<!-- jqPlot -->
+<script type="text/javascript" src="js/plugins/jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="js/plugins/jqplot.pieRenderer.min.js"></script>

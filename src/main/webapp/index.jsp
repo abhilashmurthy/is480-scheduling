@@ -2019,6 +2019,7 @@
 					});
 					
 					function showMyTeamsModal() {
+						var bookedTeamsPie = {"Booked Teams": 0, "Unbooked Teams": 0};
 						bootbox.alert({
 							title: <%=activeRole.equals(Role.FACULTY)%>?'My Teams' : 'Teams',
 							message: function() {
@@ -2050,6 +2051,7 @@
 															:$(document.createElement('i')).addClass('fa fa-check').css('color', '#A9DBA9'));
 												}
 											}
+											if ($milestoneBooking.is('.fa-times')) bookedTeamsPie["Unbooked Teams"]++; else bookedTeamsPie["Booked Teams"]++;
 											$trs.push(
 												$(document.createElement('tr'))
 													.append(
@@ -2093,9 +2095,18 @@
 									}));
 									return $tParts;
 								});
-								return $table;
+								var $bookedTeamsPieDiv = $(document.createElement('div'))
+									.attr('id', 'bookedTeamsPieDiv')
+									.css({"height": "200px", "width": "400px"});
+								var $modalDiv = $(document.createElement('div'))
+									.addClass('modalDiv')
+									.append($bookedTeamsPieDiv)
+									.append($table);
+								return $modalDiv;
 							}
 						});
+						
+						//Datatables
 						$('.modal-body').find('#myTeamsModalTable').dataTable({
 							aaSorting: [],
 							bPaginate: false,
@@ -2105,12 +2116,56 @@
 							bSort: true,
 							sDom: '<lft>'
 						});
+						
+						//Pie chart
+						var data = convertJsonToData(bookedTeamsPie);
+						var piePlot = $.jqplot('bookedTeamsPieDiv', [data], 
+							{
+								seriesColors: ["#B8F79E", "#F7A8A8"],
+								seriesDefaults: {
+									renderer: $.jqplot.PieRenderer,
+									shadow: true,
+									shadowAngle: 45,
+									rendererOptions: {
+										showDataLabels: true,
+										dataLabels: 'value',
+//										dataLabelPositionFactor: 1.0,
+										lineWidth: 5,
+										highlightMouseOver: false
+									}
+								},
+								grid: {
+									drawGridLines: false,
+									background: "#ffffff",
+									borderColor: "#dddddd",
+									shadow: false
+								},
+								legend: {
+									show: true,
+									location: 'e',
+									fontSize: 12,
+									border: "none",
+									marginRight: 30
+								}
+							}
+						);
 					}
 				}
                 
                 /*****************************
                  PLUGINS AND COMPONENTS
                  ****************************/
+				 
+				 /* JQPLOT */
+				 function convertJsonToData(jsonData) {
+					var data = [];
+					for (var key in jsonData) {
+						if (jsonData.hasOwnProperty(key)) {
+							data.push([key, jsonData[key]]);
+						}
+					}
+					return data;
+				 }
                 
                 /* PINES NOTIFY */
                 function showNotification(action, bodyTd, notificationMessage) {

@@ -618,3 +618,7 @@ select, input {
 	font-weight: bold;
 	margin-bottom: 10px;
 }
+
+#bookedTeamsPieDiv {
+	margin: auto auto 10px auto;
+}

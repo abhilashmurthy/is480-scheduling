@@ -14,6 +14,7 @@
 <link href="css/bootstrap-switch.css" rel="stylesheet">
 <link href="css/jquery.dataTables.css" rel="stylesheet">
 <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
+<link rel="stylesheet" href="css/jquery.jqplot.min.css" type="text/css">
 <!-- CSS specific to Fuel UX -->
 <link href="css/fuelux.css" rel="stylesheet" />
 <!-- Google Fonts -->
