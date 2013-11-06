@@ -117,8 +117,10 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			
 			em.getTransaction().commit();
 			//TODO Activity logging needs to be handled!
-			if (json.containsKey("success") && Boolean.parseBoolean((String) json.get("success")) == true) {
-//				logItem.setMessage("Booking was created successfully: " + booking.toString());
+			if (json.containsKey("success")) {
+				if ((Boolean)json.get("success") == true) {
+					logItem.setMessage("Booking was created successfully: " + timeslot.getCurrentBooking().toString());
+				}
 			}
 			return SUCCESS; 
         } catch (Exception e) {
