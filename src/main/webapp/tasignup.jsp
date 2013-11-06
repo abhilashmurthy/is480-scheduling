@@ -177,7 +177,7 @@
                             <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <% if (activeRole.equals(Role.TA)) %> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button> <% ; %></td>
                         </tr>
 					</table>
-					<div id="timeslotsTableSection" class='pull-left'>
+					<div id="timeslotsTableSection">
 						<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
 					</div>
 					<div id='taStatisticsChart'></div>
