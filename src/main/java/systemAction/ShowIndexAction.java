@@ -44,7 +44,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 
 	private String allTeamsJson;
 	private String allUsersJson;
-	private String allTAsJson;
+	private String milestonesJson;
 	private ArrayList<HashMap<String, Object>> myTeamsData;
     private long termId;   //To get the active term id user chooses
     private int pendingBookingCount;  //To display the number of pending bookings on the index page
@@ -118,13 +118,10 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
             if (activeRole == Role.ADMINISTRATOR || activeRole == Role.COURSE_COORDINATOR) {
                 addTeamsJson(em, session);
             }
-			
-			if (activeRole == Role.ADMINISTRATOR) {
-				addTAsJson(em, session);
-			}
             
             //Add users into session if user is admin/course coordinator/student
 			addUsersJson(em, session);
+			milestonesJson = SettingsManager.getMilestoneSettings(em).getValue();
 
         } catch (Exception e) {
             logger.error("Exception caught: " + e.getMessage());
@@ -291,54 +288,6 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
         }
 	}
 	
-	private void addTAsJson(EntityManager em, HttpSession session) {
-        Term term = (Term) session.getAttribute("currentActiveTerm");
-        List<TA> taList = new ArrayList<TA>();
-		List<Booking> bookingList = new ArrayList<Booking>();
-        EntityTransaction transaction = em.getTransaction();
-        try {
-            transaction.begin();
-            Query q = em.createQuery("Select u from User u where term_id = :term and role = :taRole")
-                    .setParameter("term", term)
-					.setParameter("taRole", Role.TA);
-			Query qb = em.createQuery("Select b from Booking b where b.timeslot.schedule.milestone.term = :term")
-                    .setParameter("term", term);
-            taList = q.getResultList();
-			bookingList = qb.getResultList();
-            transaction.commit();
-        } catch (Exception e) {
-            logger.error("Database Operation Error");
-			if (MiscUtil.DEV_MODE) {
-				for (StackTraceElement s : e.getStackTrace()) {
-					logger.debug(s.toString());
-				}
-			}
-        }
-        if (taList != null) {
-			List<HashMap<String, Object>> taJsonList = new ArrayList<HashMap<String, Object>>();
-            for (TA ta : taList) {
-				HashMap<String, Object> taMap = new HashMap<String, Object>();
-				taMap.put("name", ta.getFullName());
-				taMap.put("username", ta.getUsername());
-				List<HashMap<String, Object>> taBookingsList = new ArrayList<HashMap<String, Object>>();
-				for (Booking b : bookingList) {
-					if (ta.equals(b.getTimeslot().getTA()) && b.getBookingStatus() != BookingStatus.DELETED && b.getBookingStatus() != BookingStatus.REJECTED) {
-						HashMap<String, Object> bookingMap = new HashMap<String, Object>();
-						bookingMap.put("datetime", viewDateFormat.format(b.getTimeslot().getStartTime()));
-						if (b.getTeam() != null) {
-							bookingMap.put("teamName", b.getTeam().getTeamName());
-							bookingMap.put("teamId", b.getTeam().getId());
-						}
-					}
-				}
-				taMap.put("signups", taBookingsList);
-				taJsonList.add(taMap);
-            }
-			sortMyTeamsData();
-			allTAsJson = new Gson().toJson(taJsonList);
-        }
-	}
-	
 	public void sortMyTeamsData() {
 		Collections.sort(myTeamsData, new Comparator<HashMap<String, Object>>(){
 			public int compare(HashMap<String, Object> o1, HashMap<String, Object> o2) {
@@ -413,12 +362,12 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 		this.myTeamsData = myTeamsData;
 	}
 	
-	public String getAllTAsJson() {
-		return allTAsJson;
+	public String getMilestonesJson() {
+		return milestonesJson;
 	}
 
-	public void setAllTAsJson(String allTAsJson) {
-		this.allTAsJson = allTAsJson;
+	public void setMilestonesJson(String milestonesJson) {
+		this.milestonesJson = milestonesJson;
 	}
 	
 } //end of class

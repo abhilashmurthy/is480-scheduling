@@ -177,9 +177,10 @@
                 
                 //Admin specific variables
 				var teams = null;
-				if ("<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) || activeRole.equals(Role.FACULTY) %>" === "false" ? false : true) {
+				var milestonesJson = null;
+				if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) || activeRole.equals(Role.FACULTY) %>) {
 					teams = JSON.parse('<s:property escape= "false" value= "allTeamsJson"/>');
-					console.log('Team data is: ' + JSON.stringify(teams));
+					milestonesJson = JSON.parse('<s:property escape= "false" value= "milestonesJson"/>');
 				}
                 var $teamDropDownSelect = null;
                 var createBookingOutputForAdmin = null;
@@ -1937,6 +1938,27 @@
 				}
 				
 				function initDashboards() {
+					if (<%= activeRole.equals(Role.FACULTY) %>) {
+						teams = JSON.parse('<s:property escape= "false" value= "allTeamsJson"/>');
+						milestonesJson = JSON.parse('<s:property escape= "false" value= "milestonesJson"/>');
+						var requiredAttendees = new Array();
+						for (var i = 0; i < milestonesJson.length; i++) {
+							if (milestonesJson[i].milestone.toLowerCase() === milestone.toLowerCase()) {
+								for (var j = 0; j < milestonesJson[i].attendees.length; j++) {
+									requiredAttendees.push(milestonesJson[i].attendees[j].toLowerCase());
+								}
+								break;
+							}
+						}
+						teamsLoop: for (var i = 0; i < teams.length; i++) {
+							var myRoles = teams[i].myRoles;
+							for (var j = 0; j < myRoles.length; j++) {
+								if (requiredAttendees.indexOf(myRoles[j]) !== -1) continue teamsLoop;
+							}
+							teams.splice(teams.indexOf(teams[i]), 1);
+							--i;
+						}
+					}
 					if ($('body').find('.dashboardPicker').length) return false;
 					$('div.termPicker').after(
 						$(document.createElement('div'))
