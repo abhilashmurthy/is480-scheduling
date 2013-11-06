@@ -13,14 +13,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
 import static manager.SettingsManager.getByName;
 import model.Schedule;
 import model.Settings;
+import model.SystemActivityLog;
 import model.Term;
 import model.Timeslot;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,6 +42,18 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Timeslot: Create");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             em = MiscUtil.getEntityManagerInstance();
@@ -68,6 +82,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
 			boolean ignored = false;
 			Calendar schStart = Calendar.getInstance(); schStart.setTimeInMillis(s.getStartDate().getTime());
 			Calendar schEnd = Calendar.getInstance(); schEnd.setTimeInMillis(s.getEndDate().getTime());
+			ArrayList<Timeslot> timeslotsLog = new ArrayList<Timeslot>();
             for (int j = 0; j < timeslotTimes.length(); j++) {
                 //Getting startTime and endTime
                 Timestamp startTime = Timestamp.valueOf(timeslotTimes.getString(j));
@@ -110,6 +125,7 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
                 t.setVenue(venue);
                 t.setSchedule(s);
                 em.persist(t);
+				timeslotsLog.add(t);
             } //End of timeslot creation loop
 
             //Setting term as active for the created schedule
@@ -120,7 +136,20 @@ public class CreateTimeslotsAction extends ActionSupport implements ServletReque
             String message = "Timeslots stored successfully";
 			if (ignored) message += ". Certain timeslots were ignored as they breached the limits of the current schedule.";
             json.put("message", message);
+			
+			StringBuilder logMessage = new StringBuilder();
+			logMessage.append("Timeslots were created successfully. TimeslotId:");
+			for (Timeslot tim: timeslotsLog) {
+				logMessage.append(tim.getId());
+				logMessage.append(",");
+			}
+			logItem.setMessage(logMessage.toString());
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {

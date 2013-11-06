@@ -6,35 +6,20 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import constant.Response;
 import constant.Role;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import manager.ScheduleManager;
 import manager.TimeslotManager;
-import model.Booking;
-import model.Schedule;
+import model.SystemActivityLog;
 import model.Timeslot;
 import model.User;
-import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +37,24 @@ public class UpdateTimeslotAction extends ActionSupport implements ServletReques
 
     @Override
     public String execute() throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Timeslot: Update");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             //Code here
             //convert the chosen ID into long and get the corresponding Timeslot object
             em = MiscUtil.getEntityManagerInstance();
 			em.getTransaction().begin();
-            HttpSession session = request.getSession();
 
             //Checking whether the user setting optional attendees is student, admin or cc
             User user = (User) session.getAttribute("user");
@@ -92,6 +88,8 @@ public class UpdateTimeslotAction extends ActionSupport implements ServletReques
                 json.put("message", "Timeslot updated successfully!");
 				em.getTransaction().commit();
 				MiscUtil.logActivity(logger, user, oldTimeslot.toString() + " updated");
+				
+				logItem.setMessage("Timeslot was updated successfully for " + oldTimeslot.toString());
             } else {
                 //Incorrect user role
                 json.put("success", false);
@@ -99,6 +97,11 @@ public class UpdateTimeslotAction extends ActionSupport implements ServletReques
             }
             return SUCCESS;
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -110,12 +113,15 @@ public class UpdateTimeslotAction extends ActionSupport implements ServletReques
             json.put("message", "Error with UpdateTimeslot: Escalate to developers!");
             return ERROR;
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+           if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
     } //end of execute
 

@@ -15,7 +15,7 @@ import java.util.Calendar;
 import javax.persistence.EntityManager;
 import javax.xml.bind.DatatypeConverter;
 import model.Booking;
-import model.CronLog;
+import model.SystemActivityLog;
 import model.User;
 import org.json.JSONObject;
 import org.quartz.Job;
@@ -39,12 +39,13 @@ public class SMSReminderJob implements Job {
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         logger.debug("Started SMSReminderJob");
         //Initializing run log to be stored in database
-        CronLog logItem = new CronLog();
-        logItem.setJobName("SMS Reminders");
+        SystemActivityLog logItem = new SystemActivityLog();
+        logItem.setActivity ("SMS Reminders");
         Calendar cal = Calendar.getInstance();
         Timestamp now = new Timestamp(cal.getTimeInMillis());
         logItem.setRunTime(now);
-
+		logItem.setMessage("Sending SMS Reminders to users started " + now);
+		
         SimpleDateFormat smsDateFormat = new SimpleDateFormat("EEE, dd MMM");
         SimpleDateFormat smsTimeFormat = new SimpleDateFormat("HH:mm");
         

@@ -8,7 +8,9 @@ import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import manager.SettingsManager;
 import model.Settings;
+import model.SystemActivityLog;
 import model.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,11 +39,22 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 	
 	@Override
     public String execute() {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		SystemActivityLog logItem = new SystemActivityLog();
+		
+		logItem.setActivity("Administrator: Update Milestone Settings");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
         try {
 			json.put("exception", false);
             em = MiscUtil.getEntityManagerInstance();
-			HttpSession session = request.getSession();
 			
 			//Checking whether the active user is admin/course coordinator or not
 			User user = (User) session.getAttribute("user");
@@ -192,12 +206,19 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 				json.put("success", true);
 				json.put("message", "Your settings have been updated!");
 				MiscUtil.logActivity(logger, user, "Milestone settings updated");
+				
+				logItem.setMessage("Milestone settings were updated successfully");
 			} else {
 				//Incorrect user role
 				json.put("error", true);
 				json.put("message", "You are not authorized to access this functionality!");
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -208,8 +229,15 @@ public class UpdateMilestoneSettingsAction extends ActionSupport implements Serv
 			json.put("exception", true);
             json.put("message", "Error with UpdateMilestoneSettings: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
         return SUCCESS;
 	 } //end of execute

@@ -4,6 +4,7 @@
  */
 package notification.email;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,6 +53,16 @@ public class FacultyReminderEmail extends EmailTemplate{
 		map = generateDueDate(map, b.getCreatedAt().getTime());
 		
 		return map;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return null;
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return null;
 	}
 	
 }

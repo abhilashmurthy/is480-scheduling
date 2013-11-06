@@ -4,13 +4,16 @@
  */
 package userAction;
 
-import systemAction.*;
 import com.opensymphony.xwork2.ActionSupport;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import manager.MilestoneManager;
+import javax.servlet.http.HttpSession;
+import model.SystemActivityLog;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +30,29 @@ public class DeleteScheduleAction extends ActionSupport implements ServletReques
     
     @Override
     public String execute() throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Schedule: Delete");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
+		EntityManager em = null;
         try {
             //Code here
+
+			logItem.setMessage("Schedule was deleted successfully");
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -38,7 +61,17 @@ public class DeleteScheduleAction extends ActionSupport implements ServletReques
             }
             request.setAttribute("error", "Error with DeleteSchedule: Escalate to developers!");
             return ERROR;
-        }
+        } finally {
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
+		}
         return SUCCESS;
     }
 

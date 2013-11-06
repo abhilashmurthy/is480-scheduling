@@ -5,7 +5,6 @@
 package systemAction.quartz;
 
 import constant.BookingStatus;
-import constant.Role;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,10 +14,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import manager.SettingsManager;
-import manager.UserManager;
 import model.Booking;
 import model.CronLog;
 import model.Settings;
+import model.SystemActivityLog;
 import model.Timeslot;
 import model.User;
 import notification.email.DeletedBookingEmail;
@@ -44,11 +43,12 @@ public class ClearPendingBookingJob implements Job {
 
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         //Initializing run log to be stored in database
-        CronLog logItem = new CronLog();
-        logItem.setJobName("Clear Pending Bookings");
+		SystemActivityLog logItem = new SystemActivityLog();
+        logItem.setActivity("Clear Pending Bookings");
         Calendar cal = Calendar.getInstance();
         Timestamp now = new Timestamp(cal.getTimeInMillis());
         logItem.setRunTime(now);
+		logItem.setMessage("Clearing any pending bookings " + now);
 
         EntityManager em = null;
         

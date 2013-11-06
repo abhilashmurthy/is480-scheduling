@@ -5,10 +5,12 @@
 package notification.email;
 
 import constant.Response;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
 import model.User;
@@ -93,6 +95,16 @@ public class EditBookingEmail extends EmailTemplate {
 		map.put("[EDITOR_NAME]", editor.getFullName());
 		
 		return map;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }
