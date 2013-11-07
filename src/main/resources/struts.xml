@@ -19,12 +19,8 @@
             <result name="success" type="redirect">
                 <param name="location">/index</param>
             </result>
-        </action>
-		
-		<!-- ADMIN LOGIN ACTION -->
-		<action name="login" class="userAction.LoginAction" method="execute">
-            <result name="error" type="redirect">
-                <param name="location">/adminlogin.jsp</param>
+			<result name="error" type="redirect">
+                <param name="location">/${responseURL}</param>
             </result>
         </action>
 		

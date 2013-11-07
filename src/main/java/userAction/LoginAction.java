@@ -37,6 +37,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     //Request and Response
     private HttpServletRequest request;
+	
+	//Stores the callback URL in case of an error
+	private String responseURL;
+
     private static Logger logger = LoggerFactory.getLogger(LoginAction.class);
     // sorted in alphabetical order. ordering is important
     // when generating the signature
@@ -155,7 +159,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 			}
 			logItem.setMessage("Error: " + e.getMessage());
 			
-			request.setAttribute("error", e.getMessage());
+			//Construct callback URL
+			StringBuilder sb = new StringBuilder();
+			if (request.getParameter("bypass") != null) sb.append("admin");
+			sb.append("login.jsp").append("?error=").append(e.getMessage());
+			responseURL = sb.toString();
 			return ERROR;
 		} catch (Exception e) {
 			User userForLog = (User) session.getAttribute("user");
@@ -213,4 +221,12 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         this.request = request;
     }
 
+	public String getResponseURL() {
+		return responseURL;
+	}
+
+	public void setResponseURL(String responseURL) {
+		this.responseURL = responseURL;
+	}
+	
 } //end of class
