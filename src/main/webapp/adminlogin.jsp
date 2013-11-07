@@ -105,8 +105,18 @@
 
                     <h2>IS480 Scheduling System</h2>
 					<form method="POST" action="adminLogin" >
-						Username: <input name="username" type="text" > <br />
-						Password: <input name="password" type="password" >
+						<table style="margin: auto">
+							<tr>
+								<td>Username:&nbsp;</td>
+								<td style="padding-bottom: 10px"><input name="username" type="text" ></td>
+							</tr>
+							<tr>
+								<td>Password:&nbsp;</td>
+								<td><input name="password" type="password" ></td>
+							</tr>
+						</table>
+						<div style="margin-bottom: 10px"></div><br />
+						
 						<button id="ssoBtn" class="btn btn-inverse" type="submit">Login</button>
 					</form>
                     
