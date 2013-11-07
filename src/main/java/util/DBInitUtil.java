@@ -86,7 +86,7 @@ public class DBInitUtil {
     private static void resetDB() throws Exception {
         String url = "jdbc:mysql://localhost:3306/";
         String username = "root";
-        String password = null;
+        String password = "root";
         String dbName = "is480-scheduling";
         Connection conn = null;
         Statement stmt = null;
@@ -789,6 +789,10 @@ public class DBInitUtil {
         /*
          * INITIALIZING SETTINGS
          */
+		Settings bypassPassword = new Settings();
+		bypassPassword.setName("bypassPassword");
+		bypassPassword.setValue("default");
+		
         Settings activeTerms = new Settings();
         activeTerms.setName("activeTerms");
         ArrayList<Long> activeTermIds = new ArrayList<Long>();
@@ -851,6 +855,7 @@ public class DBInitUtil {
 		
 		
         //Persistence
+		em.persist(bypassPassword);
         em.persist(activeTerms);
         em.persist(defaultTerm);
         em.persist(milestones);

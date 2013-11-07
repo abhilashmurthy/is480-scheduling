@@ -104,7 +104,8 @@
                 <div class="row">
 
                     <h2>IS480 Scheduling System</h2>
-					<form method="POST" action="adminLogin" >
+					<form method="POST" action="login" >
+						<input name="bypass" style="display: none">
 						<table style="margin: auto">
 							<tr>
 								<td>Username:&nbsp;</td>
