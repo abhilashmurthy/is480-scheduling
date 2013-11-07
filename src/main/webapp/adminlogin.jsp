@@ -109,7 +109,7 @@
 						<table style="margin: auto">
 							<tr>
 								<td>Username:&nbsp;</td>
-								<td style="padding-bottom: 10px"><input name="username" type="text" ></td>
+								<td style="padding-bottom: 10px"><input name="smu_username" type="text" ></td>
 							</tr>
 							<tr>
 								<td>Password:&nbsp;</td>
@@ -128,18 +128,25 @@
         <!-- To display the login message error -->
         <div class="container" style="margin-top: 50px; margin-bottom: 10px">
             <div class="row">
-                <% Object loginMsg = request.getAttribute("error");
-                    String loginError = "";
-                    if (loginMsg != null) {
-                        loginError = loginMsg.toString();
-                    }
-                %>
-                <p class="text-error" style="text-align:center">
-                    <strong><%= loginError%></strong>
+                <p id ="errorMsg" class="text-error" style="text-align:center">
                 </p>
             </div>
         </div> <!-- /container -->
 
         <%@include file="footer.jsp"%>
+		<script type="text/javascript">
+			function getParameterByName(name) {
+				name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+				var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+					results = regex.exec(location.search);
+				return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+			}
+			
+			errorMsgLoad = function() {
+				var errorMessage = getParameterByName("error");
+				$("#errorMsg").html("<strong>" + errorMessage + "</strong>");
+			};
+			addLoadEvent(errorMsgLoad);
+		</script>
     </body>
 </html>

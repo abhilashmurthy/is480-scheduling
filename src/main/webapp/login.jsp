@@ -112,33 +112,30 @@
         <!-- To display the login message error -->
         <div class="container" style="margin-top: 50px; margin-bottom: 10px">
             <div class="row">
-                <% Object loginMsg = request.getAttribute("error");
-                    String loginError = "";
-                    if (loginMsg != null) {
-                        loginError = loginMsg.toString();
-                    }
-                %>
-                <p class="text-error" style="text-align:center">
-                    <strong><%= loginError%></strong>
+                <p id="errorMsg" class="text-error" style="text-align:center">
                 </p>
             </div>
         </div> <!-- /container -->
 		
-		<button id="testBtn" class="btn btn-inverse" data-loading-text="Logging in..." type="submit">Testing Login*</button>
-		<br />
-		<p id="testLoginMsg">* - To be used by developers for testing purposes only!</p>
+		<button id="testBtn" class="btn btn-inverse" data-loading-text="Logging in..." type="submit">Administrator Login</button>
 
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
+			function getParameterByName(name) {
+				name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+				var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+					results = regex.exec(location.search);
+				return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+			}
+			
+			errorMsgLoad = function() {
+				var errorMessage = getParameterByName("error");
+				$("#errorMsg").html("<strong>" + errorMessage + "</strong>");
+			};
+			addLoadEvent(errorMsgLoad);
+			
             $("#testBtn").click(function() {
-                $(this).button('loading');
-                var userId = prompt('Please enter the Username', '');
-                if (userId !== null && userId !== '') {
-                    window.location = 'login?bypass=true&smu_username=' + userId;
-                } else {
-                    alert('Invalid Username');
-                    $(this).button('reset');
-                }
+                window.location = "adminlogin.jsp";
             });
 			
             $("#ssoBtn").click(function() {

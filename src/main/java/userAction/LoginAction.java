@@ -86,6 +86,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             em = MiscUtil.getEntityManagerInstance();
 			
 			if (request.getParameter("bypass") != null) { //BYPASS SSO LOGIN
+				//Validating password for bypass login
+				String password = request.getParameter("password");
+				Settings bypassPassword = SettingsManager.getByName(em, "bypassPassword");
+				if (password == null || !bypassPassword.getValue().equals(password)) throw new CustomException("Incorrect password. Please try again!");
+				
 				initializeUser(em);
 				User userForLog = (User) session.getAttribute("user");
 				logItem.setUser(userForLog);
@@ -195,10 +200,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
     }
 	
 	private void initializeUser(EntityManager em) throws Exception {
-		//Validating password for bypass login
-		String password = request.getParameter("password");
-		Settings bypassPassword = SettingsManager.getByName(em, "bypassPassword");
-		if (password == null || !bypassPassword.getValue().equals(password)) throw new CustomException("Incorrect password. Please try again!");
 		
 		//Check if user exists in our DB
 		String smuUsername = request.getParameter("smu_username");
