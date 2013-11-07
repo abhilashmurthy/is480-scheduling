@@ -345,6 +345,7 @@ public class BookingManager {
 			//Forcing initialization for sending email
 			Hibernate.initialize(b.getTeam().getMembers());
 			Hibernate.initialize(b.getTimeslot().getSchedule().getMilestone());
+			Hibernate.initialize(b.getRequiredAttendees());
 			
 			QuartzManager.deleteSMSReminder(b, ctx);
 
