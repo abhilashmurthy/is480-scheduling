@@ -6,9 +6,11 @@
         <title>IS480 Scheduling System | Login</title>
 
         <!-- Le imports -->
-        <% if (session.getAttribute("user") != null) {
-                response.sendRedirect("index.jsp");
-            }%>
+        <% 
+			if (session.getAttribute("user") != null && !((User) session.getAttribute("user")).getUsername().equals("_")) {
+				response.sendRedirect("index");
+			}
+		%>
         <%@include file="imports.jsp"%>
 
         <style type="text/css">

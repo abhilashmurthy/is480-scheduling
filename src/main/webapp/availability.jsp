@@ -344,7 +344,6 @@
 									}
 								});
 							}
-							//console.log(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]);
 						}
 					}else if(!$checkbox.is(':checked')){
 						var dateTime = $checkbox.attr('id');

@@ -148,7 +148,6 @@
         </div>
 
         <%@include file="footer.jsp"%>
-
         <!-- View Schedule Javascript -->
         <script type="text/javascript">
             //Makes use of footer.jsp's jQuery and bootstrap imports
@@ -314,7 +313,7 @@
                 }
                 
                 //Convert scheduleData to better JSON object
-                function convertScheduleData() {
+                function convertScheduleData() { ////
                     var timeslots = scheduleData.timeslots;
                     var newTimeslots = {};
                     for (var i = 0; i < timeslots.length; i++) {

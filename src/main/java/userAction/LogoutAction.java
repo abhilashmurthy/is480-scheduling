@@ -47,10 +47,7 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
         try {
 			em = MiscUtil.getEntityManagerInstance();
 			User user = (User) session.getAttribute("user");
-			session.invalidate();
-			
 			MiscUtil.logActivity(logger, user, "Logged out");
-			
 			logItem.setMessage("Logout successful. " + user.toString());
         } catch (Exception e) {
 			User userForLog = (User) session.getAttribute("user");
@@ -76,7 +73,7 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
 				if (em.isOpen()) em.close();
 			}
 		}
-		
+		session.invalidate();
         return SUCCESS;
     }
     
