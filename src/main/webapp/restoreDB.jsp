@@ -67,8 +67,8 @@
 				var fileName = $(this).closest('tr').children('.fileName').text();
 				$.ajax({
 					type: 'POST',
-					url: 'restoreDatabase',
-					data: {jsonData: JSON.stringify({fileName: fileName, restoreType: 'ddl'})},
+					url: 'restoreSQLDump',
+					data: {"jsonData": JSON.stringify({"fileName": fileName, "restoreType": "ddl"})},
 					cache: false
 				}).done(function(response){
 					if (response.success) {
@@ -99,8 +99,8 @@
 				var fileName = $(this).closest('tr').children('.fileName').text();
 				$.ajax({
 					type: 'POST',
-					url: 'restoreDatabase',
-					data: {jsonData: JSON.stringify({fileName: fileName, restoreType: 'dml'})},
+					url: 'restoreSQLDump',
+					data: {"jsonData": JSON.stringify({"fileName": fileName, "restoreType": "dml"})},
 					cache: false
 				}).done(function(response){
 					if (response.success) {

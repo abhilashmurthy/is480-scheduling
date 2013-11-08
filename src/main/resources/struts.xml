@@ -255,7 +255,7 @@
             </result>
         </action>
 		
-		<action name="restoreDatabase" class="userAction.RestoreDatabaseAction" method="execute">
+		<action name="restoreSQLDump" class="userAction.RestoreDatabaseAction" method="execute">
 			<result type="json">
                 <param name="root">json</param>
             </result>
