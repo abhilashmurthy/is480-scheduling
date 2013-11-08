@@ -417,28 +417,10 @@
 					
                     //Constructing table body
                     for (i = 0; i < timesArray.length; i++) {
-						
-						if(counter===1){
-							startTime = Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[0]
-											+Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[1];
-						}
-						
-						if(counter===slotSize){
-							console.log(timesArray[i]);
-							//tr.append("<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>");
-							counter = 0;
-							var tr = $(document.createElement("tr"));
-							var timeTd = $(document.createElement("td"));
-							timeTd.html(timesArray[i] + "<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>" );
-							tr.append(timeTd);
-						}else{
-							var tr = $(document.createElement("tr"));
-							var timeTd = $(document.createElement("td"));
-							timeTd.html(timesArray[i]);
-							tr.append(timeTd);
-							
-						}
-						
+						var tr = $(document.createElement("tr"));
+						var timeTd = $(document.createElement("td"));
+						timeTd.html(timesArray[i]);
+						tr.append(timeTd);
 						
                         for (var j = 0; j < dateArray.length; j++) {
                             var td = $(document.createElement("td"));

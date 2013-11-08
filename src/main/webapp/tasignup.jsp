@@ -32,15 +32,15 @@
             }
 			
 			#timeslotsTableSection, #taStatisticsChart {
-				margin-top: 60px;
+				margin-top: 30px;
 				margin-left: 10px !important;
 			}
 			
 			#taStatisticsChart {
 				display: inline-block;
 				margin-left: 20px !important;
-				width: 400px;
-				height: 300px;
+				max-width: 100%;
+				height: 500px;
 			}
             
 			#milestoneTimeslotsSelect {
@@ -143,6 +143,17 @@
 				font-size: 15px;
 			}
 			
+			.taChartBtn {
+				margin-top: 30px;
+				margin-left: 10px;
+			}
+			
+			.clickableHelp {
+				font-size: 14px;
+				padding-bottom: 5px;
+				font-style: italic;
+			}
+			
         </style>
     </head>
     <body>
@@ -177,8 +188,16 @@
                             <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <% if (activeRole.equals(Role.TA)) %> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button> <% ; %></td>
                         </tr>
 					</table>
-					<div id='taStatisticsChart'></div>
+					<button class="taChartBtn btn btn-success" data-toggle="collapse" data-target="#taStatisticsAccordion">
+						TA Statistics
+					</button>
+					<div id="taStatisticsAccordion" class="accordion-body collapse">
+						<div class="accordion-inner">
+							<div id='taStatisticsChart' class="collapse"></div>
+						</div>
+					</div>
 					<div id="timeslotsTableSection">
+						<% if (activeRole.equals(Role.ADMINISTRATOR)) %> <div class="clickableHelp muted">Click on a timeslot to email TAs</div><% ; %>
 						<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
 					</div>
         </div>
@@ -433,23 +452,10 @@
 
                     //Constructing table body
                     for (i = 0; i < timesArray.length; i++) {
-						if(counter===1){
-							startTime = Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[0]
-											+Date.parse(timesArray[i]).toString('HH:mm:ss').split(":")[1];
-						}
-						if(counter===slotSize && <%= activeRole.equals(Role.TA)%>){
-							//tr.append("<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>");
-							counter = 0;
-							var tr = $(document.createElement("tr"));
-							var timeTd = $(document.createElement("td"));
-							timeTd.html(timesArray[i] + "<br/> <b>Select All <input class='checkBoxClass' type='checkbox' name='" + startTime.toString() + "' id='" + startTime.toString() + "'/>" );
-							tr.append(timeTd);
-						}else{
-							var tr = $(document.createElement("tr"));
-							var timeTd = $(document.createElement("td"));
-							timeTd.html(timesArray[i]);
-							tr.append(timeTd);
-						}
+						var tr = $(document.createElement("tr"));
+						var timeTd = $(document.createElement("td"));
+						timeTd.html(timesArray[i]);
+						tr.append(timeTd);
 
                         for (var j = 0; j < dateArray.length; j++) {
                             var td = $(document.createElement("td"));
@@ -830,7 +836,7 @@
 				loadTAStatistics();
 				var barGraph = null;
 				function loadTAStatistics() {
-					var taNames = getSeriesArray("username", false);
+					var taNames = getSeriesArray("name", false);
 					var signups = getSeriesArray("mySignups", true);
 					barGraph = $.jqplot('taStatisticsChart', [signups], {
 						seriesDefaults: {
@@ -840,23 +846,21 @@
 								highlightMouseOver: false,
 								lineWidth: 5
 							},
-							pointLabels: {show: false}
+							pointLabels: {show: false,}
 						},
 						title: 'TA Signup Count',
 						series: [{label: 'Signups'}],
 						axesDefaults: {
-							tickRenderer: "s",
-							tickOptions: {
-								angle: -45,
-								fontSize: '10px'
-							}
+							tickRenderer: $.jqplot.CanvasAxisTickRenderer
 						},
 						axes: {
 							xaxis: {
 								renderer: $.jqplot.CategoryAxisRenderer,
 								ticks: taNames,
 								tickOptions: {
-									showGridline: false
+									showGridline: false,
+									angle: 90,
+									fontSize: '14px'
 								}
 							},
 							yaxis: {

@@ -38,3 +38,6 @@
 <script type="text/javascript" src="js/jquery/jqplot/jqplot.barRenderer.min.js"></script>
 <script type="text/javascript" src="js/jquery/jqplot/jqplot.categoryAxisRenderer.min.js"></script>
 <script type="text/javascript" src="js/jquery/jqplot/jqplot.pointLabels.min.js"></script>
+<script type="text/javascript" src="js/jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js"></script>
+<script type="text/javascript" src="js/jquery/jqplot/jqplot.canvasTextRenderer.min.js"></script>
+<script type="text/javascript" src="js/jquery/jqplot/jqplot.dateAxisRenderer.min.js"></script>
