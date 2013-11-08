@@ -147,25 +147,6 @@
         //Dropdown menu from bootstrap
         $(".dropdown-toggle").dropdown();
         
-        //Dashboard popover
-//        $('#userDashboard').on('click', function(e) {
-//            e.stopPropagation();
-//            if ($(".userbox").hasClass('open')) {
-//                $(".userbox").removeClass('open');
-//            }
-//            $(this).popover({
-//                container: '#userDashboard',
-//                placement: 'bottom',
-//                title: '<b>Your Information</b>',
-//                trigger: 'manual',
-//                html: true,
-//                content: function() {
-//                    return $('#userDashboardContent').html();
-//                }
-//            });
-//            $(this).popover('show');
-//        });
-        
         //Logout link
         $("#logoutLink").on('click', function() {
             document.location.href = '/is480-scheduling/logout';
@@ -182,7 +163,6 @@
         
         //Hide all popovers on page click
         $('body').on('click', function(e) {
-//			console.log('body clicked');
             //Hide all popovers
 			if ($(e.target).closest('.ui-datepicker').length || $(e.target).closest('.ui-timepicker-wrapper').length) return false;
             $('.popover.in').each(function(e){
@@ -195,7 +175,15 @@
             });
             //Hide all notifications
             $.pnotify_remove_all();
-        });    
+        });
+		
+		//Session timeout
+		$.sessionTimeout({
+			message: 'Your session is about to timeout',
+			warnAfter: 1080000,
+			redirAfter: 1140000,
+			logoutUrl: 'logout'
+		});
             
         
         //Disable Pines Notify Settings

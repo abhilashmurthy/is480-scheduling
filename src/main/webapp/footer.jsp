@@ -41,3 +41,5 @@
 <script type="text/javascript" src="js/jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js"></script>
 <script type="text/javascript" src="js/jquery/jqplot/jqplot.canvasTextRenderer.min.js"></script>
 <script type="text/javascript" src="js/jquery/jqplot/jqplot.dateAxisRenderer.min.js"></script>
+<!-- Session timeout -->
+<script type="text/javascript" src="js/jquery/jquery.sessionTimeout.min.js"></script>

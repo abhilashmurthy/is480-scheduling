@@ -19,16 +19,31 @@
 		<%@include file="imports.jsp" %>
         <style type="text/css">
 			
-			#testBtn {
+			.testBtn {
 				margin-right: 20px;
 			}
 			
-			.termPicker {
-				margin-top: 20px;
+			.legend {
+				margin-bottom: 10px;
 			}
 			
-			.legend {
-				margin-top: 30px;
+			.loginTitle {
+				width: 100%;
+				text-align: center;
+			}
+			
+			.page {
+				border-radius: 10px;
+				background-color: #fafafa;
+				padding: 20px;
+			}
+			
+			.scheduleContainer {
+				margin-top: 0;
+			}
+			
+			#milestoneTab {
+				margin-top: 20px;
 			}
 
         </style>
@@ -39,13 +54,14 @@
             <div class="navbar-inner">
                 <div class="container">
 					<a class="brand" href="index">IS480 Scheduling</a>
-					<button id="ssoBtn" class="btn btn-primary pull-right" data-loading-text="Logging in..." type="submit">SMU Login</button>
-					<button id="testBtn" class="btn btn-inverse pull-right muted" data-loading-text="Logging in..." type="submit">Administrator Login</button>
+					<button class="ssoBtn btn btn-primary pull-right" data-loading-text="Logging in..." type="submit">SMU Login</button>
+					<button class="testBtn btn btn-inverse pull-right muted" data-loading-text="Logging in..." type="submit">Administrator Login</button>
                 </div>
             </div>
         </div>
 		
         <div class="container page">
+			<div class="loginTitle muted"><h3>IS480 Scheduling - Please <a class="ssoBtn" href="#">login</a> to use the system</h3></div>
 			<div class='termPicker'>
 				<div class="btn-group" style="float: left;">
 					<s:iterator var="term" value="termData">
@@ -68,38 +84,30 @@
 					</ul>
 				</div>
 			</div>
-			<div class="settingsView">
-				<span id="settingsViewLabel">Select View: </span>
-				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
-					<input type="checkbox" checked>
-				</div>
-				<i id='previousWeek' class='traverseWeek fa fa-arrow-circle-o-left' style='color: #5bc0de; display: none; cursor: pointer'></i>
-				<i id='nextWeek' class='traverseWeek fa fa-arrow-circle-o-right' style='color: #5bc0de; display: none; cursor: pointer'></i>
-            </div>
-            <!-- To display legend for the calendar -->
-            <table class="legend">
-                <tr>
-                    <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
-                    <td style="width:15px"></td>
-                    <td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
-                    <td style="width:15px"></td>
-                    <td class="legendBox approvedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
-                </tr>
-            </table>
         </div>
 
         <!-- Main schedule navigation -->
-        <div class="scheduleContainer container page">
-            <ul id="milestoneTab" class="nav nav-tabs">
-                <!-- milestone tabs populated dynamically -->
-            </ul>
-            <div id="milestoneTabContent" class="tab-content" hidden="">
-                <!-- milestone tables populated dynamically -->
-            </div>
-            <div id="scheduleProgressBar" class="progress progress-striped active">
-                <div class="bar" style="width: 100%;"></div>
-            </div>
-        </div>
+		<div class="scheduleContainer container page">
+			<!-- To display legend for the calendar -->
+			<table class="legend">
+				<tr>
+					<td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
+					<td style="width:15px"></td>
+					<td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
+					<td style="width:15px"></td>
+					<td class="legendBox approvedBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Approved</td> 
+				</tr>
+			</table>
+			<ul id="milestoneTab" class="nav nav-tabs">
+				<!-- milestone tabs populated dynamically -->
+			</ul>
+			<div id="milestoneTabContent" class="tab-content" hidden="">
+				<!-- milestone tables populated dynamically -->
+			</div>
+			<div id="scheduleProgressBar" class="progress progress-striped active">
+				<div class="bar" style="width: 100%;"></div>
+			</div>
+		</div>
 		
         <%@include file="footer.jsp"%>
         <script type="text/javascript">
@@ -375,59 +383,18 @@
 						}
                         return false;
                     });
+					
+                    $('body').off('click', '.unbookedTimeslot');
+                    $('body').on('click', '.unbookedTimeslot', function(e) {
+                        $('button.ssoBtn').effect('highlight', {color: "#ffff99 !important"}, 1500);
+						return false;
+                    });
 
                     $('.timeslotCell').off('click', '.close');
                     $('.timeslotCell').on('click', '.close', function(e) {
                         e.stopPropagation();
                         self.popover('hide');
                         self.trigger('mouseleave');
-                        return false;
-                    });
-                    
-					$("#weekView").off('switch-change');
-                    $("#weekView").on('switch-change', function(e, data){
-						setTimeout(function(){
-							if (data.value) {
-								weekView = null;
-								$(".weekNum").remove();
-								$(".traverseWeek").hide();
-							} else {
-								$(".traverseWeek").css('opacity', '100');
-								weekView = 0;
-								$("#previousWeek").css('opacity', '0');
-								if (maxWeekView === 1) $("#nextWeek").css('opacity', '0');
-								$(".weekNum").remove();
-								$(".traverseWeek").show();
-								$("#previousWeek").after($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
-							}
-							populateSchedule(milestone, year, semester);
-						}, 500);
-                        return false;
-                    });
-					$("#nextWeek").off('click');
-                    $("#nextWeek").on('click', function(){
-						$(".traverseWeek").css('opacity', '100');
-                        if (weekView + 1 < maxWeekView) {
-                            ++weekView;
-                            $(".weekNum").remove();
-                            $("#previousWeek").after($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
-                            populateSchedule(milestone, year, semester);
-                        }
-						if (weekView + 1 === maxWeekView) $(this).css('opacity', '0');
-                        return false;
-                    });
-					$("#previousWeek").off('click');
-                    $("#previousWeek").on('click', function(){
-						$(".traverseWeek").css('opacity', '100');
-                        if (weekView <= 0) {
-                            return false;
-                        } else {
-                            --weekView;
-                            $(".weekNum").remove();
-                            $("#previousWeek").after($(document.createElement('div')).addClass('weekNum').html('Week ' + (weekView + 1)));
-                            populateSchedule(milestone, year, semester);
-                        }
-						if (weekView === 0) $(this).css('opacity', '0');
                         return false;
                     });
                 }
@@ -496,13 +463,13 @@
                     return false;
                 });
 
-				$("#testBtn").click(function() {
+				$(".testBtn").click(function() {
 					window.location = "adminlogin.jsp";
 					return false;
 				});
 
-				$("#ssoBtn").click(function() {
-					$(this).button('loading');
+				$(".ssoBtn").click(function() {
+					if ($(this).is('button')) $(this).button('loading');
 					//blink(this);
 					window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
 					return false;

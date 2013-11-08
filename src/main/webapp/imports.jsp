@@ -23,8 +23,12 @@
 
 <!-- Ensure user has logged in -->
 <% User user = (User) session.getAttribute("user");
-if (session.getAttribute("user") == null && !request.getRequestURI().contains("login.jsp")) {
-	response.sendRedirect("login.jsp");
+if (user == null && !request.getRequestURI().contains("hello.jsp")) {
+	response.sendRedirect("hello.jsp");
+	return;
+} else if (user.getUsername().equals("_") && !request.getRequestURI().contains("login.jsp")) {
+	session.invalidate();
+	response.sendRedirect("hello.jsp");
 	return; 
 }
 %>
