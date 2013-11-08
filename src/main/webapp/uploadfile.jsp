@@ -104,7 +104,6 @@
         </div>
 		
 		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="js/plugins/jquery.ajaxfileupload.js"></script>
 		<script type="text/javascript">
 //			$(document).ready(function(){
 		uploadFileLoad = function () {
@@ -296,7 +295,7 @@
 			}
 			};
 			
-			addLoadEvent(uploadFileLoad());
+			addLoadEvent(uploadFileLoad);
 		</script>
     </body>
 </html>

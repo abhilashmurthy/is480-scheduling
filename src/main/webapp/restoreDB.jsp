@@ -59,7 +59,6 @@
         </div>
 		
 		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="js/plugins/jquery.ajaxfileupload.js"></script>
 		<script type="text/javascript">
 		restoreDBLoad = function () {
 			

@@ -168,10 +168,6 @@
 				<strong>Save</strong>
 			</button>
 		</div>
-
-
-			<script type="js/bootstrap.js"></script>
-
 			<script type="text/javascript">
 
 				$(document).ready(function() {

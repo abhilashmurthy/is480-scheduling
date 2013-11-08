@@ -150,9 +150,6 @@
         <%@include file="footer.jsp"%>
 
         <!-- View Schedule Javascript -->
-        <!-- jshashset imports -->
-        <script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
-        <script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
         <script type="text/javascript">
             //Makes use of footer.jsp's jQuery and bootstrap imports
             viewScheduleLoad = function() {

@@ -39,8 +39,8 @@
 			#taStatisticsChart {
 				display: inline-block;
 				margin-left: 20px !important;
-				width: 100%;
-				height: 400px;
+				width: 400px;
+				height: 300px;
 			}
             
 			#milestoneTimeslotsSelect {
@@ -177,17 +177,13 @@
                             <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <% if (activeRole.equals(Role.TA)) %> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button> <% ; %></td>
                         </tr>
 					</table>
+					<div id='taStatisticsChart'></div>
 					<div id="timeslotsTableSection">
 						<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
 					</div>
-					<div id='taStatisticsChart'></div>
         </div>
 
         <%@include file="footer.jsp" %>
-        <!-- jshashset imports -->
-        <script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
-        <script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
-        <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             //Makes use of footer.jsp's jQuery and bootstrap imports
             taAvailabilityLoad = function() {
@@ -848,6 +844,13 @@
 						},
 						title: 'TA Signup Count',
 						series: [{label: 'Signups'}],
+						axesDefaults: {
+							tickRenderer: "s",
+							tickOptions: {
+								angle: -45,
+								fontSize: '10px'
+							}
+						},
 						axes: {
 							xaxis: {
 								renderer: $.jqplot.CategoryAxisRenderer,

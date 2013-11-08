@@ -304,9 +304,6 @@
             </div>
         </div>
         <%@include file="footer.jsp" %>
-		<script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
-		<script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
-		<script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             editScheduleLoad = function() {                
                 //Initialize variables

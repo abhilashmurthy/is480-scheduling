@@ -2,21 +2,20 @@
 
 <!-- CSS imports -->
 <!-- Plugins -->
-<link href="css/redmond/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
-<link href="css/redmond/jquery.timepicker.css" rel="stylesheet">
-<!--<link href="css/bootstrap.css" rel="stylesheet" media="screen">-->
-<link href="css/jquery.pnotify.default.css" rel="stylesheet">
-<link href="css/token-input.css" rel="stylesheet">
-<link href="css/token-input-facebook.css" rel="stylesheet">
-<link href="css/bootstrap-formhelpers.css" rel="stylesheet">
+<link href="css/jqueryui/redmond/jquery-ui-1.10.3.custom.min.css" rel="stylesheet">
+<link href="css/jqueryui/redmond/jquery.timepicker.css" rel="stylesheet">
+<link href="css/jquery/jquery.pnotify.default.css" rel="stylesheet">
+<link href="css/jquery/token-input.css" rel="stylesheet">
+<link href="css/jquery/token-input-facebook.css" rel="stylesheet">
+<link href="css/bootstrap/bootstrap-formhelpers.css" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.min.css" rel="stylesheet">
-<link href="css/bootstrap-switch.css" rel="stylesheet">
-<link href="css/jquery.dataTables.css" rel="stylesheet">
-<link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
-<link rel="stylesheet" href="css/jquery.jqplot.min.css" type="text/css">
+<link href="css/bootstrap/bootstrap-switch.css" rel="stylesheet">
+<link href="css/jquery/jquery.dataTables.css" rel="stylesheet">
+<link href="css/bootstrap/bootstrap-multiselect.css" rel="stylesheet">
+<link href="css/jquery/jquery.jqplot.min.css" rel="stylesheet">
 <!-- CSS specific to Fuel UX -->
-<link href="css/fuelux.css" rel="stylesheet" />
+<link href="css/bootstrap/fuelux.css" rel="stylesheet" />
 <!-- Google Fonts -->
 <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
 <!-- App -->

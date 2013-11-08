@@ -292,7 +292,6 @@
 
         </div>
         <%@include file="footer.jsp" %>
-        <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             createScheduleLoad = function() {                
                 //Initialize variables
