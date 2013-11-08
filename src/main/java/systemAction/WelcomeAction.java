@@ -13,6 +13,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.DatatypeConverter;
 import manager.SettingsManager;
 import manager.TermManager;
 import manager.UserManager;
@@ -29,6 +30,7 @@ import util.MiscUtil;
 public class WelcomeAction extends ActionSupport implements ServletRequestAware {
 
     private long selectedTermId;   //To get the active term id user chooses
+	private String t;
     private ArrayList<HashMap<String, Object>> termData = new ArrayList<HashMap<String, Object>>();
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(WelcomeAction.class);
@@ -40,6 +42,10 @@ public class WelcomeAction extends ActionSupport implements ServletRequestAware 
             em = MiscUtil.getEntityManagerInstance();
 			em.getTransaction().begin();
             HttpSession session = request.getSession();
+			
+			if (t != null) {
+				selectedTermId = Long.parseLong(new String(DatatypeConverter.parseBase64Binary(t)));
+			}
 
 			//TERM MANAGEMENT
 			Term term = null;
@@ -107,6 +113,14 @@ public class WelcomeAction extends ActionSupport implements ServletRequestAware 
 
 	public void setTermData(ArrayList<HashMap<String, Object>> termData) {
 		this.termData = termData;
+	}
+	
+	public String getT() {
+		return t;
+	}
+
+	public void setT(String t) {
+		this.t = t;
 	}
 	
 }

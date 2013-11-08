@@ -476,7 +476,7 @@
 				});
 
 				$('.selectTermBtn').on('click', function(){
-					window.location = "welcome?selectedTermId=" + $(this).val();
+					window.location = "welcome?t=" + btoa($(this).val());
 					return false;
 				});
 				
