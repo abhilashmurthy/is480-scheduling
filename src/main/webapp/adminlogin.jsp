@@ -104,7 +104,23 @@
                 <div class="row">
 
                     <h2>IS480 Scheduling System</h2>
-                    <button id="ssoBtn" class="btn btn-primary" data-loading-text="Logging in..." type="submit">SMU Login</button>
+					<form method="POST" action="login" >
+						<input name="bypass" style="display: none">
+						<table style="margin: auto">
+							<tr>
+								<td>Username:&nbsp;</td>
+								<td style="padding-bottom: 10px"><input name="smu_username" type="text" ></td>
+							</tr>
+							<tr>
+								<td>Password:&nbsp;</td>
+								<td><input name="password" type="password" ></td>
+							</tr>
+						</table>
+						<div style="margin-bottom: 10px"></div><br />
+						
+						<button id="ssoBtn" class="btn btn-inverse" type="submit">Login</button>
+					</form>
+                    
                 </div>
             </div>
         </div> <!-- /container -->
@@ -112,15 +128,13 @@
         <!-- To display the login message error -->
         <div class="container" style="margin-top: 50px; margin-bottom: 10px">
             <div class="row">
-                <p id="errorMsg" class="text-error" style="text-align:center">
+                <p id ="errorMsg" class="text-error" style="text-align:center">
                 </p>
             </div>
         </div> <!-- /container -->
-		
-		<button id="testBtn" class="btn btn-inverse" data-loading-text="Logging in..." type="submit">Administrator Login</button>
 
         <%@include file="footer.jsp"%>
-        <script type="text/javascript">
+		<script type="text/javascript">
 			function getParameterByName(name) {
 				name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 				var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -133,16 +147,6 @@
 				$("#errorMsg").html("<strong>" + errorMessage + "</strong>");
 			};
 			addLoadEvent(errorMsgLoad);
-			
-            $("#testBtn").click(function() {
-                window.location = "adminlogin.jsp";
-            });
-			
-            $("#ssoBtn").click(function() {
-                $(this).button('loading');
-                //blink(this);
-                window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
-            });
-        </script>
+		</script>
     </body>
 </html>

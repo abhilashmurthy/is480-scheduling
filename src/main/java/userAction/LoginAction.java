@@ -6,7 +6,6 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -15,18 +14,19 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.EntityManager;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import manager.SettingsManager;
 import manager.UserManager;
+import model.Settings;
 import model.SystemActivityLog;
 import model.Term;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.CustomException;
 import util.MiscUtil;
 
 /**
@@ -37,6 +37,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 
     //Request and Response
     private HttpServletRequest request;
+	
+	//Stores the callback URL in case of an error
+	private String responseURL;
+
     private static Logger logger = LoggerFactory.getLogger(LoginAction.class);
     // sorted in alphabetical order. ordering is important
     // when generating the signature
@@ -82,6 +86,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
             em = MiscUtil.getEntityManagerInstance();
 			
 			if (request.getParameter("bypass") != null) { //BYPASS SSO LOGIN
+				//Validating password for bypass login
+				String password = request.getParameter("password");
+				Settings bypassPassword = SettingsManager.getByName(em, "bypassPassword");
+				if (password == null || !bypassPassword.getValue().equals(password)) throw new CustomException("Incorrect password. Please try again!");
+				
 				initializeUser(em);
 				User userForLog = (User) session.getAttribute("user");
 				logItem.setUser(userForLog);
@@ -145,9 +154,23 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 					logger.info("Client signature: " + generatedSignature);
 					logger.info("Server signature time * 1000: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(serverCal.getTime()));
 					logger.info("Client signature time * 1000: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(clientCal.getTime()));
+					throw new CustomException("SSO Login failed! Please contact the system administrator.");
 				}
 			} //END OF CODE FOR SSO
-        } catch (Exception e) {
+        } catch (CustomException e) {
+			User userForLog = (User) session.getAttribute("user");
+			if (userForLog != null) {
+				logItem.setUser(userForLog);
+			}
+			logItem.setMessage("Error: " + e.getMessage());
+			
+			//Construct callback URL
+			StringBuilder sb = new StringBuilder();
+			if (request.getParameter("bypass") != null) sb.append("admin");
+			sb.append("login.jsp").append("?error=").append(e.getMessage());
+			responseURL = sb.toString();
+			return ERROR;
+		} catch (Exception e) {
 			User userForLog = (User) session.getAttribute("user");
 			if (userForLog != null) {
 				logItem.setUser(userForLog);
@@ -176,8 +199,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         return SUCCESS;
     }
 	
-	private void initializeUser(EntityManager em) throws ServletException, IOException {
-		HttpSession session = request.getSession();
+	private void initializeUser(EntityManager em) throws Exception {
 		
 		//Check if user exists in our DB
 		String smuUsername = request.getParameter("smu_username");
@@ -185,8 +207,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 		if (smuFullName == null) smuFullName = smuUsername; 
 		//Getting the active term
 		Term activeTerm = SettingsManager.getDefaultTerm(em);
+		
+		HttpSession session = request.getSession();
 		session.setAttribute("currentActiveTerm", activeTerm);
-		new UserManager().initializeUser(em, session, smuUsername, smuFullName, activeTerm);
+		UserManager.initializeUser(em, session, smuUsername, smuFullName, activeTerm);
 		MiscUtil.logActivity(logger, smuUsername, null, "Logged in");
 	}
 	
@@ -198,4 +222,12 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         this.request = request;
     }
 
+	public String getResponseURL() {
+		return responseURL;
+	}
+
+	public void setResponseURL(String responseURL) {
+		this.responseURL = responseURL;
+	}
+	
 } //end of class
