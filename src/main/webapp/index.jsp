@@ -2022,7 +2022,7 @@
 					});
 					
 					function showMyTeamsModal() {
-						var bookedTeamsPie = {"Booked Teams": 0, "Unbooked Teams": 0};
+						var bookedTeamsPie = {"Teams with Bookings": 0, "Teams without Bookings": 0};
 						bootbox.alert({
 							title: <%=activeRole.equals(Role.FACULTY)%>?'My Teams' : 'Teams',
 							message: function() {
@@ -2054,7 +2054,7 @@
 															:$(document.createElement('i')).addClass('fa fa-check').css('color', '#A9DBA9'));
 												}
 											}
-											if ($milestoneBooking.is('.fa-times')) bookedTeamsPie["Unbooked Teams"]++; else bookedTeamsPie["Booked Teams"]++;
+											if ($milestoneBooking.is('.fa-times')) bookedTeamsPie["Teams without Bookings"]++; else bookedTeamsPie["Teams with Bookings"]++;
 											$trs.push(
 												$(document.createElement('tr'))
 													.append(
