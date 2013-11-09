@@ -28,7 +28,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTeam().getTeamName() + " - Booking Rejected";
+		return generateBookingSubjectTitle(b, "Booking rejected for ");
 	}
 
 	@Override
