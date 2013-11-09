@@ -28,7 +28,7 @@ public class FacultyReminderEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return "[Reminder] " + b.getTeam().getTeamName();
+		return generateBookingSubjectTitle(b, "[Reminder] Approval required for ");
 	}
 
 	@Override
