@@ -32,7 +32,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTeam().getTeamName() + " - Booking Deleted";
+		return generateBookingSubjectTitle(b, "Booking deleted for ");
 	}
 
 	@Override

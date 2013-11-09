@@ -79,6 +79,10 @@ public abstract class EmailTemplate {
 		return body;
 	}
 	
+	public String generateBookingSubjectTitle(Booking b, String content) {
+		return content + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
+	}
+	
 	/**
 	 * Injects standard booking information. Covers the following tags:
 	 * [TEAM_NAME], [MILESTONE], [DATE], [START_TIME], [END_TIME]

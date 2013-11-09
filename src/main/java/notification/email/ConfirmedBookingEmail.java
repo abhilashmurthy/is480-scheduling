@@ -29,7 +29,7 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return "Booking confirmed for " + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
+		return generateBookingSubjectTitle(b, "Booking confirmed for ");
 	}
 
 	@Override

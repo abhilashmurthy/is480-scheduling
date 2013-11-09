@@ -45,7 +45,7 @@
                         <table class="w640" style="margin:0 10px;" width="640" cellpadding="0" cellspacing="0" border="0">
                             <tbody><tr><td class="w640" width="640" height="20">&nbsp</td></tr>
                                 <tr>
-                                    <td id="header" class="w640" width="640" align="center" bgcolor="#049cdb">
+                                    <td id="header" class="w640" width="640" align="center" bgcolor="#D13D3D">
                                         <table class="w640" width="640" cellpadding="0" cellspacing="0" border="0">
                                             <tbody>
                                             <td class="w580" width="580" height="75">
@@ -68,8 +68,8 @@
                                                                                                 <td class="w580" width="580" align="left">
                                                                                                     <h3>Booking Deleted</h3>
                                                                                                     <div align="left">
-																										Team [TEAM_NAME]'s booking for their [MILESTONE] presentation has been deleted by [DELETOR_NAME]: [DELETOR_COMMENT]<br>
-																										<p> [TEAM_NAME], please click <a href="http://202.161.45.167/is480-scheduling/">here</a> to create a new booking.</p>
+																										Team [TEAM_NAME]'s booking for their [MILESTONE] presentation has been deleted by [DELETOR_NAME]: <i>"[DELETOR_COMMENT]"</i><br /><br />
+																										<p>[TEAM_NAME], please click <a href="http://202.161.45.167/is480-scheduling/">here</a> to create a new booking.</p>
                                                                                                 <u>Presentation Details:</u>
                                                                                                 <table>
                                                                                                     <tr align="left">
@@ -100,9 +100,14 @@
                                                                                                         <td><strong>Required Attendees:</strong></td>
                                                                                                         <td>[REQUIRED_ATTENDEES]</td>
                                                                                                     </tr>
+																									<tr align="left">
+																										<td><strong>Optional Attendees:</strong></td>
+																										<td>[OPTIONAL_ATTENDEES]</td>
+																									</tr>
                                                                                                 </table>
                                                                                                 <br>
-                                                                                                This is a system generated e-mail. Please do not reply.<br><br>
+																								<hr>
+																								<span style="font-size: 13px;">This is a system generated e-mail. Please do not reply.</span>
                                                                                             </div>
                                                                                         </td>
                                                                                     </tr>
