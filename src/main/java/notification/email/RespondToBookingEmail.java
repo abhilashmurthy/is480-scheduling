@@ -27,7 +27,7 @@ public class RespondToBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return "[Action] " + b.getTeam().getTeamName() + " - Approve Booking";
+		return "Approval required for " + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
 	}
 
 	@Override
