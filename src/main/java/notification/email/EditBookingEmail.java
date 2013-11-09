@@ -33,7 +33,7 @@ public class EditBookingEmail extends EmailTemplate {
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTeam().getTeamName() + " - Booking Updated";
+		return generateBookingSubjectTitle(b, "Booking updated for ");
 	}
 
 	@Override
