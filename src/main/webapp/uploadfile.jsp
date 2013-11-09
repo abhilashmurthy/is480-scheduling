@@ -26,6 +26,7 @@
 		 
         <div class="container">
 			<h3>CSV Upload</h3>
+			<br/>
 			<form id="uploadForm" enctype="multipart/form-data" action="uploadFileToBackend" method="POST">
 			<%--<s:form action="uploadFileToBackend" method="post" enctype="multipart/form-data">--%>
 			<div style="float: left; margin-right: 50px;">
@@ -36,7 +37,7 @@
 				<tbody>
 					<tr>
 						<td>
-						<select id="termChosen" name="termChosen" style="width:170px">
+						<select id="termChosen" name="termChosen" style="width:200px">
 							<option value=""></option>
 							<s:iterator value="dataList">
 								<option value="<s:property value="termId"/>">
@@ -103,7 +104,6 @@
         </div>
 		
 		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="js/plugins/jquery.ajaxfileupload.js"></script>
 		<script type="text/javascript">
 //			$(document).ready(function(){
 		uploadFileLoad = function () {
@@ -295,7 +295,7 @@
 			}
 			};
 			
-			addLoadEvent(uploadFileLoad());
+			addLoadEvent(uploadFileLoad);
 		</script>
     </body>
 </html>

@@ -13,11 +13,19 @@
         <global-results>
             <result name="error">/error.jsp</result>
         </global-results>
+		
+        <action name="welcome" class="systemAction.WelcomeAction" method="execute">
+            <result name="success">/login.jsp</result>
+        </action>
+		
+		<!-- NORMAL USER LOGIN ACTION -->
         <action name="login" class="userAction.LoginAction" method="execute">
             <result name="success" type="redirect">
                 <param name="location">/index</param>
             </result>
-            <!--<result name="goToRoles">/multipleroles.jsp</result>-->
+			<result name="error" type="redirect">
+                <param name="location">/${responseURL}</param>
+            </result>
         </action>
 		
 		<action name="setRole" class="userAction.SetRolesAction" method="execute">
@@ -68,6 +76,14 @@
             <result name="success">/milestoneconfig.jsp</result>
         </action>
 		
+		<action name="users" class="systemAction.PrepareManageUsersAction" method="execute">
+            <result name="success">/manageusers.jsp</result>
+        </action>
+		
+		<action name="restoreDB" class="systemAction.PrepareRestoreDBAction" method="execute">
+            <result name="success">/restoreDB.jsp</result>
+        </action>
+		
         <action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
             <result name="success">/schedule.jsp</result>
         </action>
@@ -76,7 +92,7 @@
             <result name="success">/bookinghistory.jsp</result>
         </action>
 		
-		<action name="mySubscriptions" class="userAction.ViewSubscriptionsAction" method="execute">
+		<action name="mySubscriptions" class="userAction.ViewSubscribedBookingsAction" method="execute">
             <result name="success">/mysubscriptions.jsp</result>
         </action>
 		
@@ -92,7 +108,7 @@
             <result name="success">/userpreferences.jsp</result>
         </action>
 		
-		<action name="taAvailability" method="execute">
+		<action name="taAvailability" class="systemAction.PrepareTASignupAction" method="execute">
 			<result>/tasignup.jsp</result>
 		</action>
 		
@@ -106,6 +122,10 @@
 		
 		<action name="uploadFile" class="systemAction.GetTermsAction" method="execute">
             <result name="success">/uploadfile.jsp</result>
+        </action>
+		
+		<action name="viewGenerateReport" class="systemAction.GetTermsAction" method="execute">
+            <result name="success">/reportgeneration.jsp</result>
         </action>
 		
 		<action name="uploadFileToBackend" class="userAction.UploadFileAction" method="execute">
@@ -169,17 +189,11 @@
                 <param name="root">json</param>
             </result>
         </action>
-        <action name="updateTermJson" class="userAction.UpdateTermAction" method="execute">
-            <result type="json">
-                <param name="root">json</param>
-            </result>
-        </action>
         <action name="updateScheduleJson" class="userAction.UpdateScheduleAction" method="execute">
             <result type="json">
                 <param name="root">json</param>
             </result>
         </action>
-        
         <action name="updateTimeslotsJson" class="userAction.UpdateTimeslotsAction" method="execute">
             <result type="json">
                 <param name="root">json</param>
@@ -245,7 +259,7 @@
             </result>
         </action>
 		
-		<action name="restoreDatabase" class="userAction.RestoreDatabaseAction" method="execute">
+		<action name="restoreSQLDump" class="userAction.RestoreDatabaseAction" method="execute">
 			<result type="json">
                 <param name="root">json</param>
             </result>
@@ -255,6 +269,36 @@
             <result type="json">
 				  <param name="root">json</param>
 			</result>
+        </action>
+		
+		<action name="getSubscribedUsers" class="userAction.GetSubscribedUsersAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
+		<action name="manageUser" class="userAction.ManageUserAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
+		<action name="manageTeam" class="userAction.ManageTeamAction" method="execute">
+            <result type="json">
+				  <param name="root">json</param>
+			</result>
+        </action>
+		
+		<action name="viewScheduleReport" class="userAction.ViewScheduleReportAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+		
+		<action name="generateLoggingReport" class="userAction.GenerateLoggingReportAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
         </action>
 		
 	</package>

@@ -24,14 +24,12 @@
 			IS480 Scheduling System | My Bookings
 		<% } %>
 		</title>
-		<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
-		<link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
 		<div class="container">
 		<!-- TERM SELECTION DROP DOWN -->
-		<div style="float:right; margin-top:20px">
+<!--		<div style="float:right; margin-top:20px">
 			<form action="bookingHistory" method="post">
 				Select Term: <select name="chosenTermId" onchange="this.form.submit()">
 					<option value='<%= ((Term)session.getAttribute("currentActiveTerm")).getId() %>'><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
@@ -40,17 +38,37 @@
 					</s:iterator>
 				</select>
 			</form>
-		</div>
+		</div>-->
 		<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)){ %>
-			<h3 style="float: left; margin-right: 50px;">All Bookings</h3> 
+			<h3 style="float: left; margin-right: 25px;">All Bookings</h3> 
 		<% } else if (activeR.equals(Role.TA)) { %>
-			<h3 style="float: left; margin-right: 50px;">My Sign Ups</h3> 
+			<h3 style="float: left; margin-right: 25px;">My Sign Ups</h3> 
 		<% } else { %>
-			<h3 style="float: left; margin-right: 50px;">My Bookings</h3> 
+			<h3 style="float: left; margin-right: 25px;">My Bookings</h3> 
 		<% } %>
+		
+		<div style="float:left; margin-top:16px" class="btn-group">
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#" >
+				<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+				<form action="bookingHistory" method="post">
+					<!--<select name="termId" style="float:right" onchange="this.form.submit()">--> 
+						<s:iterator value="termData">
+							<li>
+								<button type="submit" class="btn btn-link" name="chosenTermId" value="<s:property value="termId"/>">
+									<s:property value="termName"/>
+								</button>
+							</li>
+						</s:iterator>
+					<!--</select>-->
+				</form>
+			</ul>
+		</div>
+			
 		<s:if test="%{data != null && data.size() > 0}">
-			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA)) { %>
-			<div style="float:right; clear:both ;margin-bottom:16px">
+			<% if (!activeRole.equals(Role.STUDENT) && !activeRole.equals(Role.TA) && !activeRole.equals(Role.FACULTY)) { %>
+			<div style="float:right; margin-top:16px; margin-bottom:30px">
 				<input type="hidden" id="dropdownValues"/>
 				Hide/Show Columns:
 				<!--<a rel="tooltip" data-placement="bottom" title="Press Ctrl to select / deselect columns">-->
@@ -72,11 +90,14 @@
 					<% if (!activeRole.equals(Role.TA)) { %>
 						<option value="6">Booking Status</option>
 					<% } %>
-					<% if (!activeRole.equals(Role.TA)) { %>
-						<option value="7">Reason for Rejection</option>
+					<% if (!activeRole.equals(Role.TA) && !activeRole.equals(Role.FACULTY)) { %>
+						<option value="7">People Attending</option>
 					<% } %>
 					<% if (!activeRole.equals(Role.TA)) { %>
-						<option value="8">Last Modified</option>
+						<option value="8">Comment</option>
+					<% } %>
+					<% if (!activeRole.equals(Role.TA)) { %>
+						<option value="9">Last Modified</option>
 					<% } %>
 				</select>
 				<!--</a>-->
@@ -87,7 +108,12 @@
 				<thead>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.ADMINISTRATOR) 
 							|| activeRole.equals(Role.COURSE_COORDINATOR)) { %>
-						<tr>
+							<% if (activeRole.equals(Role.STUDENT)) { %>
+								<br/>
+								<tr>
+							<% } else { %>
+								<tr>
+							<% } %>
 							<!--<th>#</th>-->
 							<% if (!activeRole.equals(Role.STUDENT)) { %>
 							<th>
@@ -99,10 +125,12 @@
 							<th>Venue</th>
 							<th>Response</th>
 							<th>Booking Status</th>
-							<th>Reason for Rejection</th>
+							<th style="width:50px; text-align:center">People Attending</th>
+							<th style="text-align:center">Comment</th>
 							<th>Last Modified</th>
 						</tr>
 					<% } else if (activeRole.equals(Role.FACULTY)) { %>
+						<br/>
 						<tr>
 							<!--<th>#</th>-->
 							<th>Team</th>
@@ -111,10 +139,11 @@
 							<th>Venue</th>
 							<th>My Response</th>
 							<th>Booking Status</th>
-							<th>Reason for Rejection</th>
+							<th style="text-align:center">Comment</th>
 							<th>Last Modified</th>
 						</tr>
 					<% } else { %>
+						<br/>
 						<tr>
 							<!--For TA's-->
 							<th>Team</th>
@@ -146,7 +175,7 @@
 									<td><s:property value="teamName"/></td>
 								<% } %>
 								<td><s:property value="milestone"/></td>
-								<td><s:property value="date"/> <s:property value="time"/></td>
+								<td style="width:110px"><s:property value="date"/> <br/> <s:property value="time"/></td>
 								<td><s:property value="venue"/></td>
 								<td>
 								<% int countRows = 0; %>
@@ -158,10 +187,29 @@
 									<br/>
 								<% } %>
 								</td>
-								<td><s:property value="overallBookingStatus"/></td>
-								<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td style="width:200px"><s:property value="rejectReason"/></td>
-								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+								<td style="width:70px"><s:property value="overallBookingStatus"/></td>
+								<td style="width:50px; text-align:center">
+									<s:if test="%{noOfSubscribers > 0}">
+										<button type="submit" class="getSubscribersBtn btn btn-link" value="<s:property value="bookingId"/>">
+											<s:property value="noOfSubscribers"/>
+										</button>
+									</s:if><s:else>
+										-
+									</s:else>
+									<div class="hiddenUsersList" style="display:none">
+										<s:iterator value="subscribedUsers">
+											<s:property value="username"/> <br/>
+										</s:iterator>
+									</div>
+								</td>
+								<td style="width:170px;">
+									<s:if test="%{comment.length() > 0}">
+										<s:property value="comment"/>
+									</s:if><s:else>
+										<div style="text-align:center">-</div>
+									</s:else>	
+								</td>
+								<td style="width:140px"><s:property value="lastModifiedAt"/> by
 									<s:property value="lastModifiedBy"/></td>
 								<%--</s:if><s:else>--%>
 									<!--<td>-</td>-->
@@ -184,15 +232,20 @@
 							<%--<td><%= count %></td>--%>
 							<td><s:property value="teamName"/></td>
 							<td><s:property value="milestone"/></td>
-							<td><s:property value="date"/> <s:property value="time"/></td>
+							<td><s:property value="date"/> <br/> <s:property value="time"/></td>
 							<td><s:property value="venue"/></td>
-							<td><s:property value="myStatus"/></td>
-							<td>
+							<td style="width:110px"><s:property value="myStatus"/></td>
+							<td style="width:130px">
 								<s:property value="overallBookingStatus"/><br/><br/>
 							</td>
-							<%--<s:if test="%{rejectReason != null)}">--%> 
-								<td style="width:200px"><s:property value="rejectReason"/></td>
-								<td style="width:200px"><s:property value="lastModifiedAt"/> by
+								<td style="width:200px">
+									<s:if test="%{comment.length() > 0}">
+										<s:property value="comment"/>
+									</s:if><s:else>
+										<div style="text-align:center">-</div>
+									</s:else>	
+								</td>
+								<td style="width:150px"><s:property value="lastModifiedAt"/> by
 									<s:property value="lastModifiedBy"/></td>
 							<%--</s:if><s:else>--%>
 								<!--<td>-</td>-->
@@ -233,11 +286,27 @@
 			</div>
 		</s:else>
 		</div>
+			
+			<div class="modal hide fade in" id="subscribersModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" 
+				 style="width:450px" aria-hidden="true">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<% if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
+						<h4 id="myModalLabel">This presentation will be attended by:</h4>
+					<% } else { %>
+						<h4 id="myModalLabel">Your presentation will be attended by:</h4>
+					<% } %>
+				</div>
+				<div class="modal-body">
+					<div id="sUsersList"></div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+				</div>
+			</div>
 		</div>
 		
 		<%@include file="footer.jsp"%>
-		<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
-		<script type="text/javascript" src="js/plugins/bootstrap-multiselect.js"></script>
 		<script type="text/javascript">
 		//For data tables
 		$(document).ready(function(){
@@ -264,7 +333,7 @@
 					if (selectedValues.length > 1) {
 						console.log("Multiple values: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=8; i++) {
+							for (var i=1; i<=9; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');
@@ -276,7 +345,7 @@
 					} else {
 						console.log("Single value: " + selectedValues);
 						if (selectedValues[0] === "0") {
-							for (var i=1; i<=8; i++) {
+							for (var i=1; i<=9; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
 							}
 							$('#hideColumns option').attr('selected', 'selected');
@@ -290,13 +359,13 @@
 			}); //end of function
 		
 			var role = '<%= (Role) session.getAttribute("activeRole") %>';
-			if (role === "STUDENT") {
+			if (role === "STUDENT" || role === "TA") {
 				$('#bookingHistoryTable').dataTable({
 					"aLengthMenu": [
-						[10, 25, 50, 100, -1],[10, 25, 50, 100, "All"]], 
+						[5, 10, -1],[5, 10, "All"]], 
 					"iDisplayLength" : -1,
 	//				"bPaginate": false,
-					"bLengthChange": false,
+//					"bLengthChange": false,
 	//				"bFilter": false,
 	//				"bSort": false,
 					"bInfo": false,
@@ -366,16 +435,42 @@
 		$(document).on('mouseleave','[rel=tooltip]', function(){
 			$(this).tooltip('hide');
 		});
-//		$("#teamHide").click(function() {
-////                $('td:nth-child(2)').hide();
-//			 // if your table has header(th), use this
-//			 var thisCheck = $(this);
-//			 if (thisCheck.is (':checked')) {
-//				 $('td:nth-child(1),th:nth-child(1)').hide();
-//			 } else {
-//				 $('td:nth-child(1),th:nth-child(1)').show();
-//			 }
-//		 });
+		
+		//To display the subscribed users in a modal
+		$('.getSubscribersBtn').on('click', function(e){
+			var usersList = $(this).parent().children('.hiddenUsersList').html();
+			$('#sUsersList').html(usersList);
+			$('#subscribersModal').modal({
+				keyboard: true
+			});
+			$('#subscribersModal').modal('show');
+			return false;
+//			var bookingId = $(this).attr("value");
+////			var $this = $(this);
+//			console.log('Submitting: ' + JSON.stringify({bookingId: bookingId}));
+//			$.ajax({
+//				type: 'POST',
+//				async: false,
+//				url: 'getSubscribedUsers',
+//				data: {jsonData: JSON.stringify({bookingId: bookingId})}
+//			}).success(function(response) {
+//				console.log('Got ' + response.data);
+//				var result = response.data;
+//				var userObj = "";
+//				for(var count = 0; count < result.length; count++) {
+//					userObj += result[count] + "<br/>";
+//				}
+//				console.log(userObj);
+//				$('#sUsersList').html(userObj);
+//				$('#subscribersModal').modal({
+//					keyboard: true
+//				});
+//				$('#subscribersModal').modal('show');
+//			}).fail(function(error) {
+//				showNotification("WARNING", "Oops.. something went wrong");
+//			});
+//			return false;
+		});
 		</script>
     </body>
 </html>

@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
@@ -139,7 +140,9 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         boolean isMyTeam = false; //Variable to track if the booking belongs to the faculty member logged in
                         Date startDate = new Date(t.getStartTime().getTime());
                         Date endDate = new Date(t.getEndTime().getTime());
+						map.put("bookingId", b.getId());
                         map.put("team", b.getTeam().getTeamName());
+						map.put("wiki", b.getTeam().getWiki());
 
                         //View start date (DDD, dd MMM YYYY)
                         map.put("startDate", viewDateFormat.format(startDate));
@@ -185,14 +188,18 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                             optionalMap.put("name", optionalAttendee);
                             optionals.add(optionalMap);
                         }
+						
+						//Adding the subscribe users
+						Set<String> subscribedUsers = new HashSet<String>();
+						for (User s : b.getSubscribedUsers()) {
+							subscribedUsers.add(s.getUsername() + "@smu.edu.sg");
+						}
 
                         //Setting the list of attendees
                         map.put("students", students);
                         map.put("faculties", faculties);
                         map.put("optionals", optionals);
-
-                        String teamWiki = "-";
-                        map.put("teamWiki", teamWiki);
+						map.put("subscribedUsers", subscribedUsers);
                         if (user.getRole() == Role.FACULTY) {
                             map.put("isMyTeam", isMyTeam);
                         }
@@ -208,41 +215,42 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
 
                     if (user.getRole() == Role.STUDENT) {
                         Team team = student.getTeam();
-                        boolean available = true;
-                        ArrayList<String> unavailable = new ArrayList<String>();
+						boolean available = true;
+						ArrayList<String> unavailable = new ArrayList<String>();
+						if (team != null) {							
+							Milestone m = activeSchedule.getMilestone();
+							ArrayList<String> requiredAttendees = m.getRequiredAttendees();
+							for (String roleName : requiredAttendees) {
+								Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
+								Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
+								if (roleUser.getUnavailableTimeslots().contains(t)) {
+									available = false;
+									unavailable.add(roleUser.getFullName());
+								}
+							}
 
-                        Milestone m = activeSchedule.getMilestone();
-						ArrayList<String> requiredAttendees = m.getRequiredAttendees();
-						for (String roleName : requiredAttendees) {
-							Method roleGetter = Team.class.getDeclaredMethod("get" + roleName, null);
-							Faculty roleUser = (Faculty) roleGetter.invoke(team, null);
-							if (roleUser.getUnavailableTimeslots().contains(t)) {
-                                available = false;
-                                unavailable.add(roleUser.getFullName());
-                            }
+							//Get latest previous booking for the current schedule
+							Query bookingsQuery = em.createQuery("select b from Booking b where b.timeslot = :timeslotId and b.team = :teamId and b.lastEditedAt = "
+														+ "(select MAX(c.lastEditedAt) from Booking c where c.team = :teamId and (c.bookingStatus = :deletedBookingStatus or c.bookingStatus = :rejectedBookingStatus) and c.timeslot.schedule = :scheduleId)")
+														.setParameter("timeslotId", t)
+														.setParameter("teamId", team)
+														.setParameter("deletedBookingStatus", BookingStatus.DELETED)
+														.setParameter("rejectedBookingStatus", BookingStatus.REJECTED)
+														.setParameter("scheduleId", t.getSchedule())
+														.setMaxResults(1);
+							try {
+								Booking lastBooking = (Booking) bookingsQuery.getSingleResult();
+								//Add only the single last booking
+								map.put("lastBookingWasRemoved", true);
+								map.put("lastBookingStatus", lastBooking.getBookingStatus().toString().toLowerCase());
+								map.put("lastBookingEditedBy", lastBooking.getLastEditedBy());
+								map.put("lastBookingComment", lastBooking.getComment());
+							} catch (NoResultException n) {
+								//This is normal, there was no old booking found
+							}
 						}
-                        map.put("available", available);
-                        map.put("unavailable", unavailable);
-                        
-                        //Get latest previous booking for the current schedule
-                        Query bookingsQuery = em.createQuery("select b from Booking b where b.timeslot = :timeslotId and b.team = :teamId and b.lastEditedAt = "
-                                                    + "(select MAX(c.lastEditedAt) from Booking c where c.team = :teamId and (c.bookingStatus = :deletedBookingStatus or c.bookingStatus = :rejectedBookingStatus) and c.timeslot.schedule = :scheduleId)")
-                                                    .setParameter("timeslotId", t)
-                                                    .setParameter("teamId", team)
-                                                    .setParameter("deletedBookingStatus", BookingStatus.DELETED)
-                                                    .setParameter("rejectedBookingStatus", BookingStatus.REJECTED)
-                                                    .setParameter("scheduleId", t.getSchedule())
-                                                    .setMaxResults(1);
-                        try {
-                            Booking lastBooking = (Booking) bookingsQuery.getSingleResult();
-                            //Add only the single last booking
-                            map.put("lastBookingWasRemoved", true);
-                            map.put("lastBookingEditedBy", lastBooking.getLastEditedBy());
-                            map.put("lastBookingRejectReason", lastBooking.getRejectReason());
-                        } catch (NoResultException n) {
-                            //This is normal, there was no old booking found
-                        }
-                        
+						map.put("available", available);
+						map.put("unavailable", unavailable);
                     }
 
                     //Miscellaneous Role specific information
@@ -252,7 +260,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                             available = false;
                         }
                         map.put("available", available);
-                    } else if (user.getRole() == Role.TA && t.getTA() != null) {
+                    } else if (t.getTA() != null) {
                         map.put("taId", t.getTA().getId());
                     }
                     

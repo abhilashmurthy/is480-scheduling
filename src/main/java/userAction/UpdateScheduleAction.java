@@ -20,10 +20,13 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import manager.TimeslotManager;
 import model.Schedule;
+import model.SystemActivityLog;
 import model.Term;
 import model.Timeslot;
+import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +46,18 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Schedule: Update");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             json.put("exception", false);
@@ -77,9 +92,10 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 			
             ArrayList<HashMap<String, Object>> scheduleList = new ArrayList<HashMap<String, Object>>();
 			ArrayList<Schedule> updatedSchedules = new ArrayList<Schedule>();
+			Schedule updatedSch = null;
 			for (int i = 0; i < scheduleData.length(); i++) {
 				JSONObject schData = scheduleData.getJSONObject(i);
-				Schedule updatedSch = em.find(Schedule.class, schData.getLong("scheduleId"));
+				updatedSch = em.find(Schedule.class, schData.getLong("scheduleId"));
 				if (updatedSch == null) {
 					logger.error("Schedule with ID: " + schData.getLong("scheduleId") + " not found.");
 					json.put("message", "Oops! Something went wrong");
@@ -225,7 +241,15 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
 			em.getTransaction().commit();
 			json.put("schedules", scheduleList);
 			json.put("success", true);
+			
+			logItem.setMessage("Schedule was updated successfully for " + updatedSch.toString());
+			
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getClass().getName() + " " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -235,12 +259,15 @@ public class UpdateScheduleAction extends ActionSupport implements ServletReques
             json.put("success", false);
             json.put("message", "Error with UpdateSchedule: Escalate to developers!");
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+            if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
         return SUCCESS;
     }

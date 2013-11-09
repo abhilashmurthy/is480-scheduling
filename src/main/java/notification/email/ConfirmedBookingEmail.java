@@ -4,13 +4,12 @@
  */
 package notification.email;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
+import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
 import model.User;
@@ -30,7 +29,7 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Booking Confirmed";
+		return b.getTeam().getTeamName() + " - Booking Confirmed";
 	}
 
 	@Override
@@ -71,6 +70,16 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 	public HashMap<String, String> prepareBodyData() {
 		HashMap<String, String> map = new HashMap<String, String>();
 		return generateStandardDetails(b, map);
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }

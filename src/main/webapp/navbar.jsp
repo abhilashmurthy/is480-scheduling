@@ -40,17 +40,12 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
             <a class="brand" href="index">IS480 Scheduling</a>
             <div class="nav-collapse collapse">
                 <ul class="nav navbar-nav">
 				<%  if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<li class="dropdown">
-							<a href="#" id="scheduleDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Schedule</b><b class="caret" style="border-bottom-color: white; border-top-color: white"></b></a>
+							<a href="#" id="scheduleDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Schedule</b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href="newSchedule">Create Schedule</a></li>-->
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="createSchedule">Create Schedule</a></li>
@@ -58,21 +53,21 @@
 							</ul>
 						</li>
 						<li class="dropdown">
-							<a href="#" id="adminConfigDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Admin Config</b><b class="caret" style="border-bottom-color: white; border-top-color: white"></b></a>
+							<a href="#" id="adminConfigDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Admin Config</b></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Manage Terms</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">CSV Upload</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getNotificationSettings">Manage Reminder Settings</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewGenerateReport">Generate Reports</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="restoreDB">Database Restore</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>All Bookings</b></a></li>
-						<%  if (activeRole.equals(Role.ADMINISTRATOR)) { %>
-							<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>
-						<% } %>
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
+						<li id="users"><a href="users" class="navbar-title"><b>Users</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<!--<li class="dropdown">   
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
@@ -82,8 +77,8 @@
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Bookings</b></a></li>
 						<li id="bookingHistory"><a href="yourAvailability" class="navbar-title"><b>My Availability</b></a></li>
-						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
+						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.STUDENT)) { %>
 <!--						<li class="dropdown">
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
@@ -91,15 +86,15 @@
 							<!--</ul>-->
 						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Bookings</b></a></li>
-						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
+						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.TA)) { %>	
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Filming Sign Ups</b></a></li>
 						<li id="bookingHistory"><a href="taAvailability" class="navbar-title"><b>Sign Up for Filming!</b></a></li>
-						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="icon-question-sign icon-white"></i>&nbsp;<b>Help</b></a></li>
+						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
+						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.GUEST)) { %>
-						<!--<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My Subscriptions</b></a></li>-->
+						<!--<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>-->
 				<% } %>
 				</ul>
 			</div>
@@ -107,7 +102,7 @@
 				<!-- To display the user information -->
 				<li id="userInfo">
 					<a class='navbar-username'>
-					<i class="icon-user icon-white icon-large"></i>&nbsp;<% out.print(user.getFullName());%>
+					<i class="fa fa-user fa-white fa-large"></i>&nbsp;<% out.print(user.getFullName());%>
 					&nbsp;-&nbsp;
 					<%= activeRole.getDisplayName() %>
 					</a>	
@@ -116,12 +111,12 @@
 				<!-- To display the settings menu -->
 				<li class="dropdown">
 					<a class="dropdown-toggle navbar-title" data-toggle="dropdown" href="#">
-						<i class="icon-cogs icon-large"></i>
+						<i class="fa fa-cogs fa-large"></i>
 					</a>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu">
 						<%  if (!userRoles.isEmpty()) { %>
 						<li class="dropdown-submenu">
-							<a tabindex="-1" href="#"><i class="icon-user"></i>&nbsp&nbsp;Switch Role:</a>
+							<a tabindex="-1" href="#"><i class="fa fa-user"></i>&nbsp&nbsp;Switch Role:</a>
 							<ul class="dropdown-menu">
 							<form id="myform" action="setRole" method="post">
 								<% for (User u : userRoles) { %>
@@ -134,9 +129,9 @@
 						</li>
 						<% } %>
 						<% if (activeRole != Role.GUEST) { %>	
-						<li><a tabindex="-1" href="getUserPreferences"><i class="icon-wrench"></i>&nbsp;Manage settings</a></li>
+						<li><a tabindex="-1" href="getUserPreferences"><i class="fa fa-wrench"></i>&nbsp;Manage settings</a></li>
 						<% } %>
-						<li><a id="logoutLink" tabindex="-1" href="#"><i class="icon-off"></i>&nbsp;Logout</a></li>
+						<li><a id="logoutLink" tabindex="-1" href="#"><i class="fa fa-power-off"></i>&nbsp;Logout</a></li>
 					</ul>
 				</li>
 			</ul>
@@ -151,25 +146,6 @@
         
         //Dropdown menu from bootstrap
         $(".dropdown-toggle").dropdown();
-        
-        //Dashboard popover
-//        $('#userDashboard').on('click', function(e) {
-//            e.stopPropagation();
-//            if ($(".userbox").hasClass('open')) {
-//                $(".userbox").removeClass('open');
-//            }
-//            $(this).popover({
-//                container: '#userDashboard',
-//                placement: 'bottom',
-//                title: '<b>Your Information</b>',
-//                trigger: 'manual',
-//                html: true,
-//                content: function() {
-//                    return $('#userDashboardContent').html();
-//                }
-//            });
-//            $(this).popover('show');
-//        });
         
         //Logout link
         $("#logoutLink").on('click', function() {
@@ -187,7 +163,6 @@
         
         //Hide all popovers on page click
         $('body').on('click', function(e) {
-//			console.log('body clicked');
             //Hide all popovers
 			if ($(e.target).closest('.ui-datepicker').length || $(e.target).closest('.ui-timepicker-wrapper').length) return false;
             $('.popover.in').each(function(e){
@@ -200,7 +175,15 @@
             });
             //Hide all notifications
             $.pnotify_remove_all();
-        });    
+        });
+		
+		//Session timeout
+		$.sessionTimeout({
+			message: 'Your session is about to timeout',
+			warnAfter: 1080000,
+			redirAfter: 1140000,
+			logoutUrl: 'logout'
+		});
             
         
         //Disable Pines Notify Settings

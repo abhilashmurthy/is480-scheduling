@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
 import model.Booking;
+import model.SystemActivityLog;
 import model.Timeslot;
 import model.User;
 import model.role.Faculty;
@@ -54,6 +55,18 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Booking: Approve/Reject");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
         try {
 			em = MiscUtil.getEntityManagerInstance();
@@ -63,20 +76,19 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			//Status containing either approve or reject
 			String status = inputObject.getString("status");
 
-			String rejectReason = null;
+			String comment = null;
 			Response response = null;
 			if (status.equalsIgnoreCase("approve")) {
 				response = Response.APPROVED;
 			} else if (status.equalsIgnoreCase("reject")) {
 				response = Response.REJECTED;
 				//if status is rejected get the reson for rejection too (it could be blank)
-				rejectReason = inputObject.getString("rejectReason");
+				comment = inputObject.getString("comment");
 			} else {
 				logger.error("No valid response recorded from user");
 				return SUCCESS;
 			}
 
-			HttpSession session = request.getSession();
 			User user = (User) session.getAttribute("user");
 
 			//Getting the faculty object for the user. Cannot proceed if the user is not a faculty member.
@@ -98,6 +110,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				//Forcing initialization for sending email
 				Hibernate.initialize(booking.getTeam().getMembers());
 				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				Hibernate.initialize(booking.getRequiredAttendees());
 				
 				//Retrieving the status list of the timeslot
 				HashMap<User, Response> responseList = booking.getResponseList();
@@ -109,8 +122,8 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				}
 				
 				//Storing the reason for rejection
-				if (response == Response.REJECTED && rejectReason != null) {
-					booking.setRejectReason(rejectReason);
+				if (response == Response.REJECTED && comment != null) {
+					booking.setComment(comment);
 				}
 
 				//Computing the overall status of the booking based on the new response
@@ -142,7 +155,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
-//					scheduleSMSReminder(booking); //Scheduling SMS reminders to be sent exactly 24 hrs before the booking
+					BookingManager.scheduleSMSReminder(booking, em, request);
 				} else if (response == Response.APPROVED) {
 					ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(booking, user);
 					approvedEmail.sendEmail();
@@ -173,12 +186,19 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				}
 				
 				MiscUtil.logActivity(logger, user, booking.toString() + " " + response.toString());
+				
+				logItem.setMessage("Booking was " + response.toString() + " successfully for " + booking.toString());
 			} else {
 				request.setAttribute("error", "No timeslot selected!");
 				logger.error("User hasn't selected a timeslot to approve/reject!");
 				return SUCCESS;
 			}
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -189,8 +209,15 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			json.put("exception", true);
             json.put("message", "Error with UpdateBookingStatus: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
 		return SUCCESS;
     }

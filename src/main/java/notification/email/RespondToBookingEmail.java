@@ -4,10 +4,11 @@
  */
 package notification.email;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import manager.ICSFileManager;
 import model.Booking;
 import model.User;
 
@@ -26,7 +27,7 @@ public class RespondToBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Approve Booking";
+		return "[Action] " + b.getTeam().getTeamName() + " - Approve Booking";
 	}
 
 	@Override
@@ -51,6 +52,16 @@ public class RespondToBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateCCAddressList() {
 		return null;
+	}
+	
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }

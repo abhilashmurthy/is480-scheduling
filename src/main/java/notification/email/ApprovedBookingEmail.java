@@ -4,7 +4,7 @@
  */
 package notification.email;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +27,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Booking Approval";
+		return b.getTeam().getTeamName() + " - Booking Approved";
 	}
 
 	@Override
@@ -57,6 +57,16 @@ public class ApprovedBookingEmail extends EmailTemplate{
 		map.put("[APPROVER_NAME]", approver.getFullName());
 		
 		return map;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return null;
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return null;
 	}
 	
 }

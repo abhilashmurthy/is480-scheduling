@@ -34,20 +34,16 @@ public class Team implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String teamName;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	private String wiki;
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Faculty supervisor;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Faculty reviewer1;
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Faculty reviewer2;
-	@OneToMany(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
+	@OneToMany(mappedBy = "team")
 	private Set<Student> members = new HashSet<Student>();
 
 	public String getTeamName() {
@@ -56,6 +52,14 @@ public class Team implements Serializable {
 
 	public void setTeamName(String teamName) {
 		this.teamName = teamName;
+	}
+
+	public String getWiki() {
+		return wiki;
+	}
+
+	public void setWiki(String wiki) {
+		this.wiki = wiki;
 	}
 
 	public Term getTerm() {
@@ -119,7 +123,7 @@ public class Team implements Serializable {
 			return false;
 		}
 		Team other = (Team) object;
-		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+		if ((this.id == null && other.getId() != null) || (this.id != null && !this.id.equals(other.getId()))) {
 			return false;
 		}
 		return true;

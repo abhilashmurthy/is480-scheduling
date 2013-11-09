@@ -64,7 +64,7 @@ public class Booking implements Serializable {
             @JoinColumn(name = "user_id"))
 	private Set<User> subscribedUsers = new HashSet<User>();
 	
-    private String rejectReason;
+    private String comment;
     private String lastEditedBy;
     private Timestamp lastEditedAt;
 
@@ -124,12 +124,12 @@ public class Booking implements Serializable {
         this.requiredAttendees = attendees;
     }
 
-    public String getRejectReason() {
-        return rejectReason;
+    public String getComment() {
+        return comment;
     }
 
-    public void setRejectReason(String rejectReason) {
-        this.rejectReason = rejectReason;
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public BookingStatus getBookingStatus() {
@@ -177,7 +177,7 @@ public class Booking implements Serializable {
             return false;
         }
         Booking other = (Booking) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.getId() != null) || (this.id != null && !this.id.equals(other.getId()))) {
             return false;
         }
         return true;

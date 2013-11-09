@@ -87,6 +87,11 @@ public class GetTeamsAction extends ActionSupport implements ServletRequestAware
                 transaction.commit();
             } catch (Exception e) {
                 logger.error("Database Operation Error");
+				if (MiscUtil.DEV_MODE) {
+					for (StackTraceElement s : e.getStackTrace()) {
+						logger.debug(s.toString());
+					}
+				}
             }
             
             ArrayList<HashMap<String, Object>> teamJsonList = new ArrayList<HashMap<String, Object>>();

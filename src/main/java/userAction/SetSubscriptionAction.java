@@ -8,6 +8,8 @@ import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -17,6 +19,7 @@ import java.util.HashMap;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import model.Booking;
+import model.SystemActivityLog;
 import model.User;
 import org.json.JSONObject;
 import util.MiscUtil;
@@ -33,18 +36,29 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Subscription: Update");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
         try {
 			json.put("exception", false);
 			em = MiscUtil.getEntityManagerInstance();
-            HttpSession session = request.getSession();
 			User tempUser = (User) session.getAttribute("user");
 			User user = em.find(User.class, tempUser.getId());
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			//Need to change this for guests. Guests need to be users in our db before they can access any feature
-			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.GUEST)
-					|| activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.TA)) {
+			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.ADMINISTRATOR) 
+					|| activeRole.equals(Role.TA)) {
 				
 				//Getting input data from url
 				JSONObject subscribeObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
@@ -64,15 +78,18 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 						}
 					}
 					b.setSubscribedUsers(subscribedUsers);
-					json.put("message", "You have successfully unsubscribed!");
+					json.put("message", "You have successfully cancelled your RSVP!");
 				} else if (status.equalsIgnoreCase("Subscribe")) {
 					Set<User> subscribedUsers = b.getSubscribedUsers();
 					subscribedUsers.add(user);
 					b.setSubscribedUsers(subscribedUsers);
-					json.put("message", "You have successfully subscribed!");
+					json.put("message", "Your RSVP was successful!");
 				}
 				em.persist(b);
 				em.getTransaction().commit();
+				
+				logItem.setMessage("Subscription was updated successfully. "
+						+ status + " for " + b.toString());
 				
 				json.put("success", true);
 			} else {
@@ -81,6 +98,11 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 				return ERROR;
 			}
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -91,8 +113,15 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 			json.put("exception", true);
             json.put("message", "Error with SetSubscription: Escalate to developers!");
         } finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
 		return SUCCESS;
     }

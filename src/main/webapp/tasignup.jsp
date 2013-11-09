@@ -31,9 +31,16 @@
                 /*border-bottom: 1px solid black;*/
             }
 			
-			.timeslotsTable {
-				margin-top: 60px;
-				margin-left: 90px !important;
+			#timeslotsTableSection, #taStatisticsChart {
+				margin-top: 30px;
+				margin-left: 10px !important;
+			}
+			
+			#taStatisticsChart {
+				display: inline-block;
+				margin-left: 20px !important;
+				max-width: 100%;
+				height: 500px;
 			}
             
 			#milestoneTimeslotsSelect {
@@ -101,11 +108,6 @@
             .availabilityLegend {
 				float: right;
 				margin-right: 25%;
-/*                position: absolute;
-                left: 70%;
-                top: 12%;*/
-/*                left: 7%;
-                top: 35%;*/
             }
 			
 			.availabilityLegend td {
@@ -140,6 +142,18 @@
 			.dateHeader {
 				font-size: 15px;
 			}
+			
+			.taChartBtn {
+				margin-top: 30px;
+				margin-left: 10px;
+			}
+			
+			.clickableHelp {
+				font-size: 14px;
+				padding-bottom: 5px;
+				font-style: italic;
+			}
+			
         </style>
     </head>
     <body>
@@ -148,49 +162,47 @@
 
         <!-- Kick unauthorized user -->
         <%
-            if (activeRole != Role.TA) {
+            if (activeRole != Role.TA && activeRole != Role.ADMINISTRATOR) {
                 request.setAttribute("error", "You need to be a TA to view this page");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
             }
         %>
 
-        <!-- Edit Availability -->
-        <!-- Edit Availability -->
-        <div id="availabilityPanel" class="container">
-            <div id="editTimeslotsPanel">
-                <h3>My Sign Ups</h3>
+        <!-- Edit Sign ups -->
+        <div class="container">
+                <h3>TA Video Sign Up</h3>
 					<table class='availabilityLegend'>
-						<tr>
-							<!-- <td style="width:50px"><b>Legend:</b></td>-->
-							<td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td> 
-						</tr>
-						<tr>
-							<td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td> 
-						</tr>
-						<tr>
-							<td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td> 
-						</tr>
+						<% if (activeRole.equals(Role.TA)) { %>
+						<tr><td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available Slot</td></tr>
+						<tr><td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;You signed up</td></tr>
+						<tr><td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Unavailable Slot</td></tr>
+						<% } else { %>
+						<tr><td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;No TA</td></tr>
+						<tr><td style="background-color:#F9FCBD;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;TA Signed Up</td></tr>
+						<% } %>
 					</table>
-                <div id="timeslotsTableSection">
                     <table>
                         <tr>
                             <td>Milestone</td>
-                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button></td>
+                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <% if (activeRole.equals(Role.TA)) %> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button> <% ; %></td>
                         </tr>
 					</table>
-					<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
-                </div>
-                <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
-                <br/><br/>
-            </div>
+					<button class="taChartBtn btn btn-success" data-toggle="collapse" data-target="#taStatisticsAccordion">
+						TA Statistics
+					</button>
+					<div id="taStatisticsAccordion" class="accordion-body collapse">
+						<div class="accordion-inner">
+							<div id='taStatisticsChart' class="collapse"></div>
+						</div>
+					</div>
+					<div id="timeslotsTableSection">
+						<% if (activeRole.equals(Role.ADMINISTRATOR)) %> <div class="clickableHelp muted">Click on a timeslot to email TAs</div><% ; %>
+						<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
+					</div>
         </div>
 
         <%@include file="footer.jsp" %>
-        <!-- jshashset imports -->
-        <script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
-        <script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
-        <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             //Makes use of footer.jsp's jQuery and bootstrap imports
             taAvailabilityLoad = function() {
@@ -208,27 +220,27 @@
                 var scheduleData = null;
                 var selectedMilestone = null;
                 var milestones = new Array();
+				var taData = JSON.parse('<s:property escape= "false" value= "taJson"/>');
+				console.log('TA DATA: ' + JSON.stringify(taData));
 
                 loadMilestones();
                 loadSelectDropdown();
                 
                 function loadMilestones() {
-                    var milestonesData = getScheduleData(null, activeAcademicYearStr, activeSemesterStr);
-                    for (var i = 0; i < milestonesData.milestones.length; i++) {
-                        milestones.push(milestonesData.milestones[i].name);
-                    }
+                    milestones = getScheduleData(null, activeAcademicYearStr, activeSemesterStr).milestones;
                 };
                 
                 function loadSelectDropdown() {
                     for (var i = 0; i < milestones.length; i++) {
-                        var milestoneOption = $(document.createElement('option'));
-                        milestoneOption.attr('value', milestones[i]);
-                        milestoneOption.html(milestones[i]);
-                        $("#milestoneTimeslotsSelect").append(milestoneOption);
+						if (!milestones[i].bookable) continue;
+							var milestoneOption = $(document.createElement('option'));
+							milestoneOption.attr('value', milestones[i].name);
+							milestoneOption.html(milestones[i].name);
+							$("#milestoneTimeslotsSelect").append(milestoneOption);
                     }
                 }
                 
-                $("#milestoneTimeslotsSelect").on('change', function(e){
+                $("body").on('change', '#milestoneTimeslotsSelect', function(e){
                     $(".timeslotsTable").empty();
                     selectedMilestone = $(this).val();
                     scheduleData = getScheduleData(selectedMilestone, activeAcademicYearStr, activeSemesterStr);
@@ -236,8 +248,8 @@
                     return false; 
                 });
                 
-                $("#milestoneTimeslotsSelect").val(milestones[0]).change(); //Select first milestone
-
+                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).trigger('change');
+				
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableClass = "timeslotsTable";
                     var table = $("." + tableClass);
@@ -300,26 +312,131 @@
                     var scheduleDataDates = datesSet.values().sort();
                     return scheduleDataDates;
                 }
+				
+				//ADDED FOR SELECT/DESELECT ALL
+				$('body').on('change', '.checkBoxClass', function(){
+					var $checkbox = $(this);
+
+					if(!$checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+									
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[0].text;
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val(valtest);
+										}
+			
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+												triggerTimeslot($(this));
+											}
+										}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]
+									+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+										
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[0].text;
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val(valtest);
+										}
+			
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+						}
+					}else if($checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+										
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+										
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[valtest.selectedIndex].text;
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val("You");
+										}
+						
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] 
+										+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										
+										var valswitch = "switch_" +$(this).attr('value').split("_")[1];
+										var valtest = document.getElementById(valswitch);
+										
+										//if the TA for this timeslot is not you
+										if(valtest !==null){
+											valtest = valtest.options[0].text;
+											var assignElement = "#" + valswitch;
+											 $(assignElement).val("You");
+										}	
+			
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+						}
+					}
+					
+				});
 
                 function makeTimeslotTable(tableClass, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
-                    var minTime = 9;
-                    var maxTime = 19;
+                    var minTime = scheduleData.dayStartTime;
+                    var maxTime = scheduleData.dayEndTime;
 
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                        th.html(headerVal);
+                        if (<%= activeRole.equals(Role.TA)%>) th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
+						else th.html(headerVal);
                         thead.append(th);
                     }
                     //Inserting constructed table header into table
                     $("." + tableClass).append($(document.createElement('thead')).append(thead));
-
-                    //Creating table body with times and empty cells
-//                    var tbody = $(document.createElement("tbody"));
-
+					
                     //Generating list of times
                     var timesArray = new Array();
                     for (var i = minTime; i < maxTime; i++) {
@@ -330,13 +447,15 @@
                     }
 
 					var slotSize = scheduleData.duration / 30;
+					var counter = 1;
+					var startTime = 0;
 
                     //Constructing table body
                     for (i = 0; i < timesArray.length; i++) {
-                        var tr = $(document.createElement("tr"));
-                        var timeTd = $(document.createElement("td"));
-                        timeTd.html(timesArray[i]);
-                        tr.append(timeTd);
+						var tr = $(document.createElement("tr"));
+						var timeTd = $(document.createElement("td"));
+						timeTd.html(timesArray[i]);
+						tr.append(timeTd);
 
                         for (var j = 0; j < dateArray.length; j++) {
                             var td = $(document.createElement("td"));
@@ -347,7 +466,9 @@
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
                             if (timeslot) {
 								td.addClass('border-top');
+								td.attr('id', 'timeslot_' + datetimeString);
 								td.attr("value", "timeslot_" + timeslot.id);
+								if (<%= activeRole.equals(Role.ADMINISTRATOR)%>) td.attr('title', 'Click to send email');
 								if (timeslot.hasOwnProperty("taId")) {
 									if (timeslot.taId === loggedInTaId) {
 										td.addClass('markable');
@@ -355,18 +476,26 @@
 										td.append($(document.createElement('div')).addClass('start-marker'));
 									} else {
 										td.addClass('otherTAChosen');
-										td.append($(document.createElement('div')).addClass('textinside').html(timeslot.TA));
+										//td.append($(document.createElement('div')).addClass('textinside').html(timeslot.TA));
+										//ADDED CODE FOR DROPDOWN
+										if (<%= activeRole.equals(Role.TA)%>) {
+											td.append($(document.createElement('container')).html("<select id='switch_" + timeslot.id +  "' style='width:150px;heigth:30px;'><option selected>" +
+												timeslot.TA + "</option><option>" + "You" + "</option></select>"));
+										} else {
+											td.append($(document.createElement('div')).addClass('timeslotTA textinside').html(timeslot.TA));
+										}
 									}
 								} else {
 									td.addClass('markable');
 								}
 								if (timeslot.team) {
-									td.append($(document.createElement('div')).addClass('textinside').html(timeslot.team));
+									td.append($(document.createElement('div')).addClass('timeslotTeam textinside').html(timeslot.team));
 								}
                             }
 							td.addClass('border-left');
                             tr.append(td);
                         }
+						counter++;
                         $("." + tableClass).append(tr);
                     }
                 }
@@ -381,7 +510,7 @@
 						//Unchoose a timeslot
 						var $prevTr = $timeslotCell.closest('tr');
 						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+							if ($prevTr.children().eq($timeslotCell.index()).attr('id')) {
 								//Unselect this timeslot
 								var $nextTr = $prevTr;
 								for (var j = 0; j < slotSize; j++) {
@@ -397,7 +526,7 @@
 						//Choose a timeslot
 						var $prevTr = $timeslotCell.closest('tr');
 						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
+							if ($prevTr.children().eq($timeslotCell.index()).attr('id')) {
 								//Unselect this timeslot
 								var $nextTr = $prevTr;
 								for (var j = 0; j < slotSize; j++) {
@@ -413,7 +542,7 @@
 						//Mark a timeslot as available
 						var $nextTr = $timeslotCell.closest('tr');
 						if ($nextTr.parent().children().index($nextTr) + slotSize > $nextTr.parent().children().length) return false; //Invalid timeslot
-						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
+						if (<%= activeRole.equals(Role.TA) %>) $timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
 						for (var i = 0; i < slotSize; i++) {
 							$nextTr.children().eq($timeslotCell.index()).addClass('available');
 							$nextTr = $nextTr.next();
@@ -421,9 +550,67 @@
 					}
 					return false;
                 }
+				
+				function emailAvailable($timeslotCell) {
+                    if (!$timeslotCell.hasClass('timeslotcell')) return false;
+					var slotSize = scheduleData.duration / 30;
+					var $prevTr = $timeslotCell.closest('tr');
+					for (var i = slotSize; i > 0; i--) {
+						var $availableTd = $prevTr.children().eq($timeslotCell.index());
+						if ($availableTd.attr('id')) {
+							if ($availableTd.children('.timeslotTeam').length && !$availableTd.children('.timeslotTA').length) {
+								var mailto = 'mailto:';
+								for (var j = 0; j < taData.length; j++) {
+									mailto += taData[j].username + '@smu.edu.sg; ';
+								}
+								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
+								mailto += 'Team ' 
+										+ $availableTd.children('.timeslotTeam').text() + ' is presenting on ' 
+										+ Date.parse($availableTd.attr('id').split('_')[1]).toString('ddd, dd-MMM') 
+										+ ' at ' +  Date.parse($availableTd.attr('id').split('_')[1]).toString('HH:mm') 
+										+ ' - ' + Date.parse($availableTd.attr('id').split('_')[1]).addMinutes(scheduleData.duration).toString('HH:mm')
+										+ ' for their FYP ' + selectedMilestone + ' presentation.'
+										+ '%0D%0A';
+								mailto += 'There is currently no TA assigned. Please sign up on the IS480 Scheduling System to record their video.';
+								window.location.href = mailto;
+							} else if (!$availableTd.children('.timeslotTA').length) {
+								var mailto = 'mailto:';
+								for (var j = 0; j < taData.length; j++) {
+									mailto += taData[j].username + '@smu.edu.sg; ';
+								}
+								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
+								mailto += 'Please sign up for timeslot ' 
+										+ Date.parse($availableTd.attr('id').split('_')[1]).toString('ddd, dd-MMM') 
+										+ ' at ' +  Date.parse($availableTd.attr('id').split('_')[1]).toString('HH:mm') 
+										+ ' - ' + Date.parse($availableTd.attr('id').split('_')[1]).addMinutes(scheduleData.duration).toString('HH:mm')
+										+ ' for the FYP ' + selectedMilestone + ' presentation'
+										+ ' on the IS480 Scheduling System.';
+								window.location.href = mailto;
+							} else if ($availableTd.children('.timeslotTA').length) {
+								var mailto = 'mailto:';
+								var ta = null;
+								for (var j = 0; j < taData.length; j++) {
+									if (taData[j].name === $availableTd.children('.timeslotTA').text()) {
+										ta = taData[j];
+										break;
+									}
+								}
+								mailto += ta.username + '@smu.edu.sg;?' + 'body=Hi ' + ta.name + ',%0D%0A%0D%0A';
+								window.location.href = mailto;
+							}
+							break;
+						}
+						$prevTr = $prevTr.prev();
+					}
+					return false;
+                }
 
-                $('body').on('click', 'td.chosen, td.available', function(e){
-                    triggerTimeslot($(this));
+                $('body').on('click', 'td.timeslotcell', function(e){
+					if ($(this).is('.chosen, .available') && <%= activeRole.equals(Role.TA) %>) {
+						triggerTimeslot($(this));
+					} else if (<%= activeRole.equals(Role.ADMINISTRATOR) %>) {
+						emailAvailable($(this));
+					}
                 });
 				
 				//Hover glow effect
@@ -434,7 +621,7 @@
 						//If hovering over selectable timeslot
 						var $prevTr = $td.closest('tr');
 						for (var i = slotSize; i > 0; i--) {
-							if ($prevTr.children().eq($td.index()).children('div.start-marker').length) {
+							if ($prevTr.children().eq($td.index()).attr('id')) {
 								//Highlight this timeslot
 								var $nextTr = $prevTr;
 								for (var j = 0; j < slotSize; j++) {
@@ -525,6 +712,25 @@
                         var obj = allTimeslots[i];
                         timeslot_data.push($(obj).parent().attr("value").split("_")[1]);
                     }
+					
+					//ADDED: POPULATE THE NEW SLOTS THAT ARE TAKEN
+					var allTimeslots2 =  $("container", ".timeslotsTable").get()
+					var swappedSlotIds = new Array();
+					for (var i = 0; i < allTimeslots2.length; i++) {
+						
+                        var obj = allTimeslots2[i];
+						var timeslot = $(obj).parent().attr("value").split("_")[1];
+						//console.log("switch_"+timeslot);
+						var id = "switch_"+timeslot;
+						var valtest = document.getElementById(id);
+						var strUser = valtest.options[valtest.selectedIndex].text;
+                        
+						if(strUser === 'You'){
+							 timeslot_data.push(timeslot);
+							 swappedSlotIds.push(id);
+						}
+                    }
+					
                     timeslotsData["timeslots"] = timeslot_data;
                     timeslotsData["scheduleId"] = scheduleData.id;
                     $.ajax({
@@ -536,12 +742,67 @@
                         if (!response.exception) {
                             if (response.success) {
                                 showNotification("SUCCESS", "Timeslots saved");
+								//Update page
                                 $("#editTimeslotsSubmitBtn").button('reset');
-								console.log('Unavailable: ' + JSON.stringify(response.unavailableTimeslots));
 								unavailableTimeslots = response.unavailableTimeslots;
+								$('.otherTAChosen').each(function(){
+									var $this = $(this);
+									if ($this.find('select').val() === 'You') {
+										$this.find('container').remove();
+										$this.removeClass();
+										$this.addClass('timeslotcell markable');
+										var slotSize = scheduleData.duration / 30;
+										var $nextTr = $this.closest('tr');
+										for (var j = 0; j < slotSize; j++) {
+											$nextTr.children().eq($this.index()).removeClass();
+											$nextTr.children().eq($this.index()).addClass('timeslotcell');
+											$nextTr = $nextTr.next();
+										}
+										triggerTimeslot($this);
+										triggerTimeslot($this);
+									}
+								});
+								//Update JSON
+								var oldTimeslotIds = [];
+								var mySignups = null;
+								for (var i = 0; i < taData.length; i++) {
+									if (parseInt(taData[i].id) === parseInt(loggedInTaId)) {
+										mySignups = taData[i].mySignups;
+										mySignupLoop: for (var j = 0; j < mySignups.length; j++) {
+											if (parseInt(mySignups[j].scheduleId) === parseInt(scheduleData.id))
+												oldTimeslotIds.push(mySignups[j].timeslotId);
+										}
+										break;
+									}
+								}
+								var newTimeslotIds = timeslot_data;
+								for (var i = 0; i < newTimeslotIds.length; i++) {
+									if (oldTimeslotIds.indexOf(newTimeslotIds[i]) === -1) {
+										//Add to mySignups
+										mySignups.push({scheduleId: scheduleData.id, timeslotId: newTimeslotIds[i]});
+									}
+								}
+								for (var i = 0; i < oldTimeslotIds.length; i++) {
+									if (newTimeslotIds.indexOf(oldTimeslotIds[i]) === -1) {
+										//Delete from my signups
+										for (var j = 0; j < mySignups.length; j++) {
+											if (parseInt(mySignups[j].timeslotId) === parseInt(oldTimeslotIds[i])) {
+												mySignups.splice(mySignups.indexOf(mySignups[j]), 1);
+												break;
+											}
+										}
+									}
+								}
+								for (var i = 0; i < taData.length; i++) {
+									if (parseInt(taData[i].id) === parseInt(loggedInTaId)) {
+										taData[i].mySignups = mySignups;
+										break;
+									}
+								}
+								console.log('New count should be: ' + mySignups.length);
+								loadTAStatistics();
                             } else {
                                 var eid = btoa(response.message);
-                                console.log(response.message);
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         } else {
@@ -570,6 +831,79 @@
 						}
 					});
 				}
+				
+				/* JQPLOT */
+				loadTAStatistics();
+				var barGraph = null;
+				function loadTAStatistics() {
+					var taNames = getSeriesArray("name", false);
+					var signups = getSeriesArray("mySignups", true);
+					barGraph = $.jqplot('taStatisticsChart', [signups], {
+						seriesDefaults: {
+							renderer: $.jqplot.BarRenderer,
+							shadow: false,
+							rendererOptions: {
+								highlightMouseOver: false,
+								lineWidth: 5
+							},
+							pointLabels: {show: false,}
+						},
+						title: 'TA Signup Count',
+						series: [{label: 'Signups'}],
+						axesDefaults: {
+							tickRenderer: $.jqplot.CanvasAxisTickRenderer
+						},
+						axes: {
+							xaxis: {
+								renderer: $.jqplot.CategoryAxisRenderer,
+								ticks: taNames,
+								tickOptions: {
+									showGridline: false,
+									angle: 90,
+									fontSize: '14px'
+								}
+							},
+							yaxis: {
+								padMin: 0
+							}
+						},
+						legend: {
+							show: false,
+							location: 'e',
+							fontSize: 12,
+							border: "none",
+							marginRight: 30
+						},
+						seriesColors: ["#B8F79E"],
+						grid: {
+							drawGridLines: false,
+							background: "#ffffff",
+							borderColor: "#dddddd",
+							shadow: false
+						}
+					}).replot();
+				}
+				
+				function getSeriesArray(key, getLength) {
+				   var data = [];
+				   for (var i = 0; i < taData.length; i++) {
+					   var ta = taData[i];
+					   if (getLength) {
+						   for (var j = 0; j < ta[key].length; j++) {
+							   if (parseInt(ta[key][j].scheduleId) !== parseInt(scheduleData.id)) {
+								   ta[key].splice(ta[key][j], 1);
+								   --j;
+							   }
+						   }
+						   data.push(ta[key].length);
+					   } else {
+						   data.push(ta[key]);
+					   }
+				   }
+				   return data;
+				}
+				
+				/* NOTIFICATION */
                 
                  function showNotification(action, message) {
                      var opts = {

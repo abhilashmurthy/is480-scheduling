@@ -304,9 +304,6 @@
             </div>
         </div>
         <%@include file="footer.jsp" %>
-		<script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
-		<script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
-		<script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             editScheduleLoad = function() {                
                 //Initialize variables
@@ -474,7 +471,7 @@
 				//Term name availability check
 				$("#semesterInput").on('keyup', function(){
 					var $this = $(this);
-					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('icon-refresh icon-spin'));
+					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('fa-refresh fa-spin'));
 					setTimeout(function(){$this.trigger('change');}, 500);
 					return false;
 				});
@@ -488,11 +485,11 @@
 					}
 					for (var i = 0; i < termNames.length; i++) {
 						if (parseInt(activeAcademicYearStr) === parseInt(termNames[i].year) && semName.toLowerCase() === termNames[i].term.toLowerCase()) {
-							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('icon-remove')).append(' Term name already exists');
+							$("#semesterNameAvailabilityChecker").css('color', 'red').html($(document.createElement('span')).addClass('fa-times')).append(' Term name already exists');
 							return false;
 						}
 					}
-					$("#semesterNameAvailabilityChecker").css('color', 'green').html($(document.createElement('span')).addClass('icon-ok'));
+					$("#semesterNameAvailabilityChecker").css('color', 'green').html($(document.createElement('span')).addClass('fa-ok'));
 					return false;
 				});
                 

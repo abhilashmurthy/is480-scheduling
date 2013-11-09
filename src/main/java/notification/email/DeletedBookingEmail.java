@@ -5,10 +5,12 @@
 package notification.email;
 
 import constant.Response;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
 import model.User;
@@ -30,7 +32,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Booking Deletion";
+		return b.getTeam().getTeamName() + " - Booking Deleted";
 	}
 
 	@Override
@@ -90,8 +92,19 @@ public class DeletedBookingEmail extends EmailTemplate{
 		
 		//Inserting approver name
 		map.put("[DELETOR_NAME]", deletor.getFullName());
+		map.put("[DELETOR_COMMENT]", b.getComment());
 		
 		return map;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }

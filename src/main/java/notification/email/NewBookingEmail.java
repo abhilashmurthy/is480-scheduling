@@ -4,20 +4,13 @@
  */
 package notification.email;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.EntityManager;
-import manager.SettingsManager;
+import manager.ICSFileManager;
 import model.Booking;
-import model.Settings;
 import model.User;
-import util.MiscUtil;
 
 /**
  *
@@ -34,7 +27,7 @@ public class NewBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - New Booking";
+		return b.getTeam().getTeamName() + " - New Booking";
 	}
 
 	@Override
@@ -59,6 +52,16 @@ public class NewBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateCCAddressList() {
 		return null;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }

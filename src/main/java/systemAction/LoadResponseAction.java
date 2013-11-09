@@ -36,7 +36,8 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(LoadResponseAction.class);
-    private ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
+    private ArrayList<HashMap<String, String>> pendingData = new ArrayList<HashMap<String, String>>();
+	private ArrayList<HashMap<String, String>> confirmedData = new ArrayList<HashMap<String, String>>();
 	private ArrayList<HashMap<String, String>> termData = new ArrayList<HashMap<String, String>>();
 	private long chosenTermId; //The term ID that the user chooses to switch to
 
@@ -60,6 +61,7 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 				
 				//Getting all bookings for which the user's status is pending
 				Set<Booking> pendingBookingList = new HashSet<Booking>();
+				Set<Booking> confirmedBookingList = new HashSet<Booking>();
 				if (bookingsList.size() > 0) {
 					for (Booking b : bookingsList) {
 						HashMap<User, Response> responseList = b.getResponseList();
@@ -68,14 +70,42 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 								b.getBookingStatus() != BookingStatus.REJECTED) {
 							if (responseList.get(faculty) == Response.PENDING) {
 								pendingBookingList.add(b);
+							} else if (responseList.get(faculty) == Response.APPROVED) {
+								confirmedBookingList.add(b);
 							}
 						}
 					}
 				}
 
-				//Putting all the booking details for the user in a hash map to display it 
+				//First sorting the list and then displaying it
 				if (pendingBookingList.size() > 0) {
-					for (Booking b : pendingBookingList) {
+					//Sort the pending bookings list in ascending order
+					ArrayList<Booking> pendingBookings = new ArrayList<Booking>();
+					Long[] ts = new Long[pendingBookingList.size()];
+					int i = 0;
+					for (Booking b: pendingBookingList) {
+						ts[i] = b.getCreatedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: pendingBookingList) {
+							if (b.getCreatedAt().getTime() == ts[j]) {
+								//Now check that the booking is not a part of pendingBookings list already
+								if (pendingBookings.size() > 0) {
+									if (!pendingBookings.contains(b)) {
+										pendingBookings.add(b);
+										break;
+									}
+								} else {
+									pendingBookings.add(b);
+									break;
+								}
+							}
+						}
+					}
+					
+					for (Booking b : pendingBookings) {
 						Timeslot timeslot = b.getTimeslot();
 						
 						//Getting all the timeslot and booking details
@@ -112,7 +142,68 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 						map.put("venue", venue);
 						map.put("myStatus", myStatus);
 
-						data.add(map);
+						pendingData.add(map);
+					}
+				}
+				
+				//Putting all the confirmed booking details for the user in a hash map to display it 
+				if (confirmedBookingList.size() > 0) {
+					//Sort the pending bookings list in ascending order
+					ArrayList<Booking> confirmedBookings = new ArrayList<Booking>();
+					Long[] ts = new Long[confirmedBookingList.size()];
+					int i = 0;
+					for (Booking b: confirmedBookingList) {
+						ts[i] = b.getCreatedAt().getTime();
+						i++;
+					}
+					ts = sortTimestamps(ts);
+					for (int j = 0; j < ts.length; j++) {
+						for (Booking b: confirmedBookingList) {
+							if (b.getCreatedAt().getTime() == ts[j]) {
+								confirmedBookings.add(b);
+								break;
+							}
+						}
+					}
+					
+					for (Booking b : confirmedBookings) {
+						Timeslot timeslot = b.getTimeslot();
+						
+						//Getting all the timeslot and booking details
+						HashMap<String, String> map = new HashMap<String, String>();
+						//SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm aa");
+						SimpleDateFormat sdfForDate = new SimpleDateFormat("MMM dd, EEE");
+						SimpleDateFormat sdfForStartTime = new SimpleDateFormat("HH:mm");
+						SimpleDateFormat sdfForEndTime = new SimpleDateFormat("HH:mm aa");
+						
+						String venue = timeslot.getVenue();
+						Long bookingId = b.getId();
+						Team team = b.getTeam();
+						String teamName = team.getTeamName();
+						String milestoneName = timeslot.getSchedule().getMilestone().getName();
+						String time = sdfForStartTime.format(timeslot.getStartTime()) + " - " + 
+								sdfForEndTime.format(timeslot.getEndTime());
+						String date = sdfForDate.format(timeslot.getStartTime());
+						String myStatus = b.getResponseList().get(faculty).toString();
+						
+						//A user can only have 1 role in a team (Supervisor and Reviewer cannot be same for the same team)
+						String userRole = null;
+						if (team.getSupervisor().equals(faculty)) {
+							userRole = "Supervisor";
+						} else if (team.getReviewer1().equals(faculty) || team.getReviewer2().equals(faculty)) {
+							userRole = "Reviewer";
+						}
+
+						map.put("bookingId", String.valueOf(bookingId));
+						map.put("teamName", teamName);
+						map.put("milestone", milestoneName);
+						map.put("userRole", userRole);
+						map.put("time", time);
+						map.put("date", date);
+						map.put("venue", venue);
+						map.put("myStatus", myStatus);
+
+						confirmedData.add(map);
 					}
 				}
 				return SUCCESS;
@@ -135,6 +226,21 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 			if (em != null && em.isOpen()) em.close();
 		}
     }
+	
+	//Sorting timestamps by ascending order to sort bookings 
+	private static Long[] sortTimestamps(Long[] ts) {
+		for (int i = 0; i < ts.length - 1; i++) {
+			for (int j = 1; j < ts.length; j++) {
+				if (ts[j] < ts[i]) {
+					long temp = 0;
+					temp = ts[i];
+					ts[i] = ts[j];
+					ts[j] = temp;
+				}
+			}
+		}
+		return ts;
+	}
 	
 	//Load the appropriate faculty object based on the chosen/active term
 	private Faculty loadFacultyMemberForTerm(EntityManager em, User user) {
@@ -188,13 +294,21 @@ public class LoadResponseAction extends ActionSupport implements ServletRequestA
 		this.chosenTermId = chosenTermId;
 	}
 
-    public ArrayList<HashMap<String, String>> getData() {
-        return data;
-    }
+	public ArrayList<HashMap<String, String>> getPendingData() {
+		return pendingData;
+	}
 
-    public void setData(ArrayList<HashMap<String, String>> data) {
-        this.data = data;
-    }
+	public void setPendingData(ArrayList<HashMap<String, String>> pendingData) {
+		this.pendingData = pendingData;
+	}
+
+	public ArrayList<HashMap<String, String>> getConfirmedData() {
+		return confirmedData;
+	}
+
+	public void setConfirmedData(ArrayList<HashMap<String, String>> confirmedData) {
+		this.confirmedData = confirmedData;
+	}
 
     public void setServletRequest(HttpServletRequest hsr) {
         this.request = hsr;

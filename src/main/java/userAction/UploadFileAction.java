@@ -20,12 +20,15 @@ import javax.persistence.EntityManager;
 import util.MiscUtil;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import manager.UserManager;
+import model.SystemActivityLog;
 import model.Team;
 import model.Term;
 import model.User;
@@ -53,9 +56,21 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			
     @Override
     public String execute() throws Exception {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Administrator: Upload CSV File");
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setRunTime(now);
+		logItem.setSuccess(true);
+		
 		EntityManager em = null;
 		try {
-			HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("user");
+			
             Role activeRole = (Role) session.getAttribute("activeRole");
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
 				em = MiscUtil.getEntityManagerInstance();
@@ -69,7 +84,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				//<--------------------Validation checks for the csv file---------------------->
 				//1. Validate that there are no empty cells in the csv file for the 4 columns
 				logger.info("Validating for empty cells in the relevant part of the csv file");
-				String[] errorWithEmptyCells = validateEmptyCells(csvFile);
+				String[] errorWithEmptyCells = validateEmptyCells(csvFile, logItem);
 				if (errorWithEmptyCells[0].equalsIgnoreCase("true")) {
 					session.setAttribute("csvMsg", "Wrong Structure! There are blank cells in the csv file. Row Number: " + 
 							errorWithEmptyCells[1]);
@@ -79,7 +94,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				
 				//2. Validate that every user has a username or a "-"
 				logger.info("Validating usernames");
-				String[] errorInUsername = validateUsernames(csvFile);
+				String[] errorInUsername = validateUsernames(csvFile, logItem);
 				if (errorInUsername[0].equalsIgnoreCase("true")) {
 					session.setAttribute("csvMsg", "Wrong Username! If a username doesnt exist, please put a '-' symbol."
 							+ "Row Number: " + errorWithEmptyCells[1]);
@@ -89,7 +104,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 
 				//3. Validate roles of each user
 				logger.info("Validating user roles");
-				String[] errorInRole = validateRoles(csvFile);
+				String[] errorInRole = validateRoles(csvFile, logItem);
 				if (errorInRole[0].equalsIgnoreCase("true")) {
 					session.setAttribute("csvMsg", "Wrong User Roles! Role can only be - TA, Student, Supervisor, Reviewer 1, "
 							+ "Reviewer 2. Row Number: " + errorInRole[1]);
@@ -99,7 +114,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				
 				//4. Validate for team names
 				logger.info("Validating team names");
-				String[] errorInTeamName = validateTeamNames(csvFile);
+				String[] errorInTeamName = validateTeamNames(csvFile, logItem);
 				if (errorInTeamName[0].equalsIgnoreCase("true")) {
 					session.setAttribute("csvMsg", "Wrong Team Name! For TA, please put a '-'. For other roles, put the "
 							+ "team name. Row Number: " + errorInTeamName[1]);
@@ -109,7 +124,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				
 //				//5. Validate for team presentation type (private, internal, public)
 //				logger.info("Validating team presentation type (private, internal, public)");
-//				String[] errorInPresentationType = validatePresentationTypes(csvFile);
+//				String[] errorInPresentationType = validatePresentationTypes(csvFile, logItem);
 //				if (errorInPresentationType[0].equalsIgnoreCase("true")) {
 //					session.setAttribute("csvMsg", "Wrong Presentation Type! Presentation types can only be Private, Internal "
 //							+ "or Public (For TA, please put a '-') Row Number: " + errorInPresentationType[1]);
@@ -119,7 +134,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				
 				//6. Validate that TA's are at the start of the file
 //				logger.info("Validating order of roles for TA");
-//				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile);
+//				boolean errorInOrderOfRoles = validateOrderOfRoles(csvFile, logItem);
 //				if (errorInOrderOfRoles) {
 //					session.setAttribute("csvMsg", "Wrong order of roles! TA's should be placed first in the file");
 //					logger.error("Error with order of roles in csv upload");
@@ -128,7 +143,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 
 				//5. Validate for term names (should be the same throughout the file)
 //				logger.info("Validating term names");
-//				String displayName = validateTermNames(csvFile);
+//				String displayName = validateTermNames(csvFile, logItem);
 //				if (displayName == null) {
 //					msg = "Wrong Term Names! The Academic Year and Semester should be same for all entries";
 //					logger.error("Error with term names in csv upload");
@@ -152,7 +167,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				em.getTransaction().begin();
 
 				//1st Part: Creating unique user objects (Except for CC)
-				List<User> usersList = createUsers(csvFile, term, em);
+				List<User> usersList = createUsers(csvFile, term, em, logItem);
 				//If error
 				if (usersList == null) {
 					msg = "Error with Upload File (Create Users): Escalate to developers!";
@@ -162,7 +177,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				}
 
 				//2nd Part: Creating unique team objects
-				List<Team> teamsList = createTeams(csvFile, term, em);
+				List<Team> teamsList = createTeams(csvFile, term, em, logItem);
 				//If error
 				if (teamsList == null) {
 					msg = "Error with Upload File (Create Teams): Escalate to developers!";
@@ -172,7 +187,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				}
 
 				//3rd Part: Assigning users (Students & Faculty) to the teams
-				boolean result = assignUsersToTeams(csvFile, usersList, teamsList, em);
+				boolean result = assignUsersToTeams(csvFile, usersList, teamsList, em, logItem);
 				if (!result) {
 					msg = "Error with Upload File (Assigning Users to Teams): Escalate to developers!";
 					logger.error("Error with Upload File (Assigning Users to Teams)");
@@ -184,6 +199,9 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				tr.commit();
 				logger.info("Extracting data from CSV completed");
 				session.setAttribute("csvMsg", "Success! File has been uploaded!");
+				
+				logItem.setMessage("CSV File was uploaded successfully");
+				
 				return SUCCESS;
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
@@ -191,6 +209,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				return ERROR;
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -200,12 +223,20 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			request.setAttribute("error", "Error with Upload File: Escalate to Developers");
 			return ERROR;
 		} finally {
-			if (em != null && em.getTransaction().isActive()) em.getTransaction().rollback();
-			if (em != null && em.isOpen()) em.close();
+			if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
 		}
 	}
 			
-	private static List<User> createUsers(File csvFile, Term term, EntityManager em) {
+	private static List<User> createUsers(File csvFile, Term term, EntityManager em, SystemActivityLog logItem) {
+		HttpSession sessionForLog = request.getSession();
 		try {
 			//------------------------Creating user objects------------------------
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
@@ -288,6 +319,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			reader.close();
 			return usersList;
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -295,6 +331,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -302,6 +343,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -312,7 +358,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 		return null;
 	}
 	
-	private static List<Team> createTeams(File csvFile, Term term, EntityManager em) {
+	private static List<Team> createTeams(File csvFile, Term term, EntityManager em, SystemActivityLog logItem) {
+		HttpSession sessionForLog = request.getSession();
 		try {
 			//-------------------------Creating the teams---------------------------
 			CSVReader reader = new CSVReader(new FileReader(csvFile));
@@ -350,6 +397,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			reader.close();
 			return teamsList;
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -357,6 +409,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -364,6 +421,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -374,7 +436,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 		return null;
 	}
 		
-	private static boolean assignUsersToTeams(File csvFile, List<User> usersList, List<Team> teamsList, EntityManager em) { 
+	private static boolean assignUsersToTeams(File csvFile, List<User> usersList, List<Team> teamsList, EntityManager em, SystemActivityLog logItem) { 
+		HttpSession sessionForLog = request.getSession();
 		boolean result = false;
 		try {
 			//-----------------------Assigning users to teams-------------------------
@@ -526,6 +589,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			result = true;
 			return result;
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -533,6 +601,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -540,6 +613,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
 			   for (StackTraceElement s : e.getStackTrace()) {
@@ -562,7 +640,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating for empty cells in the csv file
-	private static String[] validateEmptyCells(File csvFile) {
+	private static String[] validateEmptyCells(File csvFile, SystemActivityLog logItem) {
+		HttpSession sessionForLog = request.getSession();
 		String[] errorWithEmptyCells = new String[2];
 		errorWithEmptyCells[0] = "false";
 		errorWithEmptyCells[0] = "0";
@@ -584,6 +663,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorWithEmptyCells[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -592,6 +676,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorWithEmptyCells[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -600,6 +689,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorWithEmptyCells[0] = "true";
 			errorWithEmptyCells[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
@@ -614,7 +708,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	
 	
 	//Validating usernames
-	private static String[] validateUsernames(File csvFile) {
+	private static String[] validateUsernames(File csvFile, SystemActivityLog logItem) {
+		HttpSession sessionForLog = request.getSession();
 		String[] errorInUsername = new String[2];
 		errorInUsername[0] = "false";
 		errorInUsername[0] = "0";
@@ -634,6 +729,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInUsername[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -642,6 +742,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInUsername[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -650,6 +755,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInUsername[0] = "true";
 			errorInUsername[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
@@ -664,7 +774,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	
 	
 	//Validating user roles
-	private static String[] validateRoles(File csvFile) {
+	private static String[] validateRoles(File csvFile, SystemActivityLog logItem) {
+		HttpSession sessionForLog = request.getSession();
 		String[] errorInRole = new String[2];
 		errorInRole[0] = "false";
 		errorInRole[1] = "0";
@@ -689,6 +800,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInRole[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -697,6 +813,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInRole[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -705,6 +826,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInRole[0] = "true";
 			errorInRole[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
@@ -718,7 +844,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating team names
-	private static String[] validateTeamNames(File csvFile) {
+	private static String[] validateTeamNames(File csvFile, SystemActivityLog logItem) {
+		HttpSession sessionForLog = request.getSession();
 		String[] errorInTeamName = new String[2];
 		errorInTeamName[0] = "false";
 		errorInTeamName[1] = "0";
@@ -746,6 +873,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInTeamName[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -754,6 +886,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInTeamName[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -762,6 +899,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInTeamName[0] = "true";
 			errorInTeamName[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
@@ -775,7 +917,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating presentation types (private, internal or public)
-	private static String[] validatePresentationTypes(File csvFile) {
+	private static String[] validatePresentationTypes(File csvFile, SystemActivityLog logItem) {
+		HttpSession sessionForLog = request.getSession();
 		String[] errorInPresentationType = new String[2];
 		errorInPresentationType[0] = "false";
 		errorInPresentationType[1] = "0";
@@ -804,6 +947,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInPresentationType[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -812,6 +960,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (IOException e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInPresentationType[0] = "true";
 			logger.error("Exception caught: " + e.getMessage());
 			if (MiscUtil.DEV_MODE) {
@@ -820,6 +973,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			   }
 			}
 		} catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) sessionForLog.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
 			errorInPresentationType[0] = "true";
 			errorInPresentationType[1] = String.valueOf(lineNo);
 			logger.error("Exception caught: " + e.getMessage());
@@ -833,7 +991,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 	}
 	
 	//Validating order of roles
-//	private static boolean validateOrderOfRoles(File csvFile) {
+//	private static boolean validateOrderOfRoles(File csvFile, SystemActivityLog logItem) {
+//		HttpSession sessionForLog = request.getSession();
 //		boolean errorInOrderOfRoles = false;
 //		try {
 //			CSVReader reader = new CSVReader(new FileReader(csvFile));
@@ -868,6 +1027,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			}
 //			reader.close();
 //		} catch (FileNotFoundException e) {
+//			logItem.setSuccess(false);
+//			User userForLog = (User) sessionForLog.getAttribute("user");
+//			logItem.setUser(userForLog);
+//			logItem.setMessage("Error: " + e.getMessage());
+			
 //			errorInOrderOfRoles = true;
 //			logger.error("Exception caught: " + e.getMessage());
 //			if (MiscUtil.DEV_MODE) {
@@ -876,6 +1040,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			   }
 //			}
 //		} catch (IOException e) {
+//			logItem.setSuccess(false);
+//			User userForLog = (User) sessionForLog.getAttribute("user");
+//			logItem.setUser(userForLog);
+//			logItem.setMessage("Error: " + e.getMessage());
+	
 //			errorInOrderOfRoles = true;
 //			logger.error("Exception caught: " + e.getMessage());
 //			if (MiscUtil.DEV_MODE) {
@@ -884,6 +1053,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			   }
 //			}
 //		} catch (Exception e) {
+//			logItem.setSuccess(false);
+//			User userForLog = (User) sessionForLog.getAttribute("user");
+//			logItem.setUser(userForLog);
+//			logItem.setMessage("Error: " + e.getMessage());
+//			
 //			errorInOrderOfRoles = true;
 //			logger.error("Exception caught: " + e.getMessage());
 //			if (MiscUtil.DEV_MODE) {
@@ -896,7 +1070,8 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //	}
 	
 	//Validating term names
-//	private static String validateTermNames(File csvFile) {
+//	private static String validateTermNames(File csvFile, SystemActivityLog logItem) {
+//		HttpSession sessionForLog = request.getSession();
 //		try {
 //			CSVReader reader = new CSVReader(new FileReader(csvFile));
 //			int lineNo = 0;
@@ -919,6 +1094,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			}
 //			return displayName;
 //		} catch (FileNotFoundException e) {
+//			logItem.setSuccess(false);
+//			User userForLog = (User) sessionForLog.getAttribute("user");
+//			logItem.setUser(userForLog);
+//			logItem.setMessage("Error: " + e.getMessage());
+//			
 //			logger.error("Exception caught: " + e.getMessage());
 //			if (MiscUtil.DEV_MODE) {
 //			   for (StackTraceElement s : e.getStackTrace()) {
@@ -926,6 +1106,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			   }
 //			}
 //		} catch (IOException e) {
+//			logItem.setSuccess(false);
+//			User userForLog = (User) sessionForLog.getAttribute("user");
+//			logItem.setUser(userForLog);
+//			logItem.setMessage("Error: " + e.getMessage());
+//			
 //			logger.error("Exception caught: " + e.getMessage());
 //			if (MiscUtil.DEV_MODE) {
 //			   for (StackTraceElement s : e.getStackTrace()) {
@@ -933,6 +1118,11 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 //			   }
 //			}
 //		} catch (Exception e) {
+//			logItem.setSuccess(false);
+//			User userForLog = (User) sessionForLog.getAttribute("user");
+//			logItem.setUser(userForLog);
+//			logItem.setMessage("Error: " + e.getMessage());
+//			
 //			logger.error("Exception caught: " + e.getMessage());
 //			if (MiscUtil.DEV_MODE) {
 //			   for (StackTraceElement s : e.getStackTrace()) {

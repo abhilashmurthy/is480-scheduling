@@ -7,6 +7,7 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
@@ -39,17 +40,19 @@ public class SetRolesAction extends ActionSupport implements ServletRequestAware
 			User currentUser = (User) session.getAttribute("user");
             //Getting all the user objects
             List<User> userRoles = (List<User>) session.getAttribute("userRoles");
+			List<User> newUserRoles = new ArrayList<User>();
 			
 			for (User u : userRoles) {
 				if (u.getId() == switchToUserId) { //Found the role to be switch to
 					session.setAttribute("user", UserManager.getUser(u)); //Setting the new user object in the session
 					session.setAttribute("activeRole", u.getRole()); //Setting the new role in the session
-					userRoles.remove(u); //Removing the new user object from the list of roles
-					userRoles.add(currentUser); //Adding the previously assumed role back into the list
+					newUserRoles.add(currentUser); //Adding the previously assumed role back into the list
+				} else { //Populate option in the list. Available for the user to choose later
+					newUserRoles.add(u);
 				}
 			}
 			
-			session.setAttribute("userRoles", userRoles); //Refreshing the role options in the session object
+			session.setAttribute("userRoles", newUserRoles); //Refreshing the role options in the session object
 
 			return SUCCESS;
         } catch (Exception e) {

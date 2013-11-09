@@ -46,10 +46,10 @@
 										<input class="durationInput spinner-input" type="text" style='width: 50px !important'/>
 										<div class="spinner-buttons btn-group btn-group-vertical">
 											<button class="btn spinner-up" type="button">
-												<i class="icon-chevron-up"></i>
+												<i class="fa fa-chevron-up"></i>
 											</button>
 											<button class="btn spinner-down" type="button">
-												<i class="icon-chevron-down"></i>
+												<i class="fa fa-chevron-down"></i>
 											</button>
 										</div>
 									</div>
@@ -63,9 +63,9 @@
                                 </td>
                                 <td>
                                     <button type="button" title="Delete Milestone" class="deleteMilestoneBtn btn btn-danger">
-                                        <i class='icon-trash icon-white'></i>
+                                        <i class='fa fa-trash-o fa-white'></i>
                                     </button>
-									<i class='moveIcon icon-move icon-black'></i>
+									<i class='fa moveIcon fa-move fa-black'></i>
                                 </td>
                             </tr>
                         </s:iterator>
@@ -79,7 +79,7 @@
 			<table id='milestoneConfigButtons'>
 				<tr>
 					<td><button type="button" id="saveMilestonesBtn" class="btn btn-primary" style="width:80px; height:30px;"><b>Save</b></button></td>
-					<td><button class="btn btn-warning" id="addMilestoneBtn" style="width:160px; height:30px"><i class="icon-black icon-plus-sign"></i><b>Add Milestone</b></button></td>
+					<td><button class="btn btn-warning" id="addMilestoneBtn" style="width:160px; height:30px"><i class="fa fa-black fa-plus-circle"></i><b>Add Milestone</b></button></td>
 				</tr>
 			</table>
 				
@@ -157,13 +157,13 @@
 													$(document.createElement('button'))
 														.attr('type', 'button')
 														.addClass('btn spinner-up')
-														.append($(document.createElement('i')).addClass('icon-chevron-up'))
+														.append($(document.createElement('i')).addClass('fa fa-chevron-up'))
 												)
 												.append(
 													$(document.createElement('button'))
 														.attr('type', 'button')
 														.addClass('btn spinner-down')
-														.append($(document.createElement('i')).addClass('icon-chevron-down'))
+														.append($(document.createElement('i')).addClass('fa fa-chevron-down'))
 												)
 										)
 								)
@@ -193,9 +193,9 @@
 										.attr('type', 'button')
 										.attr('title', 'Delete Milestone')
 										.addClass('deleteMilestoneBtn btn btn-danger')
-										.append($(document.createElement('i')).addClass('icon-trash icon-white'))
+										.append($(document.createElement('i')).addClass('fa fa-trash-o fa-white'))
 								)
-								.append($(document.createElement('i')).addClass('moveIcon icon-move icon-black'))
+								.append($(document.createElement('i')).addClass('moveIcon fa fa-move fa-black'))
 						)
 						.appendTo('#milestoneConfigTable tbody');
 						resetPlugins();

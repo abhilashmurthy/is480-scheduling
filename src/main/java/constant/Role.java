@@ -21,15 +21,15 @@ public enum Role {
 	COURSE_COORDINATOR("Course Coordinator", User.class),
 	GUEST("Guest", User.class);
 	
-	private Role(String displayName, Class baseClassType) {
+	private Role(String displayName, Class<? extends User> baseClassType) {
 		this.displayName = displayName;
 		this.baseClassType = baseClassType;
 	}
 	
 	private final String displayName;
-	private final Class baseClassType;
+	private final Class<? extends User> baseClassType;
 	
 	public String getDisplayName() { return displayName; }
 	
-	public Class getBaseClassType() { return baseClassType; }
+	public Class<? extends User> getBaseClassType() { return baseClassType; }
 }

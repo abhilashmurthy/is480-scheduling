@@ -4,10 +4,11 @@
  */
 package notification.email;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import manager.ICSFileManager;
 import model.Booking;
 import model.User;
 
@@ -27,7 +28,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTimeslot().getSchedule().getMilestone().getName() + " - Booking Rejection";
+		return b.getTeam().getTeamName() + " - Booking Rejected";
 	}
 
 	@Override
@@ -61,9 +62,19 @@ public class RejectedBookingEmail extends EmailTemplate{
 		map.put("[REJECTOR_NAME]", rejector.getFullName());
 		
 		//Inserting the reason for rejection
-		map.put("[REJECT_REASON]", b.getRejectReason());
+		map.put("[REJECT_REASON]", b.getComment());
 		
 		return map;
+	}
+	
+	@Override
+	public File getFileAttachment() {
+		return ICSFileManager.createICSFile(b);
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return b.getTeam().getTeamName() + ".ics";
 	}
 	
 }

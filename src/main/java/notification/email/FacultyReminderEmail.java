@@ -4,9 +4,7 @@
  */
 package notification.email;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +28,7 @@ public class FacultyReminderEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return "Reminder: Booking Approval";
+		return "[Reminder] " + b.getTeam().getTeamName();
 	}
 
 	@Override
@@ -55,6 +53,16 @@ public class FacultyReminderEmail extends EmailTemplate{
 		map = generateDueDate(map, b.getCreatedAt().getTime());
 		
 		return map;
+	}
+
+	@Override
+	public File getFileAttachment() {
+		return null;
+	}
+
+	@Override
+	public String getFileAttachmentName() {
+		return null;
 	}
 	
 }

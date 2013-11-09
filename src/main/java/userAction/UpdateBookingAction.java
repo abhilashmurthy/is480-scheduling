@@ -21,14 +21,13 @@ import java.util.Set;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import manager.ScheduleManager;
 import manager.TimeslotManager;
 import model.Booking;
 import model.Schedule;
+import model.SystemActivityLog;
 import model.Timeslot;
 import model.User;
 import model.role.Student;
@@ -54,12 +53,23 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		
+		Calendar nowCal = Calendar.getInstance();
+		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
+		
+		SystemActivityLog logItem = new SystemActivityLog();
+		logItem.setActivity("Administrator: Update Booking Details");
+		logItem.setRunTime(now);
+		logItem.setUser((User)session.getAttribute("user"));
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
+		
         EntityManager em = null;
         try {
             //Code here
             //convert the chosen ID into long and get the corresponding Timeslot object
             em = MiscUtil.getEntityManagerInstance();
-            HttpSession session = request.getSession();
 			
 			em.getTransaction().begin();
 
@@ -147,6 +157,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 map.put("time", viewTimeFormat.format(oldTimeslot.getStartTime()) + " - " + viewTimeFormat.format(oldTimeslot.getEndTime()));
                 map.put("venue", oldTimeslot.getVenue());
                 map.put("team", booking.getTeam().getTeamName());
+                map.put("teamId", booking.getTeam().getId());
                 map.put("startDate", viewDateFormat.format(new Date(oldTimeslot.getStartTime().getTime())));
                 map.put("status", booking.getBookingStatus().toString());
                 List<HashMap<String, String>> students = new ArrayList<HashMap<String, String>>(); //Adding all students
@@ -178,8 +189,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 
                 String TA = "-";
                 map.put("TA", TA);
-                String teamWiki = "-";
-                map.put("teamWiki", teamWiki);
+                map.put("wiki", booking.getTeam().getWiki());
                 
                 //Return if no change detected
                 if ((oldTimeslot.getStartTime().equals(newBookingTimestamp)
@@ -258,6 +268,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 				//Forcing initialization for sending email
 				Hibernate.initialize(booking.getTeam().getMembers());
 				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				Hibernate.initialize(booking.getRequiredAttendees());
 				
 				//Sending email update
 				EditBookingEmail email = new EditBookingEmail(booking, user);
@@ -268,6 +279,8 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                 json.put("success", true);
                 json.put("message", "Booking updated successfully!");
 				MiscUtil.logActivity(logger, user, booking.toString() + " updated");
+				
+				logItem.setMessage("Booking details updated successfully for " + booking.toString());
             } else {
                 //Incorrect user role
                 json.put("success", false);
@@ -275,6 +288,11 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
             }
             return SUCCESS;
         } catch (Exception e) {
+			logItem.setSuccess(false);
+			User userForLog = (User) session.getAttribute("user");
+			logItem.setUser(userForLog);
+			logItem.setMessage("Error: " + e.getMessage());
+			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -286,12 +304,15 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
             json.put("message", "Error with UpdateBooking: Escalate to developers!");
             return ERROR;
         } finally {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
+           if (em != null) {
+				//Saving job log in database
+				if (!em.getTransaction().isActive()) em.getTransaction().begin();
+				em.persist(logItem);
+				em.getTransaction().commit();
+				
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				if (em.isOpen()) em.close();
+			}
         }
     } //end of execute
 

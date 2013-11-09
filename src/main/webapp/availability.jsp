@@ -195,10 +195,6 @@
         </div>
 
         <%@include file="footer.jsp" %>
-        <!-- jshashset imports -->
-        <script type="text/javascript" src="js/plugins/jshashtable-3.0.js"></script>
-        <script type="text/javascript" src="js/plugins/jshashset-3.0.js"></script>
-        <script type="text/javascript" src="js/plugins/jquery-ui.multidatespicker.js"></script>
         <script type="text/javascript">
             //Makes use of footer.jsp's jQuery and bootstrap imports
             supervisorAvailabilityLoad = function() {
@@ -221,10 +217,7 @@
                 loadSelectDropdown();
                 
                 function loadMilestones() {
-                    var milestonesData = getScheduleData(null, activeAcademicYearStr, activeSemesterStr);
-                    for (var i = 0; i < milestonesData.milestones.length; i++) {
-                        milestones.push(milestonesData.milestones[i].name);
-                    }
+                    milestones = getScheduleData(null, activeAcademicYearStr, activeSemesterStr).milestones;
                 };
 
                 function loadUnavailableTimeslots() {
@@ -235,10 +228,11 @@
                 
                 function loadSelectDropdown() {
                     for (var i = 0; i < milestones.length; i++) {
-                        var milestoneOption = $(document.createElement('option'));
-                        milestoneOption.attr('value', milestones[i]);
-                        milestoneOption.html(milestones[i]);
-                        $("#milestoneTimeslotsSelect").append(milestoneOption);
+						if (!milestones[i].bookable) continue;
+							var milestoneOption = $(document.createElement('option'));
+							milestoneOption.attr('value', milestones[i].name);
+							milestoneOption.html(milestones[i].name);
+							$("#milestoneTimeslotsSelect").append(milestoneOption);
                     }
                 }
                 
@@ -250,7 +244,7 @@
                     return false; 
                 });
                 
-                $("#milestoneTimeslotsSelect").val(milestones[0]).change(); //Select first milestone
+                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).change(); //Select first milestone
 
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableClass = "timeslotsTable";
@@ -315,20 +309,91 @@
                     var scheduleDataDates = datesSet.values().sort();
                     return scheduleDataDates;
                 }
+				
+				String.prototype.contains = function(substr) {
+				return this.indexOf(substr) > -1;
+			  }
+				
+				$('body').on('change', '.checkBoxClass', function(){
+					var $checkbox = $(this);
+					console.log('selected ' + $checkbox.attr('id') + ': ' + $checkbox.is(':checked'));
+
+					if($checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+									
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]
+									+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("chosen") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+						}
+					}else if(!$checkbox.is(':checked')){
+						var dateTime = $checkbox.attr('id');
+						if(dateTime.length===1){
+							dateTime = "0" + dateTime;
+						}
+						for (var i = 0; i < scheduleData.timeslots.length; i++) {
+							var timeslot = scheduleData.timeslots[i];
+							if (Date.parse(timeslot.datetime).toString('yyyy-MM-dd') === dateTime) {
+								$('.timeslotcell').each(function(){
+									
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}else if(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0] 
+										+Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[1] === dateTime){
+								$('.timeslotcell').each(function(){
+									if ($(this).attr('value') && parseInt($(this).attr('value').split("_")[1]) === parseInt(timeslot.id)) {
+										if(($(this).attr('class')).indexOf("available") > 0) {
+											triggerTimeslot($(this));
+										}
+									}
+								});
+							}
+							//console.log(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]);
+						}
+					
+					
+					}
+					
+				});
 
                 function makeTimeslotTable(tableClass, scheduleData, dateArray) {
                     var thead = $(document.createElement("tr"));
-                    var minTime = 9;
-                    var maxTime = 19;
+                    var minTime = scheduleData.dayStartTime;
+                    var maxTime = scheduleData.dayEndTime;
 
                     //Creating table header with dates
                     thead.append("<td></td>"); //Empty cell for time column
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                        th.html(headerVal);
+						//console.log((dateArray[i]).toString('dd MMM yyyy'));
+                        th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
                         thead.append(th);
-                    }
+                    }					
+					
                     //Inserting constructed table header into table
                     $("." + tableClass).append($(document.createElement('thead')).append(thead));
 
@@ -342,15 +407,20 @@
                         timesArray.push(timeVal.toString("HH:mm"));
                         timeVal.addMinutes(30);
                         timesArray.push(timeVal.toString("HH:mm"));
-                    }
-
+					}
+					
+					var slotSize = scheduleData.duration / 30;
+					var counter = 1;
+					
+					var startTime = 0;
+					
                     //Constructing table body
                     for (i = 0; i < timesArray.length; i++) {
-                        var tr = $(document.createElement("tr"));
-                        var timeTd = $(document.createElement("td"));
-                        timeTd.html(timesArray[i]);
-                        tr.append(timeTd);
-
+						var tr = $(document.createElement("tr"));
+						var timeTd = $(document.createElement("td"));
+						timeTd.html(timesArray[i]);
+						tr.append(timeTd);
+						
                         for (var j = 0; j < dateArray.length; j++) {
                             var td = $(document.createElement("td"));
                             td.addClass("timeslotcell");
@@ -358,6 +428,7 @@
                             date = new Date(date).toString("yyyy-MM-dd");
                             var datetimeString = date + " " + timesArray[i] + ":00";
                             var timeslot = getScheduleDataTimeslot(datetimeString, scheduleData);
+							
                             if (timeslot) {
                                 if (timeslot.isMyTeam) {
                                     td.html("<span class='teamName'>" + timeslot.team + "</span>");
@@ -366,11 +437,17 @@
                                 }
 								td.addClass('markable border-top');
 								td.attr("value", "timeslot_" + timeslot.id);
+								td.attr("id",j);
                             }
 							td.addClass('border-left');
                             tr.append(td);
                         }
-                        $("." + tableClass).append(tr);
+						counter++;
+                        
+						
+						
+						
+						$("." + tableClass).append(tr);
                     }
                 }
 
