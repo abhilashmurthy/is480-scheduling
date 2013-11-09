@@ -29,7 +29,7 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTeam().getTeamName() + " - Booking Confirmed";
+		return "Booking confirmed for " + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
 	}
 
 	@Override
@@ -69,7 +69,9 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 	@Override
 	public HashMap<String, String> prepareBodyData() {
 		HashMap<String, String> map = new HashMap<String, String>();
-		return generateStandardDetails(b, map);
+		map = generateStandardDetails(b, map);
+		map.put("[REQUIRED_ATTENDEES_GRAMMAR]", (b.getResponseList().size() > 1) ? "have" : "has" );
+		return map;
 	}
 
 	@Override
