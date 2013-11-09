@@ -27,7 +27,7 @@ public class NewBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTeam().getTeamName() + " - New Booking";
+		return "New booking for " + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
 	}
 
 	@Override
