@@ -32,6 +32,7 @@ import model.Timeslot;
 import model.User;
 import model.role.Student;
 import notification.email.EditBookingEmail;
+import notification.email.EditBookingEmail.EditType;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.hibernate.Hibernate;
 import org.json.JSONArray;
@@ -53,6 +54,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws ServletException, IOException {
+		ArrayList<EditType> partsEdited = new ArrayList<EditType>();
 		HttpSession session = request.getSession();
 		
 		Calendar nowCal = Calendar.getInstance();
@@ -135,7 +137,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     optionalAttendees = new HashSet<String>();
                     logger.error("Erm should not reach here");
                 }
-
+				
                 //------------To update the booking date and start time----------------------
                 //update timeslot and change it based on date
                 //go through timeslot to compare start time with the user
@@ -212,7 +214,30 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
                     return SUCCESS;
                 }
                 
-                //New venue
+				/*
+				 * CHECKING WHAT PARTS OF THE BOOKING WERE MODIFIED (for email markup)
+				 */
+				//Checking if time information has been modified
+				if (!oldTimeslot.getStartTime().equals(newBookingTimestamp)) {
+					partsEdited.add(EditType.TIME);
+				}
+				
+				//Checking if the venue information has been modified
+				if (!oldTimeslot.getVenue().equals(newVenue)) {
+					partsEdited.add(EditType.VENUE);
+				}
+				
+				//Checking if the optional attendees have been modified
+				if (!oldOptionals.equals(optionalAttendees)) {
+					partsEdited.add(EditType.OPTIONAL_ATTENDEES);
+				}
+				
+                
+				/*
+				 * END OF CHECKS
+				 */
+				
+				//New venue
                 if (newVenue != null) {
                     oldTimeslot.setVenue(newVenue);
                     map.put("venue", oldTimeslot.getVenue());
@@ -271,7 +296,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 				Hibernate.initialize(booking.getRequiredAttendees());
 				
 				//Sending email update
-				EditBookingEmail email = new EditBookingEmail(booking, user);
+				EditBookingEmail email = new EditBookingEmail(booking, user, partsEdited);
 				email.sendEmail();
                 em.getTransaction().commit();
                 

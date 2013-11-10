@@ -6,6 +6,7 @@ package notification.email;
 
 import constant.Response;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,13 +23,19 @@ import util.MiscUtil;
  */
 public class EditBookingEmail extends EmailTemplate {
 	
+	public enum EditType {
+		VENUE, TIME, OPTIONAL_ATTENDEES
+	}
+	
 	Booking b;
 	User editor;
+	ArrayList<EditType> partsEdited;
 	
-	public EditBookingEmail(Booking b, User editor) {
+	public EditBookingEmail(Booking b, User editor, ArrayList<EditType> partsEdited) {
 		super("edited_booking.html");
 		this.b = b;
 		this.editor = editor;
+		this.partsEdited = partsEdited;
 	}
 
 	@Override
