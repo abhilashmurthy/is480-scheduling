@@ -61,7 +61,7 @@ public class NewBookingEmail extends EmailTemplate{
 
 	@Override
 	public String getFileAttachmentName() {
-		return b.getTeam().getTeamName() + ".ics";
+		return b.getTeam().getTeamName() + " - Tentative.ics";
 	}
 	
 }

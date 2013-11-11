@@ -81,7 +81,7 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String getFileAttachmentName() {
-		return b.getTeam().getTeamName() + ".ics";
+		return b.getTeam().getTeamName() + " - Confirmed.ics";
 	}
 	
 }
