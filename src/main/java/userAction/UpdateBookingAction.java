@@ -54,7 +54,7 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 
     @Override
     public String execute() throws ServletException, IOException {
-		ArrayList<EditType> partsEdited = new ArrayList<EditType>();
+		ArrayList<EditType> partsEdited = new ArrayList<EditType>(); //List to record what parts of the booking were modified. For email markup.
 		HttpSession session = request.getSession();
 		
 		Calendar nowCal = Calendar.getInstance();

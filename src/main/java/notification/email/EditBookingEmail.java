@@ -15,6 +15,9 @@ import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
 import model.User;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import util.MiscUtil;
 
 /**
@@ -104,6 +107,35 @@ public class EditBookingEmail extends EmailTemplate {
 		
 		//Inserting editor name
 		map.put("[EDITOR_NAME]", editor.getFullName());
+		
+		/*
+		 * HIGHLIGHTING THE INFORMATION THAT HAS BEEN UPDATED
+		 */
+		ArrayList<Element> toBeHighlighted = new ArrayList<Element>();
+		Document html = Jsoup.parse(body);
+		
+		if (partsEdited.contains(EditType.TIME)) { //Time information will be highlighted
+			toBeHighlighted.add(html.getElementById("startTime"));
+			toBeHighlighted.add(html.getElementById("endTime"));
+		}
+		
+		if (partsEdited.contains(EditType.VENUE)) { //Venue information will be highlighted
+			toBeHighlighted.add(html.getElementById("venue"));
+		}
+		
+		if (partsEdited.contains(EditType.OPTIONAL_ATTENDEES)) { //Optional attendees will be highlighted
+			toBeHighlighted.add(html.getElementById("optionalAttendees"));
+		}
+		
+		for (Element e : toBeHighlighted) {
+			e.attr("style", "background-color: yellow;");
+		}
+		
+		body = html.toString();
+		
+		/*
+		 * END OF HIGHLIGHT CODE
+		 */
 		
 		return map;
 	}
