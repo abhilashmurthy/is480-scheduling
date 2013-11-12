@@ -31,6 +31,7 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 
     private List<Term> listTerms;
     private List<HashMap<String, String>> dataList;
+    private List<HashMap<String, String>> dataListMilestones;
     private HttpServletRequest request;
     static final Logger logger = LoggerFactory.getLogger(GetTermsAction.class);
 
@@ -43,43 +44,31 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
             //Getting all the term objects
             listTerms = TermManager.getAllTerms(em);
             if (listTerms != null) {
-                dataList = new ArrayList<HashMap<String, String>>();
-                HashMap<String, String> map = null;
+				dataList = new ArrayList<HashMap<String, String>>();
+				dataListMilestones = new ArrayList<HashMap<String, String>>();
+				//Getting term specific details
                 for (Term term : listTerms) {
-                    map = new HashMap<String, String>();
-                    String semester = term.getSemester();  //e.g. 1
-                    int year = term.getAcademicYear();  //e.g. 2013
+					HashMap<String, String> map = new HashMap<String, String>();
+					//Getting term specific details
                     long termId = term.getId();
-                    //e.g. 2013-2014
-                    String academicYear = Integer.toString(year) + "-" + Integer.toString(year + 1);
-                    //e.g. Term 1
-                    String termName = academicYear + " " + semester;
-                   
-					
-					String mStone = "";
-					
-					List<Milestone> milestones = MilestoneManager.findByTerm(em, term);
+                    String termName = term.getDisplayName();
 					map.put("termName", termName);
                     map.put("termId", Long.toString(termId));
-						
-                    for(Milestone milestone: milestones){
-						
+					dataList.add(map);
+				
+					//Getting milestone specific details
+					HashMap<String, String> mapMilestone = new HashMap<String, String>();
+					mapMilestone.put("termName", termName);
+					mapMilestone.put("termId", Long.toString(termId));
+					String mStone = "";
+					List<Milestone> milestones = MilestoneManager.findByTerm(em, term);
+					for (Milestone milestone: milestones) {
 						//for every milestone, add it to the map
 						mStone += milestone.getName() + ",";
-						map.put("milestone", mStone);
-						
-						//dataList.add(map);
-						dataList.add(map);
-						
+						mapMilestone.put("milestone", mStone);
+						dataListMilestones.add(mapMilestone);
 					}
-					
-                    
-					
-					
-					
-					
-					
-                }
+				}
             } else {
                 request.setAttribute("error", "You cannot create a schedule right now. Please create a term first!");
                 logger.error("User cannot create schedule before creating term.");
@@ -101,13 +90,21 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
         return SUCCESS;
     }
 
-    public List<HashMap<String, String>> getDataList() {
-        return dataList;
-    }
+	public List<HashMap<String, String>> getDataList() {
+		return dataList;
+	}
 
-    public void setDataList(ArrayList<HashMap<String, String>> dataList) {
-        this.dataList = dataList;
-    }
+	public void setDataList(List<HashMap<String, String>> dataList) {
+		this.dataList = dataList;
+	}
+
+	public List<HashMap<String, String>> getDataListMilestones() {
+		return dataListMilestones;
+	}
+
+	public void setDataListMilestones(List<HashMap<String, String>> dataListMilestones) {
+		this.dataListMilestones = dataListMilestones;
+	}
 
     public void setServletRequest(HttpServletRequest hsr) {
         request = hsr;
