@@ -150,6 +150,14 @@
 				$(this).button('loading');
 //				saveButton.button('loading');
 				
+				var termSelected = $('#termChosen').val();
+				//Checking whether user has selected term or not
+				if (termSelected === "" || termSelected === null) {
+					showNotification("ERROR", "Please select a term!");
+					$("#submitFormBtn").button('reset');
+					return false;
+				}
+				
 				var file = $('#fileUploaded').val();
 				//Checking whether user has selected file or not
 				if (file === "" || file === null) {
@@ -180,14 +188,6 @@
 				//If file size is 0 then display error
 				if (fileSize === 0) {
 					showNotification("ERROR", "The file is empty! Please upload correct file!");
-					$("#submitFormBtn").button('reset');
-					return false;
-				}
-				
-				var termSelected = $('#termChosen').val();
-				//Checking whether user has selected term or not
-				if (termSelected === "" || termSelected === null) {
-					showNotification("ERROR", "Please select a term!");
 					$("#submitFormBtn").button('reset');
 					return false;
 				}

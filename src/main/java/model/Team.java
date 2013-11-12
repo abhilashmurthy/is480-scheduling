@@ -4,10 +4,10 @@
  */
 package model;
 
+import constant.PresentationType;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -19,7 +19,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import model.role.Faculty;
 import model.role.Student;
-import org.hibernate.annotations.Cascade;
 
 /**
  *
@@ -35,6 +34,8 @@ public class Team implements Serializable {
 	private Long id;
 	private String teamName;
 	private String wiki;
+	//Store the type of presentation
+    private PresentationType presentationType;
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -102,6 +103,14 @@ public class Team implements Serializable {
 		this.members = members;
 	}
 
+	public PresentationType getPresentationType() {
+		return presentationType;
+	}
+
+	public void setPresentationType(PresentationType presentationType) {
+		this.presentationType = presentationType;
+	}
+	
 	public Long getId() {
 		return id;
 	}
