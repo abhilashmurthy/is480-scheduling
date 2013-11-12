@@ -182,7 +182,8 @@
 			message: 'Your session is about to timeout',
 			warnAfter: 1080000,
 			redirAfter: 1140000,
-			logoutUrl: 'logout'
+			logoutUrl: 'logout',
+			redirUrl: 'logout'
 		});
             
         

@@ -147,8 +147,8 @@ input, button, select, textarea {
 
 .timeslotCell {
 	position: absolute;
-	border-radius: 5px;
 	border: 1px solid black;
+	background-color: #AEC7C9;
 	cursor: pointer !important;
 }
 
@@ -156,13 +156,9 @@ input, button, select, textarea {
 	cursor: pointer !important;
 }
 
-#userDashboard > .popover {
-    width: inherit !important;
-}
-
 .popover {
-	/*    width: 100%;*/
-    max-width: 400px !important;
+	min-width: 240px;
+    max-width: 500px !important;
     font-weight: normal;
     z-index: 1031 !important;
 }
@@ -204,7 +200,6 @@ input, button, select, textarea {
 
 .bookedTimeslot:hover, .unbookedTimeslot:hover {
     box-sizing: border-box;
-    border: 2px solid darkblue;
 }
 
 .noTimeslot {
@@ -219,22 +214,7 @@ input, button, select, textarea {
 }
 
 .unavailableTimeslot {
-	/*    background-size: 50px 50px;
-		background-color: #ac0;
-		background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-						  transparent 50%, rgba(255, 255, 255, .6) 2%, rgba(255, 255, 255, .6) 75%,
-						  transparent 0%);
-		background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-						  transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
-						  transparent 75%, transparent);
-		background-image: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-						  transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
-						  transparent 75%, transparent);
-		-pie-background: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
-						 transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
-						 transparent 75%, transparent) 0 0 / 50px 50px #ac0;*/
-    /*background-color: #269;*/
-    background-size: 100px 100px, 100px 100px, 2px 2px, 2px 2px;
+    background-size: 115px 115px, 115px 115px, 2px 2px, 2px 2px;
     background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
     background-image: -webkit-linear-gradient(white 2px, transparent 2px),
 		-webkit-linear-gradient(0, white 2px, transparent 2px),
@@ -292,7 +272,7 @@ input, button, select, textarea {
     height: 40px;
     line-height: 20px;
     text-align: center;
-    vertical-align: middle;
+	vertical-align: middle;
 	font-size: 12px;
     z-index: 10;
 }
@@ -303,24 +283,15 @@ input, button, select, textarea {
 }
 
 .pendingBooking {
-    border-radius: 5px !important;
-    -moz-border-radius: 5px !important;
     background-color: #F6EE4E !important;
-    border: 2px solid #CD950C !important;
 }
 
 .approvedBooking {
-    border-radius: 5px !important;
-    -moz-border-radius: 5px !important;
     background-color: #A9DBA9 !important;
-    border: 2px solid #415641 !important;
 }
 
 .rejectedBooking {
-    border-radius: 5px !important;
-    -moz-border-radius: 5px !important;
     background-color: #F75D59 !important;
-    border: 2px solid #722A29 !important;
 }
 
 .legend {
@@ -374,20 +345,22 @@ input, button, select, textarea {
 }
 
 
-.notification-drawer {  
+.notification-drawer {
 	position: absolute;
 	top:22%;
 	left:76%;
 }
 
 #viewTimeslotTable {
-    max-width: 300px;
+    max-width: 500px;
     font-weight: normal;
+	border: none;
 }
 
 #createTimeslotTable {
-    max-width: 300px;
+    max-width: 500px;
     font-weight: normal;
+	border: none;
 }
 
 #venueInput {
@@ -494,7 +467,6 @@ input, button, select, textarea {
 .booking:not(.myTeamBooking) {
 	color: grey;
 	background-color: rgba(248, 247, 216, 0.5) !important;
-	border: 2px solid grey !important;
 }
 
 .booking:not(.myTeamBooking) > .popover {
