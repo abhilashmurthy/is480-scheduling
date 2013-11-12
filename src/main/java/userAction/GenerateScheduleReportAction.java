@@ -7,13 +7,8 @@ package userAction;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 //import constant.Status;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -44,16 +39,16 @@ import model.Milestone;
 import model.Schedule;
 import model.Term;
 import model.Timeslot;
+import org.json.JSONObject;
 
 /**
  *
  * @author Tarlochan
  */
-public class ViewScheduleReportAction extends ActionSupport implements ServletRequestAware {
+public class GenerateScheduleReportAction extends ActionSupport implements ServletRequestAware {
 
 	private HttpServletRequest request;
 	private HttpServletResponse response;
-	private String settingDetails;
 	private HashMap<String, Object> json = new HashMap<String, Object>();
 	private Logger logger = LoggerFactory.getLogger(UpdateNotificationSettingsAction.class);
 
@@ -79,55 +74,30 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 			User user = (User) session.getAttribute("user");
 
 			if (user.getRole().equals(Role.ADMINISTRATOR) || user.getRole().equals(Role.COURSE_COORDINATOR)) {
-
-				//get the current milestone settings
-				//Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
-
-				//convert settingsDetails into an array
-//				String[] setArr = settingDetails.split(",");
-//				
-//				String termDetails = setArr[0];
-//				String milestone = setArr[1];
-//				
-//				
-//				String outputFile = "ReportDownload.csv";
-
-
-//				BufferedWriter out = new BufferedWriter(new FileWriter("C:\\is480-scheduling\\src\\main\\webapp\\ReportCSV\\ReportDownload.csv"));
-//				CSVWriter writer = new CSVWriter(out);
-//				String[] values = {"1","first","second","Third one quoted with a, comma","fourth \"double quotes\"\n line break"};
-//				writer.writeNext(values);
-//				values = new String[]{"2","erst","zweite","Dritte,mit Komma","viertl"};
-//				writer.writeNext(values);
-//				values = new String[]{"3","primero","segundo","tercero","cuarto,con la coma"};
-//				writer.writeNext(values);
-//				out.close();
-
-//				File dir = new File("ReportCSV");
-//				dir.mkdirs();
-//				File tmp = new File(dir, "ReportDownload.csv");
-//				tmp.createNewFile();
-				String[] setArr = settingDetails.split(",");
-
-				String milestone = setArr[0];
-				String termDetails = setArr[1];
-
-				long chosenID = Long.parseLong(termDetails);
-
+				
+				JSONObject reportData = new JSONObject(request.getParameter("jsonData"));
+				String reportNo = reportData.getString("reportNumber");
+				
+				if (!reportNo.equalsIgnoreCase("1")) {
+					json.put("error", true);
+					json.put("message", "Wrong report selected. Please try again!");
+					return SUCCESS;
+				}
+				
+				long termId = Long.parseLong(reportData.getString("termId"));
+				String milestone = reportData.getString("milestoneName");
+				
 				boolean termMilestoneMismatch = true;
-
-				//check if this term and milestone belongs together
-				Term thisTerm = TermManager.findTermById(em, chosenID);
-
+				//check if this term and milestone belong together
+				Term thisTerm = TermManager.findTermById(em, termId);
 				List<Milestone> milestones = MilestoneManager.findByTerm(em, thisTerm);
 
 				//for every milestone for the term
 				for (Milestone m : milestones) {
-
-					if (m.getName().equals(milestone.toString())) {
+					if (m.getName().equals(milestone)) {
 						termMilestoneMismatch = false;
+						break;
 					}
-
 				}
 
 				//if term does not contain selected milestone
@@ -136,7 +106,6 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 					json.put("message", "Milestone for the term not found!");
 					return SUCCESS;
 				}
-
 
 				//else if term and milestone exists
 				ServletContext context = ServletActionContext.getServletContext();
@@ -156,14 +125,10 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 				Schedule thisSchedule = new Schedule();
 
 				for (Schedule sch : thisSchedules) {
-
 					if (sch.getMilestone().getName().equals(milestone.toString())) {
-
 						thisSchedule = sch;
 						break;
 					}
-
-
 				}
 				//get the timeslots for this schedule
 				List<Timeslot> allSlots = TimeslotManager.findBySchedule(em, thisSchedule);
@@ -229,16 +194,12 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 							} else if (u.getRole() == Role.STUDENT) {
 								toAddStudents += u.getFullName() + " ";
 							}
-
-
 						}
 
 						requiredAttendees = toAddRequired;
 
 						if (toAddStudents.length() > 0) {
-
 							teamMembers = toAddStudents;
-
 						}
 
 						//get the optional attendees
@@ -248,9 +209,7 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 
 						if (allOptional != null) {
 							for (String eachOptional : allOptional) {
-
 								optional += eachOptional + " ";
-
 							}
 
 							if (optional.length() > 0) {
@@ -260,16 +219,13 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 
 						//get the team
 						team = t.getCurrentBooking().getTeam().getTeamName();
-
 						lastEdited = t.getCurrentBooking().getLastEditedBy();
-
 					}
 
 					String[] eachRow = {startDate, endDate, venue, TA, currentStatus,
 						requiredAttendees, optionalAttendees, team, teamMembers, lastEdited};
 
 					writer.writeNext(eachRow);
-
 				}
 
 				writer.close();
@@ -290,9 +246,6 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 				json.put("error", true);
 				json.put("message", "You are not authorized to access this page!");
 			}
-
-
-
 		} catch (Exception e) {
 			logItem.setSuccess(false);
 			User userForLog = (User) session.getAttribute("user");
@@ -344,14 +297,6 @@ public class ViewScheduleReportAction extends ActionSupport implements ServletRe
 
 	public void setResponse(HttpServletResponse response) {
 		this.response = response;
-	}
-
-	public String getSettingDetails() {
-		return settingDetails;
-	}
-
-	public void setSettingDetails(String settingDetails) {
-		this.settingDetails = settingDetails;
 	}
 
 	public HashMap<String, Object> getJson() {

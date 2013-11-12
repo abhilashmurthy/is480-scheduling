@@ -72,7 +72,7 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				
 				if (!reportNo.equalsIgnoreCase("3")) {
 					json.put("error", true);
-					json.put("message", "Wrong report selected!");
+					json.put("message", "Wrong report selected. Please try again!");
 					return SUCCESS;
 				}
 				
