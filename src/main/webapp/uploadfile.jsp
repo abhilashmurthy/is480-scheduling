@@ -73,7 +73,7 @@
 					<tbody>
 					<td>
 						<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Uploading..." 
-							style="margin-bottom: 20px;">Upload</button>
+							style="margin-bottom: 20px;"><i class='fa fa-upload'></i>&nbsp;Upload</button>
 							<!--<input type="submit" id="submitFormBtn" value="Save"/>-->
 							<%--<s:submit value="Upload"></s:submit>--%>
 					</td>
