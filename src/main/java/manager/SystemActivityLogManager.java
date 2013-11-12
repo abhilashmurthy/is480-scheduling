@@ -4,10 +4,13 @@
  */
 package manager;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
+import model.Schedule;
 import model.SystemActivityLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +39,14 @@ public class SystemActivityLogManager {
     }
 	 
 	/* To get all the logs between start time and end time*/
-	public static List<SystemActivityLog> getAllLogsBetween(EntityManager em, Date startTime, Date endTime) {
-	   logger.trace("Getting all logs between");
+	public static List<SystemActivityLog> getAllLogsBetween(EntityManager em, Timestamp startDate, Timestamp endDate) {
+	   logger.trace("Getting all logs between " + startDate.toString() + " and " + endDate.toString());
 	   List<SystemActivityLog> result = null;
 	   try {
 		   em.getTransaction().begin();
-		   Query q = em.createQuery("select l from SystemActivityLog l");
+		   Query q = em.createQuery("select l from SystemActivityLog l where l.runTime >= :startDate and l.runTime <= :endDate", SystemActivityLog.class)
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate);
 		   result = q.getResultList();
 		   em.getTransaction().commit();
 	   } catch (Exception e) {
