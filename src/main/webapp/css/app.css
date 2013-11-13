@@ -638,3 +638,7 @@ select, input {
 .dateCol {
 	text-align: center;
 }
+
+.calendarHighlighted {
+	background-color: #f5f5f5;
+}

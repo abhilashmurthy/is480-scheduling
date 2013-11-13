@@ -369,9 +369,25 @@
                 }
 
                 function setupMouseEvents() {
-					$('.timeslotCell').mouseleave(function() {
-                        $(this).removeClass('clickedCell');
-                    });
+					$('.timeslotCell').mouseenter(function(){
+						var $this = $(this);
+						var $td = $('body').find('.tdCell[value="' + $this.attr('value') + '"]');
+						var cols = $td.closest('table').find('tr:first').children('td').length;
+						var $tr = $td.closest('tr');
+						$tr.addClass('calendarHighlighted');
+						if ($tr.children('td').length !== cols) {
+							$td.closest('table').find('tr:first td:nth-child(' + ($td.index() + 2) + ')').addClass('calendarHighlighted');
+							$td.closest('table').find('tr:even:not(:first) td:nth-child(' + ($td.index() + 1) + ')').addClass('calendarHighlighted');
+							$td.closest('table').find('tr:odd td:nth-child(' + ($td.index() + 2) + ')').addClass('calendarHighlighted');
+						} else {
+							$td.closest('table').find('tr:first td:nth-child(' + ($td.index() + 1) + ')').addClass('calendarHighlighted');
+							$td.closest('table').find('tr:even:not(:first) td:nth-child(' + $td.index() + ')').addClass('calendarHighlighted');
+							$td.closest('table').find('tr:odd td:nth-child(' + ($td.index() + 1) + ')').addClass('calendarHighlighted');
+						}
+					});
+					$('.timeslotCell').mouseleave(function(){
+						$('tr, td').removeClass('calendarHighlighted');
+					});
                     
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
