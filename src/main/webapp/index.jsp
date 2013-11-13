@@ -913,7 +913,7 @@
 							bookingDiv.html(booking.team);
 							bookingDiv.css('display', 'none');
 							bookingDiv.css ({
-								height: self.innerHeight() / 1.05,
+								height: self.innerHeight() / 1.1,
 								width: self.outerWidth() / 1.1
 							});
 							self.append(bookingDiv);
@@ -977,7 +977,7 @@
 										bookingDiv.html(returnData.booking.team);
 										bookingDiv.css('display', 'none');
 										bookingDiv.css ({
-											height: self.innerHeight() / 1.05,
+											height: self.innerHeight() / 1.1,
 											width: self.outerWidth() / 1.1
 										});
 										self.append(bookingDiv);
@@ -1130,7 +1130,7 @@
                                 bookingDiv.html(returnData.booking.team);
                                 bookingDiv.css('display', 'none');
 								bookingDiv.css ({
-									height: newTimeslot.innerHeight() / 1.05,
+									height: newTimeslot.innerHeight() / 1.1,
 									width: newTimeslot.outerWidth() / 1.1
 								});
                                 newTimeslot.append(bookingDiv);
@@ -1768,15 +1768,13 @@
 						if (timeslots.hasOwnProperty(key)) {
 							var timeslot = timeslots[key];
 							var $tdCell = $('body').find('td.tdCell[value="' + timeslot.datetime + '"]');
-							console.log("Calculated height: " + ($tdCell.outerHeight(true) * (scheduleData.duration / 30)));
-							console.log("Calculated width: " + $tdCell.outerWidth());
 							var $timeslot = $(document.createElement('div'))
 								.addClass('timeslotCell')
 								.attr('id', 'timeslot_' + timeslot.id)
 								.attr('align', 'center')
 								.attr('value', timeslot.datetime)
 								.css ({
-									height: ($tdCell.innerHeight() / 1.05 * (scheduleData.duration / 30)),
+									height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
 									width: $tdCell.outerWidth() / 1.1
 								})
 								.offset({
@@ -1798,7 +1796,7 @@
 											|| timeslot.subscribedUsers.indexOf(myEmail) !== -1
 											?'myTeamBooking':false)
 										.css ({
-											height: ($tdCell.innerHeight() / 1.05 * (scheduleData.duration / 30)),
+											height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
 											width: $tdCell.outerWidth() / 1.1
 										})
 										.html(timeslot.team)
@@ -2296,7 +2294,7 @@
                     },
                     content: content,
                     placement: function(){
-                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 7) {
+                        if ($('body').find('.tdCell[value="' + container.closest('.timeslotCell').attr('value') + '"]').parents("tr").children().index($('body').find('.tdCell[value="' + container.closest('.timeslotCell').attr('value') + '"]')) >= 7) {
                             return 'left';
                         } else {
                             return 'right';
@@ -2313,7 +2311,7 @@
 					trigger: 'hover',
                     title: title,
                     placement: function(){
-                        if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 7) {
+                        if ($('body').find('.tdCell[value="' + container.closest('.timeslotCell').attr('value') + '"]').parents("tr").children().index($('body').find('.tdCell[value="' + container.closest('.timeslotCell').attr('value') + '"]')) >= 7) {
                             return 'left';
                         } else {
                             return 'right';

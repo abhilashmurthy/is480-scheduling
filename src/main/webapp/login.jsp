@@ -93,7 +93,7 @@
 			<!-- To display legend for the calendar -->
 			<table class="legend">
 				<tr>
-					<td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
+					<td class="legendBox unbookedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Available</td>
 					<td style="width:15px"></td>
 					<td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
 					<td style="width:15px"></td>
@@ -205,9 +205,10 @@
                     scheduleData = getScheduleData(milestone, year, semester);
                     if (scheduleData.success) {
                         convertScheduleData();
-                        makeSchedule();
-						appendPopovers();
-                        setupMouseEvents();
+                        renderSchedule();
+						setTimeout(function(){renderTimeslots();}, 0);
+						setTimeout(function(){appendPopovers();}, 0);	
+                        setTimeout(function(){setupMouseEvents();}, 0);
                     } else {
                         var eid = btoa(scheduleData.message);
                         window.location = "error.jsp?eid=" + eid;
@@ -227,9 +228,8 @@
                     scheduleData["timeslots"] = newTimeslots;
                 }
 				
-				function makeSchedule() {
+				function renderSchedule() {
                     var tableClass = "scheduleTable:first";
-                    var timeslots = scheduleData.timeslots;
                     var minTime = scheduleData.dayStartTime;
                     var maxTime = scheduleData.dayEndTime;
 
@@ -242,7 +242,6 @@
                     }
                     
                     var datesArray = getDateArrayBetween(scheduleData.startDate, scheduleData.endDate, weekView);
-
                     //Append header names
 					$("." + tableClass)
 						.append(
@@ -266,51 +265,30 @@
 								)
 						);
 					
-					//Append body data
+					//Append body data 2.0
 					$("." + tableClass)
 						.append(function(){
 							var $trCollection = new Array();
-							var rowspanArr = new Array();
 							for (var i = 0; i < timesArray.length; i++) {
 								$trCollection.push(
 									$(document.createElement('tr'))
-										.append(
+										.append(i%2 === 0?
 											$(document.createElement('td')) //Time display cell
 											.addClass('timeDisplayCell')
+											.attr('rowspan', '2')
 											.html(timesArray[i].substring(0, 5))
+											:false
 										)
 										.append(function(){
 											var $tdCollection = new Array();
-											rowloop: for (var j = 0; j < datesArray.length; j++) {
+											for (var j = 0; j < datesArray.length; j++) {
 												var datetime = new Date(datesArray[j]).toString("yyyy-MM-dd") + " " + timesArray[i];
-												for (var k = 0; k < rowspanArr.length; k++) { //Checking if table cell is part of a timeslot
-													if (datetime === rowspanArr[k]) {
-														continue rowloop;
-													}
-												}
-												var timeslot = timeslots[datetime];
-												var $td = $(document.createElement('td')).addClass('timeslotCell');
-												if (timeslot) {
-													for (var t = 30; t < scheduleData.duration; t++) {
-														rowspanArr.push(Date.parse(datetime).addMinutes(t).toString("yyyy-MM-dd HH:mm:ss"));
-													}
-													$td
-														.attr('id', 'timeslot_' + timeslot.id)
-														.attr('align', 'center')
+												$tdCollection.push(
+													$(document.createElement('td'))
+														.addClass('tdCell')
+														.addClass(i%2 === 0?'tdUpper':'tdLower')
 														.attr('value', datetime)
-														.attr('rowspan', scheduleData.duration/30)
-														.addClass(timeslot.team?'bookedTimeslot':'unbookedTimeslot')
-														.append(timeslot.team?
-															$(document.createElement('div'))
-																.addClass('booking pendingBooking')
-																.addClass(timeslot.status.toLowerCase() + 'Booking')
-																.addClass('myTeamBooking')
-																.html(timeslot.team)
-														:false);
-												} else {
-													$td.addClass('noTimeslot');
-												}
-												$tdCollection.push($td);
+												);
 											}
 											return $tdCollection;
 										})
@@ -318,7 +296,45 @@
 							}
 							return $trCollection;
 						});
+					return false;
                 }
+				
+				function renderTimeslots() {
+					var timeslots = scheduleData.timeslots;
+					for (var key in timeslots) {
+						if (timeslots.hasOwnProperty(key)) {
+							var timeslot = timeslots[key];
+							var $tdCell = $('body').find('td.tdCell[value="' + timeslot.datetime + '"]');
+							console.log("Calculated height: " + ($tdCell.outerHeight(true) * (scheduleData.duration / 30)));
+							console.log("Calculated width: " + $tdCell.outerWidth());
+							var $timeslot = $(document.createElement('div'))
+								.addClass('timeslotCell')
+								.attr('id', 'timeslot_' + timeslot.id)
+								.attr('align', 'center')
+								.attr('value', timeslot.datetime)
+								.css ({
+									height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
+									width: $tdCell.outerWidth() / 1.1
+								})
+								.offset({
+									top: $tdCell.offset().top,
+									left: $tdCell.offset().left
+								})
+								.addClass(timeslot.team?'bookedTimeslot':'unbookedTimeslot')
+								.append(timeslot.team?
+									$(document.createElement('div'))
+										.addClass('booking pendingBooking myTeamBooking')
+										.addClass(timeslot.status.toLowerCase() + 'Booking')
+										.css ({
+											height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
+											width: $tdCell.outerWidth() / 1.1
+										})
+										.html(timeslot.team)
+								:false);
+							$('body').append($timeslot);
+						}
+					}
+				}
 				
                 function getDateArrayBetween(startDate, stopDate, weekNum) {
                     var dateArray = new Array();
@@ -405,6 +421,7 @@
                     var timeslot = scheduleData.timeslots[$td.attr('value')];					
                     var $bookingDetailsTable = $(document.createElement('table'));
                     $bookingDetailsTable.attr('id', 'viewTimeslotTable');
+					$bookingDetailsTable.addClass('table-condensed table-hover table-bordered');
 					var outputData = {
 						Team: timeslot.wiki ? '<a id="wikiLink" href="' + timeslot.wiki + '">' + timeslot.team + '</a>':timeslot.team,
 						Status: timeslot.status,
