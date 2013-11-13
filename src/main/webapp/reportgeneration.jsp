@@ -61,8 +61,8 @@
 								<td>
 								<select id="termChosen" name="termChosen" style="width:200px">
 									<option value="0"></option>
-									<s:iterator value="dataList">
-										<option id="<s:property value="termId"/>">
+									<s:iterator value="dataListMilestones">
+										<option value="<s:property value="termId"/>">
 											<s:property value="termName"/>
 										</option>
 									</s:iterator>
@@ -83,7 +83,7 @@
 								<td>
 								<select id="milestoneChosen" name="milestoneChosen" style="width:200px">
 									<option value=""></option>
-									<s:iterator value="dataList">
+									<s:iterator value="dataListMilestones">
 										<option value="<s:property value="milestone"/>">
 											<s:property value="milestone"/>
 										</option>
@@ -132,7 +132,7 @@
 				</div>
 			</div>
 			
-			<div style="float: left;">
+			<div style="float:left; margin-right: 40px;">
 				<br/><br/>
 				<table>
 					<tbody>
@@ -148,8 +148,9 @@
 			<br/><br/>				
 			<div style="float: left">
 				<table>
-				<br/><br/>
-				<a id="downloadFile" href="ReportCSV/ScheduleReport.csv" target="_blank" style="display:none">Download Report</a>
+					<a id="downloadFile" class="btn" target="_blank" style="display: none">
+						<i class='fa fa-download'></i>&nbsp;Download Report
+					</a>
 				</table>
 			</div>
 						
@@ -157,10 +158,15 @@
 					
 		<%@include file="footer.jsp"%>
 		<script type="text/javascript">
-			window.onload = function() {
+			reportGenerationLoad = function() {
+//			window.onload = function() {
 				$(function() {
-					$("#startDatePicker").datepicker();
-					$("#endDatePicker").datepicker();
+					$("#startDatePicker").datepicker({
+						dateFormat: 'dd-mm-yy'
+					});
+					$("#endDatePicker").datepicker({
+						dateFormat: 'dd-mm-yy'
+					});
 				});
 			
 			   //removes duplicate	
@@ -224,7 +230,6 @@
 					opt.value = mArr[i];
 					select.appendChild(opt);
 				}
-			};
 			
 			//On dropdown change
 			$('#reportChosen').change(function() { 
@@ -233,21 +238,25 @@
 					$("#wikiReport").hide();
 					$("#logActivityReport").hide();
 					$("#scheduleReport").hide();
+					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', true);
 					showNotification("ERROR", "Please select a report!");
 				} else if (sel === "1") {
 					$("#wikiReport").hide();
 					$("#logActivityReport").hide();
+					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', false);
 					$("#scheduleReport").show();
 				} else if (sel === "2") {
 					$("#logActivityReport").hide();
 					$("#scheduleReport").hide();
+					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', false);
 					$("#wikiReport").show();
 				} else if (sel === "3") {
 					$("#wikiReport").hide();
 					$("#scheduleReport").hide();
+					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', false);
 					$("#logActivityReport").show();
 				}
@@ -267,58 +276,70 @@
 			$("#endDatePicker").keydown(function (e) {
 				e.preventDefault();
 			});
-			
+		
+		
 			//Submit changes to backend
 			$('#submitBtn').click(function(e) {
-//				$(this).button('loading');
+				$(this).button('loading');
 				var reportSel = $('#reportChosen').val();
-				console.log("Report Number:" + reportSel);
+
+				//For the data to send to backend
 				var reportData = {};
+				//For the url parameter
+				var urlParam = "";
 				//Validation checks
 				if (reportSel === "0") {
 					showNotification("ERROR", "Please select a report!");
 					return false;
 				} else if (reportSel === "1") {
+					$("#downloadFile").attr("href", "ReportCSV/ScheduleReport.csv");
+					urlParam = 'generateScheduleReport';
 					//Check whether term has been selected
 					var termSelected = $('#termChosen').val();
 					if (termSelected === "" || termSelected === null) {
-//						showNotification("ERROR", "Please select a term!");
+						showNotification("ERROR", "Please select a term!");
 						$("#submitBtn").button('reset');
 						return false;
 					}
 					//Check whether milestone has been selected
 					var milestoneSelected = $('#milestoneChosen').val();
 					if (milestoneSelected === "" || milestoneSelected === null) {
-//						showNotification("ERROR", "Please select a milestone!");
+						showNotification("ERROR", "Please select a milestone!");
 						$("#submitBtn").button('reset');
 						return false;
 					}
-					
 					//Prepare data
+					reportData["reportNumber"] = reportSel;
+					reportData["termId"] = termSelected;
+					reportData["milestoneName"] = milestoneSelected;
 					
 				} else if (reportSel === "2") {
+					$("#downloadFile").attr("href", "ReportCSV/ScheduleWiki.csv");
+					urlParam = 'generateWikiReport';
 					
 				} else if (reportSel === "3") {
+					$("#downloadFile").attr("href", "ReportCSV/LoggingReport.csv");
+					urlParam = 'generateLoggingReport';
 					//Check whether start date has been selected
 					var startDate = $('#startDatePicker').val();
 //					console.log("Start Date:" + startDate);
 					var endDate = $('#endDatePicker').val();
 //					console.log("End Date:" + endDate);
 					
-					if ((startDate === "") && (endDate !== "")) {
-//						showNotification("ERROR", "Please select the Start Date!");
+					if ((!startDate.length > 0) && (endDate.length > 0)) {
+						showNotification("ERROR", "Please select the Start Date!");
 						$("#submitBtn").button('reset');
 						return false;
 					} 
 					//Check whether end date has been selected
-					if ((startDate !== "") && (endDate === "")) {
-//						showNotification("ERROR", "Please select the End Date!");
+					if ((startDate.length > 0) && (!endDate.length > 0)) {
+						showNotification("ERROR", "Please select the End Date!");
 						$("#submitBtn").button('reset');
 						return false;
 					} 
 					//Check that end date is after start date
 					if (startDate > endDate) {
-//						showNotification("ERROR", "End Date should be after Start Date!");
+						showNotification("ERROR", "End Date should be after Start Date!");
 						$("#submitBtn").button('reset');
 						return false;
 					}
@@ -328,38 +349,14 @@
 					reportData["endDate"] = endDate;
 				}
 				
-//				var termSelected = $('#termChosen').val();
-//				
-//
-//				var e = document.getElementById("termChosen");
-//				var selectedTerm = e.options[e.selectedIndex].text;
-//				var e = document.getElementById("milestoneChosen");
-//				var selectedMilestone = e.options[e.selectedIndex].text;
-//				 var optionID = $('option:selected').attr('id');
-//
-//				var settings = "";
-//
-//				if((selectedTerm === "" || selectedTerm === null) || (selectedMilestone === "" || selectedMilestone === null)){
-//					showNotification("ERROR", "Please select term and milestone.");
-//					$("#submitBtn").button('reset');
-//					return false;	
-//				}else{
-//					//alert(selectedTerm);
-//					//alert(selectedMilestone);
-//					settings+= selectedMilestone+",";
-//					settings+= optionID;
-//				}
-//
-//				console.log("tosend: " + settings);
-				//var val = document.getElementById("milestoneChosen").value;
-				//console.log(val);
+				//Making ajax call and submitting data to backend
 				$.ajax({
 					type: 'POST',
 					async: false,
-					url: 'generateLoggingReport',
+					url: urlParam,
 					data: {jsonData: JSON.stringify(reportData)}
 				}).done(function(response) {
-//					$("#submitBtn").button('reset');
+					$("#submitBtn").button('reset');
 					console.log(response);
 					if (response.success) {
 						showNotification("SUCCESS", response.message);
@@ -421,6 +418,9 @@
 				}
 				$.pnotify(opts);
 			}
+		};
+		
+		addLoadEvent(reportGenerationLoad);
 		</script>
 	</body>
 </html>

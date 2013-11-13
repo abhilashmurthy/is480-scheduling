@@ -172,7 +172,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 			return ERROR;
 		} catch (Exception e) {
 			User userForLog = (User) session.getAttribute("user");
-			if (userForLog != null) {
+			if (userForLog != null && userForLog.getId() != null) {
 				logItem.setUser(userForLog);
 			}
 			logItem.setMessage("Error: " + e.getMessage());

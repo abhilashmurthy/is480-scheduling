@@ -34,7 +34,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 	public Set<String> generateToAddressList() {
 		Set<String> emails = new HashSet<String>();
 		for (User u : b.getTeam().getMembers()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+			emails.add(u.getEmail());
 		}
 		
 		return emails;
@@ -43,7 +43,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateCCAddressList() {
 		Set<String> emails = new HashSet<String>();
-		emails.add(approver.getUsername() + "@smu.edu.sg");
+		emails.add(approver.getEmail());
 		return emails;
 	}
 

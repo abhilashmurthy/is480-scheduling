@@ -8,6 +8,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.PresentationType;
 import constant.Role;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -122,15 +123,15 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 					return SUCCESS;
 				}
 				
-//				//5. Validate for team presentation type (private, internal, public)
-//				logger.info("Validating team presentation type (private, internal, public)");
-//				String[] errorInPresentationType = validatePresentationTypes(csvFile, logItem);
-//				if (errorInPresentationType[0].equalsIgnoreCase("true")) {
-//					session.setAttribute("csvMsg", "Wrong Presentation Type! Presentation types can only be Private, Internal "
-//							+ "or Public (For TA, please put a '-') Row Number: " + errorInPresentationType[1]);
-//					logger.error("Error with presentation types in csv upload. Row Number: " + errorInPresentationType[1]);
-//					return SUCCESS;
-//				}
+				//5. Validate for team presentation type (private, internal, public)
+				logger.info("Validating team presentation type (private, internal, public)");
+				String[] errorInPresentationType = validatePresentationTypes(csvFile, logItem);
+				if (errorInPresentationType[0].equalsIgnoreCase("true")) {
+					session.setAttribute("csvMsg", "Wrong Presentation Type! Presentation types can only be Private, Internal "
+							+ "or Public (For TA, please put a '-') Row Number: " + errorInPresentationType[1]);
+					logger.error("Error with presentation types in csv upload. Row Number: " + errorInPresentationType[1]);
+					return SUCCESS;
+				}
 				
 				//6. Validate that TA's are at the start of the file
 //				logger.info("Validating order of roles for TA");
@@ -390,6 +391,14 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 						Team team = new Team();
 						team.setTeamName(nextLineTeams[0]);
 						team.setTerm(term);
+						//Get the presentation type of the team
+						if (nextLineTeams[4].equalsIgnoreCase("Private")) {
+							team.setPresentationType(PresentationType.PRIVATE);
+						} else if (nextLineTeams[4].equalsIgnoreCase("Public")) {
+							team.setPresentationType(PresentationType.PUBLIC);
+						} else if (nextLineTeams[4].equalsIgnoreCase("Internal")) {
+							team.setPresentationType(PresentationType.INTERNAL);
+						}
 						teamsList.add(team);
 					}
 				}
@@ -654,7 +663,7 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 				lineNo++;
 				if (lineNo != 1) {
 					if (!(nextLine[0].length() > 0) || !(nextLine[1].length() > 0) || !(nextLine[2].length() > 0) 
-						|| !(nextLine[3].length() > 0)) {
+						|| !(nextLine[3].length() > 0) || !(nextLine[4].length() > 0)) {
 						errorWithEmptyCells[0] = "true";
 						errorWithEmptyCells[1] = String.valueOf(lineNo);
 						return errorWithEmptyCells;

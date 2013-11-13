@@ -35,7 +35,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 	public Set<String> generateToAddressList() {
 		Set<String> emails = new HashSet<String>();
 		for (User u : b.getTeam().getMembers()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+			emails.add(u.getEmail());
 		}
 		
 		return emails;
@@ -47,7 +47,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 		
 		//Adding required attendees
 		for (User u : b.getResponseList().keySet()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+			emails.add(u.getEmail());
 		}
 		return emails;
 	}

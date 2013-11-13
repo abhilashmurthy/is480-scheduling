@@ -40,7 +40,9 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="index">IS480 Scheduling</a>
+            <a class="brand" href="index">
+				<img src="img/IS480-navbar.png" style="height:21px; width:100px; display:inline-block;"/>
+			</a>
             <div class="nav-collapse collapse">
                 <ul class="nav navbar-nav">
 				<%  if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>

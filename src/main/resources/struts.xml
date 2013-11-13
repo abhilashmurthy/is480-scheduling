@@ -289,7 +289,7 @@
 			</result>
         </action>
 		
-		<action name="viewScheduleReport" class="userAction.ViewScheduleReportAction" method="execute">
+		<action name="generateScheduleReport" class="userAction.GenerateScheduleReportAction" method="execute">
 			<result type="json">
                 <param name="root">json</param>
             </result>
