@@ -1852,8 +1852,8 @@
 								.attr('align', 'center')
 								.attr('value', timeslot.datetime)
 								.css ({
-									height: ($tdCell.outerHeight(true) * (scheduleData.duration / 30)),
-									width: $tdCell.outerWidth()
+									height: ($tdCell.innerHeight() * (scheduleData.duration / 30)),
+									width: $tdCell.innerWidth()
 								})
 								.offset({
 									top: $tdCell.offset().top,
@@ -1874,8 +1874,8 @@
 											|| timeslot.subscribedUsers.indexOf(myEmail) !== -1
 											?'myTeamBooking':false)
 										.css ({
-											height: ($tdCell.outerHeight(true) * (scheduleData.duration / 30)),
-											width: $tdCell.outerWidth()
+											height: ($tdCell.innerHeight() * (scheduleData.duration / 30)),
+											width: $tdCell.innerWidth()
 										})
 										.html(timeslot.team)
 								:false)
