@@ -283,6 +283,7 @@
                 //Function to populate schedule data based on ACTIVE TERM
                 function populateSchedule(milestone, year, semester) {
                     $(".scheduleTable").empty();
+					$(".timeslotCell").remove();
                     //Hide schedule tab and show progress bar
                     $("#milestoneTabContent").hide();
                     $("#scheduleProgressBar").show();
@@ -363,7 +364,7 @@
                 }
                 
                 function appendViewBookingPopover($td) {
-                    var timeslot = scheduleData.timeslots[$td.attr('value')];					
+                    var timeslot = scheduleData.timeslots[$td.attr('value')];
                     var $bookingDetailsTable = $(document.createElement('table'));
                     $bookingDetailsTable.attr('id', 'viewTimeslotTable');
                     $bookingDetailsTable.addClass('table-condensed table-hover table-bordered');

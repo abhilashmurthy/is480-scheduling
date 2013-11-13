@@ -200,6 +200,7 @@
 				
                 function populateSchedule(milestone, year, semester) {
                     $(".scheduleTable").empty();
+					$(".timeslotCell").remove();
                     $("#milestoneTabContent").hide();
                     $("#scheduleProgressBar").show();
                     scheduleData = getScheduleData(milestone, year, semester);
@@ -305,8 +306,6 @@
 						if (timeslots.hasOwnProperty(key)) {
 							var timeslot = timeslots[key];
 							var $tdCell = $('body').find('td.tdCell[value="' + timeslot.datetime + '"]');
-							console.log("Calculated height: " + ($tdCell.outerHeight(true) * (scheduleData.duration / 30)));
-							console.log("Calculated width: " + $tdCell.outerWidth());
 							var $timeslot = $(document.createElement('div'))
 								.addClass('timeslotCell')
 								.attr('id', 'timeslot_' + timeslot.id)
