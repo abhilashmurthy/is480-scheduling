@@ -125,10 +125,10 @@
                     <td style="width:15px"></td>
 					<% } %>
 					<% if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)) {%>
-                    <td class="legendBox timeslotCell unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
+                    <td class="legendBox unbookedTimeslot unavailableTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Not Available</td> 
 					<% } else if (activeRole.equals(Role.TA)) { %>
-					<td class="legendBox timeslotCell taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td style="padding-right: 5px;">&nbsp;Your video signup</td>
-					<td class="legendBox timeslotCell otherTATimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Another TA signup</td>
+					<td class="legendBox unbookedTimeslot taChosenTimeslot" style="border-width:1px!important;width:19px;"></td><td style="padding-right: 5px;">&nbsp;Your video signup</td>
+					<td class="legendBox unbookedTimeslot otherTATimeslot" style="border-width:1px!important;width:19px;"></td><td>&nbsp;Another TA signup</td>
 					<% } %>
                 </tr>
             </table>
