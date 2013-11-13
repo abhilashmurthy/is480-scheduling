@@ -1822,8 +1822,13 @@
 									function(){
 										var $removedDiv = $(document.createElement('div'));
 										if (timeslot.lastBookingWasRemoved && timeslot.lastBookingStatus === 'rejected') {
-											$removedDiv.addClass('rejectedBooking');
-											makeTooltip($td, 'Removed by ' + timeslot.lastBookingEditedBy);
+											$removedDiv
+													.addClass('rejectedBooking')
+													.css ({
+														height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
+														width: $tdCell.outerWidth() / 1.1
+													});
+											makeTooltip($tdCell, 'Removed by ' + timeslot.lastBookingEditedBy);
 										} else if (timeslot.lastBookingWasRemoved) {
 											$removedDiv.addClass('deletedBookingOnTimeslot').addClass('fa fa-info-circle');
 											makeTooltip($removedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
