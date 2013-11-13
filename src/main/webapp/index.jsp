@@ -1236,7 +1236,7 @@
                     $('.timeslotCell').off('click', '#subscribeBtn');
                     $('.timeslotCell').on('click', '#subscribeBtn', function(e) {
                         e.stopPropagation();
-						self = self.is('div') ? self.parent('.timeslotCell') : self;
+						self = self.is('.booking') ? self.parent('.timeslotCell') : self;
 						var timeslot = scheduleData.timeslots[self.attr('value')];
                         var returnData = subscribeBooking(self, true);
 						if (returnData && returnData.success) {
@@ -1261,7 +1261,7 @@
                     $('.timeslotCell').off('click', '#unsubscribeBtn');
                     $('.timeslotCell').on('click', '#unsubscribeBtn', function(e) {
                         e.stopPropagation();
-						self = self.is('div') ? self.parent('.timeslotCell') : self;
+						self = self.is('.booking') ? self.parent('.timeslotCell') : self;
 						var timeslot = scheduleData.timeslots[self.attr('value')];
                         var returnData = subscribeBooking(self, false);
 						if (returnData && returnData.success) {
