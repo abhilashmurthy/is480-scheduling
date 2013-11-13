@@ -37,7 +37,7 @@ input, button, select, textarea {
 }
 
 .brand:hover {
-    color: gainsboro !important;
+	background-color: #535353;
 }
 
 .nav-collapse .nav {
