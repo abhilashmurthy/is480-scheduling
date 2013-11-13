@@ -114,7 +114,7 @@
             <!-- To display legend for the calendar -->
             <table class="legend">
                 <tr>
-                    <td style="background-color:#AEC7C9;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Available</td> 
+                    <td class="legendBox unbookedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Available</td> 
                     <td style="width:15px"></td>
                     <td class="legendBox pendingBooking" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Pending</td> 
                     <td style="width:15px"></td>
@@ -913,8 +913,8 @@
 							bookingDiv.html(booking.team);
 							bookingDiv.css('display', 'none');
 							bookingDiv.css ({
-								height: self.outerHeight(true),
-								width: self.outerWidth()
+								height: self.innerHeight() / 1.05,
+								width: self.outerWidth() / 1.1
 							});
 							self.append(bookingDiv);
 							showNotification('SUCCESS', self, null);
@@ -977,8 +977,8 @@
 										bookingDiv.html(returnData.booking.team);
 										bookingDiv.css('display', 'none');
 										bookingDiv.css ({
-											height: self.outerHeight(true),
-											width: self.outerWidth()
+											height: self.innerHeight() / 1.05,
+											width: self.outerWidth() / 1.1
 										});
 										self.append(bookingDiv);
 										showNotification('SUCCESS', self, null);
@@ -1130,8 +1130,8 @@
                                 bookingDiv.html(returnData.booking.team);
                                 bookingDiv.css('display', 'none');
 								bookingDiv.css ({
-									height: newTimeslot.outerHeight(true),
-									width: newTimeslot.outerWidth()
+									height: newTimeslot.innerHeight() / 1.05,
+									width: newTimeslot.outerWidth() / 1.1
 								});
                                 newTimeslot.append(bookingDiv);
                                 scheduleData.timeslots[newTimeslot.attr('value')] = returnData.booking;
@@ -1759,85 +1759,7 @@
 							}
 							return $trCollection;
 						});
-					
 					return false;
-					
-					
-					//Append body data
-					$("." + tableClass)
-						.append(function(){
-							var $trCollection = new Array();
-							var rowspanArr = new Array();
-							for (var i = 0; i < timesArray.length; i++) {
-								$trCollection.push(
-									$(document.createElement('tr'))
-										.append(
-											$(document.createElement('td')) //Time display cell
-											.addClass('timeDisplayCell')
-											.html(timesArray[i].substring(0, 5))
-										) /////CHANGE
-										.append(function(){
-											var $tdCollection = new Array();
-											rowloop: for (var j = 0; j < datesArray.length; j++) {
-												var datetime = new Date(datesArray[j]).toString("yyyy-MM-dd") + " " + timesArray[i];
-												for (var k = 0; k < rowspanArr.length; k++) { //Checking if table cell is part of a timeslot
-													if (datetime === rowspanArr[k]) {
-														continue rowloop;
-													}
-												}
-												var timeslot = timeslots[datetime];
-												var $td = $(document.createElement('td')).addClass('timeslotCell');
-												if (timeslot) {
-													for (var t = 30; t < scheduleData.duration; t++) {
-														rowspanArr.push(Date.parse(datetime).addMinutes(t).toString("yyyy-MM-dd HH:mm:ss"));
-													}
-													$td
-														.attr('id', 'timeslot_' + timeslot.id)
-														.attr('align', 'center')
-														.attr('value', datetime)
-														.attr('rowspan', scheduleData.duration/30)
-														.addClass(timeslot.team?'bookedTimeslot':'unbookedTimeslot')
-														.addClass(<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !timeslot.available?'unavailableTimeslot':'')
-														.addClass(<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined?loggedInTa === timeslot.taId?'taChosenTimeslot':'otherTATimeslot':'')
-														.append(timeslot.team?
-															$(document.createElement('div'))
-																.addClass('booking pendingBooking')
-																.addClass(timeslot.status.toLowerCase() + 'Booking')
-																.addClass(
-																	(<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam)
-																	|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)
-																	|| (<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined && loggedInTa === timeslot.taId)
-																	|| (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>)
-																	|| timeslot.subscribedUsers.indexOf(myEmail) !== -1
-																	?'myTeamBooking':false)
-																.html(timeslot.team)
-														:false)
-														.append(!timeslot.team && timeslot.lastBookingWasRemoved?
-															function(){
-																var $removedDiv = $(document.createElement('div'));
-																if (timeslot.lastBookingWasRemoved && timeslot.lastBookingStatus === 'rejected') {
-																	$removedDiv.addClass('rejectedBooking');
-																	makeTooltip($td, 'Removed by ' + timeslot.lastBookingEditedBy);
-																} else if (timeslot.lastBookingWasRemoved) {
-																	$removedDiv.addClass('deletedBookingOnTimeslot').addClass('fa fa-info-circle');
-																	makeTooltip($removedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
-																}
-																return $removedDiv;
-															}
-															:false
-														)
-														;
-												} else {
-													$td.addClass('noTimeslot');
-												}
-												$tdCollection.push($td);
-											}
-											return $tdCollection;
-										})
-								);
-							}
-							return $trCollection;
-						});
                 }
 				
 				function renderTimeslots() {
@@ -1854,8 +1776,8 @@
 								.attr('align', 'center')
 								.attr('value', timeslot.datetime)
 								.css ({
-									height: ($tdCell.outerHeight(true) * (scheduleData.duration / 30)) - 2,
-									width: $tdCell.outerWidth() - 2
+									height: ($tdCell.innerHeight() / 1.05 * (scheduleData.duration / 30)),
+									width: $tdCell.outerWidth() / 1.1
 								})
 								.offset({
 									top: $tdCell.offset().top,
@@ -1876,8 +1798,8 @@
 											|| timeslot.subscribedUsers.indexOf(myEmail) !== -1
 											?'myTeamBooking':false)
 										.css ({
-											height: ($tdCell.outerHeight(true) * (scheduleData.duration / 30)) - 2,
-											width: $tdCell.outerWidth() - 2
+											height: ($tdCell.innerHeight() / 1.05 * (scheduleData.duration / 30)),
+											width: $tdCell.outerWidth() / 1.1
 										})
 										.html(timeslot.team)
 								:false)

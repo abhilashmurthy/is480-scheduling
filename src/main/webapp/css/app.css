@@ -146,15 +146,6 @@ input, button, select, textarea {
 	border-left: 1px solid #dddddd;
 }
 
-.timeslotCell {
-	position: absolute;
-	border: 1px solid white;
-	border-radius: 6px;
-	opacity: 0.8;
-	background: linear-gradient(to bottom, #759AFF 0%,#5280FF 100%);
-	cursor: pointer !important;
-}
-
 .traverseWeek {
 	cursor: pointer !important;
 }
@@ -164,6 +155,7 @@ input, button, select, textarea {
     max-width: 500px !important;
     font-weight: normal;
     z-index: 1031 !important;
+	opacity: 1.0;
 }
 
 .token-input-list {
@@ -201,19 +193,9 @@ input, button, select, textarea {
 	margin-bottom: 0 !important;
 }
 
-.approvedBooking:hover, .pendingBooking:hover, .unbookedTimeslot:hover {
-    border: 2px dashed black;
-}
-
 .noTimeslot {
     background-color: #f5f5f5 !important; 
     border: none !important;
-}
-
-.unbookedTimeslot {
-    /*box-sizing: border-box;*/
-	/*    background-color: #AEC7C9 !important; 
-		border: 1px solid #dddddd;*/
 }
 
 .unavailableTimeslot {
@@ -269,7 +251,21 @@ input, button, select, textarea {
 	background-color: #FFDFD6 !important;
 }
 
-.booking, .rejectedBooking {
+
+.tooltip {
+    z-index: 9;
+}
+
+.timeslotCell {
+	position: absolute;
+	cursor: pointer !important;
+	/* SURESH */
+	border-radius: 6px;
+	/* ABHILASH */
+	/*border-radius: 0;*/
+}
+
+.booking {
     margin: auto;
     width: 100px;
     height: 40px;
@@ -278,25 +274,46 @@ input, button, select, textarea {
 	vertical-align: middle;
 	font-size: 12px;
     z-index: 10;
-}
-
-
-.tooltip {
-    z-index: 9;
+	/* SURESH */
+	border-radius: 6px;
+	/* ABHILASH */
+	/*border-radius: 0; */
 }
 
 .pendingBooking {
-    background: linear-gradient(to bottom, #F5EF49 0%,#D9D329 100%);
-	border-radius: 6px;
+	border: 2px solid #D9D01C;
+	/* ABHILASH */
+    /*background-color: #F6EE4E;*/
+	/* SURESH */
+	background: linear-gradient(to bottom, #F5EF49 0%,#D9D329 100%);
+}
+
+.pendingBooking:hover {
+	background-color: #D1CA43;
 }
 
 .approvedBooking {
-    background: linear-gradient(to bottom, #5ED160 0%,#3DBA40 100%);
-	border-radius: 6px;
+	border: 2px solid #0DBA0D;
+	/* ABHILASH */
+    /*background-color: #A9DBA9;*/ 
+	/* SURESH */
+	background: linear-gradient(to bottom, #5ED160 0%,#3DBA40 100%);
 }
 
-.rejectedBooking {
-    background-color: #F75D59 !important;
+.approvedBooking:hover {
+	background-color: #63B863;
+}
+
+.unbookedTimeslot {
+	border: 2px solid #068C96;
+	/* ABHILASH */
+	/*background-color: #AEC7C9;*/ 
+	/* SURESH */ 
+	background: linear-gradient(to bottom, #759AFF 0%,#5280FF 100%);
+}
+
+.unbookedTimeslot:hover {
+	background-color: #8FA4A6;
 }
 
 .legend {
