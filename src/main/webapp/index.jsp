@@ -1846,14 +1846,16 @@
 						if (timeslots.hasOwnProperty(key)) {
 							var timeslot = timeslots[key];
 							var $tdCell = $('body').find('td.tdCell[value="' + timeslot.datetime + '"]');
+							console.log("Calculated height: " + ($tdCell.outerHeight(true) * (scheduleData.duration / 30)));
+							console.log("Calculated width: " + $tdCell.outerWidth());
 							var $timeslot = $(document.createElement('div'))
 								.addClass('timeslotCell')
 								.attr('id', 'timeslot_' + timeslot.id)
 								.attr('align', 'center')
 								.attr('value', timeslot.datetime)
 								.css ({
-									height: ($tdCell.innerHeight() * (scheduleData.duration / 30)),
-									width: $tdCell.innerWidth()
+									height: ($tdCell.outerHeight(true) * (scheduleData.duration / 30)) - 2,
+									width: $tdCell.outerWidth() - 2
 								})
 								.offset({
 									top: $tdCell.offset().top,
@@ -1874,8 +1876,8 @@
 											|| timeslot.subscribedUsers.indexOf(myEmail) !== -1
 											?'myTeamBooking':false)
 										.css ({
-											height: ($tdCell.innerHeight() * (scheduleData.duration / 30)),
-											width: $tdCell.innerWidth()
+											height: ($tdCell.outerHeight(true) * (scheduleData.duration / 30)) - 2,
+											width: $tdCell.outerWidth() - 2
 										})
 										.html(timeslot.team)
 								:false)
