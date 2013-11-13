@@ -126,7 +126,7 @@ public class ICSFileManager {
 	
 	private static void addRequiredAttendees(VEvent meeting, Set<User> requiredAttendees) {
 		for (User u : requiredAttendees) {
-			addAttendee(meeting, u.getFullName(), u.getUsername() + "@smu.edu.sg", Role.REQ_PARTICIPANT);
+			addAttendee(meeting, u.getFullName(), u.getEmail(), Role.REQ_PARTICIPANT);
 		}
 	}
 	

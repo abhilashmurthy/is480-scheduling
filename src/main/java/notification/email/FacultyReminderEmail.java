@@ -34,7 +34,7 @@ public class FacultyReminderEmail extends EmailTemplate{
 	@Override
 	public Set<String> generateToAddressList() {
 		HashSet<String> emails = new HashSet<String>();
-		emails.add(person.getUsername() + "@smu.edu.sg");
+		emails.add(person.getEmail());
 		return emails;
 	}
 

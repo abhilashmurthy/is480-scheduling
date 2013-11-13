@@ -34,7 +34,7 @@ public class NewBookingEmail extends EmailTemplate{
 	public Set<String> generateToAddressList() {
 		Set<String> emails = new HashSet<String>();
 		for (User u : b.getTeam().getMembers()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+			emails.add(u.getEmail());
 		}
 		
 		return emails;
