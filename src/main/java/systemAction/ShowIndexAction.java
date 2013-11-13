@@ -175,7 +175,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 				teamMap.put("teamId", t.getId());
 				List<String> memberEmailList = new ArrayList<String>();
 				for (Student s : t.getMembers()) {
-					memberEmailList.add(s.getUsername() + "@smu.edu.sg");
+					memberEmailList.add(s.getEmail());
 				}
 				teamMap.put("memberEmails", memberEmailList);
 				List<HashMap<String, Object>> teamBookingsList = new ArrayList<HashMap<String, Object>>();
@@ -219,7 +219,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
             ArrayList<HashMap<String, Object>> userJsonList = new ArrayList<HashMap<String, Object>>();
             for (User u : userList) {
                 HashMap<String, Object> userMap = new HashMap<String, Object>();
-                userMap.put("id", u.getUsername() + "@smu.edu.sg");
+                userMap.put("id", u.getEmail());
                 userMap.put("name", u.getFullName());
                 userJsonList.add(userMap);
             }
@@ -260,7 +260,7 @@ public class ShowIndexAction extends ActionSupport implements ServletRequestAwar
 					teamMap.put("teamId", t.getId());
 					List<String> memberEmailList = new ArrayList<String>();
 					for (Student s : t.getMembers()) {
-						memberEmailList.add(s.getUsername() + "@smu.edu.sg");
+						memberEmailList.add(s.getEmail());
 					}
 					teamMap.put("memberEmails", memberEmailList);
 					List<String> myRolesList = new ArrayList<String>();

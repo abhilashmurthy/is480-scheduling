@@ -107,6 +107,10 @@ public class User implements Serializable {
 	public void setSubscribedBookings(Set<Booking> subscribedBookings) {
 		this.subscribedBookings = subscribedBookings;
 	}
+	
+	public String getEmail() {
+		return username + "@smu.edu.sg";
+	}
 		
 	public Long getId() {
 		return id;

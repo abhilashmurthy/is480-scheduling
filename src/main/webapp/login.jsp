@@ -35,7 +35,7 @@
 			.page {
 				border-radius: 10px;
 				background-color: #fafafa;
-				padding: 20px;
+				/*padding: 20px;*/
 			}
 			
 			.scheduleContainer {
@@ -53,7 +53,9 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-					<a class="brand" href="index">IS480 Scheduling</a>
+					<a class="brand" href="index">
+						<img src="img/IS480-navbar.png" style="height:21px; width:100px; display:inline-block;"/>
+					</a>
 					<button class="ssoBtn btn btn-primary pull-right" data-loading-text="Logging in..." type="submit">SMU Login</button>
 					<button class="testBtn btn btn-inverse pull-right muted" data-loading-text="Logging in..." type="submit">Administrator Login</button>
                 </div>

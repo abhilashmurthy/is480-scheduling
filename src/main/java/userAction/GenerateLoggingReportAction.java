@@ -28,6 +28,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletContext;
 import manager.SystemActivityLogManager;
@@ -69,35 +70,39 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				JSONObject reportData = new JSONObject(request.getParameter("jsonData"));
 				String reportNo = reportData.getString("reportNumber");
 				
-				if (!reportNo.equalsIgnoreCase("1")) {
+				if (!reportNo.equalsIgnoreCase("3")) {
 					json.put("error", true);
-					json.put("message", "Wrong report selected!");
+					json.put("message", "Wrong report selected. Please try again!");
 					return SUCCESS;
 				}
 				
-				String startTime = reportData.getString("startTime");
-				String endTime = reportData.getString("endTime");
+				String sDate = reportData.getString("startDate");
+				String eDate = reportData.getString("endDate");
 				
-				if (startTime == null && endTime != null) {
+				if (sDate == null && eDate != null) {
 					json.put("error", true);
 					json.put("message", "Start Time not selected for report!");
 					return SUCCESS;
 				}
 				
-				if (startTime != null && endTime == null) {
+				if (sDate != null && eDate == null) {
 					json.put("error", true);
 					json.put("message", "End Time not selected for report!");
 					return SUCCESS;
 				}
 				
-				//------------Getting data - Login/Logout, Administrator, Booking-----------------
+				SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 				List<SystemActivityLog> allActivity = new ArrayList<SystemActivityLog>();
-				if (startTime == null && endTime == null) {
+				//------------Getting data - Login/Logout, Administrator, Booking-----------------
+				if ((sDate.equals("") || sDate == null) && (eDate.equals("") || eDate == null)) {
 					allActivity = SystemActivityLogManager.getAllLogs(em);
-				} 
-//				else {
-//					allActivity = SystemActivityLogManager.getAllLogsBetween(startTime, endTime);
-//				}
+				} else {
+					sDate = sDate + " 00:00:00";
+					eDate = eDate + " 00:00:00";
+					Timestamp startDate = new Timestamp(sdf.parse(sDate).getTime());
+					Timestamp endDate = new Timestamp(sdf.parse(eDate).getTime());
+					allActivity = SystemActivityLogManager.getAllLogsBetween(em, startDate, endDate);
+				}
 				
 				//Sorting the log activity according to the 3 categories - Login/Logout, Administrator, Booking
 				ArrayList<SystemActivityLog> loginActivity = new ArrayList<SystemActivityLog>();
@@ -124,29 +129,29 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				BufferedWriter out = new BufferedWriter(new FileWriter(path));
 				CSVWriter writer = new CSVWriter(out);
 				
-				//write the first row (column headers
+				//write the first row (column headers)
 				String[] firstRow = {"Id", "Log Activity", "Activity Message", "Date and Time", "User", "Success"};
 				writer.writeNext(firstRow);
 				
-				String[] blankLine = {};
-				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+				String[] blankLine = new String[6];
 				
 				//1st: Booking Activity
 				if (bookingActivity.size() > 0) {
 					for (SystemActivityLog log: bookingActivity) {
-						String[] nextLine = {};
-						//Prepare data
-						nextLine[0] = String.valueOf(log.getId());
-						nextLine[1] = log.getActivity();
-						nextLine[2] = log.getMessage();
-						nextLine[3] = sdf.format(log.getRunTime());
-						nextLine[4] = log.getUser().getFullName();
+						//Prepare data and write to file
+						String id = String.valueOf(log.getId());
+						String activity = log.getActivity();
+						String message = log.getMessage();
+						String time = sdf.format(log.getRunTime());
+						String username = log.getUser().getFullName();
+						String result = "";
 						if (log.isSuccess() == true) {
-							nextLine[5] = "SUCCESS";
+							result = "SUCCESS";
 						} else {
-							nextLine[5] = "ERROR";
+							result = "ERROR";
 						}
 						//Write to file
+						String[] nextLine = {id, activity, message, time, username, result}; 
 						writer.writeNext(nextLine);
 					}
 					//Print blank line
@@ -156,7 +161,7 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				//2nd: Administrator Activity
 				if (administratorActivity.size() > 0) {
 					for (SystemActivityLog log: administratorActivity) {
-						String[] nextLine = {};
+						String[] nextLine = new String[6];
 						//Prepare data
 						nextLine[0] = String.valueOf(log.getId());
 						nextLine[1] = log.getActivity();
@@ -178,7 +183,7 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				//3rd: Login/Logout Activity
 				if (loginActivity.size() > 0) {
 					for (SystemActivityLog log: loginActivity) {
-						String[] nextLine = {};
+						String[] nextLine = new String[6];
 						//Prepare data
 						nextLine[0] = String.valueOf(log.getId());
 						nextLine[1] = log.getActivity();
@@ -196,7 +201,7 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				}
 				if (logoutActivity.size() > 0) {
 					for (SystemActivityLog log: logoutActivity) {
-						String[] nextLine = {};
+						String[] nextLine = new String[6];
 						//Prepare data
 						nextLine[0] = String.valueOf(log.getId());
 						nextLine[1] = log.getActivity();
@@ -213,7 +218,7 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 					}
 				}
 				
-				out.close();
+				writer.close();
 				
 				json.put("message", "Report created successfully");
 				json.put("success", true);

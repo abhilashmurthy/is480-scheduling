@@ -39,7 +39,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 	public Set<String> generateToAddressList() {
 		Set<String> emails = new HashSet<String>();
 		for (User u : b.getTeam().getMembers()) {
-			emails.add(u.getUsername() + "@smu.edu.sg");
+			emails.add(u.getEmail());
 		}
 		
 		return emails;
@@ -53,11 +53,11 @@ public class DeletedBookingEmail extends EmailTemplate{
 			HashSet<String> emails = new HashSet<String>();
 			
 			//Adding the person who perform the delete action
-			emails.add(deletor.getUsername() + "@smu.edu.sg");
+			emails.add(deletor.getEmail());
 
 			//Adding required attendees
 			for (User u : b.getResponseList().keySet()) {
-				emails.add(u.getUsername() + "@smu.edu.sg");
+				emails.add(u.getEmail());
 			}
 
 			//Check if the booking was previously confirmed
@@ -71,7 +71,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 			//Adding the course coordinator and optional attendees if this is a previously confirmed booking
 			if (confirmed) {
 				//Adding the course coordinator
-				emails.add(UserManager.getCourseCoordinator(em).getUsername() + "@smu.edu.sg");
+				emails.add(UserManager.getCourseCoordinator(em).getEmail());
 
 				//Adding the optional attendees
 				for (String s : b.getOptionalAttendees()) {
