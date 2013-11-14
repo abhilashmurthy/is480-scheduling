@@ -14,6 +14,8 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import manager.SettingsManager;
+import model.Settings;
 import model.SystemActivityLog;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -56,11 +58,26 @@ public class ChangePasswordAction extends ActionSupport implements ServletReques
 			
 			JsonElement newPassElem = inputData.get("newPassword");
 			if (newPassElem == null) throw new CustomException("Please specify the new password");
-			String newPassword = currPassElem.getAsString();
+			String newPassword = newPassElem.getAsString();
 			
 			JsonElement verifyPassElem = inputData.get("verifyPassword");
 			if (verifyPassElem == null) throw new CustomException("Please specify the verified new password");
 			String verifyPassword = verifyPassElem.getAsString();
+			
+			//Checking if the new password matches the confirmation/verification
+			if (!newPassword.equals(verifyPassword)) throw new CustomException("New password doesn't match the confirmation. Please try again!");
+			
+			//Checking if the new password is blank
+			if (newPassword.trim().equals("")) throw new CustomException("New password cannot be blank. Please try again!");
+			
+			em.getTransaction().begin();
+			
+			Settings bypassPassword = SettingsManager.getByName(em, "bypassPassword");
+			if (!bypassPassword.getValue().equals(currentPassword)) throw new CustomException("Current password does not match. Please try again!");
+			
+			bypassPassword.setValue(newPassword.trim());
+			
+			em.getTransaction().commit();
 			
 			json.put("success", true);
 			//TODO Set logItem message
