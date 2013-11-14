@@ -28,8 +28,11 @@
                 height: 25px;
                 padding: 10px;
                 text-align: left;
-                /*border-bottom: 1px solid black;*/
             }
+			
+			.timeslotsTable td, .timeslotsTable th {
+				text-align: center;
+			}
 			
 			#timeslotsTableSection, #taStatisticsChart {
 				margin-top: 30px;
@@ -430,7 +433,7 @@
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                        if (<%= activeRole.equals(Role.TA)%>) th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
+                        if (<%= activeRole.equals(Role.TA)%>) th.html(headerVal + "<br/>Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
 						else th.html(headerVal);
                         thead.append(th);
                     }

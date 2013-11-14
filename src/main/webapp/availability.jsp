@@ -28,12 +28,15 @@
                 height: 25px;
                 padding: 10px;
                 text-align: left;
-                /*border-bottom: 1px solid black;*/
             }
 			
 			.timeslotsTable {
 				margin-top: 60px;
 				margin-left: 90px !important;
+			}
+			
+			.timeslotsTable td, .timeslotsTable th {
+				text-align: center;
 			}
             
 			#milestoneTimeslotsSelect {
@@ -82,10 +85,6 @@
             .unavailable {
                 background-color: #F7A8A8 !important ;
             }
-            
-/*            .teamExists {
-                background-color: #F9FCBD !important;
-            }*/
 			
 			.chosen.teamExists {
 				background-color: #00C918 !important ;
@@ -390,7 +389,7 @@
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
 						//console.log((dateArray[i]).toString('dd MMM yyyy'));
-                        th.html(headerVal + "<br/><b> Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
+                        th.html(headerVal + "<br/>Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
                         thead.append(th);
                     }					
 					
