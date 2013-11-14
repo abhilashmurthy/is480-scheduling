@@ -415,9 +415,34 @@
 						);
                     }
 					
+					//Allow faculty to change availability on view booking popover
+                    if (<%= activeRole.equals(Role.FACULTY) %>) {
+						if ($td.closest('.timeslotCell').is('.unavailableTimeslot')) {
+							outputData[""] = (
+								$(document.createElement('button'))
+										.attr('id', 'availableTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
+										.append("Available")
+										.outerHTML()
+							);
+						} else {
+							outputData[""] = (
+								$(document.createElement('button'))
+										.attr('id', 'unavailableTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
+										.append("Unavailable")
+										.outerHTML()
+							);
+						}
+                    }
+					
                     //Allow supervisor to update booking
                     if (<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam) {
-                        outputData[""] = (
+                        outputData[""] += (
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
 								.addClass('popoverBtn btn btn-info')
@@ -477,7 +502,7 @@
 							for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
 								if (myEmail === timeslot.subscribedUsers[i]) {
 									subscribe = false;
-										outputData[""] = (
+										outputData[""] += (
 											$(document.createElement('button'))
 												.attr('id', 'unsubscribeBtn')
 												.addClass('popoverBtn btn')
@@ -490,7 +515,7 @@
 							}
 						}
 						if (subscribe) {
-							outputData[""] = (
+							outputData[""] += (
 								$(document.createElement('button'))
 									.attr('id', 'subscribeBtn')
 									.addClass('popoverBtn btn')
@@ -1199,9 +1224,10 @@
                     $('.timeslotCell').on('click', '#availableTimeslotBtn', function(e) {
                         e.stopPropagation();
                         changeAvailability(self, true);
-                        showNotification("WARNING", self, "Set as available");
+                        showNotification("WARNING", self.closest('.timeslotCell'), "Set as available");
                         self.popover('destroy');
-                        appendChangeAvailabilityPopover(self);
+						if (self.is('.booking')) appendViewBookingPopover(self.closest('.timeslotCell'));
+                        else appendChangeAvailabilityPopover(self);
                         return false;
                     });
                     
@@ -1210,9 +1236,10 @@
                     $('.timeslotCell').on('click', '#unavailableTimeslotBtn', function(e) {
                         e.stopPropagation();
                         changeAvailability(self, false);
-                        showNotification("WARNING", self, "Set as unavailable");
+                        showNotification("WARNING", self.closest('.timeslotCell'), "Set as unavailable");
                         self.popover('destroy');
-                        appendChangeAvailabilityPopover(self);
+						if (self.is('.booking')) appendViewBookingPopover(self.closest('.timeslotCell'));
+                        else appendChangeAvailabilityPopover(self);
                         return false;
                     });
 					
@@ -1605,11 +1632,11 @@
                         if (!response.exception) {
                             if (response.success) {
                                 if (!available) {
-                                    bodyTd.removeClass('availableTimeslot');
-                                    bodyTd.addClass('unavailableTimeslot');
+                                    bodyTd.closest('.timeslotCell').removeClass('availableTimeslot');
+                                    bodyTd.closest('.timeslotCell').addClass('unavailableTimeslot');
                                 } else {
-                                    bodyTd.removeClass('unavailableTimeslot');
-                                    bodyTd.addClass("availableTimeslot");
+                                    bodyTd.closest('.timeslotCell').removeClass('unavailableTimeslot');
+                                    bodyTd.closest('.timeslotCell').addClass("availableTimeslot");
                                 }
                             } else {
                                 var eid = btoa(response.message);
