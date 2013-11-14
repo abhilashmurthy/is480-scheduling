@@ -290,7 +290,7 @@ input, button, select, textarea {
 
 .pendingBooking:hover {
 	border: 2px dashed black;
-	background-color: #D1CA43;
+	background-color: #DBD446;
 }
 
 .approvedBooking {
@@ -304,7 +304,7 @@ input, button, select, textarea {
 
 .approvedBooking:hover {
 	border: 2px dashed black;
-	background-color: #63B863;
+	background-color: #8BC58B;
 }
 
 .unbookedTimeslot {
