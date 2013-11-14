@@ -261,6 +261,7 @@ input, button, select, textarea {
 	/*border-radius: 6px;*/
 	/* ABHILASH */
 	border-radius: 0;
+	box-shadow: 0 1px 3px #727272;
 }
 
 .booking {
@@ -280,6 +281,7 @@ input, button, select, textarea {
 
 .pendingBooking {
 	border: 2px solid #D9D01C;
+	box-shadow: 0 1px 3px #727272;
 	/* ABHILASH */
     background-color: #F6EE4E;
 	/* SURESH */
@@ -293,6 +295,7 @@ input, button, select, textarea {
 
 .approvedBooking {
 	border: 2px solid #0DBA0D;
+	box-shadow: 0 1px 3px #727272;
 	/* ABHILASH */
     background-color: #A9DBA9; 
 	/* SURESH */
