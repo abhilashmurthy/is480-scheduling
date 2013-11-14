@@ -1799,6 +1799,7 @@
 														.addClass('tdCell')
 														.addClass(i%2 === 0?'tdUpper':'tdLower')
 														.attr('value', datetime)
+														.height(25)
 												);
 											}
 											return $tdCollection;
