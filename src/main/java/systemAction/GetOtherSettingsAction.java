@@ -26,7 +26,7 @@ import util.MiscUtil;
  *
  * @author Tarlochan
  */
-public class GetNotificationSettingsAction extends ActionSupport implements ServletRequestAware {
+public class GetOtherSettingsAction extends ActionSupport implements ServletRequestAware {
 	
 	private HashMap<String, Object> json = new HashMap<String, Object>();
 	private ArrayList<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
