@@ -14,7 +14,7 @@
     <head>
 		<meta charset=”utf-8”> 
         <%@include file="header.jsp" %>
-        <title>IS480 Scheduling System | Manage Notifications </title>
+        <title>IS480 Scheduling System | Other Settings </title>
 
         <%@include file="footer.jsp"%>
 		<link type="text/css" rel="stylsheet" hred="css/bootstrap.css">
@@ -23,189 +23,217 @@
 
     </head>
     <body>
+		<!-- Kick unauthorized user -->
+				<%	if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
+						request.setAttribute("error", "Oops. You are not authorized to access this page!");
+						RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+						rd.forward(request, response);
+					}
+				%>
         <%@include file="navbar.jsp" %>
         <div class="container">
-            <h3>Manage Reminder Settings</h3>
+			
+			<!-- REMINDER SETTINGS SECTION -->
+			
+			<div>
+				<h3>Manage Reminder Settings</h3>
 
-            <!-- Kick unauthorized user -->
-            <%	if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
-					request.setAttribute("error", "Oops. You are not authorized to access this page!");
-					RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-					rd.forward(request, response);
-				}
-            %>
+				<s:iterator value="data"> 
 
-			<s:iterator value="data"> 
+					<div style="float: left; margin-right: 50px;">
+					<table class="table ">
 
-				<div style="float: left; margin-right: 50px;">
-				<table class="table ">
+						<% String eStatus = (String) request.getAttribute("emailStatus");%> 
+						<% String eStatusClear = (String) request.getAttribute("emailClearStatus");%>
+						<thead>
+						<tr style="color:blue">
+							<th style="float:left;border:none"><i class="fa fa-white fa-envelope"></i>Email Reminders:</td></th>
+						</thead>
+						<tr><td style="float:left;">
 
-					<% String eStatus = (String) request.getAttribute("emailStatus");%> 
-					<% String eStatusClear = (String) request.getAttribute("emailClearStatus");%>
-					<thead>
-					<tr style="color:blue">
-						<th style="float:left;border:none"><i class="fa fa-white fa-envelope"></i>Email Reminders:</td></th>
-					</thead>
-					<tr><td style="float:left;">
+								<div id="emailStatusBlock">
+									Remind pending bookings (days):&nbsp&nbsp;
 
-							<div id="emailStatusBlock">
-								Remind pending bookings (days):&nbsp&nbsp;
+									<form>
 
-								<form>
+										<% if (eStatus.equalsIgnoreCase("On")) {%>
+										<input type="radio" id="onPrefa" class="pref" name="pref" value="On" onchange="onOption(onPrefa)" checked>&nbsp; On 
+										<input type="radio" id="offPrefb" class="pref" name="pref" value="Off" onchange="onOption(offPrefb)">&nbsp; Off
+										<% } else {%>
+										<input type="radio" id="onPref1" class="pref" name="pref" value="On" onchange="onOption(onPref1)">&nbsp; On 
+										<input type="radio" id="offPref2" class="pref" name="pref" value="Off" onchange="onOption(offPref2)" checked>&nbsp; Off
+										<% }%>
+									</form></div></td>
 
-									<% if (eStatus.equalsIgnoreCase("On")) {%>
-									<input type="radio" id="onPrefa" class="pref" name="pref" value="On" onchange="onOption(onPrefa)" checked>&nbsp; On 
-									<input type="radio" id="offPrefb" class="pref" name="pref" value="Off" onchange="onOption(offPrefb)">&nbsp; Off
-									<% } else {%>
-									<input type="radio" id="onPref1" class="pref" name="pref" value="On" onchange="onOption(onPref1)">&nbsp; On 
-									<input type="radio" id="offPref2" class="pref" name="pref" value="Off" onchange="onOption(offPref2)" checked>&nbsp; Off
-									<% }%>
-								</form></div></td>
-								
-						<td id="emailFrequencyRow" style="float:left;border:none">
+							<td id="emailFrequencyRow" style="float:left;border:none">
 
-							<div id="emailFrequencyBlock">
+								<div id="emailFrequencyBlock">
 
-								<div class="input-append">
+									<div class="input-append">
 
-									<input id="emailFrequency" style="width: 18px;height: 20px" type="text" value="<s:property value="emailFrequency"/>" disabled />
-									<div class="btn-group">
-										<button class="btn" type="button" onclick="upOne(emailFrequency);" >&#9650;</button>
-										<button class="btn" type="button" onclick="downOne(emailFrequency);" >&#9660;</button>
+										<input id="emailFrequency" style="width: 18px;height: 20px" type="text" value="<s:property value="emailFrequency"/>" disabled />
+										<div class="btn-group">
+											<button class="btn" type="button" onclick="upOne(emailFrequency);" >&#9650;</button>
+											<button class="btn" type="button" onclick="downOne(emailFrequency);" >&#9660;</button>
+										</div>
 									</div>
 								</div>
-							</div>
-					</td></tr>
+						</td></tr>
 
 
-					
-					<!-- to do for clear pending bookings --> <tr><td style="float:left;border:none">
-							<form>
-								Remove pending bookings (days):
-								<br/>
-								<% if (eStatusClear.equalsIgnoreCase("On")) {%>
-								<input type="radio" id="onPrefe" class="pref" name="pref" value="On" onchange="onOption3(onPrefe)" checked>&nbsp; On 
-								<input type="radio" id="offPreff" class="pref" name="pref" value="Off" onchange="onOption3(offPreff)">&nbsp; Off
-								<% } else {%>
-								<input type="radio" id="onPref5" class="pref" name="pref" value="On" onchange="onOption3(onPref5)">&nbsp; On 
-								<input type="radio" id="offPref6" class="pref" name="pref" value="Off" onchange="onOption3(offPref6)" checked>&nbsp; Off
-								<% }%>
-							</form>
 
-							</div></td>
-
-					<td id="emailClearPendingRow" style="float:left;border:none">
-							<div id="emailClearPending">
-
-								<div class="input-append">
-
-									<input id="emailClear" style="width: 18px;height: 20px" type="text" value="<s:property value="emailClearFrequency"/>" disabled />
-									<div class="btn-group">
-										<button class="btn" type="button" onclick="upOne(emailClear);" >&#9650;</button>
-										<button class="btn" type="button" onclick="downOne(emailClear);" >&#9660;</button>
-									</div>
-								</div>
-							</div>
-						</td>
-					</tr>
-				</table>
-		</div>
-<!--					<tr>
-						<td style="border:none"></td>
-					</tr>-->
-			<div style="float: right;margin-right:200px">
-				<table class="table">
-					<thead>
-					<tr>
-						<th style="color:blue;">
-							<i class="fa fa-white fa-comment"></i>SMS Reminders:
-						</th>
-					</tr>
-					</thead>
-					
-					<!-- SMS part -->
-					<tr><td style="float:left;">
-								
-							<% String sStatus = (String) request.getAttribute("smsStatus");%> 
-							
-							Remind confirmed bookings (hours):&nbsp;
-							<div id="smsStatusBlock">
+						<!-- to do for clear pending bookings --> <tr><td style="float:left;border:none">
 								<form>
-
-									<% if (sStatus.equalsIgnoreCase("On")) {%>
-									<input type="radio" id="onPrefc" class="pref" name="pref" value="On" onchange="onOption2(onPrefc)" checked>&nbsp; On 
-									<input type="radio" id="offPrefd" class="pref" name="pref" value="Off" onchange="onOption2(offPrefd)">&nbsp; Off
+									Remove pending bookings (days):
+									<br/>
+									<% if (eStatusClear.equalsIgnoreCase("On")) {%>
+									<input type="radio" id="onPrefe" class="pref" name="pref" value="On" onchange="onOption3(onPrefe)" checked>&nbsp; On 
+									<input type="radio" id="offPreff" class="pref" name="pref" value="Off" onchange="onOption3(offPreff)">&nbsp; Off
 									<% } else {%>
-									<input type="radio" id="onPref3" class="pref" name="pref" value="On" onchange="onOption2(onPref3)">&nbsp; On 
-									<input type="radio" id="offPref4" class="pref" name="pref" value="Off" onchange="onOption2(offPref4)" checked>&nbsp; Off
+									<input type="radio" id="onPref5" class="pref" name="pref" value="On" onchange="onOption3(onPref5)">&nbsp; On 
+									<input type="radio" id="offPref6" class="pref" name="pref" value="Off" onchange="onOption3(offPref6)" checked>&nbsp; Off
 									<% }%>
 								</form>
-							</div>
-					</td>
-					
-					<td style="border:none;float:left">
-						
-						<div id="smsFrequencyBlock">
-							<div class="input-append">	
-								<input id="smsFrequency" style="width: 18px;height: 20px" type="text" value="<s:property value="smsFrequency"/>" disabled />
-								<div class="btn-group">
-									<button class="btn" type="button" onclick="upOne(smsFrequency);" >&#9650;</button>
-									<button class="btn" type="button" onclick="downOne(smsFrequency);" >&#9660;</button>
+
+								</div></td>
+
+						<td id="emailClearPendingRow" style="float:left;border:none">
+								<div id="emailClearPending">
+
+									<div class="input-append">
+
+										<input id="emailClear" style="width: 18px;height: 20px" type="text" value="<s:property value="emailClearFrequency"/>" disabled />
+										<div class="btn-group">
+											<button class="btn" type="button" onclick="upOne(emailClear);" >&#9650;</button>
+											<button class="btn" type="button" onclick="downOne(emailClear);" >&#9660;</button>
+										</div>
+									</div>
 								</div>
+							</td>
+						</tr>
+					</table>
+			</div>
+	<!--					<tr>
+							<td style="border:none"></td>
+						</tr>-->
+				<div style="float: right;margin-right:200px">
+					<table class="table">
+						<thead>
+						<tr>
+							<th style="color:blue;">
+								<i class="fa fa-white fa-comment"></i>SMS Reminders:
+							</th>
+						</tr>
+						</thead>
+
+						<!-- SMS part -->
+						<tr><td style="float:left;">
+
+								<% String sStatus = (String) request.getAttribute("smsStatus");%> 
+
+								Remind confirmed bookings (hours):&nbsp;
+								<div id="smsStatusBlock">
+									<form>
+
+										<% if (sStatus.equalsIgnoreCase("On")) {%>
+										<input type="radio" id="onPrefc" class="pref" name="pref" value="On" onchange="onOption2(onPrefc)" checked>&nbsp; On 
+										<input type="radio" id="offPrefd" class="pref" name="pref" value="Off" onchange="onOption2(offPrefd)">&nbsp; Off
+										<% } else {%>
+										<input type="radio" id="onPref3" class="pref" name="pref" value="On" onchange="onOption2(onPref3)">&nbsp; On 
+										<input type="radio" id="offPref4" class="pref" name="pref" value="Off" onchange="onOption2(offPref4)" checked>&nbsp; Off
+										<% }%>
+									</form>
+								</div>
+						</td>
+
+						<td style="border:none;float:left">
+
+							<div id="smsFrequencyBlock">
+								<div class="input-append">	
+									<input id="smsFrequency" style="width: 18px;height: 20px" type="text" value="<s:property value="smsFrequency"/>" disabled />
+									<div class="btn-group">
+										<button class="btn" type="button" onclick="upOne(smsFrequency);" >&#9650;</button>
+										<button class="btn" type="button" onclick="downOne(smsFrequency);" >&#9660;</button>
+									</div>
+								</div>
+
 							</div>
 
-						</div>
+						</td>
+						</tr>
+					</table>
+				</div>
+				</s:iterator>
 
-					</td>
+				<div style="clear: both;">
+					<button type="button" id="saveButton" class="btn btn-primary" data-loading-text="Saving..."
+							style="width:80px; height:30px;">
+						<strong>Save</strong>
+					</button>
+				</div>
+			</div>
+			
+			<!-- END OF REMINDER SETTINGS SECTION -->
+			
+			<!-- ADMINISTRATOR PASSWORD SECTION -->
+			
+			<div>
+				<h3>Change Administrator Password</h3> <br />
+				<table>
+					<tr>
+						<td>Current Password: </td>
+						<td><input type="password" id="currentPassword"/></td>
+					</tr>
+					<tr>
+						<td>New Password: </td>
+						<td><input type="password" id="currentPassword"/></td>
+					</tr>
+					<tr>
+						<td>Reconfirm New Password: </td>
+						<td><input type="password" id="currentPassword"/></td>
 					</tr>
 				</table>
+				<button id="passwordChangeSubmitButton" class="btn btn-primary" data-loading-text="Saving...">Save</button>
 			</div>
-			</s:iterator>
-
-		<div style="clear: both;">
-			<button type="button" id="saveButton" class="btn btn-primary" data-loading-text="Saving..."
-					style="width:80px; height:30px;">
-				<strong>Save</strong>
-			</button>
-		</div>
+			
+			<!-- END OF ADMINISTRATOR PASSWORD SECTION -->
+			
 			<script type="text/javascript">
 
-				$(document).ready(function() {
-					//if it is off don't show
-					var values = $('input:checked').map(function() {
-						return this.value;
-					}).get();
+				var loadForm = function() {
+						//if it is off don't show
+						var values = $('input:checked').map(function() {
+							return this.value;
+						}).get();
 
-					var splitArray = new Array();
-					splitArray = values.slice(',');
-					console.log(splitArray);
-					//alert(splitArray[0] + splitArray[1]);
+						var splitArray = new Array();
+						splitArray = values.slice(',');
+						console.log(splitArray);
+						//alert(splitArray[0] + splitArray[1]);
 
-					var ons = "On";
-					//this is for email
-					if (splitArray[0] !== ons) {
+						var ons = "On";
+						//this is for email
+						if (splitArray[0] !== ons) {
 
-						onOption("offPrefb");
-						onOption("offPref2");
+							onOption("offPrefb");
+							onOption("offPref2");
 
-					}
+						}
 
-					if (splitArray[2] !== ons) {
+						if (splitArray[2] !== ons) {
 
-						onOption2("offPrefd");
-						onOption2("offPref4");
+							onOption2("offPrefd");
+							onOption2("offPref4");
 
-					}
-					
-					if (splitArray[1] !== ons) {
+						}
 
-						onOption3("offPreff");
-						onOption3("offPref6");
+						if (splitArray[1] !== ons) {
 
-					}
+							onOption3("offPreff");
+							onOption3("offPref6");
 
-
-				});
+						}
+					};
 
 
 				function upOne(id) {
@@ -392,6 +420,8 @@
 					$.pnotify(opts);
 				}
 
+				//Append page load functions
+				addLoadEvent(loadForm());
 			</script>
     </body>
 </html>
