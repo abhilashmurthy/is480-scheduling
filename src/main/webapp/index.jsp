@@ -999,8 +999,8 @@
 							var booking = returnData.booking;
 							self.popover('destroy');
 							self.tooltip('destroy');
-							self.removeClass('unbookedTimeslot');
-							self.addClass('bookedTimeslot');
+							self.removeClass();
+							self.addClass('timeslotCell bookedTimeslot');
 							var $deletedDiv = self.children('.deletedBookingOnTimeslot, .rejectedBooking');
 							if ($deletedDiv) $deletedDiv.remove();
 							var bookingDiv = $(document.createElement('div'));
@@ -1877,9 +1877,11 @@
 				
 				function renderTimeslots() {
 					var timeslots = scheduleData.timeslots;
+					var datesArray = weekView !== null?getDateArrayBetween(scheduleData.startDate, scheduleData.endDate, weekView):null;
 					for (var key in timeslots) {
 						if (timeslots.hasOwnProperty(key)) {
 							var timeslot = timeslots[key];
+							if (datesArray && (Date.parse(timeslot.datetime) < Date.parse(datesArray[0]) || Date.parse(timeslot.datetime) > Date.parse(datesArray[datesArray.length - 1]))) continue;
 							var $tdCell = $('body').find('td.tdCell[value="' + timeslot.datetime + '"]');
 							var $timeslot = $(document.createElement('div'))
 								.addClass('timeslotCell')
@@ -1951,7 +1953,7 @@
                     }
                     var currentDate = startDate;
                     while (currentDate <= stopDate) {
-                        dateArray.push(currentDate);
+                        dateArray.push(currentDate.toString('yyyy-MM-dd'));
                         currentDate = new Date(currentDate).addDays(1);
                     }
                     return dateArray;

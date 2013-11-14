@@ -449,7 +449,7 @@ input, button, select, textarea {
 
 
 .popoverBtn {
-	display: block;
+	display: inline;
     margin-right: 20px !important;
 }
 
