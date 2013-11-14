@@ -23,6 +23,7 @@
 
     </head>
     <body>
+		<%@include file="navbar.jsp" %>
 		<!-- Kick unauthorized user -->
 				<%	if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
 						request.setAttribute("error", "Oops. You are not authorized to access this page!");
@@ -30,7 +31,7 @@
 						rd.forward(request, response);
 					}
 				%>
-        <%@include file="navbar.jsp" %>
+        
         <div class="container">
 			
 			<!-- REMINDER SETTINGS SECTION -->
@@ -174,11 +175,11 @@
 			</div>
 			
 			<!-- END OF REMINDER SETTINGS SECTION -->
-			
+			<br />
 			<!-- ADMINISTRATOR PASSWORD SECTION -->
 			
 			<div>
-				<h3>Change Administrator Password</h3> <br />
+				<h3>Change Administrator Password</h3>
 				<table>
 					<tr>
 						<td>Current Password: </td>
@@ -186,13 +187,13 @@
 					</tr>
 					<tr>
 						<td>New Password: </td>
-						<td><input type="password" id="currentPassword"/></td>
+						<td><input type="password" id="newPassword"/></td>
 					</tr>
 					<tr>
-						<td>Reconfirm New Password: </td>
-						<td><input type="password" id="currentPassword"/></td>
+						<td>Confirm New Password: </td>
+						<td><input type="password" id="verifyPassword"/></td>
 					</tr>
-				</table>
+				</table> <br />
 				<button id="passwordChangeSubmitButton" class="btn btn-primary" data-loading-text="Saving...">Save</button>
 			</div>
 			
@@ -233,6 +234,8 @@
 							onOption3("offPref6");
 
 						}
+						
+						$("#passwordChangeSubmitButton").on("click", changePassword);
 					};
 
 
@@ -377,6 +380,45 @@
 
 					return false;
 				});
+				
+				function changePassword() {
+					$("#passwordChangeSubmitButton").button('loading');
+					var currentPasswordStr = $("#currentPassword").val();
+					var newPasswordStr = $("#newPassword").val();
+					var verifyPasswordStr = $("#verifyPassword").val();
+					
+					//Validate if the new passwords match
+					if (newPasswordStr !== verifyPasswordStr) {
+						showNotification("ERROR", "New password doesn't match the confirmation. Please try again!");
+						$("#passwordChangeSubmitButton").button('reset');
+						return false;
+					}
+					var testingInput = {
+						currentPassword: currentPasswordStr,
+						newPassword: newPasswordStr,
+						verifyPassword: verifyPasswordStr
+					};
+					console.log(testingInput);
+					$.ajax({
+						type: 'POST',
+						async: false,
+						url: 'changePassword',
+						data: {jsonData: JSON.stringify(testingInput)}
+					}).done(function(response) {
+						$("#passwordChangeSubmitButton").button('reset');
+						console.log(JSON.stringify(response));
+						var success = response.success;
+						var notificationType = (success) ? "SUCCESS" : "ERROR";
+						var message = (response.message) ? response.message : "Password changed successfully" ;
+						showNotification(notificationType, message);
+					}).fail(function(response) {
+						$("#passwordChangeSubmitButton").button('reset');
+						console.log(JSON.stringify(response));
+						showNotification("ERROR", "Error in contacting the server. Please try again.");
+					});
+					
+					return false;
+				}
 
 				//Notification-------------
 				function showNotification(action, notificationMessage) {
@@ -421,7 +463,7 @@
 				}
 
 				//Append page load functions
-				addLoadEvent(loadForm());
+				addLoadEvent(loadForm);
 			</script>
     </body>
 </html>
