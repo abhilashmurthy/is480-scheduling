@@ -1578,17 +1578,18 @@
                 function changeAvailability(bodyTd, available) {
                     var timeslotsData = {};
                     var timeslot_data = new Array();
-                    var allTimeslots = $(".unavailableTimeslot", ".scheduleTable").get();
+                    var allTimeslots = $(".unavailableTimeslot").get();
                     var timeslotsSet = new HashSet();
                     for (var i = 0; i < allTimeslots.length; i++) {
-                        var obj = allTimeslots[i];
-                        timeslotsSet.add(obj.id);
+                        var $obj = $(allTimeslots[i]);
+						if ($obj.is('.legendBox')) continue;
+                        timeslotsSet.add($obj.attr('id'));
                     }
                     timeslot_data = timeslotsSet.values().sort();
                     if (!available) {
-                        timeslot_data.push(bodyTd.attr('id'));
+                        timeslot_data.push(bodyTd.is('.timslotCell')?bodyTd.attr('id'):bodyTd.closest('.timeslotCell').attr('id'));
                     } else {
-                        var index = timeslot_data.indexOf(bodyTd.attr('id'));
+                        var index = timeslot_data.indexOf(bodyTd.is('.timslotCell')?bodyTd.attr('id'):bodyTd.closest('.timeslotCell').attr('id'));
                         timeslot_data.splice(index, 1);
                     }
                     timeslotsData["timeslot_data[]"] = timeslot_data;
@@ -1633,15 +1634,14 @@
                     var timeslotsSet = new HashSet();
                     for (var i = 0; i < allTimeslots.length; i++) {
                         var $obj = $(allTimeslots[i]);
-						console.log('Retreived: ' + $obj.attr('class') + ' - ' + $obj.attr('id'));
-                        timeslotsSet.add($obj.is('.timeslotCell:not(.legendBox)')?$obj.attr('id').split("_")[1]:$obj.closest('.timeslotCell').attr('id').split("_")[1]);
+						if ($obj.is('.legendBox')) continue;
+                        timeslotsSet.add($obj.attr('id').split("_")[1]);
                     }
-					return false;
                     timeslot_data = timeslotsSet.values().sort();
                     if (taChosen) {
-                        timeslot_data.push(bodyTd.attr('id')?bodyTd.attr('id').split("_")[1]:bodyTd.closest('.timeslotCell').attr('id').split("_")[1]);
+                        timeslot_data.push(bodyTd.is('.timslotCell')?bodyTd.attr('id').split("_")[1]:bodyTd.closest('.timeslotCell').attr('id').split('_')[1]);
                     } else {
-                        var index = timeslot_data.indexOf(bodyTd.attr('id')?bodyTd.attr('id').split("_")[1]:bodyTd.closest('.timeslotCell').attr('id').split("_")[1]);
+                        var index = timeslot_data.indexOf(bodyTd.is('.timslotCell')?bodyTd.attr('id').split("_")[1]:bodyTd.closest('.timeslotCell').attr('id').split('_')[1]);
                         timeslot_data.splice(index, 1);
                     }
                     timeslotsData["timeslots"] = timeslot_data;
