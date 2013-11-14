@@ -581,6 +581,8 @@
 						Venue: timeslot.venue,
 						Milestone: milestone,
 						TA: timeslot.TA,
+						"Auto Approve": "",
+						Unavailable: "",
 						"": "" //For buttons
 					};
                    
@@ -609,6 +611,19 @@
 								.append("Save")
 								.attr('disabled', true)
 								.outerHTML();
+						//Override approval of supervisors
+						outputData["Auto Approve"] = 
+								$(document.createElement('div'))
+									.attr('id', 'autoApprove')
+									.addClass('make-switch switch-small')
+									.attr('data-on', 'success')
+									.attr('data-off', 'danger')
+									.attr('data-on-label', 'Yes')
+									.attr('data-off-label', 'No')
+									.attr('padding-left', '30px')
+									.append($(document.createElement('input')).attr('type', 'checkbox').attr('name', 'autoApprove').attr('checked', false));
+				   } else {
+					   delete outputData["Auto Approve"];
 				   }
 				   
 				   if (<%= activeRole.equals(Role.STUDENT)%>) {
@@ -629,6 +644,7 @@
 								.append("Book Anyway")
 								.outerHTML();
 					   } else {
+						delete outputData["Unavailable"];
 						outputData[""] += 
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
@@ -637,6 +653,8 @@
 								.append("Book")
 								.outerHTML();
 					   }	
+				   } else {
+						delete outputData["Unavailable"];
 				   }
 					
                     //Append all fields
@@ -902,8 +920,16 @@
 							if (self.find('tr:last').length && self.find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
 								$('body').animate({scrollTop: self.find('tr:last').offset().top - $(window).scrollTop()}, 500);
 							}
-                            self.find('ul').remove(); //Remove all old tokenInputs
-                            appendTokenInput(self); //Optional attendees
+							if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)%>) {
+								self.find("#autoApprove")
+									.empty()
+									.append(
+										$(document.createElement('input'))
+											.attr('type', 'checkbox')
+											.attr('name', 'autoApprove')
+											.attr('checked', false)
+									).bootstrapSwitch();
+							}
                         }
                         return false;
                     });
@@ -979,7 +1005,7 @@
 							if ($deletedDiv) $deletedDiv.remove();
 							var bookingDiv = $(document.createElement('div'));
 							bookingDiv.addClass('booking myTeamBooking');
-							bookingDiv.addClass(<%= activeRole.equals(Role.ADMINISTRATOR)%>?'approvedBooking':'pendingBooking');
+							bookingDiv.addClass(returnData.overrideApproval?'approvedBooking':'pendingBooking');
 							bookingDiv.html(booking.team);
 							bookingDiv.css('display', 'none');
 							bookingDiv.css ({
@@ -1521,7 +1547,8 @@
                             var tId = $("#createTeamSelect").val();
                             data = {
                                 timeslotId: bodyTd.attr('id').split("_")[1],
-                                teamId: tId
+                                teamId: tId,
+								overrideApproval: $('#autoApprove').bootstrapSwitch('status')
                             };
                     } else if (<%= activeRole.equals(Role.STUDENT)%>) {
                         tName = teamName;

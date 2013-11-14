@@ -51,7 +51,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     private static Logger logger = LoggerFactory.getLogger(CreateBookingAction.class);
     private Long timeslotId;
     private Long teamId;
-	private boolean overrideApproval = false;
+	private boolean overrideApproval;
     private HashMap<String, Object> json = new HashMap<String, Object>();
 
     public HttpServletRequest getRequest() {
@@ -112,8 +112,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
 			em.getTransaction().begin();
 			json = BookingManager.createBooking(em, timeslot, user, team, overrideApproval);
 			
-			//Test SMS
-//			BookingManager.testSMS((Long) ((HashMap) json.get("booking")).get("bookingId"), request);
+			json.put("overrideApproval", overrideApproval);
 			
 			em.getTransaction().commit();
 			//TODO Activity logging needs to be handled!
@@ -221,6 +220,14 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
     public void setTimeslotId(Long timeslotId) {
         this.timeslotId = timeslotId;
     }
+	
+	public boolean isOverrideApproval() {
+		return overrideApproval;
+	}
+
+	public void setOverrideApproval(boolean overrideApproval) {
+		this.overrideApproval = overrideApproval;
+	}
 
     public HashMap<String, Object> getJson() {
         return json;
