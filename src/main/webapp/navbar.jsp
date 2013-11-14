@@ -60,9 +60,9 @@
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Manage Terms</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">CSV Upload</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="getNotificationSettings">Manage Reminder Settings</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewGenerateReport">Generate Reports</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="restoreDB">Database Restore</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="getOtherSettings">Other Settings</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>
