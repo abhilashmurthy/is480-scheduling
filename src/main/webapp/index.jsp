@@ -146,6 +146,8 @@
                 <div class="bar" style="width: 100%;"></div>
             </div>
         </div>
+		
+		<br />
 
         <%@include file="footer.jsp"%>
         <!-- View Schedule Javascript -->
