@@ -69,9 +69,12 @@ public class RemindPendingBookingJob implements Job {
 			String durationStr = clearBookingSetting.get("emailClearFrequency").getAsString();
 			int duration = Integer.parseInt(durationStr); //Duration for faculty to respond to booking
 			Calendar tomorrow = Calendar.getInstance();
-			tomorrow.add(Calendar.DAY_OF_MONTH, 1); //Tomorrow 3AM
-//			tomorrow.add(Calendar.MINUTE, 1); //TESTING. Next minute
-
+			if (MiscUtil.DEV_MODE) {
+				tomorrow.add(Calendar.DAY_OF_MONTH, 1); //Tomorrow 3AM
+	//			tomorrow.add(Calendar.MINUTE, 1); //TESTING. Next minute	
+			} else {
+				tomorrow.add(Calendar.DAY_OF_MONTH, 1); //Tomorrow 3AM
+			}
             em.getTransaction().begin();
             List<Booking> pendingBookings = null;
             //get all the pending bookings
@@ -83,9 +86,12 @@ public class RemindPendingBookingJob implements Job {
 			for (Booking pendingBooking : pendingBookings) {
 				Calendar deadline = Calendar.getInstance();
 				deadline.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
-				deadline.add(Calendar.DAY_OF_MONTH, duration);
-//				deadline.add(Calendar.MINUTE, duration); //TESTING
-
+				if (MiscUtil.DEV_MODE) {
+					deadline.add(Calendar.DAY_OF_MONTH, duration);
+	//				deadline.add(Calendar.MINUTE, duration); //TESTING	
+				} else {
+					deadline.add(Calendar.DAY_OF_MONTH, duration);
+				}
 				//If the deadline is between today 3AM and tomorrow 3AM, send a reminder
 				if (deadline.compareTo(nowCal) >= 0 && deadline.compareTo(tomorrow) <= 0) {
 					logger.debug("Booking: " + pendingBooking + ". Reminder sent.");

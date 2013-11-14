@@ -89,8 +89,12 @@ public class ClearPendingBookingJob implements Job {
                 //Do the time calculation
                 cal.clear();
                 cal.setTimeInMillis(pendingBooking.getCreatedAt().getTime());
-                cal.add(Calendar.DATE, noOfDaysToRespond);
-//                cal.add(Calendar.MINUTE, noOfDaysToRespond); //For testing
+				if (MiscUtil.DEV_MODE) {
+					cal.add(Calendar.DATE, noOfDaysToRespond);
+//					cal.add(Calendar.MINUTE, noOfDaysToRespond); //For testing	
+				} else {
+					cal.add(Calendar.DATE, noOfDaysToRespond);	
+				}
                 Timestamp dueDate = new Timestamp(cal.getTimeInMillis());
                 //Delete booking is date is passed
                 if (now.after(dueDate)) {
