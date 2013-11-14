@@ -109,7 +109,8 @@ input, button, select, textarea {
     padding: 0 10px 0 10px;
 }
 
-#milestoneTabContent {
+.tab-content {
+	overflow: visible;
 }
 
 .scheduleTable {
@@ -132,7 +133,7 @@ input, button, select, textarea {
 .tdCell {
 	position: relative;
 	box-sizing: border-box;
-	width: 110px;
+	min-width: 110px;
 	height: 20px;
 }
 
