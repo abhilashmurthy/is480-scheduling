@@ -481,6 +481,11 @@ public class UserManager {
 			b.getSubscribedUsers().remove(user);
 		}
 		
+		//Removing all SystemActivityLog entries that correspond to this user
+		Query removeLogs = em.createQuery("DELETE FROM SystemActivityLog s WHERE s.user = :user");
+		removeLogs.setParameter("user", user);
+		removeLogs.executeUpdate();
+		
 		em.flush(); //Forcing write to DB
 		em.remove(user);
 		em.flush(); //Forcing write to DB
