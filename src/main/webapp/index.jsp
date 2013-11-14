@@ -1349,7 +1349,7 @@
 									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
 									.append("RSVP")
 							);
-							if (<%= activeRole.equals(Role.TA) %>) self.find('#unsubscribeBtn').after(
+							if (<%= activeRole.equals(Role.TA) %> && !self.is('.otherTATimeslot')) self.find('#unsubscribeBtn').after(
 								$(document.createElement('button'))
 											.attr('id', 'signupTimeslotBtn')
 											.addClass('popoverBtn btn btn-primary')
