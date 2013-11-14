@@ -400,14 +400,14 @@
                         outputData[""] += (
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
-								.addClass('popoverBtn btn btn-danger')
+								.addClass('popoverBtn btn btn-small btn-danger')
 								.append($(document.createElement('i')).addClass('fa fa-trash-o fa-white'))
 								.append('Delete')
 								.outerHTML()
 							+
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
-								.addClass('popoverBtn btn btn-info')
+								.addClass('popoverBtn btn btn-small btn-info')
 								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append('Save')
 								.css('float', 'right')
@@ -422,7 +422,7 @@
 							outputData[""] += (
 								$(document.createElement('button'))
 										.attr('id', 'availableTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
+										.addClass('popoverBtn btn btn-small btn-primary')
 										.css('float', 'right')
 										.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 										.append("Available")
@@ -432,7 +432,7 @@
 							outputData[""] += (
 								$(document.createElement('button'))
 										.attr('id', 'unavailableTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
+										.addClass('popoverBtn btn btn-small btn-primary')
 										.css('float', 'right')
 										.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
 										.append("Unavailable")
@@ -447,7 +447,7 @@
 							outputData[""] += (
 								$(document.createElement('button'))
 										.attr('id', 'unsignupTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
+										.addClass('popoverBtn btn btn-small btn-primary')
 										.css('float', 'right')
 										.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
 										.append("Cancel Signup")
@@ -457,7 +457,7 @@
 							outputData[""] += (
 								$(document.createElement('button'))
 										.attr('id', 'signupTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
+										.addClass('popoverBtn btn btn-small btn-primary')
 										.css('float', 'right')
 										.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 										.append("Signup")
@@ -471,7 +471,7 @@
                         outputData[""] += (
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
-								.addClass('popoverBtn btn btn-info')
+								.addClass('popoverBtn btn btn-small btn-info')
 								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append('Save')
 								.css('float', 'right')
@@ -508,14 +508,14 @@
                         outputData[""] += (
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
-								.addClass('popoverBtn btn btn-danger')
+								.addClass('popoverBtn btn btn-small btn-danger')
 								.append($(document.createElement('i')).addClass('fa fa-trash-o fa-white'))
 								.append("Delete")
 								.outerHTML()
 							+
 							$(document.createElement('button'))
 								.attr('id', 'updateBookingBtn')
-								.addClass('popoverBtn btn btn-info')
+								.addClass('popoverBtn btn btn-small btn-info')
 								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append("Save")
 								.attr('disabled', true)
@@ -531,9 +531,9 @@
 										outputData[""] += (
 											$(document.createElement('button'))
 												.attr('id', 'unsubscribeBtn')
-												.addClass('popoverBtn btn')
+												.addClass('popoverBtn btn btn-small')
 												.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-												.append("Cancel RSVP")
+												.append("UnRSVP")
 												.outerHTML()
 										);
 									break;
@@ -544,7 +544,7 @@
 							outputData[""] += (
 								$(document.createElement('button'))
 									.attr('id', 'subscribeBtn')
-									.addClass('popoverBtn btn')
+									.addClass('popoverBtn btn btn-small')
 									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
 									.append("RSVP")
 									.outerHTML()
@@ -598,7 +598,7 @@
 						outputData[""] += 
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
-								.addClass('popoverBtn btn btn-primary')
+								.addClass('popoverBtn btn btn-small btn-primary')
 								.append($(document.createElement('i')).addClass('fa fa-plus-circle  fa-white'))
 								.append("Book")
 								.outerHTML()
@@ -606,7 +606,7 @@
 							$(document.createElement('button'))
 								.attr('id', 'updateTimeslotBtn')
 								.css('float', 'right')
-								.addClass('popoverBtn btn btn-info')
+								.addClass('popoverBtn btn btn-small btn-info')
 								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
 								.append("Save")
 								.attr('disabled', true)
@@ -639,7 +639,7 @@
 						outputData[""] += 
 							$(document.createElement('button'))
 								.attr('id', 'createAnywayBookingBtn')
-								.addClass('popoverBtn btn btn-warning')
+								.addClass('popoverBtn btn btn-small btn-warning')
 								.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 								.append("Book Anyway")
 								.outerHTML();
@@ -648,7 +648,7 @@
 						outputData[""] += 
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
-								.addClass('popoverBtn btn btn-primary')
+								.addClass('popoverBtn btn btn-small btn-primary')
 								.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 								.append("Book")
 								.outerHTML();
@@ -683,7 +683,7 @@
 						if ($td.is('.unavailableTimeslot')) {
 							return $(document.createElement('button'))
 										.attr('id', 'availableTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
+										.addClass('popoverBtn btn btn-small btn-primary')
 										.css('float', 'right')
 										.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 										.append("Available")
@@ -691,7 +691,7 @@
 						} else {
 							return $(document.createElement('button'))
 										.attr('id', 'unavailableTimeslotBtn')
-										.addClass('popoverBtn btn btn-primary')
+										.addClass('popoverBtn btn btn-small btn-primary')
 										.css('float', 'right')
 										.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
 										.append("Unavailable")
@@ -730,7 +730,7 @@
 							if ($td.is('.taChosenTimeslot')) {
 								return $(document.createElement('button'))
 											.attr('id', 'unsignupTimeslotBtn')
-											.addClass('popoverBtn btn btn-primary')
+											.addClass('popoverBtn btn btn-small btn-primary')
 											.css('float', 'right')
 											.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
 											.append("Cancel")
@@ -738,7 +738,7 @@
 							} else {
 								return $(document.createElement('button'))
 											.attr('id', 'signupTimeslotBtn')
-											.addClass('popoverBtn btn btn-primary')
+											.addClass('popoverBtn btn btn-small btn-primary')
 											.css('float', 'right')
 											.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 											.append("Sign Up")
@@ -1345,9 +1345,9 @@
 							self.find('#subscribeBtn').after(
 								$(document.createElement('button'))
 									.attr('id', 'unsubscribeBtn')
-									.addClass('popoverBtn btn')
+									.addClass('popoverBtn btn btn-small')
 									.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-									.append("Cancel RSVP")
+									.append("UnRSVP")
 							);
 							self.find('#subscribeBtn').remove();
 							if (self.find('#signupTimeslotBtn')) self.find('#signupTimeslotBtn').remove();
@@ -1371,14 +1371,14 @@
 							self.find('#unsubscribeBtn').after(
 								$(document.createElement('button'))
 									.attr('id', 'subscribeBtn')
-									.addClass('popoverBtn btn')
+									.addClass('popoverBtn btn btn-small')
 									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
 									.append("RSVP")
 							);
 							if (<%= activeRole.equals(Role.TA) %> && !self.is('.otherTATimeslot')) self.find('#unsubscribeBtn').after(
 								$(document.createElement('button'))
 											.attr('id', 'signupTimeslotBtn')
-											.addClass('popoverBtn btn btn-primary')
+											.addClass('popoverBtn btn btn-small btn-primary')
 											.css('float', 'right')
 											.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
 											.append("Sign Up")
