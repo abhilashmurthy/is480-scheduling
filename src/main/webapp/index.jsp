@@ -983,8 +983,8 @@
 							bookingDiv.html(booking.team);
 							bookingDiv.css('display', 'none');
 							bookingDiv.css ({
-								height: self.innerHeight() / 1.1,
-								width: self.outerWidth() / 1.1
+								height: self.innerHeight(),
+								width: self.outerWidth()
 							});
 							self.append(bookingDiv);
 							showNotification('SUCCESS', self, null);
@@ -1047,8 +1047,8 @@
 										bookingDiv.html(returnData.booking.team);
 										bookingDiv.css('display', 'none');
 										bookingDiv.css ({
-											height: self.innerHeight() / 1.1,
-											width: self.outerWidth() / 1.1
+											height: self.innerHeight(),
+											width: self.outerWidth()
 										});
 										self.append(bookingDiv);
 										showNotification('SUCCESS', self, null);
@@ -1200,8 +1200,8 @@
                                 bookingDiv.html(returnData.booking.team);
                                 bookingDiv.css('display', 'none');
 								bookingDiv.css ({
-									height: newTimeslot.innerHeight() / 1.1,
-									width: newTimeslot.outerWidth() / 1.1
+									height: newTimeslot.innerHeight(),
+									width: newTimeslot.outerWidth()
 								});
                                 newTimeslot.append(bookingDiv);
                                 scheduleData.timeslots[newTimeslot.attr('value')] = returnData.booking;
