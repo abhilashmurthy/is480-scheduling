@@ -391,12 +391,13 @@
 							return facultyList;
 						},
 						TA: timeslot.TA,
-						"Invite Others": $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput')
+						"Invite Others": $(document.createElement('input')).attr('id', 'updateAttendees').addClass('optionalAttendees popoverInput'),
+						"": "" //For buttons
 					};
 
                     //Allow team to edit booking
                     if (timeslot.team !== null && timeslot.team === teamName) {
-                        outputData[""] = (
+                        outputData[""] += (
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
 								.addClass('popoverBtn btn btn-danger')
@@ -418,7 +419,7 @@
 					//Allow faculty to change availability on view booking popover
                     if (<%= activeRole.equals(Role.FACULTY) %>) {
 						if ($td.closest('.timeslotCell').is('.unavailableTimeslot')) {
-							outputData[""] = (
+							outputData[""] += (
 								$(document.createElement('button'))
 										.attr('id', 'availableTimeslotBtn')
 										.addClass('popoverBtn btn btn-primary')
@@ -428,13 +429,38 @@
 										.outerHTML()
 							);
 						} else {
-							outputData[""] = (
+							outputData[""] += (
 								$(document.createElement('button'))
 										.attr('id', 'unavailableTimeslotBtn')
 										.addClass('popoverBtn btn btn-primary')
 										.css('float', 'right')
 										.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
 										.append("Unavailable")
+										.outerHTML()
+							);
+						}
+                    }
+					
+					//Allow TA's to change signup on view booking popover
+					if (<%= activeRole.equals(Role.TA) %> && !$td.closest('.timeslotCell').is('.otherTATimeslot')) {
+						if ($td.closest('.timeslotCell').is('.taChosenTimeslot')) {
+							outputData[""] += (
+								$(document.createElement('button'))
+										.attr('id', 'unsignupTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('fa fa-minus-circle fa-white'))
+										.append("Cancel Signup")
+										.outerHTML()
+							);
+						} else {
+							outputData[""] += (
+								$(document.createElement('button'))
+										.attr('id', 'signupTimeslotBtn')
+										.addClass('popoverBtn btn btn-primary')
+										.css('float', 'right')
+										.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
+										.append("Signup")
 										.outerHTML()
 							);
 						}
@@ -479,7 +505,7 @@
 									.attr('title', 'Enter a new start time (HH:MM)')
 									.addClass('updateFormDate popoverInput')
 									.val(outputData.Time).change();	
-                        outputData[""] = (
+                        outputData[""] += (
 							$(document.createElement('button'))
 								.attr('id', 'deleteBookingBtn')
 								.addClass('popoverBtn btn btn-danger')
@@ -545,7 +571,6 @@
                 function appendCreateBookingPopover($td) {
                     if ($td.hasClass('legendBox')) return;
                     var timeslot = scheduleData.timeslots[$td.attr('value')];
-					
                     var $createBookingTable = $(document.createElement('table'));
                     $createBookingTable.attr('id', 'createTimeslotTable');
 					$createBookingTable.addClass('table-condensed table-hover table-bordered');
@@ -555,7 +580,8 @@
 						Time: Date.parse($td.attr('value')).toString('HH:mm')+ " - " + Date.parse($td.attr('value')).addMinutes(scheduleData.duration).toString('HH:mm'),
 						Venue: timeslot.venue,
 						Milestone: milestone,
-						TA: timeslot.TA
+						TA: timeslot.TA,
+						"": "" //For buttons
 					};
                    
 				   if (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>) {
@@ -567,7 +593,7 @@
 								.attr('placeholder', outputData.Venue)
 								.addClass('updateFormVenue popoverInput')
 								.val(outputData.Venue).change();
-						outputData[""] = 
+						outputData[""] += 
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
 								.addClass('popoverBtn btn btn-primary')
@@ -595,7 +621,7 @@
 							   }
 							   return unavailableList;
 						   };
-						outputData[""] = 
+						outputData[""] += 
 							$(document.createElement('button'))
 								.attr('id', 'createAnywayBookingBtn')
 								.addClass('popoverBtn btn btn-warning')
@@ -603,7 +629,7 @@
 								.append("Book Anyway")
 								.outerHTML();
 					   } else {
-						outputData[""] = 
+						outputData[""] += 
 							$(document.createElement('button'))
 								.attr('id', 'createBookingBtn')
 								.addClass('popoverBtn btn btn-primary')
@@ -1248,17 +1274,18 @@
                     $('.timeslotCell').on('click', '#signupTimeslotBtn', function(e) {
                         e.stopPropagation();
                         changeSignup(self, true);
-                        showNotification("WARNING", self, "Signed up for filming");
+                        showNotification("WARNING", self.closest('.timeslotCell'), "Signed up for filming");
                         self.popover('destroy');
-                        appendChangeSignupPopover(self);
-						var timeslot = scheduleData.timeslots[self.attr('value')];
+						if (self.is('.booking')) appendViewBookingPopover(self.closest('.timeslotCell'));
+                        else appendChangeSignupPopover(self);
+						var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 						timeslot.taId = loggedInTa;
 						if (timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1) {
-							subscribeBooking(self, false);
+							subscribeBooking(self.closest('.timeslotCell'), false);
 							timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
 						}
-						self.children('.booking').popover('destroy');
-						if (self.children('.booking').length) appendViewBookingPopover(self);
+						self.closest('.timeslotCell').children('.booking').popover('destroy');
+						if (self.closest('.timeslotCell').children('.booking').length) appendViewBookingPopover(self.closest('.timeslotCell'));
                         return false;
                     });
 					
@@ -1268,13 +1295,14 @@
                         e.stopPropagation();
 						var timeslot = scheduleData.timeslots[self.attr('value')];
                         changeSignup(self, false);
-                        showNotification("WARNING", self, "Cancelled for filming");
+                        showNotification("WARNING", self.closest('.timeslotCell'), "Cancelled for filming");
                         self.popover('destroy');
-                        appendChangeSignupPopover(self);
-						var timeslot = scheduleData.timeslots[self.attr('value')];
+						if (self.is('.booking')) appendViewBookingPopover(self.closest('.timeslotCell'));
+                        else appendChangeSignupPopover(self);
+						var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 						delete timeslot.taId;
-						self.children('.booking').popover('destroy');
-						if (self.children('.booking').length) appendViewBookingPopover(self);
+						self.closest('.timeslotCell').children('.booking').popover('destroy');
+						if (self.closest('.timeslotCell').children('.booking').length) appendViewBookingPopover(self.closest('.timeslotCell'));
                         return false;
                     });
                     
@@ -1296,6 +1324,7 @@
 									.append("Cancel RSVP")
 							);
 							self.find('#subscribeBtn').remove();
+							if (self.find('#signupTimeslotBtn')) self.find('#signupTimeslotBtn').remove();
 							timeslot.subscribedUsers.push(myEmail);
 						} else {
 							showNotification("ERROR", self, returnData.message);
@@ -1320,6 +1349,14 @@
 									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
 									.append("RSVP")
 							);
+							if (<%= activeRole.equals(Role.TA) %>) self.find('#unsubscribeBtn').after(
+								$(document.createElement('button'))
+											.attr('id', 'signupTimeslotBtn')
+											.addClass('popoverBtn btn btn-primary')
+											.css('float', 'right')
+											.append($(document.createElement('i')).addClass('fa fa-plus-circle fa-white'))
+											.append("Sign Up")
+								);
 							self.find('#unsubscribeBtn').remove();
 							if (timeslot.subscribedUsers.indexOf(myEmail) !== -1) timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
 						} else {
@@ -1684,14 +1721,14 @@
                         if (!response.exception) {
                             if (response.success) {
                                 if (taChosen) {
-                                    bodyTd.addClass('taChosenTimeslot');
-									if (bodyTd.children('.booking').length) {
-										bodyTd.children('.booking').addClass('myTeamBooking');
+                                    bodyTd.closest('.timeslotCell').addClass('taChosenTimeslot');
+									if (bodyTd.closest('.timeslotCell').children('.booking').length) {
+										bodyTd.closest('.timeslotCell').children('.booking').addClass('myTeamBooking');
 									}
                                 } else {
-                                    bodyTd.removeClass('taChosenTimeslot');
-									if (bodyTd.children('.booking').length) {
-										bodyTd.children('.booking').removeClass('myTeamBooking');
+                                    bodyTd.closest('.timeslotCell').removeClass('taChosenTimeslot');
+									if (bodyTd.closest('.timeslotCell').children('.booking').length) {
+										bodyTd.closest('.timeslotCell').children('.booking').removeClass('myTeamBooking');
 									}
                                 }
                             } else {
