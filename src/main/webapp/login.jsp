@@ -539,7 +539,7 @@
 						},
 						content: content,
 						placement: function(){
-							if (container.parents("tr").children().index(container.closest(".timeslotCell")) > 7) {
+							if ($('body').find('.tdCell[value="' + container.closest('.timeslotCell').attr('value') + '"]').parents("tr").children().index($('body').find('.tdCell[value="' + container.closest('.timeslotCell').attr('value') + '"]')) >= 7) {
 								return 'left';
 							} else {
 								return 'right';

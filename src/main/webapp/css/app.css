@@ -158,6 +158,10 @@ input, button, select, textarea {
 	opacity: 1.0;
 }
 
+.changeSelectedPopover {
+	min-width: 232px;
+}
+
 .token-input-list {
     display: none;
 }
@@ -198,23 +202,15 @@ input, button, select, textarea {
     border: none !important;
 }
 
-.unavailableTimeslot {
-    background-size: 115px 115px, 115px 115px, 2px 2px, 2px 2px;
-    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-    background-image: -webkit-linear-gradient(white 2px, transparent 2px),
-		-webkit-linear-gradient(0, white 2px, transparent 2px),
-		-webkit-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
-		-webkit-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
-    background-image: -moz-linear-gradient(white 2px, transparent 2px),
-		-moz-linear-gradient(0, white 2px, transparent 2px),
-		-moz-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
-		-moz-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
-    background-image: linear-gradient(white 2px, transparent 2px),
-		linear-gradient(90deg, white 2px, transparent 2px),
+.unavailableTimeslot, .unavailableTimeslot > .booking {
+    background-size: 115px 115px, 115px 115px, 5px 5px, 5px 5px;
+    background-position: -5px -5px, -5px -5px, -1px -1px, -1px -1px;
+    background-image: linear-gradient(white 5px, transparent 5px),
+		linear-gradient(90deg, white 5px, transparent 5px),
 		linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
 		linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px);
-    -pie-background: linear-gradient(white 2px, transparent 2px) -2px -2px / 100px,
-		linear-gradient(90deg, white 2px, transparent 2px) -2px -2px / 100px,
+    -pie-background: linear-gradient(white 5px, transparent 5px) -5px -5px / 100px,
+		linear-gradient(90deg, white 5px, transparent 5px) -5px -5px / 100px,
 		linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
 		linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
 		#269;
@@ -238,14 +234,20 @@ input, button, select, textarea {
 	pointer-events: none;
 }
 
-.taChosenTimeslot {
-	background-color: #AEC7C9;
+.taChosenTimeslot, .taChosenTimeslot > .booking {
 	background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,.5) 50%);
 	background-size: 8px 8px;
 }
 
 .otherTATimeslot {
-	background-color: #FFDFD6 !important;
+	background: #ddd;
+	background: 
+	linear-gradient(115deg, transparent 75%, rgba(255,255,255,.8) 75%) 0 0,
+	linear-gradient(245deg, transparent 75%, rgba(255,255,255,.8) 75%) 0 0,
+	linear-gradient(115deg, transparent 75%, rgba(255,255,255,.8) 75%) 7px -15px,
+	linear-gradient(245deg, transparent 75%, rgba(255,255,255,.8) 75%) 7px -15px,
+	#ddd;
+	background-size: 15px 30px
 }
 
 
@@ -489,8 +491,8 @@ input, button, select, textarea {
 
 .booking:not(.myTeamBooking) {
 	color: grey;
-	background-color: rgba(248, 247, 216, 0.5) !important;
-	border: 2px solid rgba(248, 247, 216, 0.5);
+	background-color: rgba(191, 191, 191, 0.5) !important;
+	border: 2px solid rgba(191, 191, 191, 0.5);
 }
 
 .booking:not(.myTeamBooking) > .popover {

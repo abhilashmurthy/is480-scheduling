@@ -643,7 +643,7 @@
 					}
                     
 					//Popover
-					makePopover($td, "Change Availability", $changeAvailabilityTable);
+					makePopover($td, "Change Availability", $changeAvailabilityTable, 'changeSelectedPopover');
                 }
 				
                 function appendChangeSignupPopover($td) {
@@ -691,7 +691,7 @@
 					}
                     
 					//Popover
-					makePopover($td, title, $changeSignupTable);
+					makePopover($td, title, $changeSignupTable, 'changeSelectedPopover');
                 }
                 
                 //Function to refresh booking exists
@@ -1629,17 +1629,19 @@
                 function changeSignup(bodyTd, taChosen) {
                     var timeslotsData = {};
                     var timeslot_data = new Array();
-                    var allTimeslots = $(".taChosenTimeslot", ".scheduleTable").get();
+                    var allTimeslots = $(".taChosenTimeslot").get();
                     var timeslotsSet = new HashSet();
                     for (var i = 0; i < allTimeslots.length; i++) {
-                        var obj = allTimeslots[i];
-                        timeslotsSet.add(obj.id.split("_")[1]);
+                        var $obj = $(allTimeslots[i]);
+						console.log('Retreived: ' + $obj.attr('class') + ' - ' + $obj.attr('id'));
+                        timeslotsSet.add($obj.is('.timeslotCell:not(.legendBox)')?$obj.attr('id').split("_")[1]:$obj.closest('.timeslotCell').attr('id').split("_")[1]);
                     }
+					return false;
                     timeslot_data = timeslotsSet.values().sort();
                     if (taChosen) {
-                        timeslot_data.push(bodyTd.attr('id').split("_")[1]);
+                        timeslot_data.push(bodyTd.attr('id')?bodyTd.attr('id').split("_")[1]:bodyTd.closest('.timeslotCell').attr('id').split("_")[1]);
                     } else {
-                        var index = timeslot_data.indexOf(bodyTd.attr('id').split("_")[1]);
+                        var index = timeslot_data.indexOf(bodyTd.attr('id')?bodyTd.attr('id').split("_")[1]:bodyTd.closest('.timeslotCell').attr('id').split("_")[1]);
                         timeslot_data.splice(index, 1);
                     }
                     timeslotsData["timeslots"] = timeslot_data;
@@ -2306,7 +2308,7 @@
             };
             
             /* POPOVER */
-            function makePopover(container, title, content) {
+            function makePopover(container, title, content, customClass) {
                 container.popover({
                     container: container,
                     trigger: 'manual',
@@ -2323,8 +2325,9 @@
                         } else {
                             return 'right';
                         }
-                    }
-                });
+                    },
+					template: '<div class="popover ' + (customClass?customClass:'') + '"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+				});
             }
             
             /* TOOLTIP */
