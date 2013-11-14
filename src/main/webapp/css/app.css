@@ -289,7 +289,6 @@ input, button, select, textarea {
 }
 
 .pendingBooking:hover {
-	border: 2px dashed black;
 	background-color: #DBD446;
 }
 
@@ -303,7 +302,6 @@ input, button, select, textarea {
 }
 
 .approvedBooking:hover {
-	border: 2px dashed black;
 	background-color: #8BC58B;
 }
 
@@ -316,7 +314,6 @@ input, button, select, textarea {
 }
 
 .unbookedTimeslot:hover {
-	border: 2px dashed black;
 	background-color: #8FA4A6;
 }
 
@@ -493,7 +490,7 @@ input, button, select, textarea {
 .booking:not(.myTeamBooking) {
 	color: grey;
 	background-color: rgba(248, 247, 216, 0.5) !important;
-	border: 2px solid #dddddd;
+	border: 2px solid rgba(248, 247, 216, 0.5);
 }
 
 .booking:not(.myTeamBooking) > .popover {
