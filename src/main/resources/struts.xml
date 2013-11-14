@@ -112,8 +112,8 @@
 			<result>/tasignup.jsp</result>
 		</action>
 		
-		<action name="getNotificationSettings" class="systemAction.GetNotificationSettingsAction" method="execute">
-            <result name="success">/managenotifications.jsp</result>
+		<action name="getOtherSettings" class="systemAction.GetOtherSettingsAction" method="execute">
+            <result name="success">/othersettings.jsp</result>
         </action>
 		
 		<action name="createSchedule" class="systemAction.PrepareCreateScheduleAction" method="execute">
@@ -296,6 +296,12 @@
         </action>
 		
 		<action name="generateLoggingReport" class="userAction.GenerateLoggingReportAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+		
+		<action name="changePassword" class="userAction.ChangePasswordAction" method="execute">
 			<result type="json">
                 <param name="root">json</param>
             </result>
