@@ -41,7 +41,7 @@
     <div class="navbar-inner">
         <div class="container">
             <a class="brand" href="index">
-				<img src="img/IS480-navbar.png" style="height:23px; width:105px; display:inline-block;"/>
+				<img src="img/IS480-navbar1.png" style="height:25px; width:120px; display:inline-block;"/>
 			</a>
             <div class="nav-collapse collapse">
                 <ul class="nav navbar-nav">

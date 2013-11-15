@@ -54,7 +54,7 @@
             <div class="navbar-inner">
                 <div class="container">
 					<a class="brand" href="index">
-						<img src="img/IS480-navbar.png" style="height:23px; width:105px; display:inline-block;"/>
+						<img src="img/IS480-navbar1.png" style="height:25px; width:120px; display:inline-block;"/>
 					</a>
 					<button class="ssoBtn btn btn-primary pull-right" data-loading-text="Logging in..." type="submit">SMU Login</button>
 					<button class="testBtn btn btn-inverse pull-right muted" data-loading-text="Logging in..." type="submit">Administrator Login</button>
