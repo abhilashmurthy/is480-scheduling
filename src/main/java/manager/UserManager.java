@@ -484,10 +484,8 @@ public class UserManager {
 	}
 	
 	public static ArrayList<Booking> getSubscribedBookings(EntityManager em, String email) {
-		ArrayList<Booking> list = new ArrayList<Booking>();
-		
 		Query q = em.createQuery("SELECT b FROM Booking b WHERE :email MEMBER OF b.subscribers");
-		
-		return list;
+		q.setParameter("email", email);
+		return (ArrayList<Booking>) q.getResultList();
 	}
 }
