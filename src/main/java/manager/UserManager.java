@@ -482,4 +482,12 @@ public class UserManager {
 		em.remove(user);
 		em.flush(); //Forcing write to DB
 	}
+	
+	public static ArrayList<Booking> getSubscribedBookings(EntityManager em, String email) {
+		ArrayList<Booking> list = new ArrayList<Booking>();
+		
+		Query q = em.createQuery("SELECT b FROM Booking b WHERE :email MEMBER OF b.subscribers");
+		
+		return list;
+	}
 }
