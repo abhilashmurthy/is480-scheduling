@@ -50,7 +50,7 @@
 				</tbody>
 			</table>
 				
-			<div id="scheduleReport" style="display: none">
+			<div id="scheduleWikiReport" style="display: none">
 				<div style="float: left; margin-right: 50px;">
 					<table class="table table-hover" style="width:auto">
 						<thead>
@@ -235,27 +235,18 @@
 			$('#reportChosen').change(function() { 
 				var sel = $(this).val();
 				if (sel === "0") {
-					$("#wikiReport").hide();
 					$("#logActivityReport").hide();
-					$("#scheduleReport").hide();
+					$("#scheduleWikiReport").hide();
 					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', true);
 					showNotification("ERROR", "Please select a report!");
-				} else if (sel === "1") {
-					$("#wikiReport").hide();
+				} else if (sel === "1" || sel === "2") {
 					$("#logActivityReport").hide();
 					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', false);
-					$("#scheduleReport").show();
-				} else if (sel === "2") {
-					$("#logActivityReport").hide();
-					$("#scheduleReport").hide();
-					$("#downloadFile").hide();
-					$('#submitBtn').prop('disabled', false);
-					$("#wikiReport").show();
+					$("#scheduleWikiReport").show();
 				} else if (sel === "3") {
-					$("#wikiReport").hide();
-					$("#scheduleReport").hide();
+					$("#scheduleWikiReport").hide();
 					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', false);
 					$("#logActivityReport").show();
@@ -316,6 +307,24 @@
 				} else if (reportSel === "2") {
 					$("#downloadFile").attr("href", "ReportCSV/ScheduleWiki.csv");
 					urlParam = 'generateWikiReport';
+					//Check whether term has been selected
+					var termSelected = $('#termChosen').val();
+					if (termSelected === "" || termSelected === null) {
+						showNotification("ERROR", "Please select a term!");
+						$("#submitBtn").button('reset');
+						return false;
+					}
+					//Check whether milestone has been selected
+					var milestoneSelected = $('#milestoneChosen').val();
+					if (milestoneSelected === "" || milestoneSelected === null) {
+						showNotification("ERROR", "Please select a milestone!");
+						$("#submitBtn").button('reset');
+						return false;
+					}
+					//Prepare data
+					reportData["reportNumber"] = reportSel;
+					reportData["termId"] = termSelected;
+					reportData["milestoneName"] = milestoneSelected;
 					
 				} else if (reportSel === "3") {
 					$("#downloadFile").attr("href", "ReportCSV/LoggingReport.csv");
