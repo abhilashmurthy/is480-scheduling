@@ -473,14 +473,6 @@ public class UserManager {
 			b.getRequiredAttendees().remove(user);
 		}
 		
-		//Removing user from subscribed users for all bookings
-		Query subscribedBookingQuery = em.createQuery("SELECT b FROM Booking b WHERE :user MEMBER OF b.subscribedUsers");
-		subscribedBookingQuery.setParameter("user", user);
-		ArrayList<Booking> subscribedBookings = (ArrayList<Booking>) subscribedBookingQuery.getResultList();
-		for (Booking b : subscribedBookings) {
-			b.getSubscribedUsers().remove(user);
-		}
-		
 		//Removing all SystemActivityLog entries that correspond to this user
 		Query removeLogs = em.createQuery("DELETE FROM SystemActivityLog s WHERE s.user = :user");
 		removeLogs.setParameter("user", user);
