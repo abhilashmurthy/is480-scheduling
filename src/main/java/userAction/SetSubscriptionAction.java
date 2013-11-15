@@ -82,6 +82,9 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 					json.put("message", "You have successfully cancelled your RSVP!");
 				} else if (status.equalsIgnoreCase("Subscribe")) {
 					HashSet<String> subscribedUsers = b.getSubscribers();
+					if (subscribedUsers == null) {
+						subscribedUsers = new HashSet<String>();
+					}
 					subscribedUsers.add(user.getEmail());
 					b.setSubscribers(subscribedUsers);
 					json.put("message", "Your RSVP was successful!");
