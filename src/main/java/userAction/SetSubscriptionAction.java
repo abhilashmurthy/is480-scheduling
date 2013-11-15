@@ -16,6 +16,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import model.Booking;
@@ -56,9 +57,9 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 			User user = em.find(User.class, tempUser.getId());
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
-			//Need to change this for guests. Guests need to be users in our db before they can access any feature
-			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.ADMINISTRATOR) 
-					|| activeRole.equals(Role.TA)) {
+			
+			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) || 
+					activeRole.equals(Role.GUEST)) {
 				
 				//Getting input data from url
 				JSONObject subscribeObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
@@ -70,19 +71,19 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 				em.getTransaction().begin();
 				Booking b = em.find(Booking.class, bookingId);
 				if (status.equalsIgnoreCase("Unsubscribe")) {
-					Set<User> subscribedUsers = b.getSubscribedUsers();
-					for (User userObj: subscribedUsers) {
-						if (userObj.equals(user)) {
-							subscribedUsers.remove(userObj);
+					HashSet<String> subscribedUsers = b.getSubscribers();
+					for (String userEmail: subscribedUsers) {
+						if (userEmail.equals(user.getEmail())) {
+							subscribedUsers.remove(userEmail);
 							break;
 						}
 					}
-					b.setSubscribedUsers(subscribedUsers);
+					b.setSubscribers(subscribedUsers);
 					json.put("message", "You have successfully cancelled your RSVP!");
 				} else if (status.equalsIgnoreCase("Subscribe")) {
-					Set<User> subscribedUsers = b.getSubscribedUsers();
-					subscribedUsers.add(user);
-					b.setSubscribedUsers(subscribedUsers);
+					HashSet<String> subscribedUsers = b.getSubscribers();
+					subscribedUsers.add(user.getEmail());
+					b.setSubscribers(subscribedUsers);
 					json.put("message", "Your RSVP was successful!");
 				}
 				em.persist(b);

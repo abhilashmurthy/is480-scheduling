@@ -190,10 +190,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         }
 						
 						//Adding the subscribe users
-						Set<String> subscribedUsers = new HashSet<String>();
-						for (User s : b.getSubscribedUsers()) {
-							subscribedUsers.add(s.getEmail());
-						}
+						Set<String> subscribedUsers = b.getSubscribers();
 
                         //Setting the list of attendees
                         map.put("students", students);
