@@ -57,9 +57,6 @@ public class User implements Serializable {
 	
 	private Role role;
 	
-	@ManyToMany(mappedBy = "subscribedUsers", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Booking> subscribedBookings = new HashSet<Booking>();
-	
 	public String getUsername() {
 		return username;
 	}
@@ -100,14 +97,6 @@ public class User implements Serializable {
 		this.mobileNumber = mobileNumber;
 	}
 
-	public Set<Booking> getSubscribedBookings() {
-		return subscribedBookings;
-	}
-
-	public void setSubscribedBookings(Set<Booking> subscribedBookings) {
-		this.subscribedBookings = subscribedBookings;
-	}
-	
 	public String getEmail() {
 		return username + "@smu.edu.sg";
 	}
