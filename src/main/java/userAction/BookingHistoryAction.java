@@ -276,7 +276,7 @@ public class BookingHistoryAction extends ActionSupport implements ServletReques
 					//Getting the list of user emails who have subscribed to the booking
 					HashSet<String> subscribedUsers = b.getSubscribers();
 					List<HashMap<String, String>> sUsernamesList = new ArrayList<HashMap<String, String>>();
-					if (subscribedUsers.size() > 0) {
+					if (subscribedUsers != null && subscribedUsers.size() > 0) {
 						for (String sUser: subscribedUsers) {
 							HashMap<String, String> userMap = new HashMap<String, String>();
 							userMap.put("userEmail", sUser);
