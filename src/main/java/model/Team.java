@@ -35,7 +35,7 @@ public class Team implements Serializable {
 	private String teamName;
 	private String wiki;
 	//Store the type of presentation
-    private PresentationType presentationType;
+    private PresentationType presentationType = PresentationType.PRIVATE;
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Term term;
 	@ManyToOne(fetch = FetchType.LAZY)
