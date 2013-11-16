@@ -347,7 +347,9 @@
 						return false;
 					} 
 					//Check that end date is after start date
-					if (startDate > endDate) {
+					var sDate = new Date($('#startDate').val());
+					var eDate = new Date($('#endDate').val());
+					if (sDate > eDate) {
 						showNotification("ERROR", "End Date should be after Start Date!");
 						$("#submitBtn").button('reset');
 						return false;

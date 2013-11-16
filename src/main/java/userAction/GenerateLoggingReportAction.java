@@ -97,7 +97,7 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 					allActivity = SystemActivityLogManager.getAllLogs(em);
 				} else {
 					sDate = sDate + " 00:00:00";
-					eDate = eDate + " 00:00:00";
+					eDate = eDate + " 23:59:59";
 					Timestamp startDate = new Timestamp(sdf.parse(sDate).getTime());
 					Timestamp endDate = new Timestamp(sdf.parse(eDate).getTime());
 					allActivity = SystemActivityLogManager.getAllLogsBetween(em, startDate, endDate);
@@ -140,9 +140,15 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 						//Prepare data and write to file
 						String id = String.valueOf(log.getId());
 						String activity = log.getActivity();
-						String message = log.getMessage();
+						String message = "";
+						if (log.getMessage() != null) {
+							message = log.getMessage();
+						}
 						String time = sdf.format(log.getRunTime());
-						String username = log.getUser().getFullName();
+						String username = "";
+						if (log.getUser() != null) {
+							username = log.getUser().getFullName();
+						}
 						String result = "";
 						if (log.isSuccess() == true) {
 							result = "SUCCESS";
@@ -160,19 +166,26 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				//2nd: Administrator Activity
 				if (administratorActivity.size() > 0) {
 					for (SystemActivityLog log: administratorActivity) {
-						String[] nextLine = new String[6];
-						//Prepare data
-						nextLine[0] = String.valueOf(log.getId());
-						nextLine[1] = log.getActivity();
-						nextLine[2] = log.getMessage();
-						nextLine[3] = sdf.format(log.getRunTime());
-						nextLine[4] = log.getUser().getFullName();
+						//Prepare data and write to file
+						String id = String.valueOf(log.getId());
+						String activity = log.getActivity();
+						String message = "";
+						if (log.getMessage() != null) {
+							message = log.getMessage();
+						}
+						String time = sdf.format(log.getRunTime());
+						String username = "";
+						if (log.getUser() != null) {
+							username = log.getUser().getFullName();
+						}
+						String result = "";
 						if (log.isSuccess() == true) {
-							nextLine[5] = "SUCCESS";
+							result = "SUCCESS";
 						} else {
-							nextLine[5] = "ERROR";
+							result = "ERROR";
 						}
 						//Write to file
+						String[] nextLine = {id, activity, message, time, username, result}; 
 						writer.writeNext(nextLine);
 					}
 					//Print blank line
@@ -182,37 +195,51 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				//3rd: Login/Logout Activity
 				if (loginActivity.size() > 0) {
 					for (SystemActivityLog log: loginActivity) {
-						String[] nextLine = new String[6];
-						//Prepare data
-						nextLine[0] = String.valueOf(log.getId());
-						nextLine[1] = log.getActivity();
-						nextLine[2] = log.getMessage();
-						nextLine[3] = sdf.format(log.getRunTime());
-						nextLine[4] = log.getUser().getFullName();
+						//Prepare data and write to file
+						String id = String.valueOf(log.getId());
+						String activity = log.getActivity();
+						String message = "";
+						if (log.getMessage() != null) {
+							message = log.getMessage();
+						}
+						String time = sdf.format(log.getRunTime());
+						String username = "";
+						if (log.getUser() != null) {
+							username = log.getUser().getFullName();
+						}
+						String result = "";
 						if (log.isSuccess() == true) {
-							nextLine[5] = "SUCCESS";
+							result = "SUCCESS";
 						} else {
-							nextLine[5] = "ERROR";
+							result = "ERROR";
 						}
 						//Write to file
+						String[] nextLine = {id, activity, message, time, username, result}; 
 						writer.writeNext(nextLine);
 					}
 				}
 				if (logoutActivity.size() > 0) {
 					for (SystemActivityLog log: logoutActivity) {
-						String[] nextLine = new String[6];
-						//Prepare data
-						nextLine[0] = String.valueOf(log.getId());
-						nextLine[1] = log.getActivity();
-						nextLine[2] = log.getMessage();
-						nextLine[3] = sdf.format(log.getRunTime());
-						nextLine[4] = log.getUser().getFullName();
+						//Prepare data and write to file
+						String id = String.valueOf(log.getId());
+						String activity = log.getActivity();
+						String message = "";
+						if (log.getMessage() != null) {
+							message = log.getMessage();
+						}
+						String time = sdf.format(log.getRunTime());
+						String username = "";
+						if (log.getUser() != null) {
+							username = log.getUser().getFullName();
+						}
+						String result = "";
 						if (log.isSuccess() == true) {
-							nextLine[5] = "SUCCESS";
+							result = "SUCCESS";
 						} else {
-							nextLine[5] = "ERROR";
+							result = "ERROR";
 						}
 						//Write to file
+						String[] nextLine = {id, activity, message, time, username, result}; 
 						writer.writeNext(nextLine);
 					}
 				}
