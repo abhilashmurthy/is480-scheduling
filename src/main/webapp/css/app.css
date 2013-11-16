@@ -449,8 +449,10 @@ input, button, select, textarea {
 
 
 .popoverBtn {
-	display: inline;
+	display: block;
     margin-right: 20px !important;
+	clear: none;
+	float: right;
 }
 
 .ui-notifiy {
