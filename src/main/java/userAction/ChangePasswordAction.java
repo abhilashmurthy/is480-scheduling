@@ -45,6 +45,8 @@ public class ChangePasswordAction extends ActionSupport implements ServletReques
 		logItem.setActivity("Administrator: Change Administrator Password");
 		logItem.setRunTime(now);
 		if (user.getId() != null) logItem.setUser(user);
+		logItem.setMessage("Error with validation / No changes made");
+		logItem.setSuccess(true);
 		
 		EntityManager em = null;
         try {
@@ -80,7 +82,8 @@ public class ChangePasswordAction extends ActionSupport implements ServletReques
 			em.getTransaction().commit();
 			
 			json.put("success", true);
-			//TODO Set logItem message
+			logItem.setMessage("Password changed successfully");
+			
         } catch (CustomException e) {
 			json.put("success", false);
             json.put("message", e.getMessage());

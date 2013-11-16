@@ -28,7 +28,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletContext;
 import manager.SystemActivityLogManager;
