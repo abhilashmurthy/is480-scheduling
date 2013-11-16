@@ -7,6 +7,7 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
 import constant.Role;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -81,6 +82,12 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 					b.setSubscribers(subscribedUsers);
 					json.put("message", "You have successfully cancelled your RSVP!");
 				} else if (status.equalsIgnoreCase("Subscribe")) {
+					//Checking whether the booking has been confirmed or not
+					if (b.getBookingStatus() != BookingStatus.APPROVED) {
+						json.put("message", "This presentation has not yet been confirmed. Please try again later!");
+						json.put("success", true);
+						return SUCCESS;
+					}
 					HashSet<String> subscribedUsers = b.getSubscribers();
 					if (subscribedUsers == null) {
 						subscribedUsers = new HashSet<String>();
