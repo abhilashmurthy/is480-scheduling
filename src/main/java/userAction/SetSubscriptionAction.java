@@ -11,7 +11,6 @@ import constant.BookingStatus;
 import constant.PresentationType;
 import constant.Role;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,13 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import model.Booking;
 import model.SystemActivityLog;
 import model.Team;
 import model.User;
-import model.role.Faculty;
 import org.json.JSONObject;
 import util.MiscUtil;
 
@@ -89,17 +86,21 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 					//Check whether the team's presentation is PRIVATE, INTERNAL or PUBLIC
 					Team team = b.getTeam();
 					if (team.getPresentationType() == PresentationType.PRIVATE) {
+						//Only for faculty and students part of the team only
 						if (user.getId() != team.getSupervisor().getId() && user.getId() != team.getReviewer1().getId() 
 								&& user.getId() != team.getReviewer2().getId()) {
 							json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
 							json.put("success", true);
 							return SUCCESS;
 						}
-					} else if (team.getPresentationType() == PresentationType.INTERNAL) {
-						//Write logic for INTERNAL presentations
-						json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
-						json.put("success", true);
-						return SUCCESS;
+					} else {
+						//For all SIS staff and students only
+						String smuGroups = (String) session.getAttribute("smu_groups");
+						if (!smuGroups.toLowerCase().contains("sis")) {
+							json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
+							json.put("success", true);
+							return SUCCESS;
+						}
 					} 
 					
 					//Checking whether the booking has been confirmed or not
