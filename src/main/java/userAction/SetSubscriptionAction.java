@@ -96,7 +96,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 					} else {
 						//For all SIS staff and students only
 						String smuGroups = (String) session.getAttribute("smu_groups");
-						if (!smuGroups.toLowerCase().contains("sis")) {
+						if (smuGroups == null || !smuGroups.toLowerCase().contains("sis")) {
 							json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
 							json.put("success", true);
 							return SUCCESS;
