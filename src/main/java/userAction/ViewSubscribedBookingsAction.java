@@ -108,7 +108,7 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
 						
 						String milestoneName = b.getTimeslot().getSchedule().getMilestone().getName();
 						String termName = b.getTimeslot().getSchedule().getMilestone().getTerm().getDisplayName();
-						String termMilestone = termName + " " + milestoneName;
+						String termMilestone = milestoneName + ", " + termName;
 						
 						String venue = timeslot.getVenue();
 						
