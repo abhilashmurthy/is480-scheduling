@@ -60,7 +60,7 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 
 		SystemActivityLog logItem = new SystemActivityLog();
-		logItem.setActivity("Administrator: Update Notification Settings");
+		logItem.setActivity("Administrator: Generate Schedule Wiki Report");
 		logItem.setRunTime(now);
 		logItem.setUser((User) session.getAttribute("user"));
 		logItem.setMessage("Error with validation / No changes made");
@@ -94,7 +94,6 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 				//check if this term and milestone belong together
 				Term thisTerm = TermManager.findTermById(em, termId);
 				List<Milestone> milestones = MilestoneManager.findByTerm(em, thisTerm);
-
 
 				//for every milestone for the term
 				for (Milestone m : milestones) {
@@ -132,11 +131,8 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 
 				//for each timeslot, get the information for each column
 				for (Timeslot t : allSlots) {
-
 					timeArr.add(t);
-
 				}
-
 
 				//Dates that have already been added
 				ArrayList<String> isAdded = new ArrayList<String>();
@@ -146,7 +142,6 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 
 				//loop through list
 				for (int i = 0; i < timeArr.size(); i++) {
-
 					Timeslot t = timeArr.get(i);
 					String date = t.getStartTime().toString();
 					String startDate = date.substring(0, 10);
@@ -155,73 +150,50 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 
 					//see if startDate already exists in the added list
 					for (String eachString : isAdded) {
-
 						if (eachString.equals(startDate)) {
-
 							foundFirst = true;
-
 						}
-
 					}
 
 					//if not found add this to the sorted list
 					if (!foundFirst) {
-
 						sortTimes.add(t);
-
 					}
 
 					if (i != timeArr.size() - 1) {
-
 						for (int j = i + 1; j < timeArr.size(); j++) {
-
 							Timeslot tCompare = timeArr.get(j);
 							String dateCompare = tCompare.getStartTime().toString();
 							String startDateCompare = dateCompare.substring(0, 10);
 
 							//compare the first timeslot with the next few to see if same starting date	
 							if (startDateCompare.equals(startDate)) {
-
 								boolean found = false;
 
 								//see if startDate already exists in the added list
 								for (String eachString : isAdded) {
-
 									if (eachString.equals(startDateCompare)) {
-
 										found = true;
-
 									}
-
 								}
 
 								//if not found add this to the sorted list
 								if (!found) {
-
 									sortTimes.add(tCompare);
-
 								}
-
 							}
-
 						}
 
 						//add this slot to the added slot, so that will never add again
 						isAdded.add(startDate);
-
 					}
-
 				}
-
 
 				//to see if already added
 				ArrayList<String> alreadyAdded = new ArrayList<String>();
 
-
 				for (int i = 0; i < sortTimes.size(); i++) {
-
 					Timeslot t = sortTimes.get(i);
-
 					String startDateTime = "";
 					startDateTime = t.getStartTime().toString();
 					String startDate = startDateTime.substring(0, 10);
@@ -230,17 +202,13 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 					boolean added = false;
 
 					for (String st : alreadyAdded) {
-
 						if (st.equals(startDate)) {
-
 							added = true;
-
 						}
 					}
 
 					//when added is false
 					if (!added) {
-
 						//get day
 						String dayString = "";
 
@@ -262,12 +230,10 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 
 						//if i is not the last one
 						if (i != sortTimes.size()) {
-
 							//count the number of occurences
 							int overAllCounter = 0;
 
 							for (int j = i; j < sortTimes.size(); j++) {
-
 								//get all the similar timeslots and add them
 								Timeslot tCompare = sortTimes.get(j);
 								String startDateTimeCompare = "";
@@ -275,13 +241,9 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 								String startDateCompare = startDateTimeCompare.substring(0, 10);
 
 								Booking book = tCompare.getCurrentBooking();
-
 								if (startDateCompare.equals(startDate) && book != null) {
-
 									overAllCounter++;
-
 								}
-
 							}
 
 							int compareAll = 0;
@@ -289,7 +251,6 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 							boolean printHeader = true;
 
 							for (int j = i; j < sortTimes.size(); j++) {
-
 								//get all the similar timeslots and add them
 								Timeslot tCompare = sortTimes.get(j);
 								String startDateTimeCompare = "";
@@ -298,15 +259,12 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 								String startTimeEach = startDateTimeCompare.substring(11, 13);
 
 								if (startDateCompare.equals(startDate)) {
-
 									//if there is a booking
 									Booking book = tCompare.getCurrentBooking();
 
 									if (book != null) {
-
 										//print header
 										if (printHeader) {
-
 											//start new table header
 											out.write("==" + startDate + " " + dayString + "==");
 											out.newLine();
@@ -329,7 +287,6 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 											out.newLine();
 
 											printHeader = false;
-
 										}
 
 										//print out stuff for this section
@@ -337,7 +294,6 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 										out.newLine();
 										out.write("|width=\"160pt\"|" + startTimeEach + ":00hrs");
 										out.newLine();
-
 
 										Team team = tCompare.getCurrentBooking().getTeam();
 
@@ -347,10 +303,8 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 											out.write(teamName);
 											out.newLine();
 										} else {
-
 											out.write("||");
 											out.newLine();
-
 										}
 
 										Set<User> allUsers = tCompare.getCurrentBooking().getRequiredAttendees();
@@ -361,9 +315,7 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 
 										if (allUsers.size() > 0) {
 											for (User u : allUsers) {
-
 												if (u.getRole() == Role.FACULTY) {
-
 													if (counter == 0) {
 														attendees += u.getFullName();
 														counter++;
@@ -371,7 +323,6 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 														attendees += " & " + u.getFullName();
 													}
 												}
-
 											}
 										}
 
@@ -421,7 +372,6 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 											pt = "NA";
 										}
 
-
 										out.write("||" + pt + " / " + TA);
 										out.newLine();
 
@@ -433,29 +383,21 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 										} else {
 											out.write("|-");
 										}
-
 										out.newLine();
 									}
 								}
-
 							}
-
 						}
-
 						//add this string to already added
 						alreadyAdded.add(startDate);
 					}
-
-					out.newLine();
-
+//					out.newLine();
 				}
-
 				out.close();
-
+				
+				logItem.setMessage("Wiki Report was created successfully");
 				json.put("message", "Report created successfully");
 				json.put("success", true);
-
-
 			} else {
 				//Incorrect user role
 				json.put("error", true);

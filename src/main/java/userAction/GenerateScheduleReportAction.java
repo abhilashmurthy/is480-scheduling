@@ -60,7 +60,7 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 
 		SystemActivityLog logItem = new SystemActivityLog();
-		logItem.setActivity("Administrator: Update Notification Settings");
+		logItem.setActivity("Administrator: Generate Schedule Report");
 		logItem.setRunTime(now);
 		logItem.setUser((User) session.getAttribute("user"));
 		logItem.setMessage("Error with validation / No changes made");
@@ -286,7 +286,9 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 				}
 
 				writer.close();
-
+				
+				logItem.setMessage("Schedule Report was created successfully");
+				
 				json.put("message", "Report created successfully");
 				json.put("success", true);
 

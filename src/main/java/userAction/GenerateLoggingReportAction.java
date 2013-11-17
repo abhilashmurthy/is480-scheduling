@@ -245,6 +245,7 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				}
 				
 				writer.close();
+				logItem.setMessage("Logging Report was created successfully");
 				
 				json.put("message", "Report created successfully");
 				json.put("success", true);
