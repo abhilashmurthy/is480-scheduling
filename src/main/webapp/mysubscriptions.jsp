@@ -46,7 +46,19 @@
 						</thead>
 						<tbody> 
 							<s:iterator value="data">
-								<tr class="success" style="height:40px">
+								<s:if test="%{bookingStatus.equalsIgnoreCase('Pending')}"> 
+									<tr class="warning" style="height:40px">
+								</s:if>
+								<s:if test="%{bookingStatus.equalsIgnoreCase('Approved')}">
+									<tr class="success" style="height:40px">
+								</s:if>
+								<s:if test="%{bookingStatus.equalsIgnoreCase('Rejected')}">
+									<tr class="error" style="height:40px">
+								</s:if>
+								<s:if test="%{bookingStatus.equalsIgnoreCase('Deleted')}">
+									<tr class="info" style="height:40px">
+								</s:if>
+<!--								<tr class="success" style="height:40px">-->
 									<td style="vertical-align: middle"><i class="fa fa-check"></i></td>
 									<td style="vertical-align: middle"><s:property value="teamName"/></td>
 									<td style="vertical-align: middle"><s:property value="termMilestone"/></td>

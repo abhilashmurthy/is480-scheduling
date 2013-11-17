@@ -7,6 +7,7 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
 import constant.Role;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
@@ -75,7 +76,25 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
 						}
 					}
 					
-					for (Booking b : subscribedBookings) {
+					//Now sorting the bookings by their status - APPROVED, REJECTED, DELETED
+					List<Booking> sBookings = new ArrayList<Booking>();
+					for (Booking b: subscribedBookings) {
+						if (b.getBookingStatus() == BookingStatus.APPROVED) {
+							sBookings.add(b);
+						}
+					}
+					for (Booking b: subscribedBookings) {
+						if (b.getBookingStatus() == BookingStatus.REJECTED) {
+							sBookings.add(b);
+						}
+					}
+					for (Booking b: subscribedBookings) {
+						if (b.getBookingStatus() == BookingStatus.DELETED) {
+							sBookings.add(b);
+						}
+					}
+					
+					for (Booking b : sBookings) {
 						Timeslot timeslot = b.getTimeslot();
 						//Getting all the timeslot and booking details
 						HashMap<String, String> map = new HashMap<String, String>();
@@ -99,7 +118,9 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
 						String time = sdfForStartTime.format(timeslot.getStartTime()) + " - " + 
 								sdfForEndTime.format(timeslot.getEndTime());
 						
+						String bookingStatus = b.getBookingStatus().toString();
 						map.put("bookingId", String.valueOf(bookingId));
+						map.put("bookingStatus", bookingStatus);
 						map.put("teamName", teamName);
 						map.put("termMilestone", termMilestone);
 						map.put("time", time);
