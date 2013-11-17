@@ -1158,7 +1158,7 @@
 						$('.modal-body').prepend(
 							$(document.createElement('div'))
 								.addClass('customPrompt')
-								.append('Reason to delete booking')
+								.append('Reason to delete booking (Max 55 char.)')
 						);
 						$('input.bootbox-input').on('keyup', function(){
 							if ($(this).val() && $(this).val().length > 55) {
