@@ -484,8 +484,14 @@ public class UserManager {
 	}
 	
 	public static ArrayList<Booking> getSubscribedBookings(EntityManager em, String email) {
-		Query q = em.createQuery("SELECT b FROM Booking b WHERE :email MEMBER OF b.subscribers");
-		q.setParameter("email", email);
-		return (ArrayList<Booking>) q.getResultList();
+		ArrayList<Booking> rsvps = new ArrayList<Booking>();
+		
+		Query q = em.createQuery("SELECT b FROM Booking b");
+		ArrayList<Booking> allBookings = (ArrayList<Booking>) q.getResultList();
+		for (Booking b : allBookings) {
+			if (b.getSubscribers().contains(email)) rsvps.add(b);
+		}
+		
+		return rsvps;
 	}
 }
