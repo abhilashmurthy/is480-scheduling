@@ -6,7 +6,7 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
-import com.sun.tools.internal.jxc.gen.config.Config;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;

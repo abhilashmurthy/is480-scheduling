@@ -307,6 +307,12 @@
             </result>
         </action>
 		
+		<action name="generateWikiReport" class="userAction.GenerateWikiReportAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+		
 	</package>
 
 </struts>

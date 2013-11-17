@@ -264,7 +264,7 @@
 					reportData["milestoneName"] = milestoneSelected;
 					
 				} else if (reportSel === "2") {
-					$("#downloadFile").attr("href", "ReportCSV/ScheduleWiki.csv");
+					$("#downloadFile").attr("href", "ReportCSV/WikiReport.txt");
 					urlParam = 'generateWikiReport';
 					//Check whether term has been selected
 					var termSelected = $('#termChosen').val();
