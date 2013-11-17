@@ -2254,9 +2254,13 @@
 							}
 						});
 						
+						var aoColumnsArray = (<%=activeRole.equals(Role.FACULTY)%>)? [null, null, {sType: 'datetime'}] : [null, {sType: 'datetime'}];
+						var aaSortingArray = (<%=activeRole.equals(Role.FACULTY)%>)? [[2, 'asc']] : [[1, 'asc']];
+						
 						//Datatables
 						$('.modal-body').find('#myTeamsModalTable').dataTable({
-							aaSorting: [],
+							aoColumns: aoColumnsArray,
+							aaSorting: aaSortingArray,
 							bPaginate: false,
 							bJqueryUI: false,
 							bLengthChange: true,

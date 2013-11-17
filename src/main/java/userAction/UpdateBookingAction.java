@@ -218,12 +218,12 @@ public class UpdateBookingAction extends ActionSupport implements ServletRequest
 				 * CHECKING WHAT PARTS OF THE BOOKING WERE MODIFIED (for email markup)
 				 */
 				//Checking if time information has been modified
-				if (!oldTimeslot.getStartTime().equals(newBookingTimestamp)) {
+				if (newBookingTimestamp != null && !oldTimeslot.getStartTime().equals(newBookingTimestamp)) {
 					partsEdited.add(EditType.TIME);
 				}
 				
 				//Checking if the venue information has been modified
-				if (!oldTimeslot.getVenue().equals(newVenue)) {
+				if (newVenue != null && !oldTimeslot.getVenue().equals(newVenue)) {
 					partsEdited.add(EditType.VENUE);
 				}
 				

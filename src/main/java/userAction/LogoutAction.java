@@ -34,14 +34,14 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
     @Override
     public String execute() throws Exception {
 		HttpSession session = request.getSession();
-		
+		User userForLog = (User)session.getAttribute("user");
 		Calendar nowCal = Calendar.getInstance();
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 		
 		SystemActivityLog logItem = new SystemActivityLog();
 		logItem.setActivity("Logout");
 		logItem.setRunTime(now);
-		logItem.setUser((User)session.getAttribute("user"));
+		if (userForLog.getId() != null) logItem.setUser(userForLog);
 		
 		EntityManager em = null;
         try {
@@ -50,8 +50,7 @@ public class LogoutAction extends ActionSupport implements ServletRequestAware, 
 			MiscUtil.logActivity(logger, user, "Logged out");
 			logItem.setMessage("Logout successful. " + user.toString());
         } catch (Exception e) {
-			User userForLog = (User) session.getAttribute("user");
-			logItem.setUser(userForLog);
+			if (userForLog.getId() != null) logItem.setUser(userForLog);
 			logItem.setMessage("Error: " + e.getMessage());
 			
             logger.error("Exception caught: " + e.getMessage());

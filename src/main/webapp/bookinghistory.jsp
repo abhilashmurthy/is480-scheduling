@@ -198,7 +198,7 @@
 									</s:else>
 									<div class="hiddenUsersList" style="display:none">
 										<s:iterator value="subscribedUsers">
-											<s:property value="username"/> <br/>
+											<s:property value="userEmail"/> <br/>
 										</s:iterator>
 									</div>
 								</td>

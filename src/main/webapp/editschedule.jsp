@@ -155,6 +155,14 @@
 				margin-bottom: 0 !important;
             }
 			
+			.border-top {
+				border-top: 1px solid #dddddd !important;
+			}
+			
+			.border-left {
+				border-left: 1px solid #dddddd !important;
+			}
+			
 			.glow-top {
 				border-top: 1px solid #fff966 !important;
 				border-radius: 5px 5px 0px 0px; 
@@ -774,7 +782,16 @@
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("th"));
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-                        th.html(headerVal);
+                        th
+							.append(headerVal + '<br/>')
+							.append(
+								$(document.createElement('input'))
+									.attr('type', 'checkbox')
+									.attr('name', 'selectDay_' + (dateArray[i]).toString('yyyy-MM-dd'))
+									.attr('id', 'checkbox_' + (dateArray[i]).toString('yyyy-MM-dd'))
+									.addClass('selectDay')
+							)
+							.append(' Select All');
                         thead.append(th);
                     }
                     //Inserting constructed table header into table
@@ -822,6 +839,23 @@
 					$(this).trigger('mouseenter');
                     return false;
                 });
+				
+				$('body').on('click', '.selectDay', function(){
+					var $this = $(this);
+					if ($this.is(':checked')) {
+						$('.timeslotcell:not(.teamExists)').each(function(){
+							if ($(this).is('.chosen')) return true;
+							if (Date.parse($(this).attr('value')).toString('yyyy-MM-dd') === $this.attr('id').split('_')[1]) triggerTimeslot($(this));
+						});
+					} else {
+						console.log('hello');
+						$('.timeslotcell:not(.teamExists)').each(function(){
+							if ($(this).is('.chosen') && $(this).find('div.start-marker').length && Date.parse($(this).attr('value')).toString('yyyy-MM-dd') === $this.attr('id').split('_')[1]) {
+								triggerTimeslot($(this));
+							}
+						});
+					}
+				});
 				
 				//Hover glow effect
                 $('body').on('mouseenter', '.timeslotsTable tr:not(:has(table, th)) td:not(:first-child)', function(e) {
@@ -872,7 +906,6 @@
                 });
                 $('body').on('mouseleave', '.timeslotsTable td', function(e) {
 					var $td = $(this);
-					console.log('leaving');
 					var slotSize = selectedSchedule.duration / 30;
 					if ($td.hasClass('glow-sides')) {
 						var $prevTr = $td.closest('tr');
@@ -904,7 +937,7 @@
 								//Unselect this timeslot
 								var $nextTr = $prevTr;
 								for (var j = 0; j < slotSize; j++) {
-									$nextTr.children().eq($timeslotCell.index()).removeClass('chosen').empty();
+									$nextTr.children().eq($timeslotCell.index()).removeClass('chosen border-top border-left').empty();
 									$nextTr = $nextTr.next();
 								}
 								break;
@@ -922,9 +955,9 @@
 							}
 						}
 						$nextTr = $timeslotCell.closest('tr');
-						$timeslotCell.append($(document.createElement('div')).addClass('start-marker'));
+						$timeslotCell.append($(document.createElement('div')).addClass('start-marker')).addClass('border-top');
 						for (var i = 0; i < slotSize; i++) {
-							$nextTr.children().eq($timeslotCell.index()).addClass('chosen');
+							$nextTr.children().eq($timeslotCell.index()).addClass('chosen border-left');
 							$nextTr = $nextTr.next();
 							if (i !== slotSize - 1 && $nextTr.children().eq($timeslotCell.index()).children('div.start-marker').length) {
 								//Uh oh, overlapping timeslot detected. Let's remove it.
@@ -946,10 +979,10 @@
 									if (timeslots[i].team) {
 										//If team exists, don't clickable
 										var slotSize = selectedSchedule.duration / 30;
-										$this.append($(document.createElement('div')).addClass('defaultadd-marker'));
+										$this.append($(document.createElement('div')).addClass('defaultadd-marker')).addClass('border-top');
 										var $nextTr = $this.closest('tr');
 										for (var k = 0; k < slotSize; k++) {
-											$nextTr.children().eq($this.index()).addClass('teamExists');
+											$nextTr.children().eq($this.index()).addClass('teamExists border-left');
 											var $nextTr = $nextTr.next();
 										}
 									} else {

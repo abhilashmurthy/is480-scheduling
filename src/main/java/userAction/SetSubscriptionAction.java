@@ -7,6 +7,8 @@ package userAction;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
+import constant.PresentationType;
 import constant.Role;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -16,10 +18,11 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.HashSet;
 import javax.persistence.EntityManager;
 import model.Booking;
 import model.SystemActivityLog;
+import model.Team;
 import model.User;
 import org.json.JSONObject;
 import util.MiscUtil;
@@ -56,9 +59,9 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 			User user = em.find(User.class, tempUser.getId());
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
-			//Need to change this for guests. Guests need to be users in our db before they can access any feature
-			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.ADMINISTRATOR) 
-					|| activeRole.equals(Role.TA)) {
+			
+			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) || 
+					activeRole.equals(Role.GUEST)) {
 				
 				//Getting input data from url
 				JSONObject subscribeObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
@@ -70,19 +73,49 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 				em.getTransaction().begin();
 				Booking b = em.find(Booking.class, bookingId);
 				if (status.equalsIgnoreCase("Unsubscribe")) {
-					Set<User> subscribedUsers = b.getSubscribedUsers();
-					for (User userObj: subscribedUsers) {
-						if (userObj.equals(user)) {
-							subscribedUsers.remove(userObj);
+					HashSet<String> subscribedUsers = b.getSubscribers();
+					for (String userEmail: subscribedUsers) {
+						if (userEmail.equals(user.getEmail())) {
+							subscribedUsers.remove(userEmail);
 							break;
 						}
 					}
-					b.setSubscribedUsers(subscribedUsers);
+					b.setSubscribers(subscribedUsers);
 					json.put("message", "You have successfully cancelled your RSVP!");
 				} else if (status.equalsIgnoreCase("Subscribe")) {
-					Set<User> subscribedUsers = b.getSubscribedUsers();
-					subscribedUsers.add(user);
-					b.setSubscribedUsers(subscribedUsers);
+					//Check whether the team's presentation is PRIVATE, INTERNAL or PUBLIC
+					Team team = b.getTeam();
+					if (team.getPresentationType() == PresentationType.PRIVATE) {
+						//Only for faculty and students part of the team only
+						if (user.getId() != team.getSupervisor().getId() && user.getId() != team.getReviewer1().getId() 
+								&& user.getId() != team.getReviewer2().getId()) {
+							json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
+							json.put("success", true);
+							return SUCCESS;
+						}
+					} else {
+						//For all SIS staff and students only
+						String smuGroups = (String) session.getAttribute("smu_groups");
+						if (smuGroups == null || !smuGroups.toLowerCase().contains("sis")) {
+							json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
+							json.put("success", true);
+							return SUCCESS;
+						}
+					} 
+					
+					//Checking whether the booking has been confirmed or not
+					if (b.getBookingStatus() != BookingStatus.APPROVED) {
+						json.put("message", "This presentation has not yet been confirmed. Please try again later!");
+						json.put("success", true);
+						return SUCCESS;
+					}
+					
+					HashSet<String> subscribedUsers = b.getSubscribers();
+					if (subscribedUsers == null) {
+						subscribedUsers = new HashSet<String>();
+					}
+					subscribedUsers.add(user.getEmail());
+					b.setSubscribers(subscribedUsers);
 					json.put("message", "Your RSVP was successful!");
 				}
 				em.persist(b);

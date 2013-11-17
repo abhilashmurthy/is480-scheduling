@@ -27,6 +27,7 @@ import util.MiscUtil;
 import au.com.bytecode.opencsv.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 
 		SystemActivityLog logItem = new SystemActivityLog();
-		logItem.setActivity("Administrator: Update Notification Settings");
+		logItem.setActivity("Administrator: Generate Schedule Report");
 		logItem.setRunTime(now);
 		logItem.setUser((User) session.getAttribute("user"));
 		logItem.setMessage("Error with validation / No changes made");
@@ -87,10 +88,14 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 				long termId = Long.parseLong(reportData.getString("termId"));
 				String milestone = reportData.getString("milestoneName");
 				
+				//termId = 3;
+				//milestone = "Final";
+				
 				boolean termMilestoneMismatch = true;
 				//check if this term and milestone belong together
 				Term thisTerm = TermManager.findTermById(em, termId);
 				List<Milestone> milestones = MilestoneManager.findByTerm(em, thisTerm);
+				
 
 				//for every milestone for the term
 				for (Milestone m : milestones) {
@@ -119,9 +124,18 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 				String[] firstRow = {"Start Date & Time", "End Date & Time", "Venue", "TA", "Current Booking Status",
 					"Required Attendees", "Optional Attendees", "Team", "Team Members", "Last Edited By"};
 				writer.writeNext(firstRow);
-
+				
+				//get the milestone first
+				Milestone milestoneSelected = MilestoneManager.findByNameAndTerm(em,milestone,thisTerm);
+				
+				//get the schedule from that milestone
+				Schedule s = ScheduleManager.findByMilestone(em, milestoneSelected);
+				
+				//get all slots for this schedule
+				Set<Timeslot> allSlots = s.getTimeslots();
+				
 				//get schedules for this term
-				List<Schedule> thisSchedules = ScheduleManager.getAllSchedules(em);
+				/*List<Schedule> thisSchedules = ScheduleManager.getAllSchedules(em);
 				Schedule thisSchedule = new Schedule();
 
 				for (Schedule sch : thisSchedules) {
@@ -131,16 +145,17 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 					}
 				}
 				//get the timeslots for this schedule
-				List<Timeslot> allSlots = TimeslotManager.findBySchedule(em, thisSchedule);
+				List<Timeslot> allSlots = TimeslotManager.findBySchedule(em, thisSchedule);*/
 
 				//for each timeslot, get the information for each column
 				for (Timeslot t : allSlots) {
-
+					
+					SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 					String startDate = "";
-					startDate = t.getStartTime().toString();
+					startDate = sdf.format(t.getStartTime());
 //					String startTime = "";
 					String endDate = "";
-					endDate = t.getEndTime().toString();
+					endDate = sdf.format(t.getEndTime());
 //					String endTime ="";
 
 //					String starting = t.getStartTime().toString();
@@ -186,15 +201,50 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 						Set<User> allUsers = t.getCurrentBooking().getRequiredAttendees();
 						String toAddRequired = "";
 						String toAddStudents = "";
+						
+						int counter = 0;
+						
+						int facultyCounter = 0;
+						
+						for (User u: allUsers){
 
-						for (User u : allUsers) {
+							if (u.getRole() == Role.STUDENT) {
+								
+								if(counter!=allUsers.size()-1){
+									toAddStudents += u.getFullName() + ",";
+								}else{
+									toAddStudents += u.getFullName();
+								}
+								
+							}else{
+								
+								facultyCounter++;
+								
+							}
+							
+							counter++;
+						}
+						
+						counter = 0;
+						
+						for (User u: allUsers){
+							
+							counter++;
 
 							if (u.getRole() == Role.FACULTY) {
-								toAddRequired += u.getFullName() + " ";
-							} else if (u.getRole() == Role.STUDENT) {
-								toAddStudents += u.getFullName() + " ";
+								
+								if(counter!=facultyCounter){
+									toAddRequired += u.getFullName() + ",";
+								}else{
+									toAddRequired += u.getFullName() + ",";
+								}
+								
 							}
+							
+							
 						}
+						
+						
 
 						requiredAttendees = toAddRequired;
 
@@ -206,10 +256,19 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 						HashSet<String> allOptional = t.getCurrentBooking().getOptionalAttendees();
 
 						String optional = "";
+						
+						counter = 0;
 
 						if (allOptional != null) {
 							for (String eachOptional : allOptional) {
-								optional += eachOptional + " ";
+								
+								if(counter!=allOptional.size()-1){
+									optional += eachOptional + ",";
+								}else{
+									optional += eachOptional;
+								}
+								
+								counter++;
 							}
 
 							if (optional.length() > 0) {
@@ -229,7 +288,9 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 				}
 
 				writer.close();
-
+				
+				logItem.setMessage("Schedule Report was created successfully");
+				
 				json.put("message", "Report created successfully");
 				json.put("success", true);
 

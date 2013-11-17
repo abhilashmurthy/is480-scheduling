@@ -198,7 +198,6 @@ public class TeamManager {
 			Booking currentBooking = t.getCurrentBooking();
 			if (currentBooking != null && currentBooking.equals(b)) t.setCurrentBooking(null);
 			b.setRequiredAttendees(null);
-			b.setSubscribedUsers(null);
 			em.remove(b);
 		}
 		em.flush(); //Forcing write to DB

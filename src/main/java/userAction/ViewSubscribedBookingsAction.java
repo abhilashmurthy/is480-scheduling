@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import manager.UserManager;
 import model.Booking;
 import model.Team;
 import model.User;
@@ -47,11 +48,11 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			//Need to change this for guests. Guests need to be users in our db before they can access any feature
 			if (activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY) || activeRole.equals(Role.GUEST)
-					|| activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.TA)) {
+					|| activeRole.equals(Role.TA)) {
 				
-				Set<Booking> subscribedTo;
+				ArrayList<Booking> subscribedTo;
 				//Getting all the bookings the user has subscribed to
-				subscribedTo = user.getSubscribedBookings();
+				subscribedTo = UserManager.getSubscribedBookings(em, user.getEmail());
 				
 				//Sort the bookings in ascending order of time
 				if (subscribedTo.size() > 0) {
@@ -86,6 +87,10 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
 						
 						long bookingId = b.getId();
 						
+						String milestoneName = b.getTimeslot().getSchedule().getMilestone().getName();
+						String termName = b.getTimeslot().getSchedule().getMilestone().getTerm().getDisplayName();
+						String termMilestone = termName + " " + milestoneName;
+						
 						String venue = timeslot.getVenue();
 						
 						Team team = b.getTeam();
@@ -96,6 +101,7 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
 						
 						map.put("bookingId", String.valueOf(bookingId));
 						map.put("teamName", teamName);
+						map.put("termMilestone", termMilestone);
 						map.put("time", time);
 						map.put("venue", venue);
 //						map.put("wikiLink", wikiLink);

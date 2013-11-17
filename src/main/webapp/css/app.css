@@ -436,6 +436,12 @@ input, button, select, textarea {
 		box-sizing: border-box;*/
 }
 
+/* To color the caret on the navbar*/
+.white-caret {
+	border-top-color: white !important;
+	border-bottom-color: white !important;
+}
+
 .navbar-title:hover {
 	/*	border-radius: 5px;
 		box-sizing: border-box;*/
@@ -446,7 +452,6 @@ input, button, select, textarea {
 .navbar-username {
 	color: white !important
 }
-
 
 .popoverBtn {
 	display: block;

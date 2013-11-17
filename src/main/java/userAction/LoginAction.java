@@ -100,7 +100,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 				if (request.getParameter("oauth_callback") == null) {
 					return "error";
 				}
-
+				
+				//Setting the smu_groups value in session (For RSVP restrictions)
+				String smuGroups = request.getParameter("smu_groups");
+				session.setAttribute("smu_groups", smuGroups);
+				
 				//Get callback URL
 				String callbackUrl = null;
 				if (request.getServerName().equals("localhost")) {
@@ -159,7 +163,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 			} //END OF CODE FOR SSO
         } catch (CustomException e) {
 			User userForLog = (User) session.getAttribute("user");
-			if (userForLog != null) {
+			if (userForLog != null && userForLog.getId() != null) {
 				logItem.setUser(userForLog);
 			}
 			logItem.setMessage("Error: " + e.getMessage());

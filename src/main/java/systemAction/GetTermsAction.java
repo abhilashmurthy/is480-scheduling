@@ -4,6 +4,7 @@
  */
 package systemAction;
 
+import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import manager.MilestoneManager;
@@ -29,6 +29,7 @@ import util.MiscUtil;
  */
 public class GetTermsAction extends ActionSupport implements ServletRequestAware {
 
+	private String milestonesList;
     private List<Term> listTerms;
     private List<HashMap<String, String>> dataList;
     private List<HashMap<String, String>> dataListMilestones;
@@ -58,17 +59,17 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
 				
 					//Getting milestone specific details
 					HashMap<String, String> mapMilestone = new HashMap<String, String>();
-					mapMilestone.put("termName", termName);
 					mapMilestone.put("termId", Long.toString(termId));
 					String mStone = "";
 					List<Milestone> milestones = MilestoneManager.findByTerm(em, term);
 					for (Milestone milestone: milestones) {
 						//for every milestone, add it to the map
 						mStone += milestone.getName() + ",";
-						mapMilestone.put("milestone", mStone);
-						dataListMilestones.add(mapMilestone);
 					}
+					mapMilestone.put("milestone", mStone);
+					dataListMilestones.add(mapMilestone);
 				}
+				milestonesList = new Gson().toJson(dataListMilestones);
             } else {
                 request.setAttribute("error", "You cannot create a schedule right now. Please create a term first!");
                 logger.error("User cannot create schedule before creating term.");
@@ -109,4 +110,12 @@ public class GetTermsAction extends ActionSupport implements ServletRequestAware
     public void setServletRequest(HttpServletRequest hsr) {
         request = hsr;
     }
+
+	public String getMilestonesList() {
+		return milestonesList;
+	}
+
+	public void setMilestonesList(String milestonesList) {
+		this.milestonesList = milestonesList;
+	}
 }

@@ -37,6 +37,7 @@
 							<tr>
 								<th></th>
 								<th>Presenting Team</th>
+								<th>Milestone</th>
 								<th>Date of Presentation</th>
 								<th>Venue</th>
 								<th>More Information</th>
@@ -48,6 +49,7 @@
 								<tr class="success" style="height:40px">
 									<td style="vertical-align: middle"><i class="fa fa-check"></i></td>
 									<td style="vertical-align: middle"><s:property value="teamName"/></td>
+									<td style="vertical-align: middle"><s:property value="termMilestone"/></td>
 									<td style="vertical-align: middle"><s:property value="time"/></td>
 									<td style="vertical-align: middle"><s:property value="venue"/></td>
 									<td style="vertical-align: middle"><s:property value="wikiLink"/></td>

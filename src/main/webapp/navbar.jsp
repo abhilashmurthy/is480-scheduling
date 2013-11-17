@@ -47,7 +47,7 @@
                 <ul class="nav navbar-nav">
 				<%  if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<li class="dropdown">
-							<a href="#" id="scheduleDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Schedule</b></a>
+							<a href="#" id="scheduleDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Schedule</b><span class="caret white-caret"></span></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href="newSchedule">Create Schedule</a></li>-->
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="createSchedule">Create Schedule</a></li>
@@ -55,14 +55,14 @@
 							</ul>
 						</li>
 						<li class="dropdown">
-							<a href="#" id="adminConfigDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Admin Config</b></a>
+							<a href="#" id="adminConfigDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Admin Config</b><span class="caret white-caret"></span></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">CSV Upload</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="restoreDB">Database Restore</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewGenerateReport">Generate Reports</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Manage Terms</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">CSV Upload</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="getNotificationSettings">Manage Reminder Settings</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewGenerateReport">Generate Reports</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="restoreDB">Database Restore</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="getOtherSettings">Other Settings</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>
@@ -96,7 +96,7 @@
 						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.GUEST)) { %>
-						<!--<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>-->
+						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
 				<% } %>
 				</ul>
 			</div>
@@ -187,7 +187,24 @@
 			logoutUrl: 'logout',
 			redirUrl: 'logout'
 		});
-            
+		
+		//Datatables datetime sorting
+		$.fn.dataTableExt.oSort['datetime-asc']  = function(a,b) {
+			if ($(a).length !== 0) {
+				a = $(a).text();
+				b = $(b).text();
+			}
+			if (a.length === 0) return -1; else if (b.length === 0) return 1; else
+			return Date.parse(a).compareTo(Date.parse(b));
+		};
+		$.fn.dataTableExt.oSort['datetime-desc']  = function(a,b) {
+			if ($(a).length !== 0) {
+				a = $(a).text();
+				b = $(b).text();
+			}
+			if (a.length === 0) return 1; else if (b.length === 0) return -1; else
+			return Date.parse(a).compareTo(Date.parse(b)) * -1;
+		};
         
         //Disable Pines Notify Settings
         $.pnotify.defaults.history = false;

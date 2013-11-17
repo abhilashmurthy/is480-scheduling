@@ -56,14 +56,9 @@ public class Booking implements Serializable {
     @Column(length = 19000000)
     private HashSet<String> optionalAttendees = new HashSet<String>();
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "Booking_Subscribers",
-            joinColumns =
-            @JoinColumn(name = "booking_id"),
-            inverseJoinColumns =
-            @JoinColumn(name = "user_id"))
-	private Set<User> subscribedUsers = new HashSet<User>();
-	
+	@Column(length = 19000000)
+    private HashSet<String> subscribers = new HashSet<String>();
+
     private String comment;
     private String lastEditedBy;
     private Timestamp lastEditedAt;
@@ -148,14 +143,14 @@ public class Booking implements Serializable {
         this.optionalAttendees = optionalAttendees;
     }
 
-	public Set<User> getSubscribedUsers() {
-		return subscribedUsers;
+	public HashSet<String> getSubscribers() {
+		return subscribers;
 	}
 
-	public void setSubscribedUsers(Set<User> subscribedUsers) {
-		this.subscribedUsers = subscribedUsers;
+	public void setSubscribers(HashSet<String> subscribers) {
+		this.subscribers = subscribers;
 	}
-
+	
     public Long getId() {
         return id;
     }
