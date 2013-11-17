@@ -70,13 +70,12 @@ public class SMSReminderJob implements Job {
                 logger.debug("Booking: " + booking + ". SMS sending..");
                 StringBuilder msg = new StringBuilder();
                 msg
-                    .append("Reminder from IS480 Scheduling System").append("[NEWLINE][NEWLINE]")
+                    .append("Presentation Reminder from IS480 Scheduling System -:").append("[NEWLINE]")
                     .append("Team: ").append(booking.getTeam().getTeamName()).append("[NEWLINE]")
                     .append("Date: ").append(smsDateFormat.format(booking.getTimeslot().getStartTime())).append("[NEWLINE]")
                     .append("Time: ").append(smsTimeFormat.format(booking.getTimeslot().getStartTime())).append(" - ").append(smsTimeFormat.format(booking.getTimeslot().getEndTime())).append("[NEWLINE]")
                     .append("Venue: ").append(booking.getTimeslot().getVenue()).append("[NEWLINE]")
-					.append("Milestone: ").append(booking.getTimeslot().getSchedule().getMilestone().getName()).append("[NEWLINE][NEWLINE]")
-                    .append("See you there!");
+					.append("Milestone: ").append(booking.getTimeslot().getSchedule().getMilestone().getName()).append("[NEWLINE]");
 
                 String countryCode = "65";
                 StringBuilder phoneNums = new StringBuilder();

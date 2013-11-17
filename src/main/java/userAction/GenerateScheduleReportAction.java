@@ -27,6 +27,7 @@ import util.MiscUtil;
 import au.com.bytecode.opencsv.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 
 		SystemActivityLog logItem = new SystemActivityLog();
-		logItem.setActivity("Administrator: Update Notification Settings");
+		logItem.setActivity("Administrator: Generate Schedule Report");
 		logItem.setRunTime(now);
 		logItem.setUser((User) session.getAttribute("user"));
 		logItem.setMessage("Error with validation / No changes made");
@@ -148,12 +149,13 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 
 				//for each timeslot, get the information for each column
 				for (Timeslot t : allSlots) {
-
+					
+					SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 					String startDate = "";
-					startDate = t.getStartTime().toString();
+					startDate = sdf.format(t.getStartTime());
 //					String startTime = "";
 					String endDate = "";
-					endDate = t.getEndTime().toString();
+					endDate = sdf.format(t.getEndTime());
 //					String endTime ="";
 
 //					String starting = t.getStartTime().toString();
@@ -286,7 +288,9 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 				}
 
 				writer.close();
-
+				
+				logItem.setMessage("Schedule Report was created successfully");
+				
 				json.put("message", "Report created successfully");
 				json.put("success", true);
 

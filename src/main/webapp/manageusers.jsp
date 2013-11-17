@@ -542,46 +542,57 @@
 						title: 'Signups of ' + ta.name,
 						message: function() {
 							return $(document.createElement('table')).addClass('modalTable taSignupsTable').append(function(){
-								if ($.isEmptyObject(ta.mySignups)) {
-									return $(document.createElement('tr')).append($(document.createElement('td')).html('No registered signups!'));
-								}
-								var $trs = new Array();
-								$trs.push(
+								var $thead = $(document.createElement('thead'));
+								$thead.append(
 									$(document.createElement('tr'))
 										.append($(document.createElement('th')).html('Milestone'))
 										.append($(document.createElement('th')).html('Date'))
-										.append($(document.createElement('th')).html('Time'))
 										.append($(document.createElement('th')).html('Team'))
 								);
-								for (var key in ta.mySignups) {
-									if (ta.mySignups.hasOwnProperty(key)) {
-										$trs.push(
-											$(document.createElement('tr'))
-												.append(
-													$(document.createElement('td')).append(ta.mySignups[key].milestone)
-												)
-												.append(
-													$(document.createElement('td')).append(Date.parse(ta.mySignups[key].datetime).toString('dd MMM yyyy'))
-												)
-												.append(
-													$(document.createElement('td')).append(Date.parse(ta.mySignups[key].datetime).toString('HH:mm'))
-												)
-												.append(
-													$(document.createElement('td'))
-														.append(ta.mySignups[key].teamName?
-														$(document.createElement('a'))
-															.addClass('studentTeamLink')
-															.html(ta.mySignups[key].teamName)
-															:'-'
-														)
-												)
-										);
+								var $tbody = $(document.createElement('tbody'));
+								if ($.isEmptyObject(ta.mySignups)) {
+									$tbody.append($(document.createElement('tr')).append($(document.createElement('td')).html('No registered signups!')));
+								} else {
+									for (var key in ta.mySignups) {
+										if (ta.mySignups.hasOwnProperty(key)) {
+											$tbody.append(
+												$(document.createElement('tr'))
+													.append(
+														$(document.createElement('td')).append(ta.mySignups[key].milestone)
+													)
+													.append(
+														$(document.createElement('td')).append(Date.parse(ta.mySignups[key].datetime).toString('dd MMM yyyy HH:mm'))
+													)
+													.append(
+														$(document.createElement('td'))
+															.append(ta.mySignups[key].teamName?
+															$(document.createElement('a'))
+																.addClass('studentTeamLink')
+																.html(ta.mySignups[key].teamName)
+																:'-'
+															)
+													)
+											);
+										}
 									}
 								}
-								return $trs;
+								return [$thead, $tbody];
 							});
 						}
 					});
+					
+					//Datatables
+					$('.modal-body').find('.taSignupsTable').dataTable({
+						aoColumns: [null, {sType: 'datetime'}, null],
+						aaSorting: [[1, 'asc']],
+						bPaginate: false,
+						bJqueryUI: false,
+						bLengthChange: true,
+						bFilter: false,
+						bSort: true,
+						sDom: '<lft>'
+					});
+					
 					return false;
 				});
 				
