@@ -271,12 +271,6 @@
 			</result>
         </action>
 		
-		<action name="getSubscribedUsers" class="userAction.GetSubscribedUsersAction" method="execute">
-            <result type="json">
-				  <param name="root">json</param>
-			</result>
-        </action>
-		
 		<action name="manageUser" class="userAction.ManageUserAction" method="execute">
             <result type="json">
 				  <param name="root">json</param>
