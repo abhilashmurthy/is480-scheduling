@@ -114,38 +114,6 @@
 								</tbody>
 							</table>
 							<br/><br/>
-					<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							<h3 id="myModalLabel">Information Required</h3>
-						</div>
-						<div class="modal-body">
-							<form id="rejectForm">
-							<table>
-								<tr>
-									<td width="150px">
-										Reason for Rejecting <br/>
-										<i style="font-size: 13px;">(55 characters max.)</i>
-									</td>
-									<!--<th>Add Proxy</th>-->
-									<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
-												  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td>
-										<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
-									</td>
-								</tr>
-							</table>
-							</form>
-						</div>
-						<div class="modal-footer">
-							<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-							<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
-						</div>
-					</div>
 				</s:if><s:else>
 					<div style="clear: both;">
 					<h4>No pending bookings available!</h4>
@@ -154,6 +122,39 @@
 			<h4 id="approveRejectMessage"></h4>
 			</div>
 
+			<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 id="myModalLabel">Information Required</h3>
+					</div>
+					<div class="modal-body">
+						<form id="rejectForm">
+						<table>
+							<tr>
+								<td width="150px">
+									Reason for Rejecting <br/>
+									<i style="font-size: 13px;">(55 characters max.)</i>
+								</td>
+								<!--<th>Add Proxy</th>-->
+								<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
+											  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
+								</td>
+							</tr>
+						</table>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+						<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
+					</div>
+				</div>
+				
 			<div class="tab-pane" id="confirmedBookingSection">
 				<s:if test="%{confirmedData != null && confirmedData.size() > 0}"> 
 						<table id="confirmTable" class="table table-hover" style="font-size: 13px;">
@@ -189,38 +190,6 @@
 								</tbody>
 							</table>
 							<br/><br/>
-					<div class="modal hide fade in" id="rejectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							<h3 id="myModalLabel">Information Required</h3>
-						</div>
-						<div class="modal-body">
-							<form id="rejectForm">
-							<table>
-								<tr>
-									<td width="150px">
-										Reason for Rejecting <br/>
-										<i style="font-size: 13px;">(55 characters max.)</i>
-									</td>
-									<!--<th>Add Proxy</th>-->
-									<td><textarea rows="1" id="rejectionText" name="rejectiontText" style="width:350px; height:50px;" 
-												  placeholder="Unexpected Meeting..." maxlength="55"></textarea>
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td>
-										<span id="errorMsg" class="hide text-error">Please enter a reason for rejecting this booking!</span>
-									</td>
-								</tr>
-							</table>
-							</form>
-						</div>
-						<div class="modal-footer">
-							<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-							<button class="btn btn-primary" data-dismiss="modal" id="rejectionTextSubmit">Save</button>
-						</div>
-					</div>
 				</s:if><s:else>
 					<div style="clear: both;">
 					<h4>No bookings have yet been confirmed!</h4>
@@ -326,10 +295,10 @@
 				
 				$(".rejectBookingBtn").on('click', function(e){
 					$('.updateStatusBtn').attr('disabled', true);
+					$('#rejectionModal').modal('show');
 					$('#rejectionModal').modal({
 						keyboard: true
 					});
-					$('#rejectionModal').modal('show');
 					activeBtn = $(this);
 					return false;
 				});
@@ -339,6 +308,7 @@
 				});
 				
 				$('#rejectionModal').on('hidden', function(e){
+//					$(this).remove();
 					$('.updateStatusBtn').attr('disabled', false);
 				});
 				
