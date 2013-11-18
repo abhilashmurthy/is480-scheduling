@@ -129,8 +129,12 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				CSVWriter writer = new CSVWriter(out);
 				
 				//write the first row (column headers)
-				String[] firstRow = {"Id", "Log Activity", "Activity Message", "Date and Time", "User", "Success"};
+				String[] firstRow = {"Start Time", "End Time"};
 				writer.writeNext(firstRow);
+				String[] secondRow = {sDate, eDate};
+				writer.writeNext(secondRow);
+				String[] thirdRow = {"Id", "Log Activity", "Activity Message", "Date and Time", "User", "Success"};
+				writer.writeNext(thirdRow);
 				
 				String[] blankLine = new String[6];
 				
