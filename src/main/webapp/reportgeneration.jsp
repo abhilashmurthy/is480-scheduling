@@ -138,20 +138,21 @@
 						<tr>
 							<td>
 								<button id="submitBtn" class="btn btn-primary" data-loading-text="Generating..." 
-									style="margin-bottom: 20px;" disabled>Generate Report</button>
+									style="margin-bottom: 20px;" disabled><i class='fa fa-download'></i>&nbsp;
+									Generate Report</button>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 			<br/><br/>				
-			<div style="float: left">
+<!--			<div style="float: left">
 				<table>
 					<a id="downloadFile" class="btn" target="_blank" style="display: none">
 						<i class='fa fa-download'></i>&nbsp;Download Report
 					</a>
 				</table>
-			</div>
+			</div>-->
 						
 		 </div>
 					
@@ -196,17 +197,17 @@
 				if (sel === "0") {
 					$("#logActivityReport").hide();
 					$("#scheduleWikiReport").hide();
-					$("#downloadFile").hide();
+//					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', true);
 					showNotification("ERROR", "Please select a report!");
 				} else if (sel === "1" || sel === "2") {
 					$("#logActivityReport").hide();
-					$("#downloadFile").hide();
+//					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', false);
 					$("#scheduleWikiReport").show();
 				} else if (sel === "3") {
 					$("#scheduleWikiReport").hide();
-					$("#downloadFile").hide();
+//					$("#downloadFile").hide();
 					$('#submitBtn').prop('disabled', false);
 					$("#logActivityReport").show();
 				}
@@ -232,7 +233,7 @@
 			$('#submitBtn').click(function(e) {
 				$(this).button('loading');
 				var reportSel = $('#reportChosen').val();
-
+				var downloadLink = "";
 				//For the data to send to backend
 				var reportData = {};
 				//For the url parameter
@@ -242,7 +243,8 @@
 					showNotification("ERROR", "Please select a report!");
 					return false;
 				} else if (reportSel === "1") {
-					$("#downloadFile").attr("href", "ReportCSV/ScheduleReport.csv");
+//					$("#downloadFile").attr("href", "ReportCSV/ScheduleReport.csv");
+					downloadLink = "ReportCSV/ScheduleReport.csv";
 					urlParam = 'generateScheduleReport';
 					//Check whether term has been selected
 					var termSelected = $('#termChosen').val();
@@ -264,7 +266,8 @@
 					reportData["milestoneName"] = milestoneSelected;
 					
 				} else if (reportSel === "2") {
-					$("#downloadFile").attr("href", "ReportCSV/WikiReport.txt");
+//					$("#downloadFile").attr("href", "ReportCSV/WikiReport.txt");
+					downloadLink = "ReportCSV/WikiReport.txt";
 					urlParam = 'generateWikiReport';
 					//Check whether term has been selected
 					var termSelected = $('#termChosen').val();
@@ -286,7 +289,8 @@
 					reportData["milestoneName"] = milestoneSelected;
 					
 				} else if (reportSel === "3") {
-					$("#downloadFile").attr("href", "ReportCSV/LoggingReport.csv");
+//					$("#downloadFile").attr("href", "ReportCSV/LoggingReport.csv");
+					downloadLink = "ReportCSV/LoggingReport.csv";
 					urlParam = 'generateLoggingReport';
 					//Check whether start date has been selected
 					var startDate = $('#startDatePicker').val();
@@ -329,9 +333,10 @@
 					$("#submitBtn").button('reset');
 					console.log(response);
 					if (response.success) {
-						showNotification("SUCCESS", response.message);
 						//Create the download link
-						$("#downloadFile").show();
+//						$("#downloadFile").show();
+						window.open(downloadLink);
+						showNotification("SUCCESS", response.message);
 					} else {
 						showNotification("ERROR", response.message);
 					}
