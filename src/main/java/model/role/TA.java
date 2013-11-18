@@ -49,7 +49,7 @@ public class TA extends User implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "model.role.TA[ id=" + super.getId() + " ]";
+		return "model.role.TA[ id=" + super.getId() + ", username=" + super.getUsername() + " ]";
 	}
 	
 }

@@ -89,12 +89,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 				//Validating password for bypass login
 				String password = request.getParameter("password");
 				Settings bypassPassword = SettingsManager.getByName(em, "bypassPassword");
-				if (password == null || !bypassPassword.getValue().equals(password)) throw new CustomException("Incorrect password. Please try again!");
+				if (password == null || !bypassPassword.getValue().equals(password)) throw new CustomException("Administrator entered "
+						+ "incorrect password. Please try again!");
 				
 				initializeUser(em);
 				User userForLog = (User) session.getAttribute("user");
 				if (userForLog.getId() != null) logItem.setUser(userForLog);
-				logItem.setMessage("Login successful. " + userForLog.toString());
+				logItem.setMessage("Login successful. Administrator logged in as " + userForLog.toString());
 			} else { //CODE FOR SSO
 				//return to login
 				if (request.getParameter("oauth_callback") == null) {

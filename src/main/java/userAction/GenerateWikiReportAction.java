@@ -395,7 +395,8 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 				}
 				out.close();
 				
-				logItem.setMessage("Wiki Report was created successfully");
+				logItem.setMessage("Wiki Report was created successfully for " + thisTerm.toString() + " and " +
+						milestone);
 				json.put("message", "Report created successfully");
 				json.put("success", true);
 			} else {
