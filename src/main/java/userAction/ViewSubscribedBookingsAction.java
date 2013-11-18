@@ -118,14 +118,20 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
 						String time = sdfForStartTime.format(timeslot.getStartTime()) + " - " + 
 								sdfForEndTime.format(timeslot.getEndTime());
 						
+						String wikiLink = "";
+						if (team.getWiki() != null) {
+							wikiLink = team.getWiki();
+						}
+						
 						String bookingStatus = b.getBookingStatus().toString();
+						
 						map.put("bookingId", String.valueOf(bookingId));
 						map.put("bookingStatus", bookingStatus);
 						map.put("teamName", teamName);
 						map.put("termMilestone", termMilestone);
 						map.put("time", time);
 						map.put("venue", venue);
-//						map.put("wikiLink", wikiLink);
+						map.put("wikiLink", wikiLink);
 
 						data.add(map);
 					}
