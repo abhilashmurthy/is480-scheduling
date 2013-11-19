@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import manager.SettingsManager;
+import manager.TermManager;
 import manager.UserManager;
 import model.Settings;
 import model.SystemActivityLog;
@@ -210,8 +212,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 		String smuUsername = request.getParameter("smu_username");
 		String smuFullName = request.getParameter("smu_fullname");
 		if (smuFullName == null) smuFullName = smuUsername; 
-		//Getting the active term
-		Term activeTerm = SettingsManager.getDefaultTerm(em);
+		//Getting the active term based on all user objects
+		Term activeTerm = TermManager.getDefaultActiveTerm(em, smuUsername);
 		
 		HttpSession session = request.getSession();
 		session.setAttribute("currentActiveTerm", activeTerm);

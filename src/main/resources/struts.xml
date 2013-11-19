@@ -84,10 +84,6 @@
             <result name="success">/restoreDB.jsp</result>
         </action>
 		
-        <action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
-            <result name="success">/schedule.jsp</result>
-        </action>
-		
         <action name="bookingHistory" class="userAction.BookingHistoryAction" method="execute">
             <result name="success">/bookinghistory.jsp</result>
         </action>

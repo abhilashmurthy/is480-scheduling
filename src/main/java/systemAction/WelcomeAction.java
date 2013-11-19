@@ -52,7 +52,7 @@ public class WelcomeAction extends ActionSupport implements ServletRequestAware 
 			if (selectedTermId != 0) {
 				term = TermManager.findTermById(em, selectedTermId);
 			} else {
-				term = SettingsManager.getDefaultTerm(em);
+				term = TermManager.getDefaultTermUserAgnostic(em);
 				selectedTermId = term.getId();
 			}
 			

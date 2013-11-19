@@ -156,12 +156,9 @@ public class ScheduleManager {
     public static List<Schedule> getAllSchedules(EntityManager em) {
         logger.trace("Getting all schedule objects");
         List<Schedule> sourceList = null;
-        EntityTransaction transaction = em.getTransaction();
         try {
-            transaction.begin();
             Query q = em.createQuery("Select s from Schedule s");
             sourceList = q.getResultList();
-            transaction.commit();
             return sourceList;
         } catch (Exception e) {
             logger.error("Database Operation Error");
