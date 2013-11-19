@@ -799,10 +799,6 @@ public class DBInitUtil {
         activeTermIds.add(term12013.getId());
         activeTerms.setValue(new Gson().toJson(activeTermIds));
 
-        Settings defaultTerm = new Settings();
-        defaultTerm.setName("defaultTerm");
-        defaultTerm.setValue(term12013.getId().toString());
-
         Settings milestones = new Settings();
         milestones.setName("milestones");
         ArrayList<HashMap<String, Object>> milestoneList = new ArrayList<HashMap<String, Object>>();
@@ -857,7 +853,6 @@ public class DBInitUtil {
         //Persistence
 		em.persist(bypassPassword);
         em.persist(activeTerms);
-        em.persist(defaultTerm);
         em.persist(milestones);
 		em.persist(manageNotifications);
     }
