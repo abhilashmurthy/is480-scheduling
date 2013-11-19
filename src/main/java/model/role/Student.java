@@ -68,7 +68,7 @@ public class Student extends User implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "model.role.Student[ id=" + super.getId() + " ]";
+		return "model.role.Student[ id=" + super.getId() + ", username=" + super.getUsername() + " ]";
 	}
 	
 }

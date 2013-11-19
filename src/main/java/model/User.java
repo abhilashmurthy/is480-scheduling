@@ -130,6 +130,6 @@ public class User implements Serializable {
 
 	@Override
 	public String toString() {
-		return "model.User[ id=" + id + " ]";
+		return "model.User[ id=" + id + ", username=" + username + " ]";
 	}
 }

@@ -37,10 +37,10 @@
 							<tr>
 								<th></th>
 								<th>Presenting Team</th>
+								<th>Status</th>
 								<th>Milestone</th>
 								<th>Date of Presentation</th>
 								<th>Venue</th>
-								<th>More Information</th>
 								<th style="width:110px">Cancel RSVP</th>
 							</tr>
 						</thead>
@@ -51,25 +51,40 @@
 								</s:if>
 								<s:if test="%{bookingStatus.equalsIgnoreCase('Approved')}">
 									<tr class="success" style="height:40px">
+										<td style="vertical-align: middle"><i class="fa fa-check"></i></td>
 								</s:if>
 								<s:if test="%{bookingStatus.equalsIgnoreCase('Rejected')}">
 									<tr class="error" style="height:40px">
 								</s:if>
 								<s:if test="%{bookingStatus.equalsIgnoreCase('Deleted')}">
 									<tr class="info" style="height:40px">
+										<td style="vertical-align: middle"><i class="fa fa-times"></i></td>
 								</s:if>
 <!--								<tr class="success" style="height:40px">-->
-									<td style="vertical-align: middle"><i class="fa fa-check"></i></td>
-									<td style="vertical-align: middle"><s:property value="teamName"/></td>
+									<td style="width:150px; vertical-align: middle">
+										<s:if test="%{wikiLink.length() > 0}"> 
+												<a href="<s:property value="wikiLink"/>" target="_blank">
+													<s:property value="teamName"/>
+												</a>
+										</s:if><s:else>
+												<s:property value="teamName"/>
+										</s:else>
+									</td>
+									<td style="vertical-align: middle">
+										<s:property value="bookingStatus"/>
+									</td>
 									<td style="vertical-align: middle"><s:property value="termMilestone"/></td>
 									<td style="vertical-align: middle"><s:property value="time"/></td>
 									<td style="vertical-align: middle"><s:property value="venue"/></td>
-									<td style="vertical-align: middle"><s:property value="wikiLink"/></td>
-									<td style="width:90px; text-align:center;vertical-align: middle"> 
-										<button type="button" class="unsubscribeBtn updateStatusBtn btn btn-danger" value="<s:property value="bookingId"/>"
-												name="Unsubscribe!"><i class="fa fa-trash-o fa-white"></i>
-										</button>
-									</td>
+									<s:if test="%{bookingStatus.equalsIgnoreCase('Approved')}">
+										<td style="width:90px; text-align:center;vertical-align: middle"> 
+											<button type="button" class="unsubscribeBtn updateStatusBtn btn btn-danger" value="<s:property value="bookingId"/>"
+													name="Unsubscribe!"><i class="fa fa-trash-o fa-white"></i>
+											</button>
+										</td>
+									</s:if><s:else>
+										<td style="width:90px; text-align:center;vertical-align: middle"></td>
+									</s:else>
 								</tr>
 							</s:iterator>
 							</tbody>

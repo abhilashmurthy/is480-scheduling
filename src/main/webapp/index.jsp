@@ -533,7 +533,7 @@
 												.attr('id', 'unsubscribeBtn')
 												.addClass('popoverBtn btn btn-small')
 												.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-												.append("UnRSVP")
+												.append("Cancel RSVP")
 												.outerHTML()
 										);
 									break;
@@ -1158,7 +1158,7 @@
 						$('.modal-body').prepend(
 							$(document.createElement('div'))
 								.addClass('customPrompt')
-								.append('Reason to delete booking')
+								.append('Reason to delete booking (Max 55 char.)')
 						);
 						$('input.bootbox-input').on('keyup', function(){
 							if ($(this).val() && $(this).val().length > 55) {
@@ -1347,7 +1347,7 @@
 									.attr('id', 'unsubscribeBtn')
 									.addClass('popoverBtn btn btn-small')
 									.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-									.append("UnRSVP")
+									.append("Cancel RSVP")
 							);
 							self.find('#subscribeBtn').remove();
 							if (self.find('#signupTimeslotBtn')) self.find('#signupTimeslotBtn').remove();

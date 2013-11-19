@@ -129,8 +129,20 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				CSVWriter writer = new CSVWriter(out);
 				
 				//write the first row (column headers)
-				String[] firstRow = {"Id", "Log Activity", "Activity Message", "Date and Time", "User", "Success"};
+				String[] firstRow = {"Start Time", "End Time"};
 				writer.writeNext(firstRow);
+				String[] secondRow = new String[2];
+				if (sDate.equalsIgnoreCase("") && eDate.equalsIgnoreCase("")) {
+					secondRow[0] = "All Logs";
+					secondRow[1] = "All Logs";
+				} else {
+					secondRow[0] = sDate;
+					secondRow[1] = eDate;
+				}
+				writer.writeNext(secondRow);
+				
+				String[] thirdRow = {"Id", "Log Activity", "Activity Message", "Date and Time", "User", "Success"};
+				writer.writeNext(thirdRow);
 				
 				String[] blankLine = new String[6];
 				
@@ -245,7 +257,11 @@ public class GenerateLoggingReportAction extends ActionSupport implements Servle
 				}
 				
 				writer.close();
-				logItem.setMessage("Logging Report was created successfully");
+				if (sDate.equalsIgnoreCase("") && eDate.equalsIgnoreCase("")) {
+					logItem.setMessage("Logging Report was created successfully for all logs");
+				} else {
+					logItem.setMessage("Logging Report was created successfully between " + sDate + " and " + eDate);
+				}
 				
 				json.put("message", "Report created successfully");
 				json.put("success", true);

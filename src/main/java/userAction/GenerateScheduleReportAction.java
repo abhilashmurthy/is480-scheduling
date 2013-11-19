@@ -289,7 +289,8 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 
 				writer.close();
 				
-				logItem.setMessage("Schedule Report was created successfully");
+				logItem.setMessage("Schedule Report was created successfully for " + thisTerm.toString() + " and " +
+						milestone);
 				
 				json.put("message", "Report created successfully");
 				json.put("success", true);

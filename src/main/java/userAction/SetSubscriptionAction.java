@@ -93,7 +93,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 							json.put("success", true);
 							return SUCCESS;
 						}
-					} else {
+					} else if (team.getPresentationType() == PresentationType.INTERNAL) {
 						//For all SIS staff and students only
 						String smuGroups = (String) session.getAttribute("smu_groups");
 						if (smuGroups == null || !smuGroups.toLowerCase().contains("sis")) {
