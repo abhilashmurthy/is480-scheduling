@@ -18,15 +18,17 @@
             html, body {
                 background-color: #eee;
             }
+			
             body {
                 padding-top: 100px; 
             }
-            .container {
+			
+            .loginBody > .container {
                 width: 600px !important;
             }
-
+			
+			.container > .content {
             /* The white background content wrapper */
-            .container > .content {
 		text-align: center;
                 background-color: #fff;
                 padding: 20px;
@@ -91,42 +93,45 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-                    <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    </button>
+					<a class="brand" href="index">
+						<img src="img/IS480-navbar.png" style="height:25px; width:120px; display:inline-block;"/>
+					</a>
+                    <!--<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">-->
+                    <!--</button>-->
                 </div>
             </div>
         </div>
 
+		<div class="loginBody">
+			<div class="container">
+				<div class="content">
+					<div>
+						<img src="img/IS480-logo.jpg" style="height:150px; width:450px; display:inline-block;" />
+					</div>
+					<div class="row">
 
-        <div class="container">
-            <div class="content">
-                <div>
-                    <img src="img/IS480-logo.jpg" style="height:150px; width:450px; display:inline-block;" />
-                </div>
-                <div class="row">
+						<h2>IS480 Scheduling System</h2>
+						<form method="POST" action="login" >
+							<input name="bypass" style="display: none">
+							<table style="margin: auto">
+								<tr>
+									<td>Username:&nbsp;</td>
+									<td style="padding-bottom: 10px"><input name="smu_username" type="text" ></td>
+								</tr>
+								<tr>
+									<td>Password:&nbsp;</td>
+									<td><input name="password" type="password" ></td>
+								</tr>
+							</table>
+							<div style="margin-bottom: 10px"></div><br />
 
-                    <h2>IS480 Scheduling System</h2>
-					<form method="POST" action="login" >
-						<input name="bypass" style="display: none">
-						<table style="margin: auto">
-							<tr>
-								<td>Username:&nbsp;</td>
-								<td style="padding-bottom: 10px"><input name="smu_username" type="text" ></td>
-							</tr>
-							<tr>
-								<td>Password:&nbsp;</td>
-								<td><input name="password" type="password" ></td>
-							</tr>
-						</table>
-						<div style="margin-bottom: 10px"></div><br />
-						
-						<button id="ssoBtn" class="btn btn-inverse" type="submit">Login</button>
-					</form>
-                    
-                </div>
-            </div>
-        </div> <!-- /container -->
+							<button id="ssoBtn" class="btn btn-inverse" type="submit">Login</button>
+						</form>
 
+					</div>
+				</div>
+			</div> <!-- /container -->
+		</div>	
         <!-- To display the login message error -->
         <div class="container" style="margin-top: 50px; margin-bottom: 10px">
             <div class="row">
