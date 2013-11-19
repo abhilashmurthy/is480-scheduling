@@ -523,32 +523,34 @@
 						);
                     } else if (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName || <%= activeRole.equals(Role.FACULTY) %> && !timeslot.isMyTeam || <%= activeRole.equals(Role.TA) %> && loggedInTa !== timeslot.taId || <%= activeRole.equals(Role.GUEST) %>) {
 						//Subscribe and Unscribe buttons
-						var subscribe = true;
-						if (timeslot.subscribedUsers) {
-							for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
-								if (myEmail === timeslot.subscribedUsers[i]) {
-									subscribe = false;
-										outputData[""] += (
-											$(document.createElement('button'))
-												.attr('id', 'unsubscribeBtn')
-												.addClass('popoverBtn btn btn-small')
-												.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-												.append("Cancel RSVP")
-												.outerHTML()
-										);
-									break;
+						if (timeslot.status === 'APPROVED') {
+							var subscribe = true;
+							if (timeslot.subscribedUsers) {
+								for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
+									if (myEmail === timeslot.subscribedUsers[i]) {
+										subscribe = false;
+											outputData[""] += (
+												$(document.createElement('button'))
+													.attr('id', 'unsubscribeBtn')
+													.addClass('popoverBtn btn btn-small')
+													.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
+													.append("Cancel RSVP")
+													.outerHTML()
+											);
+										break;
+									}
 								}
 							}
-						}
-						if (subscribe) {
-							outputData[""] += (
-								$(document.createElement('button'))
-									.attr('id', 'subscribeBtn')
-									.addClass('popoverBtn btn btn-small')
-									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
-									.append("RSVP")
-									.outerHTML()
-							);
+							if (subscribe) {
+								outputData[""] += (
+									$(document.createElement('button'))
+										.attr('id', 'subscribeBtn')
+										.addClass('popoverBtn btn btn-small')
+										.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
+										.append("RSVP")
+										.outerHTML()
+								);
+							}
 						}
 					}
 
@@ -1154,20 +1156,20 @@
 								}
 							}
 						});
-						$('button[data-bb-handler="confirm"').attr('disabled', true);
+						$('.modal-footer button:not(:first)').attr('disabled', true);
 						$('.modal-body').prepend(
 							$(document.createElement('div'))
 								.addClass('customPrompt')
-								.append('Reason to delete booking (Max 55 char.)')
+								.append('Reason to delete booking (max 55 chars)')
 						);
 						$('input.bootbox-input').on('keyup', function(){
 							if ($(this).val() && $(this).val().length > 55) {
-								$('button[data-bb-handler="confirm"').attr('disabled', true);
+								$('.modal-footer button:not(:first)').attr('disabled', true);
 								showNotification("WARNING", $timeslot, "Please enter max 55 chars");
 							} else if ($(this).val()) {
-								$('button[data-bb-handler="confirm"').attr('disabled', false);
+								$('.modal-footer button:not(:first)').attr('disabled', false);
 							} else {
-								$('button[data-bb-handler="confirm"').attr('disabled', true);
+								$('.modal-footer button:not(:first)').attr('disabled', true);
 							}
 							return false;
 						});
@@ -1384,7 +1386,7 @@
 											.append("Sign Up")
 								);
 							self.find('#unsubscribeBtn').remove();
-							if (timeslot.subscribedUsers.indexOf(myEmail) !== -1) timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
+							if (timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1) timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
 						} else {
 							showNotification("ERROR", self, returnData.message);
 						}
@@ -1908,7 +1910,7 @@
 											|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)
 											|| (<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined && loggedInTa === timeslot.taId)
 											|| (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>)
-											|| timeslot.subscribedUsers.indexOf(myEmail) !== -1
+											|| timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1
 											?'myTeamBooking':false)
 										.css ({
 											height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),

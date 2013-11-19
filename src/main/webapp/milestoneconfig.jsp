@@ -24,7 +24,7 @@
 			} %>
 
             <!-- SECTION: Booking History -->
-			<table id="milestoneConfigTable" class="table table-hover zebra-striped" cellspacing="0">
+			<table class="milestoneConfigTable table table-hover zebra-striped" cellspacing="0">
 				<thead>
 					<tr>
 						<th style="width: 5px;">Order</th>
@@ -78,8 +78,8 @@
 				
 			<table id='milestoneConfigButtons'>
 				<tr>
-					<td><button type="button" id="saveMilestonesBtn" class="btn btn-primary" style="width:80px; height:30px;"><b>Save</b></button></td>
-					<td><button class="btn btn-warning" id="addMilestoneBtn" style="width:160px; height:30px"><i class="fa fa-black fa-plus-circle"></i><b>Add Milestone</b></button></td>
+					<td><button type="button" class="btn btn-primary saveMilestonesBtn" style="width:80px; height:30px;"><b>Save</b></button></td>
+					<td><button class="btn btn-warning addMilestoneBtn" style="width:160px; height:30px"><i class="fa fa-black fa-plus-circle"></i><b>Add Milestone</b></button></td>
 				</tr>
 			</table>
 				
@@ -113,10 +113,11 @@
 						$milestoneTr.remove();
 						resetPlugins();
 					});
+					return false;
 				});
 				
 				//Add milestone
-				$("#addMilestoneBtn").on('click', function(){
+				$(".addMilestoneBtn").on('click', function(){
 					$(".noMilestoneMsg").fadeOut('slow', function(){
 						$(this).remove();
 					});
@@ -197,12 +198,13 @@
 								)
 								.append($(document.createElement('i')).addClass('moveIcon fa fa-move fa-black'))
 						)
-						.appendTo('#milestoneConfigTable tbody');
+						.appendTo('.milestoneConfigTable tbody');
 						resetPlugins();
+					return false;
 				});
 				
 				//Save milestones
-				$('#saveMilestonesBtn').on('click', function(){
+				$('.saveMilestonesBtn').on('click', function(){
 					$(".noMilestoneMsg").fadeOut('slow', function(){
 						$(this).remove();
 					});
@@ -237,8 +239,7 @@
 						}
 					})
 					.fail(function(response) {
-						$("#saveButton").button('reset');
-						$("#addRowBtn").button('reset');
+						$(".saveMilestonesBtn").button('reset');
 						console.log("Updating Milestone settings AJAX FAIL");
 						showNotification("WARNING", "Oops.. something went wrong");
 					});
@@ -329,7 +330,7 @@
 						$(this).append(i + 1);
 					});
 					
-					$("#milestoneConfigTable tbody").sortable({
+					$(".milestoneConfigTable tbody").sortable({
 						helper: function(e, $tr) {
 							var $originals = $tr.children();
 							var $helper = $tr.clone();
@@ -344,9 +345,9 @@
 								$(this).append(i + 1);
 							});
 						}
-					}).disableSelection();
+					});
 					
-					$("#milestoneConfigTable tbody").sortable('refresh');
+					$(".milestoneConfigTable tbody").sortable('refresh');
 				}
 				
 			};

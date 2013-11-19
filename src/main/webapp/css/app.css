@@ -456,6 +456,7 @@ input, button, select, textarea {
 .popoverBtn {
 	display: block;
     margin-right: 20px !important;
+	margin-bottom: 5px;
 	clear: none;
 	float: right;
 }
