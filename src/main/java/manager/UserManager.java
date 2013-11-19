@@ -501,6 +501,7 @@ public class UserManager {
 		Query q = em.createQuery("SELECT u FROM User u WHERE u.username = :username")
 				.setParameter("username", smu_username);
 		userList = q.getResultList();
+		if (userList.isEmpty()) throw new Exception();
 		return userList;
 	}
 	

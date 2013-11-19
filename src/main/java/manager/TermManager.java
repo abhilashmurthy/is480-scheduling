@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
@@ -140,11 +141,12 @@ public class TermManager {
 	 * @param username
 	 * @return Calculated Default Term
 	 */
-	public static Term getDefaultTermUserAgnostic(EntityManager em) {
+	public static Term getDefaultActiveTerm(EntityManager em) {
 		logger.trace("Getting latest term");
 		Calendar cal = Calendar.getInstance();
 		Timestamp now = new Timestamp(cal.getTimeInMillis());
 		List<Term> terms = getAllTerms(em);
+		Map<Term, Timestamp> currentTerms = new HashMap<Term, Timestamp>();
 		for (Term term : terms) {
 			if (!isActive(em, term)) continue;
 			List<Schedule> termSchedules = ScheduleManager.findByTerm(em, term);
@@ -154,10 +156,27 @@ public class TermManager {
 					return Integer.valueOf(o1.getMilestone().getMilestoneOrder()).compareTo(Integer.valueOf(o2.getMilestone().getMilestoneOrder()));
 				}
 			});
+			//TESTING
+			logger.info("TERM: " + term.getDisplayName());
+			logger.info("START: " + termSchedules.get(0).getStartDate());
+			logger.info("END: " + termSchedules.get(termSchedules.size() - 1).getEndDate());
 			if (now.after(termSchedules.get(0).getStartDate()) && now.before(termSchedules.get(termSchedules.size() - 1).getEndDate())) {
-				//Check if now is between first schedule's startDate and last schedule's endDate
-				return term;
+				currentTerms.put(term, termSchedules.get(termSchedules.size() - 1).getEndDate());
 			}
+		}
+		if (currentTerms.size() > 1) {
+			Term nearestCurrentTerm = null;
+			long difference = Long.MAX_VALUE;
+			for (Term currentTerm : currentTerms.keySet()) {
+				Timestamp endDate = currentTerms.get(currentTerm);
+				if (endDate.getTime() - now.getTime() < difference) {
+					nearestCurrentTerm = currentTerm;
+					difference = endDate.getTime() - now.getTime();
+				}
+			}
+			return nearestCurrentTerm;
+		} else if (currentTerms.size() > 0) {
+			return currentTerms.keySet().iterator().next();
 		}
 		List<Schedule> allSchedules = ScheduleManager.getAllSchedules(em);
 		Collections.sort(allSchedules, new Comparator<Schedule>(){
@@ -191,18 +210,19 @@ public class TermManager {
 	 */
 	public static Term getDefaultActiveTerm(EntityManager em, String username) {
 		logger.trace("Getting default active term for user: " + username);
+		em.getTransaction().begin();
 		try {
-			em.getTransaction().begin();
 			List<User> userObjects = UserManager.getUserObjectsForAllTerms(em, username);
 			Calendar cal = Calendar.getInstance();
 			Timestamp now = new Timestamp(cal.getTimeInMillis());
+			Map<Term, Timestamp> currentTerms = new HashMap<Term, Timestamp>();
 			for (User userObject : userObjects) {
 				Term userTerm = userObject.getTerm();
+				if (userObject.getRole().equals(Role.ADMINISTRATOR) && userTerm == null) {
+					return getDefaultActiveTerm(em); //Return latest term if admin
+				}
 				if (!isActive(em, userTerm)) continue;
 				List<Schedule> termSchedules = ScheduleManager.findByTerm(em, userTerm);
-				if (userObject.getRole().equals(Role.ADMINISTRATOR) && termSchedules == null || termSchedules.isEmpty()) {
-					return getDefaultTermUserAgnostic(em); //Return latest term if admin
-				}
 				Collections.sort(termSchedules, new Comparator<Schedule>(){
 					//Sort schedules by milestone orders
 					public int compare(Schedule o1, Schedule o2) {
@@ -211,8 +231,22 @@ public class TermManager {
 				});
 				if (now.after(termSchedules.get(0).getStartDate()) && now.before(termSchedules.get(termSchedules.size() - 1).getEndDate())) {
 					//Check if now is between first schedule's startDate and last schedule's endDate
-					return userTerm;
+					currentTerms.put(userTerm, termSchedules.get(termSchedules.size() - 1).getEndDate());
 				}
+			}
+			if (currentTerms.size() > 1) {
+				Term nearestCurrentTerm = null;
+				long difference = Long.MAX_VALUE;
+				for (Term currentTerm : currentTerms.keySet()) {
+					Timestamp endDate = currentTerms.get(currentTerm);
+					if (endDate.getTime() - now.getTime() < difference) {
+						nearestCurrentTerm = currentTerm;
+						difference = endDate.getTime() - now.getTime();
+					}
+				}
+				return nearestCurrentTerm;
+			} else if (currentTerms.size() > 0) {
+				return currentTerms.keySet().iterator().next();
 			}
 			List<Schedule> allSchedules = new ArrayList<Schedule>();
 			for (User userObject : userObjects) {
@@ -252,7 +286,7 @@ public class TermManager {
                 }
             }
 			//Return latest term if user not found 
-			return getDefaultTermUserAgnostic(em);
+			return getDefaultActiveTerm(em);
         } finally {
 			em.getTransaction().commit();
 		}
