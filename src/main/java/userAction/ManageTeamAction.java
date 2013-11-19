@@ -112,6 +112,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			
 			Type collectionType = new TypeToken<ArrayList<Long>>(){}.getType();
 			ArrayList<Long> memberIds = new Gson().fromJson(dataObj.get("members"), collectionType);
+			if (memberIds == null) memberIds = new ArrayList<Long>();
 		
 			json = TeamManager.addEditTeam(em, user, teamName, wiki, termId, memberIds, supervisorId, reviewer1Id, reviewer2Id, existingTeamId, ctx);
 			return true;

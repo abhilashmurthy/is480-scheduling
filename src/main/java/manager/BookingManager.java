@@ -373,30 +373,6 @@ public class BookingManager {
 		return json;
 	}
 	
-	public static void scheduleSMSReminder(Booking booking, EntityManager em, HttpServletRequest request) throws Exception {
-		Settings reminderSettings = SettingsManager.getNotificationSettings(em);
-		int smsHours = -1 * new Gson().fromJson(reminderSettings.getValue(), JsonArray.class).get(1).getAsJsonObject().get("smsFrequency").getAsInt();
-		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
-				.getServletContext()
-				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
-		Scheduler scheduler = factory.getScheduler();
-		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
-				.usingJobData("bookingId", booking.getId())
-				.withIdentity(String.valueOf(booking.getId()), MiscUtil.SMS_REMINDER_JOBS).build();
-		//Calculating the time to trigger the job
-		Calendar scheduledTime = Calendar.getInstance();
-		scheduledTime.setTimeInMillis(booking.getTimeslot().getStartTime().getTime());
-		scheduledTime.add(Calendar.HOUR, smsHours);
-		if (scheduledTime.getTime().before(new Date())) {
-			scheduledTime.setTimeInMillis(new Date().getTime());
-			scheduledTime.add(Calendar.SECOND, 10);
-		}
-		logger.debug("Scheduled SMS at: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(scheduledTime.getTimeInMillis()));
-		Trigger tr = TriggerBuilder.newTrigger().withIdentity(String.valueOf(booking.getId()), MiscUtil.SMS_REMINDER_JOBS)
-						.startAt(scheduledTime.getTime()).build();
-		scheduler.scheduleJob(jd, tr);
-	}
-	
 	public static void testSMS(long bookingId, HttpServletRequest request) throws Exception {
 		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
 				.getServletContext()
