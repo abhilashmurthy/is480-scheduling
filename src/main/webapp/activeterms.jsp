@@ -64,28 +64,6 @@
 			</table>
 			</div>
 			<div style="float: left;">
-			<table class="table" style="width:auto">
-			<thead>
-				<tr>
-				<th>
-					<b>Default Active Term</b>
-				</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-				<td>
-					<select id="defaultActiveTermList">
-						<s:iterator value="activeTermObjects">
-							<option value="<s:property value="id"/>" <s:if test="%{id == defaultTerm}">selected</s:if> >
-								<s:property value="displayName"/>
-							</option>
-						</s:iterator>
-					</select>
-				</td>
-				</tr>
-			</tbody>
-			</table>
 			</div>
 			<div style="clear: both;">
 			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
@@ -104,7 +82,6 @@
 			loadActiveTerms = function() {
 				//Method to update the dropdown list based on the radio buttons selected
 				$(":radio").click(function(){
-					var dropdown = $("#defaultActiveTermList");
 					var tr = $(this).parents("tr");
 					var termId = $(tr).children(":hidden").text();
 					
@@ -136,7 +113,6 @@
 				$('#submitFormBtn').click(function() {
 					$(this).button('loading');
 					var activeTermData = new Object();
-					activeTermData["defaultTerm"] = $("#defaultActiveTermList").find(":selected").val();
 					activeTermData["activeTerms"] = generateArray($(":radio:checked[value='true']"));
 					
 					if (activeTermData.activeTerms.length === 0) {
