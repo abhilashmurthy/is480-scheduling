@@ -4,6 +4,7 @@
  */
 package manager;
 
+import constant.BookingStatus;
 import constant.Role;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import javax.persistence.PersistenceException;
 import model.Milestone;
 import model.Schedule;
 import model.Term;
+import model.Timeslot;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,7 +217,8 @@ public class TermManager {
 			List<User> userObjects = UserManager.getUserObjectsForAllTerms(em, username);
 			Calendar cal = Calendar.getInstance();
 			Timestamp now = new Timestamp(cal.getTimeInMillis());
-			Map<Term, Timestamp> currentTerms = new HashMap<Term, Timestamp>();
+			Map<Term, Integer> pendingBookingsMap = new HashMap<Term ,Integer>();
+			Map<Term, Timestamp> currentTermsMap = new HashMap<Term, Timestamp>();
 			for (User userObject : userObjects) {
 				Term userTerm = userObject.getTerm();
 				if (userObject.getRole().equals(Role.ADMINISTRATOR) && userTerm == null) {
@@ -231,22 +234,40 @@ public class TermManager {
 				});
 				if (now.after(termSchedules.get(0).getStartDate()) && now.before(termSchedules.get(termSchedules.size() - 1).getEndDate())) {
 					//Check if now is between first schedule's startDate and last schedule's endDate
-					currentTerms.put(userTerm, termSchedules.get(termSchedules.size() - 1).getEndDate());
+					currentTermsMap.put(userTerm, termSchedules.get(termSchedules.size() - 1).getEndDate());
 				}
+				int pendingBookingCount = 0;
+				for (Schedule s : termSchedules) {
+					for (Timeslot t : s.getTimeslots()) {
+						if (t.getCurrentBooking() != null && t.getCurrentBooking().getBookingStatus().equals(BookingStatus.PENDING)) pendingBookingCount++;
+					}
+				}
+				if (pendingBookingCount > 0) pendingBookingsMap.put(userTerm, pendingBookingCount);
 			}
-			if (currentTerms.size() > 1) {
+			if (pendingBookingsMap.size() > 0) {
+				int maxPendingBookings = 0;
+				Term termWithMostPendingBookings = null;
+				for (Term pendingBookingsTerm : pendingBookingsMap.keySet()) {
+					if (pendingBookingsMap.get(pendingBookingsTerm) > maxPendingBookings) {
+						maxPendingBookings = pendingBookingsMap.get(pendingBookingsTerm);
+						termWithMostPendingBookings = pendingBookingsTerm;
+					}
+				}
+				return termWithMostPendingBookings;
+			}
+			if (currentTermsMap.size() > 1) {
 				Term nearestCurrentTerm = null;
 				long difference = Long.MAX_VALUE;
-				for (Term currentTerm : currentTerms.keySet()) {
-					Timestamp endDate = currentTerms.get(currentTerm);
+				for (Term currentTerm : currentTermsMap.keySet()) {
+					Timestamp endDate = currentTermsMap.get(currentTerm);
 					if (endDate.getTime() - now.getTime() < difference) {
 						nearestCurrentTerm = currentTerm;
 						difference = endDate.getTime() - now.getTime();
 					}
 				}
 				return nearestCurrentTerm;
-			} else if (currentTerms.size() > 0) {
-				return currentTerms.keySet().iterator().next();
+			} else if (currentTermsMap.size() > 0) {
+				return currentTermsMap.keySet().iterator().next();
 			}
 			List<Schedule> allSchedules = new ArrayList<Schedule>();
 			for (User userObject : userObjects) {

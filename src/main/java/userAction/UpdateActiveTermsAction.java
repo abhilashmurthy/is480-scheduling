@@ -87,11 +87,12 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 						return SUCCESS;
 					}
 					activeTermIds.add(activeTermsArray.getLong(i));
-					if (currentTerm.getId() == activeTermsArray.getLong(i)) {
-						json.put("message", "Cannot set current term as inactive!");
-						json.put("success", false);
-						return SUCCESS;
-					}
+				}
+				
+				if (activeTermIds.indexOf(currentTerm.getId()) == -1) {
+					json.put("message", "Error! Cannot set current active term as inactive!");
+					json.put("success", false);
+					return SUCCESS;
 				}
 				
 				//Storing the active terms list in settings table in db
