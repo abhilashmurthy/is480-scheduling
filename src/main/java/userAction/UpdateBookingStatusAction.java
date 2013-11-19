@@ -20,6 +20,7 @@ import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.BookingManager;
+import manager.QuartzManager;
 import model.Booking;
 import model.SystemActivityLog;
 import model.Timeslot;
@@ -155,7 +156,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
-					BookingManager.scheduleSMSReminder(booking, em, request);
+					QuartzManager.scheduleSMSReminder(booking, em, request);
 				} else if (response == Response.REJECTED) {
 					RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(booking, user);
 					rejectedEmail.sendEmail();
