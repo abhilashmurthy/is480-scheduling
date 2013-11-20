@@ -22,7 +22,7 @@
 		
 		 <!-- Kick unauthorized user -->
         <%
-            if (activeRole.equals(Role.COURSE_COORDINATOR) || activeRole.equals(Role.GUEST)) {
+            if (activeRole.equals(Role.COURSE_COORDINATOR) || activeRole.equals(Role.ADMINISTRATOR)) {
                 request.setAttribute("error", "Oops. You are not authorized to access this page!");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
