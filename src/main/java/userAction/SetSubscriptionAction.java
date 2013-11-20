@@ -90,7 +90,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 						if (user.getId() != team.getSupervisor().getId() && user.getId() != team.getReviewer1().getId() 
 								&& user.getId() != team.getReviewer2().getId()) {
 							json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
-							json.put("success", true);
+							json.put("success", false);
 							return SUCCESS;
 						}
 					} else if (team.getPresentationType() == PresentationType.INTERNAL) {
@@ -98,7 +98,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 						String smuGroups = (String) session.getAttribute("smu_groups");
 						if (smuGroups == null || !smuGroups.toLowerCase().contains("sis")) {
 							json.put("message", "This presentation is " + team.getPresentationType() + ". You cannot RSVP!");
-							json.put("success", true);
+							json.put("success", false);
 							return SUCCESS;
 						}
 					} 
@@ -106,7 +106,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 					//Checking whether the booking has been confirmed or not
 					if (b.getBookingStatus() != BookingStatus.APPROVED) {
 						json.put("message", "This presentation has not yet been confirmed. Please try again later!");
-						json.put("success", true);
+						json.put("success", false);
 						return SUCCESS;
 					}
 					
