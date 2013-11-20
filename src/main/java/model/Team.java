@@ -140,7 +140,7 @@ public class Team implements Serializable {
 
 	@Override
 	public String toString() {
-		return "model.Team[ id=" + id + " ]";
+		return "model.Team[ id=" + id + ", name=" + teamName + " ]";
 	}
 	
 }

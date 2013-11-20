@@ -112,7 +112,7 @@ public class Term implements Serializable {
 
 	@Override
 	public String toString() {
-		return "model.Term[ id=" + id + " ]";
+		return "model.Term[ id=" + id + ", name=" + displayName + " ]";
 	}
 	
 }
