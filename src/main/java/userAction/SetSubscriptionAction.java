@@ -40,6 +40,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
     @Override
     public String execute() throws Exception {
 		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
 		
 		Calendar nowCal = Calendar.getInstance();
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
@@ -47,7 +48,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
 		SystemActivityLog logItem = new SystemActivityLog();
 		logItem.setActivity("Subscription: Update");
 		logItem.setRunTime(now);
-		logItem.setUser((User)session.getAttribute("user"));
+		if (user.getId() != null) logItem.setUser(user);
 		logItem.setMessage("Error with validation / No changes made");
 		logItem.setSuccess(true);
 		
@@ -55,8 +56,6 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
         try {
 			json.put("exception", false);
 			em = MiscUtil.getEntityManagerInstance();
-			User tempUser = (User) session.getAttribute("user");
-			User user = em.find(User.class, tempUser.getId());
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			
@@ -133,7 +132,7 @@ public class SetSubscriptionAction extends ActionSupport implements ServletReque
         } catch (Exception e) {
 			logItem.setSuccess(false);
 			User userForLog = (User) session.getAttribute("user");
-			logItem.setUser(userForLog);
+			if (userForLog.getId() != null) logItem.setUser(userForLog);
 			logItem.setMessage("Error: " + e.getMessage());
 			
             logger.error("Exception caught: " + e.getMessage());
