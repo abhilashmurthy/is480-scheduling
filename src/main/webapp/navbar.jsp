@@ -62,13 +62,14 @@
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewGenerateReport">Generate Reports</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Manage Terms</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="users">Manage Users/Teams</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="getOtherSettings">Other Settings</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>All Bookings</b></a></li>
-						<li id="users"><a href="users" class="navbar-title"><b>Users</b></a></li>
+<!--						<li id="users"><a href="users" class="navbar-title"><b>Users</b></a></li>-->
 						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<!--<li class="dropdown">   
