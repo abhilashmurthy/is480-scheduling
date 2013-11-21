@@ -313,7 +313,8 @@
 								.attr('value', timeslot.datetime)
 								.css ({
 									height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
-									width: $tdCell.outerWidth() / 1.1
+									width: $tdCell.outerWidth() / 1.1,
+									position: 'absolute'
 								})
 								.offset({
 									top: $tdCell.offset().top,
