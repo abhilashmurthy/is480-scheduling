@@ -157,6 +157,9 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
 					QuartzManager.scheduleSMSReminder(booking, em, request);
+				} else if (response == Response.APPROVED) {
+					ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(booking, user);
+					approvedEmail.sendEmail();
 				} else if (response == Response.REJECTED) {
 					RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(booking, user);
 					rejectedEmail.sendEmail();
