@@ -467,34 +467,32 @@
 						);
                     } else if (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName || <%= activeRole.equals(Role.FACULTY) %> && !timeslot.isMyTeam || <%= activeRole.equals(Role.TA) %> && loggedInTa !== timeslot.taId || <%= activeRole.equals(Role.GUEST) %>) {
 						//Subscribe and Unscribe buttons
-						if (timeslot.status === 'APPROVED') {
-							var subscribe = true;
-							if (timeslot.subscribedUsers) {
-								for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
-									if (myEmail === timeslot.subscribedUsers[i]) {
-										subscribe = false;
-											outputData[""] += (
-												$(document.createElement('button'))
-													.attr('id', 'unsubscribeBtn')
-													.addClass('popoverBtn btn btn-small')
-													.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-													.append("Cancel RSVP")
-													.outerHTML()
-											);
-										break;
-									}
+						var subscribe = true;
+						if (timeslot.subscribedUsers) {
+							for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
+								if (myEmail === timeslot.subscribedUsers[i]) {
+									subscribe = false;
+										outputData[""] = (
+											$(document.createElement('button'))
+												.attr('id', 'unsubscribeBtn')
+												.addClass('popoverBtn btn')
+												.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
+												.append("Cancel RSVP")
+												.outerHTML()
+										);
+									break;
 								}
 							}
-							if (subscribe) {
-								outputData[""] += (
-									$(document.createElement('button'))
-										.attr('id', 'subscribeBtn')
-										.addClass('popoverBtn btn btn-small')
-										.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
-										.append("RSVP")
-										.outerHTML()
-								);
-							}
+						}
+						if (subscribe) {
+							outputData[""] = (
+								$(document.createElement('button'))
+									.attr('id', 'subscribeBtn')
+									.addClass('popoverBtn btn')
+									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
+									.append("RSVP")
+									.outerHTML()
+							);
 						}
 					}
 
