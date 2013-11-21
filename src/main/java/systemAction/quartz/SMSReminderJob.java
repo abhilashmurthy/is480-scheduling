@@ -70,12 +70,12 @@ public class SMSReminderJob implements Job {
                 logger.debug("Booking: " + booking + ". SMS sending..");
                 StringBuilder msg = new StringBuilder();
                 msg
-                    .append("Presentation Reminder from IS480 Scheduling System -:").append("[NEWLINE]")
-                    .append("Team: ").append(booking.getTeam().getTeamName()).append("[NEWLINE]")
-                    .append("Date: ").append(smsDateFormat.format(booking.getTimeslot().getStartTime())).append("[NEWLINE]")
-                    .append("Time: ").append(smsTimeFormat.format(booking.getTimeslot().getStartTime())).append(" - ").append(smsTimeFormat.format(booking.getTimeslot().getEndTime())).append("[NEWLINE]")
-                    .append("Venue: ").append(booking.getTimeslot().getVenue()).append("[NEWLINE]")
-					.append("Milestone: ").append(booking.getTimeslot().getSchedule().getMilestone().getName()).append("[NEWLINE]");
+                    .append("Presentation Reminder from IS480 Scheduling System:").append("[NEWLINE]")
+                    .append("Team ").append(booking.getTeam().getTeamName()).
+						append(" - ").append(booking.getTimeslot().getSchedule().getMilestone().getName()).append("[NEWLINE]")
+                    .append(smsDateFormat.format(booking.getTimeslot().getStartTime())).
+						append(" ").append(smsTimeFormat.format(booking.getTimeslot().getStartTime())).append("[NEWLINE]")
+                    .append(booking.getTimeslot().getVenue()).append("[NEWLINE]");
 
                 String countryCode = "65";
                 StringBuilder phoneNums = new StringBuilder();
