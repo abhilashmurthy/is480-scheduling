@@ -37,7 +37,7 @@ input, button, select, textarea {
 }
 
 .brand:hover {
-	background-color: #2B2B2B;
+    color: gainsboro !important;
 }
 
 .nav-collapse .nav {
@@ -109,8 +109,7 @@ input, button, select, textarea {
     padding: 0 10px 0 10px;
 }
 
-.tab-content {
-	overflow: visible;
+#milestoneTabContent {
 }
 
 .scheduleTable {
@@ -123,44 +122,32 @@ input, button, select, textarea {
 .timeDisplayCell {
     white-space: nowrap;
     width: 50px;
-	padding-top: 0px !important;
-	vertical-align: top;
-	text-align: right;
-	font-size: 13px;
-	border-top: 1px solid #dddddd;
+    max-width: 70px;
 }
 
-.tdCell {
-	position: relative;
-	box-sizing: border-box;
-	min-width: 110px;
-	height: 20px;
-}
-
-.tdUpper {
-	border-top: 1px solid #dddddd;
-	border-left: 1px solid #dddddd;
-}
-
-.tdLower {
-	border-top: 1px dotted #dddddd;
-	border-left: 1px solid #dddddd;
+.timeslotCell {
+    box-sizing: border-box;
+    border: 1px solid #dddddd;
+    background-color: #AEC7C9 !important; 
+    padding: 5px;
+    width: 110px;
+    height: 20px;
+	cursor: pointer !important;
 }
 
 .traverseWeek {
 	cursor: pointer !important;
 }
 
-.popover {
-	min-width: 300px;
-    max-width: 500px !important;
-    font-weight: normal;
-    z-index: 1031 !important;
-	opacity: 1.0;
+#userDashboard > .popover {
+    width: inherit !important;
 }
 
-.changeSelectedPopover {
-	min-width: 220px;
+.popover {
+	/*    width: 100%;*/
+    max-width: 400px !important;
+    font-weight: normal;
+    z-index: 1031 !important;
 }
 
 .token-input-list {
@@ -198,14 +185,57 @@ input, button, select, textarea {
 	margin-bottom: 0 !important;
 }
 
+.bookedTimeslot:hover, .unbookedTimeslot:hover {
+    box-sizing: border-box;
+    border: 2px solid darkblue;
+}
+
 .noTimeslot {
     background-color: #f5f5f5 !important; 
     border: none !important;
 }
 
-.unavailableTimeslot, .unavailableTimeslot > .booking {
-    background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,.5) 50%);
-	background-size: 14px 14px;
+.unbookedTimeslot {
+    /*box-sizing: border-box;*/
+	/*    background-color: #AEC7C9 !important; 
+		border: 1px solid #dddddd;*/
+}
+
+.unavailableTimeslot {
+	/*    background-size: 50px 50px;
+		background-color: #ac0;
+		background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						  transparent 50%, rgba(255, 255, 255, .6) 2%, rgba(255, 255, 255, .6) 75%,
+						  transparent 0%);
+		background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						  transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+						  transparent 75%, transparent);
+		background-image: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						  transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+						  transparent 75%, transparent);
+		-pie-background: linear-gradient(45deg, rgba(255, 255, 255, .6) 25%, transparent 25%,
+						 transparent 50%, rgba(255, 255, 255, .6) 50%, rgba(255, 255, 255, .6) 75%,
+						 transparent 75%, transparent) 0 0 / 50px 50px #ac0;*/
+    /*background-color: #269;*/
+    background-size: 100px 100px, 100px 100px, 2px 2px, 2px 2px;
+    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+    background-image: -webkit-linear-gradient(white 2px, transparent 2px),
+		-webkit-linear-gradient(0, white 2px, transparent 2px),
+		-webkit-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
+		-webkit-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
+    background-image: -moz-linear-gradient(white 2px, transparent 2px),
+		-moz-linear-gradient(0, white 2px, transparent 2px),
+		-moz-linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
+		-moz-linear-gradient(0, rgba(255,255,255,.8) 1px, transparent 1px);
+    background-image: linear-gradient(white 2px, transparent 2px),
+		linear-gradient(90deg, white 2px, transparent 2px),
+		linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px);
+    -pie-background: linear-gradient(white 2px, transparent 2px) -2px -2px / 100px,
+		linear-gradient(90deg, white 2px, transparent 2px) -2px -2px / 100px,
+		linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
+		linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px) -1px -1px / 20px,
+		#269;
 }
 
 .bookedTimeslot, .popover {
@@ -216,98 +246,64 @@ input, button, select, textarea {
 }
 
 .deletedBookingOnTimeslot {
+    margin-top: -20px !important;
     float: right;
 }
 
 .rejectedBooking {
     opacity: 0.3;
+    border-radius: 5px;
     background-color: #F75D59 !important;
     background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGUlEQVQY02P8//8/AzGAkSYKrQbO6sHuRgB90h5hFaCnewAAAABJRU5ErkJggg==);
+    border: 2px solid #415641 !important;
 	pointer-events: none;
 }
 
-.taChosenTimeslot, .taChosenTimeslot > .booking {
+.taChosenTimeslot {
+	background-color: #AEC7C9;
 	background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,.5) 50%);
-	background-size: 14px 14px;
+	background-size: 8px 8px;
 }
 
 .otherTATimeslot {
-	background: #ddd;
-	background: 
-	linear-gradient(115deg, transparent 75%, rgba(255,255,255,.8) 75%) 0 0,
-	linear-gradient(245deg, transparent 75%, rgba(255,255,255,.8) 75%) 0 0,
-	linear-gradient(115deg, transparent 75%, rgba(255,255,255,.8) 75%) 7px -15px,
-	linear-gradient(245deg, transparent 75%, rgba(255,255,255,.8) 75%) 7px -15px,
-	#ddd;
-	background-size: 15px 30px
+	background-color: #FFDFD6 !important;
 }
 
-
-.tooltip {
-	min-width: 150px;
-    z-index: 9;
-}
-
-.timeslotCell {
-	position: absolute;
-	cursor: pointer !important;
-	/* SURESH */
-	/*border-radius: 6px;*/
-	/* ABHILASH */
-	border-radius: 0;
-}
-
-.booking {
+.booking, .rejectedBooking {
     margin: auto;
     width: 100px;
     height: 40px;
     line-height: 20px;
     text-align: center;
-	vertical-align: middle;
+    vertical-align: middle;
 	font-size: 12px;
     z-index: 10;
-	box-shadow: 0 1px 3px #727272;
-	/* SURESH */
-	/*border-radius: 6px;*/
-	/* ABHILASH */
-	border-radius: 0; 
+}
+
+
+.tooltip {
+    z-index: 9;
 }
 
 .pendingBooking {
-	border: 2px solid #D9D01C;
-	/* ABHILASH */
-    background-color: #F6EE4E;
-	/* SURESH */
-	/*background: linear-gradient(to bottom, #F5EF49 0%,#D9D329 100%);*/
-}
-
-.pendingBooking:hover {
-	background-color: #DBD446;
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
+    background-color: #F6EE4E !important;
+    border: 2px solid #CD950C !important;
 }
 
 .approvedBooking {
-	border: 2px solid #0DBA0D;
-	/* ABHILASH */
-    background-color: #A9DBA9; 
-	/* SURESH */
-	/*background: linear-gradient(to bottom, #5ED160 0%,#3DBA40 100%);*/
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
+    background-color: #A9DBA9 !important;
+    border: 2px solid #415641 !important;
 }
 
-.approvedBooking:hover {
-	background-color: #8BC58B;
-}
-
-.unbookedTimeslot {
-	border: 2px solid #068C96;
-	box-shadow: 0 1px 3px #727272;
-	/* ABHILASH */
-	background-color: #AEC7C9; 
-	/* SURESH */ 
-	/*background: linear-gradient(to bottom, #759AFF 0%,#5280FF 100%);*/
-}
-
-.unbookedTimeslot:hover {
-	background-color: #8FA4A6;
+.rejectedBooking {
+    border-radius: 5px !important;
+    -moz-border-radius: 5px !important;
+    background-color: #F75D59 !important;
+    border: 2px solid #722A29 !important;
 }
 
 .legend {
@@ -361,22 +357,20 @@ input, button, select, textarea {
 }
 
 
-.notification-drawer {
+.notification-drawer {  
 	position: absolute;
 	top:22%;
 	left:76%;
 }
 
 #viewTimeslotTable {
-    max-width: 500px;
+    max-width: 300px;
     font-weight: normal;
-	border: none;
 }
 
 #createTimeslotTable {
-    max-width: 500px;
+    max-width: 300px;
     font-weight: normal;
-	border: none;
 }
 
 #venueInput {
@@ -436,12 +430,6 @@ input, button, select, textarea {
 		box-sizing: border-box;*/
 }
 
-/* To color the caret on the navbar*/
-.white-caret {
-	border-top-color: white !important;
-	border-bottom-color: white !important;
-}
-
 .navbar-title:hover {
 	/*	border-radius: 5px;
 		box-sizing: border-box;*/
@@ -453,12 +441,9 @@ input, button, select, textarea {
 	color: white !important
 }
 
+
 .popoverBtn {
-	display: block;
     margin-right: 20px !important;
-	margin-bottom: 5px;
-	clear: none;
-	float: right;
 }
 
 .ui-notifiy {
@@ -491,8 +476,8 @@ input, button, select, textarea {
 
 .booking:not(.myTeamBooking) {
 	color: grey;
-	background-color: rgba(191, 191, 191, 0.5) !important;
-	border: 2px solid rgba(191, 191, 191, 0.5);
+	background-color: rgba(248, 247, 216, 0.5) !important;
+	border: 2px solid grey !important;
 }
 
 .booking:not(.myTeamBooking) > .popover {
@@ -636,12 +621,4 @@ select, input {
 
 #bookedTeamsPieDiv {
 	margin: auto auto 10px auto;
-}
-
-.dateCol {
-	text-align: center;
-}
-
-.calendarHighlighted {
-	background-color: #f5f5f5;
 }
