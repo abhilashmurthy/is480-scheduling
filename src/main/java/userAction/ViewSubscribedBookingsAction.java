@@ -43,8 +43,7 @@ public class ViewSubscribedBookingsAction extends ActionSupport implements Servl
         try {
 			em = MiscUtil.getEntityManagerInstance();
             HttpSession session = request.getSession();
-			User tempUser = (User) session.getAttribute("user");
-			User user = em.find(User.class, tempUser.getId());
+			User user = (User) session.getAttribute("user");
 			
 			Role activeRole = (Role) session.getAttribute("activeRole");
 			//Need to change this for guests. Guests need to be users in our db before they can access any feature

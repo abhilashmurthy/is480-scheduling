@@ -19,7 +19,7 @@
                 <job-name>ClearPendingBookingJob</job-name>
                 <job-group>BookingJobs</job-group>
                 <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
-                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
+                <!--<cron-expression>0 5 3 ? * *</cron-expression>-->
                 <!-- Testing: It will run every minute -->
                 <cron-expression>0 * * * *</cron-expression>
             </cron>
@@ -40,7 +40,7 @@
                 <job-name>BackupDatabaseJob</job-name>
                 <job-group>DatabaseJobs</job-group>
                 <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
-                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
+                <!--<cron-expression>0 0 3 ? * *</cron-expression>-->
                 <!-- Testing: It will run every 10 minutes -->
                 <cron-expression>0 * * * *</cron-expression>
             </cron>
@@ -61,21 +61,7 @@
                 <job-name>RemindPendingBookingJob</job-name>
                 <job-group>BookingJob</job-group>
                 <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
-                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
-                <!-- Testing: It will run every minute -->
-                <cron-expression>0 * * * *</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>
-    
-    <schedule>
-        <trigger>
-            <cron>
-                <name>TriggerEveryMinute</name>
-                <job-name>SMSReminderJob</job-name>
-                <job-group>BookingJob</job-group>
-                <!-- Production: It will run at 3AM every MONDAY to FRIDAY -->
-                <!--<cron-expression>0 0 3 ? * MON-FRI</cron-expression>-->
+                <!--<cron-expression>0 10 3 ? * *</cron-expression>-->
                 <!-- Testing: It will run every minute -->
                 <cron-expression>0 * * * *</cron-expression>
             </cron>
