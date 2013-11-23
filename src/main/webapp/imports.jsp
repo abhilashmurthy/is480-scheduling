@@ -50,7 +50,7 @@ if (user == null && !request.getRequestURI().contains("hello.jsp")) {
     }
 	
 	//UAT mode
-	var uatMode = true;
+	var uatMode = false;
 	function recordHumanInteraction(e) {
 		var $this = $(e.target);
 		while ($this[0].tagName !== 'BODY' && !$this.attr('class')
