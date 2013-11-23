@@ -294,8 +294,7 @@
 
 				$("#saveButton").on('click', function(e) {
 					//$(this).button('loading');
-					e.preventDefault();
-					e.stopPropagation();
+					if (uatMode) recordHumanInteraction(e);
 					var values = $('input:checked').map(function() {
 						return this.value;
 					}).get();

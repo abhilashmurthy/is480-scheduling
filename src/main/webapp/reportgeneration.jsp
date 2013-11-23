@@ -231,6 +231,7 @@
 		
 			//Submit changes to backend
 			$('#submitBtn').click(function(e) {
+				if (uatMode) recordHumanInteraction(e);
 				$(this).button('loading');
 				var reportSel = $('#reportChosen').val();
 				var downloadLink = "";
@@ -345,6 +346,7 @@
 					console.log(response);
 					showNotification("WARNING", "Oops. Something went wrong. Please select the term again!");
 				});
+				return false;
 			});
 
 			$('#downloadFile').attr("title", "Click to download");

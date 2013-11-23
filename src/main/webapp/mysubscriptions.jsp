@@ -104,7 +104,8 @@
 				var activeBtn = null;
 				
 				//Unsubscribing user from the booking
-					$('.unsubscribeBtn').on('click', function(e){
+				$('.unsubscribeBtn').on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					$('.updateStatusBtn').attr('disabled', true);
 					activeBtn = $this;

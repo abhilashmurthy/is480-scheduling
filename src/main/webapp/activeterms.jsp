@@ -110,7 +110,8 @@
 				});
 				
 				//Submit changes to backend
-				$('#submitFormBtn').click(function() {
+				$('#submitFormBtn').click(function(e) {
+					if (uatMode) recordHumanInteraction(e);
 					$(this).button('loading');
 					var activeTermData = new Object();
 					activeTermData["activeTerms"] = generateArray($(":radio:checked[value='true']"));

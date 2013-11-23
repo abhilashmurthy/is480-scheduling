@@ -165,11 +165,6 @@
                 <param name="root">json</param>
             </result>
         </action>
-        <action name="getTeams" class="systemAction.GetTeamsAction" method="execute">
-            <result type="json" >
-                <param name="root">json</param>
-            </result>
-        </action>
         <action name="createBookingJson" class="userAction.CreateBookingAction" method="execute">
             <result type="json">
                 <param name="root">json</param>
@@ -298,6 +293,12 @@
         </action>
 		
 		<action name="generateWikiReport" class="userAction.GenerateWikiReportAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+		
+		<action name="recordHumanInteraction" class="systemAction.RecordHumanInteractionAction" method="execute">
 			<result type="json">
                 <param name="root">json</param>
             </result>

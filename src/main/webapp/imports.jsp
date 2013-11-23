@@ -34,7 +34,7 @@ if (user == null && !request.getRequestURI().contains("hello.jsp")) {
 %>
 
 <script type="text/javascript">
-    //This is used for multiple window.onload's
+    //This is used for multiple window.onload's	
     function addLoadEvent(func) {
         var oldonload = window.onload;
         if (typeof window.onload !== 'function') {
@@ -48,4 +48,56 @@ if (user == null && !request.getRequestURI().contains("hello.jsp")) {
             };
         }
     }
+	
+	//UAT mode
+	var uatMode = true;
+	function recordHumanInteraction(e) {
+		var $this = $(e.target);
+		while ($this[0].tagName !== 'BODY' && !$this.attr('class')
+				|| $this[0].tagName === 'LI'
+				|| ($this[0].tagName === 'TD' && !$this.attr('id'))
+				|| ($this[0].tagName === 'TR' && !$this.attr('id'))
+				|| $this[0].tagName === 'TH'
+				|| $this[0].tagName === 'THEAD'
+				|| $this[0].tagName === 'TBODY') {
+			$this = $this.parent();
+		}
+		var tagName = $this[0].tagName;
+		var data = {
+			action: 'clicked',
+			url: location.href,
+			target: $(e.target)[0].tagName,
+			clickedItem: tagName + '[class = ' + $this.attr('class') + ', id = ' + $this.attr('id') + ']'
+		};
+		if (uatMode) {
+			console.log(JSON.stringify(data));
+			$.ajax({
+				type: 'POST',
+				url: 'recordHumanInteraction',
+				data: {jsonData: JSON.stringify(data)}
+			}).done(function(response) {
+			}).fail(function(error) {
+			});
+		}
+	}
+	
+	var documentLoaded = function() {
+		var data = {
+			action: 'loaded',
+			url: location.href
+		};
+		if (uatMode) {
+			console.log(JSON.stringify(data));
+			$.ajax({
+				type: 'POST',
+				url: 'recordHumanInteraction',
+				data: {jsonData: JSON.stringify(data)}
+			}).done(function(response) {
+			}).fail(function(error) {
+			});
+		}
+	};
+	
+	addLoadEvent(documentLoaded);
+	
 </script>

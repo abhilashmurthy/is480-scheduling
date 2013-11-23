@@ -73,7 +73,8 @@
 				});
 
 				//Submit changes to backend
-				$('#submitFormBtn').click(function() {
+				$('#submitFormBtn').click(function(e) {
+					if (uatMode) recordHumanInteraction(e);
 					$(this).button('loading');
 					var mobNo = "";
 					if ($('#setMobileNumber').is(":visible")) {

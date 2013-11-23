@@ -434,7 +434,8 @@
 				/***************/
 				
 				 //Manual navigation because of struts URL
-				$('body').on('click', '.usersNav li a', function(){
+				$('body').on('click', '.usersNav li a', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var href = $(this).attr('href').split('#')[1];
 					$(".tab-pane, .nav-tabs li").removeClass('active');
 					$(".tab-pane").hide();
@@ -487,13 +488,15 @@
 				});
 				
 				//- Assign Teams Link
-				$('body').on('click', '.assignTeamsLink', function(){
+				$('body').on('click', '.assignTeamsLink', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					$('.usersNav li.team').children('a').trigger('click');
 					return false;
 				});
 				
 				//Team Name Link
-				$('body').on('click', '.studentTeamLink', function(){
+				$('body').on('click', '.studentTeamLink', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					$('.modal').modal('hide');
 					$('.usersNav li.team').children('a').trigger('click');
 					var $tr = getTrFromTable('teamsTable', 'teamName', $(this).text());
@@ -503,7 +506,8 @@
 				});
 				
 				//Student Name Link
-				$('body').on('click', '.teamStudentLink', function(){
+				$('body').on('click', '.teamStudentLink', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					$('.modal').modal('hide');
 					$('.usersNav li.student').children('a').trigger('click');
 					var $tr = getTrFromTable('studentUsersTable', 'fullName', $(this).text());
@@ -513,7 +517,7 @@
 				});
 				
 				//Team Name Link
-				$('body').on('click', '.teamFacultyLink', function(){
+				$('body').on('click', '.teamFacultyLink', function(e){
 					$('.modal').modal('hide');
 					$('.usersNav li.faculty').children('a').trigger('click');
 					var $tr = getTrFromTable('facultyUsersTable', 'fullName', $(this).text());
@@ -536,7 +540,8 @@
 				}
 				
 				//TA Signups Link
-				$('body').on('click', '.taSignupsLink', function(){
+				$('body').on('click', '.taSignupsLink', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var ta = taData[$(this).attr('id').split("_")[1]];
 					bootbox.alert({
 						title: 'Signups of ' + ta.name,
@@ -612,7 +617,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.editAdminBtn', function(){
+				$('body').on('click', '.editAdminBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					var userType = 'cc';
 					var id = $('#ccUsersTable tr:last').attr('id').split('_')[1];
@@ -630,7 +636,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.emailBtn, .emailAllBtn', function(){
+				$('body').on('click', '.emailBtn, .emailAllBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					var userType = $this.is('.emailAllBtn')?$this.attr('id').substring(10):$this.closest('tr').attr('class').split('Row')[0];
 					var id = $this.is('.emailAllBtn')?'':$this.closest('tr').attr('id').split('_')[1];
@@ -682,7 +689,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.modBtn', function(){
+				$('body').on('click', '.modBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					var userType = $this.closest('tr').attr('class').split('Row')[0];
 					var id = $this.closest('tr').attr('id').split('_')[1];
@@ -721,7 +729,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.addBtn', function(){
+				$('body').on('click', '.addBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var userType = $(this).attr('id').split('_')[1];
 					var addableFields = [{key: "Username", name:"username", order: 1}, {key: "Full Name", name: "fullName", order: 2}];
 					if (userType === 'student') addableFields.push({key: "Team", name: "teamId", order: 3});
@@ -730,7 +739,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.addTeamBtn, .editTeamBtn', function(){
+				$('body').on('click', '.addTeamBtn, .editTeamBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var action = $(this).hasClass('addTeamBtn')?'add':'edit';
 					var team = null;
 					var $tr = null;
@@ -890,7 +900,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.emailAllTeamsBtn', function(){
+				$('body').on('click', '.emailAllTeamsBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					var to = '';
 					var body = 'Hi IS480 Teams';
@@ -913,7 +924,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.emailTeamBtn', function(){
+				$('body').on('click', '.emailTeamBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					var userType = $this.closest('tr').attr('class').split('Row')[0];
 					var id = $this.closest('tr').attr('id').split('_')[1];
@@ -928,7 +940,8 @@
 					return false;
 				});
 				
-				$('body').on('click', '.delTeamBtn', function(){
+				$('body').on('click', '.delTeamBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var team = teamData[$(this).closest('tr').attr('id').split('_')[1]];
 					bootbox.confirm({
 						title: "Remove Team ",
@@ -969,12 +982,15 @@
 					return false;
 				});
 				$('body').on('click', '.userSelectBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					setTimeout(function(){$('.modal-body').find('input.multiselect-search').focus();}, 50);
 				});
-				$('body').on('click', '.facultyUserSelectBtn', function(){
+				$('body').on('click', '.facultyUserSelectBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					$('.modal-body').animate({scrollTop: $('.modal-body').height()}, 'slow');
 				});
 				$('body').on('keyup', 'input.multiselect-search', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					if (e.keyCode === 13) {
 						$(this).trigger('enterKey');
 					}
@@ -997,8 +1013,8 @@
 					}
 					return false;
 				});
-				$('body').on('mousedown', 'i.resetMultiselect', function(){
-					console.log($(this));
+				$('body').on('mousedown', 'i.resetMultiselect', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $multiselect = $(this).closest('div.btn-group').prev();
 					var vals = $multiselect.val();
 					if (vals && vals.length > 0) {

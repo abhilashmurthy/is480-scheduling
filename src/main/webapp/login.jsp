@@ -392,6 +392,7 @@
                     
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
+						if (uatMode) recordHumanInteraction(e);
 						self = $(this).children('.booking').length?$(this).children('.booking'):$(this)
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateBookingBtn').attr('disabled', true);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateTimeslotBtn').attr('disabled', true);
@@ -403,6 +404,7 @@
                     $('body').off('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking');
                     $('body').on('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking', function(e) {
 						if (e.target === this) {
+							if (uatMode) recordHumanInteraction(e);
 							self = ($(this).is('.booking')) ? $(this) : $(this).children('.booking');
 							var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 							self.popover('show');
@@ -420,13 +422,14 @@
 					
                     $('body').off('click', '.unbookedTimeslot');
                     $('body').on('click', '.unbookedTimeslot', function(e) {
+						if (uatMode) recordHumanInteraction(e);
                         $('button.ssoBtn').effect('highlight', {color: "#ffff99 !important"}, 1500);
 						return false;
                     });
 
                     $('.timeslotCell').off('click', '.close');
                     $('.timeslotCell').on('click', '.close', function(e) {
-                        e.stopPropagation();
+						if (uatMode) recordHumanInteraction(e);
                         self.popover('hide');
                         self.trigger('mouseleave');
                         return false;
@@ -488,6 +491,7 @@
 				
                 //Function to change schedule based on selected milestone tab
                 $('#milestoneTab a').on('click', function(e) {
+					if (uatMode) recordHumanInteraction(e);
                     $("#milestoneTab").removeClass('active in');
                     $(this).tab('show');
                     milestone = $(this).attr('id').toUpperCase();
@@ -498,19 +502,22 @@
                     return false;
                 });
 
-				$(".testBtn").click(function() {
+				$(".testBtn").click(function(e) {
+					if (uatMode) recordHumanInteraction(e);
 					window.location = "adminlogin.jsp";
 					return false;
 				});
 
-				$(".ssoBtn").click(function() {
+				$(".ssoBtn").click(function(e) {
+					if (uatMode) recordHumanInteraction(e);
 					if ($(this).is('button')) $(this).button('loading');
 					//blink(this);
 					window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
 					return false;
 				});
 
-				$('.selectTermBtn').on('click', function(){
+				$('.selectTermBtn').on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					window.location = "welcome?t=" + btoa($(this).val());
 					return false;
 				});
