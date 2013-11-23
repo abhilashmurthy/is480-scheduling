@@ -248,7 +248,9 @@
                     selectedMilestone = $(this).val();
                     scheduleData = getScheduleData(selectedMilestone, activeAcademicYearStr, activeSemesterStr);
                     loadScheduleTimeslots(selectedMilestone, scheduleData);
-                    return false; 
+					taData = JSON.parse('<s:property escape= "false" value= "taJson"/>');
+					loadTAStatistics();
+                    return false;
                 });
                 
                 $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).trigger('change');
