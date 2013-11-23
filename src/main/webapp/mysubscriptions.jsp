@@ -117,7 +117,6 @@
 						data: {jsonData: JSON.stringify({subscribedBooking: activeBtn.attr('value'), subscriptionStatus: "Unsubscribe"})}
 					})
 					.done(function(response) {
-						console.log('Got ' + JSON.stringify(response));
 						if (!response.exception) {
 							if (response.success) {
 								showNotification("SUCCESS", response.message);

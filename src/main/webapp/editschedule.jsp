@@ -674,7 +674,6 @@
 							$("#editScheduleSubmitBtn").button('reset');
                         }
                     }).fail(function(error) {
-                        console.log("editScheduleData AJAX FAIL");
 						var eid = btoa("Erro in EditScheduleAction: Escalate to developers!");
 						window.location = "error.jsp?eid=" + eid;
                     });
@@ -739,7 +738,7 @@
                     timeslotsData["scheduleId"] = selectedSchedule.id;
                     timeslotsData["timeslots[]"] = timeslots_array;
                     timeslotsData["venue"] = $("#venueInput").val();
-                    console.log('Timeslots data is: ' + JSON.stringify(timeslotsData));
+                    console.log('Submitting: ' + JSON.stringify(timeslotsData));
                     $.ajax({
                         type: 'POST',
                         url: 'updateTimeslotsJson',
@@ -747,13 +746,11 @@
                         dataType: 'json'
                     }).done(function(response) {
                         if (response.success) {
-                            console.log("editTimeslotsJson was successful");
 							showNotification("SUCCESS", response.message);
                         } else {
                             showNotification("ERROR", response.message);
                         }
                     }).fail(function(error) {
-                        console.log("editTimeslotsJson AJAX FAIL");
                         showNotification("ERROR", "Oops.. something went wrong");
                     });
 					$("#editTimeslotsSubmitBtn").button('reset');
@@ -851,7 +848,6 @@
 							if (Date.parse($(this).attr('value')).toString('yyyy-MM-dd') === $this.attr('id').split('_')[1]) triggerTimeslot($(this));
 						});
 					} else {
-						console.log('hello');
 						$('.timeslotcell:not(.teamExists)').each(function(){
 							if ($(this).is('.chosen') && $(this).find('div.start-marker').length && Date.parse($(this).attr('value')).toString('yyyy-MM-dd') === $this.attr('id').split('_')[1]) {
 								triggerTimeslot($(this));

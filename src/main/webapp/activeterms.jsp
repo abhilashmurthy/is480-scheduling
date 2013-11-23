@@ -129,7 +129,6 @@
 						data: {jsonData: JSON.stringify(activeTermData)}	
 					}).done(function(response) {
 						$("#submitFormBtn").button('reset');
-						console.log(response);
 //						$("#responseBanner").show().delay(2000).fadeOut(400);
 						if (response.success) {
 //							$("#responseBanner").removeClass("alert-error").addClass("alert-success");
@@ -142,7 +141,6 @@
 						}
 					}).fail(function(response) {
 						$("#submitFormBtn").button('reset');
-						console.log(response);
 //						$("#responseBanner").show().delay(2000).fadeOut(400);
 //						$("#responseBanner").removeClass("alert-success").addClass("alert-error");
 //						$("#responseMessage").text("Oops. Something went wrong. Please try again!");

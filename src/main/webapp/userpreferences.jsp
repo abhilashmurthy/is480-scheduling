@@ -93,7 +93,6 @@
 						data: {jsonData: JSON.stringify(mobJson)}	
 					}).done(function(response) {
 						$("#submitFormBtn").button('reset');
-						console.log(response);
 						if (response.success) {
 							if (response.message.split("No changes").length > 1) {
 								showNotification("WARNING", response.message);
@@ -105,7 +104,6 @@
 						}
 					}).fail(function(response) {
 						$("#submitFormBtn").button('reset');
-						console.log(response);
 						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
 					});
 					return false;

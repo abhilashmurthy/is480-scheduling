@@ -240,7 +240,6 @@
 					data: {jsonData: JSON.stringify(termData)}	
 				}).done(function(response) {
 //					$("#submitFormBtn").button('reset');
-					console.log(response);
 //					if (response.success) {
 //						showNotification("SUCCESS", response.message);
 //					} else {
@@ -248,7 +247,6 @@
 //					}
 				}).fail(function(response) {
 //					$("#submitFormBtn").button('reset');
-					console.log(response);
 					showNotification("WARNING", "Oops. Something went wrong. Please select the term again!");
 				});
 			});

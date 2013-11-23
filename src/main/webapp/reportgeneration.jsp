@@ -332,7 +332,6 @@
 					data: {jsonData: JSON.stringify(reportData)}
 				}).done(function(response) {
 					$("#submitBtn").button('reset');
-					console.log(response);
 					if (response.success) {
 						//Create the download link
 //						$("#downloadFile").show();
@@ -343,7 +342,6 @@
 					}
 				}).fail(function(response) {
 					$("#submitBtn").button('reset');
-					console.log(response);
 					showNotification("WARNING", "Oops. Something went wrong. Please select the term again!");
 				});
 				return false;

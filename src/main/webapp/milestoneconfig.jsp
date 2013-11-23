@@ -243,7 +243,6 @@
 					})
 					.fail(function(response) {
 						$(".saveMilestonesBtn").button('reset');
-						console.log("Updating Milestone settings AJAX FAIL");
 						showNotification("WARNING", "Oops.. something went wrong");
 					});
 					$('button').attr('disabled', false);

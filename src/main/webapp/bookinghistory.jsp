@@ -318,7 +318,6 @@
 			
 			$('#hideColumns').change(function(){
 				var n = $('#dropdownValues').val();
-				console.log("All values: " + n);
 				var allValues = n.split(","); 
 				//First show all columns then hide whichever column has been chosen
 				//Starting from 1st index, not 0th index
@@ -327,11 +326,9 @@
 				}
 				//Hiding the columns which have been selected
 				var selectedValues = $("#hideColumns").val();
-				console.log("Value to hide: " + selectedValues);
 				//Only if a column has been selected
 				if (selectedValues.length > 0) {
 					if (selectedValues.length > 1) {
-						console.log("Multiple values: " + selectedValues);
 						if (selectedValues[0] === "0") {
 							for (var i=1; i<=9; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();
@@ -343,7 +340,6 @@
 							}
 						}
 					} else {
-						console.log("Single value: " + selectedValues);
 						if (selectedValues[0] === "0") {
 							for (var i=1; i<=9; i++) {
 								$('td:nth-child('+ i +'),th:nth-child('+ i +')').hide();

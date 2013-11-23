@@ -316,7 +316,6 @@
 				
 				$('body').on('change', '.checkBoxClass', function(){
 					var $checkbox = $(this);
-					console.log('selected ' + $checkbox.attr('id') + ': ' + $checkbox.is(':checked'));
 
 					if($checkbox.is(':checked')){
 						var dateTime = $checkbox.attr('id');
@@ -371,7 +370,6 @@
 									}
 								});
 							}
-							//console.log(Date.parse(timeslot.datetime).toString('HH:mm:ss').split(":")[0]);
 						}
 					
 					
@@ -389,7 +387,6 @@
                     for (i = 0; i < dateArray.length; i++) {
                         var th = $(document.createElement("td")).addClass('dateHeader');
                         var headerVal = new Date(dateArray[i]).toString('dd MMM yyyy') + "<br/>" + new Date(dateArray[i]).toString('ddd');
-						//console.log((dateArray[i]).toString('dd MMM yyyy'));
                         th.html(headerVal + "<br/>Select All <input class='checkBoxClass' type='checkbox' name='" + dateArray[i] + "' id='" + dateArray[i] + "'/>");
                         thead.append(th);
                     }					
@@ -630,11 +627,9 @@
                             if (response.success) {
                                 showNotification("SUCCESS", "Timeslots saved");
                                 $("#editTimeslotsSubmitBtn").button('reset');
-								console.log('Unavailable: ' + JSON.stringify(response.unavailableTimeslots));
 								unavailableTimeslots = response.unavailableTimeslots;
                             } else {
                                 var eid = btoa(response.message);
-                                console.log(response.message);
                                 window.location = "error.jsp?eid=" + eid;
                             }
                         } else {

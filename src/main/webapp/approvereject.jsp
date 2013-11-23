@@ -273,7 +273,6 @@
 						data: {jsonData: JSON.stringify({bookingId: activeBtn.attr('value'), status: "approve"})}
 					})
 					.done(function(response) {
-						console.log('Got ' + JSON.stringify(response));
 						if (!response.exception) {
 							if (response.success) {
 								showNotification("SUCCESS", response.message);

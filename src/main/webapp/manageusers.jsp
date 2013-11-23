@@ -350,12 +350,6 @@
 					studentData = convertUserData(JSON.parse('<s:property escape= "false" value= "studentJson"/>'));
 					facultyData = convertUserData(JSON.parse('<s:property escape= "false" value= "facultyJson"/>'));
 					taData = convertUserData(JSON.parse('<s:property escape= "false" value= "taJson"/>'));
-					console.log('\n\nAdmin data: ' + JSON.stringify(adminData));
-					console.log('\n\nCC data: ' + JSON.stringify(ccData));
-					console.log('\n\nTeam data: ' + JSON.stringify(teamData));
-					console.log('\n\nStudent data: ' + JSON.stringify(studentData));
-					console.log('\n\nFaculty data: ' + JSON.stringify(facultyData));
-					console.log('\n\nTA data: ' + JSON.stringify(taData));
 				}
 				
 				//Order comparator
@@ -607,7 +601,6 @@
 				
 				$('.termPicker').on('change', function(){
 					if (oTables.length > 0) {
-						console.log('oTables: ' + oTables.length);
 						for (var i = 0; i < oTables.length; i++) {
 							oTables[i].fnDestroy();
 						}

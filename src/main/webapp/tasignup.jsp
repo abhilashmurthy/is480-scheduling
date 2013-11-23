@@ -224,7 +224,6 @@
                 var selectedMilestone = null;
                 var milestones = new Array();
 				var taData = JSON.parse('<s:property escape= "false" value= "taJson"/>');
-				console.log('TA DATA: ' + JSON.stringify(taData));
 
                 loadMilestones();
                 loadSelectDropdown();
@@ -728,7 +727,6 @@
 						
                         var obj = allTimeslots2[i];
 						var timeslot = $(obj).parent().attr("value").split("_")[1];
-						//console.log("switch_"+timeslot);
 						var id = "switch_"+timeslot;
 						var valtest = document.getElementById(id);
 						var strUser = valtest.options[valtest.selectedIndex].text;
@@ -807,7 +805,6 @@
 										break;
 									}
 								}
-								console.log('New count should be: ' + mySignups.length);
 								loadTAStatistics();
                             } else {
                                 var eid = btoa(response.message);

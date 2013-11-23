@@ -704,8 +704,7 @@
 							$("#createScheduleSubmitBtn").button('reset');
                         }
                     }).fail(function(error) {
-                        console.log("createScheduleData AJAX FAIL");
-						var eid = btoa("Erro in CreateScheduleAction: Escalate to developers!");
+						var eid = btoa("Error in CreateScheduleAction: Escalate to developers!");
 						window.location = "error.jsp?eid=" + eid;
                     });
                     return false;
@@ -835,11 +834,9 @@
 							}
                         } else {
                             var eid = btoa(response.message);
-                            console.log(response.message);
                             window.location = "error.jsp?eid=" + eid;
                         }
                     }).fail(function(error) {
-                        console.log("createTimeslotsJson AJAX FAIL");
                         showNotification("ERROR", "Oops.. something went wrong");
                     });
                     return false;
@@ -925,7 +922,6 @@
 							if (Date.parse($(this).attr('value')).toString('yyyy-MM-dd') === $this.attr('id').split('_')[1]) triggerTimeslot($(this));
 						});
 					} else {
-						console.log('hello');
 						$('.timeslotcell:not(.teamExists)').each(function(){
 							if ($(this).is('.chosen') && $(this).find('div.start-marker').length && Date.parse($(this).attr('value')).toString('yyyy-MM-dd') === $this.attr('id').split('_')[1]) {
 								triggerTimeslot($(this));
@@ -983,7 +979,6 @@
                 });
                 $('body').on('mouseleave', '.timeslotsTable td', function(e) {
 					var $td = $(this);
-					console.log('leaving');
 					var slotSize = selectedSchedule.duration / 30;
 					if ($td.hasClass('glow-sides')) {
 						var $prevTr = $td.closest('tr');

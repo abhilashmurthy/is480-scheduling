@@ -209,7 +209,6 @@
 
 						var splitArray = new Array();
 						splitArray = values.slice(',');
-						console.log(splitArray);
 						//alert(splitArray[0] + splitArray[1]);
 
 						var ons = "On";
@@ -351,7 +350,7 @@
 
 					}
 					
-					console.log(toSend);
+					console.log('Submitting: ' + toSend);
 
 					//send data to store information
 					$.ajax({
@@ -397,7 +396,7 @@
 						newPassword: newPasswordStr,
 						verifyPassword: verifyPasswordStr
 					};
-					console.log(testingInput);
+					console.log('Submitting: ' + testingInput);
 					$.ajax({
 						type: 'POST',
 						async: false,
@@ -405,14 +404,12 @@
 						data: {jsonData: JSON.stringify(testingInput)}
 					}).done(function(response) {
 						$("#passwordChangeSubmitButton").button('reset');
-						console.log(JSON.stringify(response));
 						var success = response.success;
 						var notificationType = (success) ? "SUCCESS" : "ERROR";
 						var message = (response.message) ? response.message : "Password changed successfully" ;
 						showNotification(notificationType, message);
 					}).fail(function(response) {
 						$("#passwordChangeSubmitButton").button('reset');
-						console.log(JSON.stringify(response));
 						showNotification("ERROR", "Error in contacting the server. Please try again.");
 					});
 					
