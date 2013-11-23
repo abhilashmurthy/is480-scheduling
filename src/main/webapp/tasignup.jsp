@@ -609,11 +609,13 @@
                 }
 
                 $('body').on('click', 'td.timeslotcell', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					if ($(this).is('.chosen, .available') && <%= activeRole.equals(Role.TA) %>) {
 						triggerTimeslot($(this));
 					} else if (<%= activeRole.equals(Role.ADMINISTRATOR) %>) {
 						emailAvailable($(this));
 					}
+					return false;
                 });
 				
 				//Hover glow effect
@@ -704,7 +706,8 @@
                 //------------------------------------------//
 
                 //Update Timeslots AJAX Call            
-                $("#editTimeslotsSubmitBtn").on('click', function() {
+                $("#editTimeslotsSubmitBtn").on('click', function(e) {
+					if (uatMode) recordHumanInteraction(e);
                     $("#editTimeslotsSubmitBtn").button('loading');
                     //SerializeArray not functional for timeslots
                     var timeslotsData = {};

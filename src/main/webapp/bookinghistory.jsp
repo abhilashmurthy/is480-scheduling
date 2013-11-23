@@ -438,6 +438,7 @@
 		
 		//To display the subscribed users in a modal
 		$('.getSubscribersBtn').on('click', function(e){
+			if (uatMode) recordHumanInteraction(e);
 			var usersList = $(this).parent().children('.hiddenUsersList').html();
 			$('#sUsersList').html(usersList);
 			$('#subscribersModal').modal({

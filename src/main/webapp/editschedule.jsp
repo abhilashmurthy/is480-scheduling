@@ -460,7 +460,8 @@
                  ------------------------------------------*/
                  
 				 //Manual navigation because of struts URL
-                 $(".scheduleLeftNav li a").on('click', function(){
+                 $(".scheduleLeftNav li a").on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					 var href = $(this).attr('href').split('#')[1];
 					 $(".tab-pane, .nav-tabs li").removeClass('active');
 					 $(".tab-pane").hide();
@@ -539,6 +540,7 @@
 				
 				//Reset Dates on crossing from Pillbox
 				$(".pillbox ul").on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $pill = $(e.target);
 					if (!$pill.is('li')) return false;
 					var date = $pill.text();
@@ -589,8 +591,7 @@
                 //Edit Schedule Submit - Show timeslots panel
                 $("#editScheduleForm").on('submit', function(e) {
                     $("#editScheduleSubmitBtn").button('loading');
-                    e.preventDefault();
-                    e.stopPropagation();     
+					if (uatMode) recordHumanInteraction(e);
 					
 					//Validate year and semester
 					var year = activeAcademicYearStr;
@@ -725,7 +726,8 @@
                 });
                 
                 //Submit Update Timeslots
-                $("#editTimeslotsSubmitBtn").on('click', function() {
+                $("#editTimeslotsSubmitBtn").on('click', function(e) {
+					if (uatMode) recordHumanInteraction(e);
                     $("#editTimeslotsSubmitBtn").button('loading');
                     var timeslotsData = {};
                     var timeslots_array = new Array();
@@ -833,6 +835,7 @@
                 }
                 
                 $('body').on('click', '.timeslotcell', function(e) {
+					if (uatMode) recordHumanInteraction(e);
 					if ($(this).is('.teamExists')) return false;
                     triggerTimeslot($(this));
 					$(this).trigger('mouseleave');

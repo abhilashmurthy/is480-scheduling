@@ -27,14 +27,13 @@ import util.MiscUtil;
  *
  * @author Suresh
  */
-public class ManageActiveTermsAction extends ActionSupport implements ServletRequestAware {
+public class PrepareActiveTermsAction extends ActionSupport implements ServletRequestAware {
 
     private HttpServletRequest request;
-    static final Logger logger = LoggerFactory.getLogger(ManageActiveTermsAction.class);
+    static final Logger logger = LoggerFactory.getLogger(PrepareActiveTermsAction.class);
 	private ArrayList<Term> allTerms = new ArrayList<Term>();
 	private ArrayList<Long> activeTermIds = new ArrayList<Long>();
 	private ArrayList<Term> activeTermObjects = new ArrayList<Term>();
-	private Long defaultTerm;
 
     @Override
     public String execute() throws ServletException, IOException {
@@ -52,8 +51,6 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
 				for (Term t : activeTermObjects) {
 					activeTermIds.add(t.getId());
 				}
-				
-				defaultTerm = SettingsManager.getDefaultTerm(em).getId();
 				
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");
@@ -99,14 +96,6 @@ public class ManageActiveTermsAction extends ActionSupport implements ServletReq
 
 	public void setActiveTermObjects(ArrayList<Term> activeTermObjects) {
 		this.activeTermObjects = activeTermObjects;
-	}
-
-	public Long getDefaultTerm() {
-		return defaultTerm;
-	}
-
-	public void setDefaultTerm(Long defaultTerm) {
-		this.defaultTerm = defaultTerm;
 	}
 
     public void setServletRequest(HttpServletRequest hsr) {

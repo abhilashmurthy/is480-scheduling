@@ -314,7 +314,8 @@
                  
 				 //Disable createTimeslotsTab first
                 $(".createTimeslotsTab a").removeAttr('data-toggle');
-                 $(".scheduleLeftNav li a").on('click', function(){
+                 $(".scheduleLeftNav li a").on('click', function(e){
+					 if (uatMode) recordHumanInteraction(e);
                      if (!$(this).attr('data-toggle')) {
                         var activeTab = $('.scheduleLeftNav').children('.active').children('a').html();
                         showNotification("WARNING", "Please " + activeTab + " First!");
@@ -341,7 +342,7 @@
 					max: 9999,
 					step: 1
 				});
-				$("#yearSpinnerInput").on('focusout', function(){
+				$("#yearSpinnerInput").on('focusout', function(e){
 					var value = $(this).spinner('value');
 					if (value < thisYear) {
 						$(this).spinner('value', thisYear);
@@ -349,7 +350,7 @@
 				});
 				
 				//Term name availability check
-				$("#semesterInput").on('keyup', function(){
+				$("#semesterInput").on('keyup', function(e){
 					var $this = $(this);
 					$("#semesterNameAvailabilityChecker").css('color', 'grey').html($(document.createElement('span')).addClass('fa fa-refresh fa-spin'));
 					setTimeout(function(){$this.trigger('change');}, 500);
@@ -357,7 +358,7 @@
 				});
 				
 				//Term name availability check
-				$("#semesterInput, #yearSpinnerInput").on('change blur changed', function(){
+				$("#semesterInput, #yearSpinnerInput").on('change blur changed', function(e){
 					var semName = $.trim($("#semesterInput").val());
 					var yearVal = $("#yearSpinnerInput").spinner('value');
 					if (!semName) {
@@ -374,7 +375,7 @@
 					return false;
 				});
 				
-				$("#yearSpinnerInput").on('changed', function(){
+				$("#yearSpinnerInput").on('changed', function(e){
 					var semName = $.trim($("#semesterInput").val());
 					var yearVal = $("#yearSpinnerInput").spinner('value');
 					//Update multiDatesPickers to year selected
@@ -564,6 +565,7 @@
 				
 				//Reset Dates on crossing from Pillbox
 				$(".pillbox ul").on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $pill = $(e.target);
 					if (!$pill.is('li')) return false;
 					var date = $pill.text();
@@ -614,6 +616,7 @@
 
                 //Create Schedule Submit - Show timeslots panel
                 $("#createScheduleForm").on('submit', function(e) {
+					if (uatMode) recordHumanInteraction(e);
                     $("#createScheduleSubmitBtn").button('loading');
                     e.preventDefault();
                     e.stopPropagation();                  
@@ -778,7 +781,8 @@
                 });
                 
                 //Submit to server
-                $("#createTimeslotsSubmitBtn").on('click', function() {
+                $("#createTimeslotsSubmitBtn").on('click', function(e) {
+					if (uatMode) recordHumanInteraction(e);
                     $("#createTimeslotsSubmitBtn").button('loading');
                     var timeslotsData = {};
                     var timeslots_array = new Array();
@@ -904,6 +908,7 @@
                 }
                 
                 $('body').on('click', '.timeslotcell', function(e) {
+					if (uatMode) recordHumanInteraction(e);
 					if (selectedSchedule.isCreated) return false; //If created already, disable timeslot selection
                     triggerTimeslot($(this));
 					$(this).trigger('mouseleave');
@@ -911,7 +916,8 @@
                     return false;
                 });
 				
-$('body').on('click', '.selectDay', function(){
+				$('body').on('click', '.selectDay', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					if ($this.is(':checked')) {
 						$('.timeslotcell:not(.teamExists)').each(function(){

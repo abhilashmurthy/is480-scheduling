@@ -143,21 +143,22 @@
 </div>
 
 
-<script type="text/javascript">
+<script type="text/javascript">	
     //Makes use of footer.jsp's jQuery and bootstrap imports
     navbarLoad = function(){
-        
         //Dropdown menu from bootstrap
         $(".dropdown-toggle").dropdown();
         
         //Logout link
-        $("#logoutLink").on('click', function() {
+        $("#logoutLink").on('click', function(e) {
+			if (uatMode) recordHumanInteraction(e);
             document.location.href = '/is480-scheduling/logout';
 			return false;
         });
         
         //Hide all popovers on other button click
-        $("#userAccess").on('click', function(){
+        $("#userAccess").on('click', function(e){
+			if (uatMode) recordHumanInteraction(e);
             if ($('.popover').hasClass("in")) {
                 $('.popover').parent().popover('hide');
             }
@@ -210,6 +211,11 @@
         //Disable Pines Notify Settings
         $.pnotify.defaults.history = false;
         $.pnotify.defaults.delay = 3000;
+		
+		//UAT mode
+		$('body').bind('click', '*', function(e){
+			if (uatMode) recordHumanInteraction(e);
+		});
     };
     
     addLoadEvent(navbarLoad);

@@ -107,7 +107,8 @@
 				}
 				
 				//Delete milestone
-				$('body').on('click', '.deleteMilestoneBtn', function(){
+				$('body').on('click', '.deleteMilestoneBtn', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $milestoneTr = $(this).closest('tr');
 					$milestoneTr.fadeOut('slow', function(){
 						$milestoneTr.remove();
@@ -117,7 +118,8 @@
 				});
 				
 				//Add milestone
-				$(".addMilestoneBtn").on('click', function(){
+				$(".addMilestoneBtn").on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					$(".noMilestoneMsg").fadeOut('slow', function(){
 						$(this).remove();
 					});
@@ -204,7 +206,8 @@
 				});
 				
 				//Save milestones
-				$('.saveMilestonesBtn').on('click', function(){
+				$('.saveMilestonesBtn').on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					$(".noMilestoneMsg").fadeOut('slow', function(){
 						$(this).remove();
 					});

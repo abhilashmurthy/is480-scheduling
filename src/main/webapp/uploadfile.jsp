@@ -144,7 +144,8 @@
 			
 			//Submit changes to backend
 			$('#submitFormBtn').click(function(e) {
-//			function validate(saveButton) {
+				if (uatMode) recordHumanInteraction(e);
+//				function validate(saveButton) {
 //				e.stopPropagation();
 //				e.preventDefault();
 				$(this).button('loading');

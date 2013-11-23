@@ -261,6 +261,7 @@
 					});
 				
 				$('.approveBookingBtn').on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					var $this = $(this);
 					$('.updateStatusBtn').attr('disabled', true);
 					activeBtn = $this;
@@ -294,6 +295,7 @@
 				});
 				
 				$(".rejectBookingBtn").on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					$('.updateStatusBtn').attr('disabled', true);
 					$('#rejectionModal').modal('show');
 					$('#rejectionModal').modal({
@@ -313,6 +315,7 @@
 				});
 				
 				$('#rejectionTextSubmit').on('click', function(e){
+					if (uatMode) recordHumanInteraction(e);
 					if ($('#rejectionText').val() === "") {
 						$('#errorMsg').show();
 						return false;

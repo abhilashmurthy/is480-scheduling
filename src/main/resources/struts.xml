@@ -84,10 +84,6 @@
             <result name="success">/restoreDB.jsp</result>
         </action>
 		
-        <action name="newSchedule" class="systemAction.GetTermsAction" method="execute">
-            <result name="success">/schedule.jsp</result>
-        </action>
-		
         <action name="bookingHistory" class="userAction.BookingHistoryAction" method="execute">
             <result name="success">/bookinghistory.jsp</result>
         </action>
@@ -96,7 +92,7 @@
             <result name="success">/mysubscriptions.jsp</result>
         </action>
 		
-		<action name="manageActiveTerms" class="systemAction.ManageActiveTermsAction" method="execute">
+		<action name="manageActiveTerms" class="systemAction.PrepareActiveTermsAction" method="execute">
             <result name="success">/activeterms.jsp</result>
         </action>
 		
@@ -165,11 +161,6 @@
         </global-results>
 		
         <action name="getSchedule" class="systemAction.GetScheduleAction" method="execute">
-            <result type="json" >
-                <param name="root">json</param>
-            </result>
-        </action>
-        <action name="getTeams" class="systemAction.GetTeamsAction" method="execute">
             <result type="json" >
                 <param name="root">json</param>
             </result>
@@ -302,6 +293,12 @@
         </action>
 		
 		<action name="generateWikiReport" class="userAction.GenerateWikiReportAction" method="execute">
+			<result type="json">
+                <param name="root">json</param>
+            </result>
+        </action>
+		
+		<action name="recordHumanInteraction" class="systemAction.RecordHumanInteractionAction" method="execute">
 			<result type="json">
                 <param name="root">json</param>
             </result>

@@ -240,7 +240,8 @@
 
                 //Function to change schedule based on selected milestone tab
                 $('#milestoneTab a').on('click', function(e) {
-                    $("#milestoneTab").removeClass('active in');
+                    if (uatMode) recordHumanInteraction(e);
+					$("#milestoneTab").removeClass('active in');
                     $(this).tab('show');
                     milestone = $(this).attr('id').toUpperCase();
                     year = "<%= activeTerm.getAcademicYear()%>";
@@ -750,6 +751,7 @@
                     //Hide other popovers when others clicked
                     $('body').off('click', '.timeslotCell, .booking');
                     $('body').on('click', '.timeslotCell, .booking', function(e) {
+						if (uatMode) recordHumanInteraction(e);
 						self = <%= activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) %>?$(this):$(this).children('.booking').length?$(this).children('.booking'):$(this);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateBookingBtn').attr('disabled', true);
 						$('.timeslotCell, .booking').not(self).not(self.parents()).find('#updateTimeslotBtn').attr('disabled', true);
@@ -763,6 +765,7 @@
                     $('body').off('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking');
                     $('body').on('click', '.bookedTimeslot:not(.unavailableTimeslot), .bookedTimeslot > .booking', function(e) {
 						if (e.target === this) {
+							if (uatMode) recordHumanInteraction(e);
 							if ($(this).hasClass('timeslotCell') && <%= activeRole.equals(Role.FACULTY) || activeRole.equals(Role.TA) %>) {
 								$(this).popover('show');
 								if ($(this).find('tr:last').length && $(this).find('tr:last').offset().top - $(window).scrollTop() > window.innerHeight){
@@ -781,6 +784,7 @@
 							self.find('ul').remove();
 							appendTokenInput(self); //Optional attendees
 						} else if ($(e.target).attr('id') === 'wikiLink') {
+							if (uatMode) recordHumanInteraction(e);
 							window.open($(e.target).attr('href'), '_blank');
 						}
                         return false;
@@ -790,7 +794,8 @@
                     $('body').off('click', '.unbookedTimeslot:not(.unavailableTimeslot)');
                     $('body').on('click', '.unbookedTimeslot:not(.unavailableTimeslot)', function(e) {
 						if (e.target === this) {
-							self = $(this).is('div') ? $(this).parent('.timeslotCell') : $(this);
+							if (uatMode) recordHumanInteraction(e);
+							self = $(this).is('.booking') ? $(this).parent('.timeslotCell') : $(this);
                             var timeslot = scheduleData.timeslots[self.attr('value')];
                             var refreshData = refreshScheduleData();
                             if (<%= activeRole.equals(Role.STUDENT) %>) {
@@ -837,6 +842,7 @@
                     $('body').off('click', '.unavailableTimeslot');
                     $('body').on('click', '.unavailableTimeslot', function(e) {
 						if (e.target === this) {
+							if (uatMode) recordHumanInteraction(e);
 							var timeslot = scheduleData.timeslots[self.attr('value')];
 							self = $(this);
 							var refreshData = refreshScheduleData();
@@ -884,7 +890,7 @@
                     //Close Booking Button
                     $('.timeslotCell').off('click', '.close');
                     $('.timeslotCell').on('click', '.close', function(e) {
-                        e.stopPropagation();
+                        if (uatMode) recordHumanInteraction(e);
                         self.popover('hide');
                         self.trigger('mouseleave');
                         return false;
@@ -893,6 +899,7 @@
                     //Create Booking Button
                     $('.timeslotCell').off('click', '#createBookingBtn');
                     $('.timeslotCell').on('click', '#createBookingBtn', function(e) {
+						if (uatMode) recordHumanInteraction(e);
                         var returnData = createBooking(self);
 						if (returnData && returnData.success) {
 							var booking = returnData.booking;
@@ -941,6 +948,7 @@
                     //Create Anyway Booking Button
                     $('.timeslotCell').off('click', '#createAnywayBookingBtn');
                     $('.timeslotCell').on('click', '#createAnywayBookingBtn', function(e) {
+						if (uatMode) recordHumanInteraction(e);
 						var timeslot = scheduleData.timeslots[self.attr('value')];
 						bootbox.confirm({
 							title: "Faculty Unavailable",
@@ -992,7 +1000,7 @@
                     //Delete Booking Button
                     $('.timeslotCell').off('click', '#deleteBookingBtn');
                     $('.timeslotCell').on('click', '#deleteBookingBtn', function(e) {
-						e.stopPropagation();
+						if (uatMode) recordHumanInteraction(e);
 						var $timeslot = self.parents('.timeslotCell');
 						var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
 						bootbox.prompt({
@@ -1074,7 +1082,7 @@
                     //Update Booking Button
                     $('.timeslotCell').off('click', '#updateBookingBtn');
                     $('.timeslotCell').on('click', '#updateBookingBtn', function(e) {
-                        e.stopPropagation();
+                        if (uatMode) recordHumanInteraction(e);
                         var startDateVal = $('#updateFormDate').val();
                         var startTimeVal = $('#updateFormStartTime').val();
                         var newDateTime = "";
@@ -1144,7 +1152,7 @@
                     //Update Timeslot Button
                     $('.timeslotCell').off('click', '#updateTimeslotBtn');
                     $('.timeslotCell').on('click', '#updateTimeslotBtn', function(e) {
-                        e.stopPropagation();
+                        if (uatMode) recordHumanInteraction(e);
                         var newVenue = $('#updateFormVenue').val();
                         var $timeslot = self.closest('.timeslotCell');
                         var returnData = updateTimeslot($timeslot, newVenue);
@@ -1161,7 +1169,7 @@
                     //Faculty Set Available Button
                     $('.timeslotCell').off('click', '#availableTimeslotBtn');
                     $('.timeslotCell').on('click', '#availableTimeslotBtn', function(e) {
-                        e.stopPropagation();
+                        if (uatMode) recordHumanInteraction(e);
                         changeAvailability(self, true);
                         showNotification("WARNING", self, "Set as available");
                         self.popover('destroy');
@@ -1172,7 +1180,7 @@
                     //Faculty Set Unavailable Button
                     $('.timeslotCell').off('click', '#unavailableTimeslotBtn');
                     $('.timeslotCell').on('click', '#unavailableTimeslotBtn', function(e) {
-                        e.stopPropagation();
+                        if (uatMode) recordHumanInteraction(e);
                         changeAvailability(self, false);
                         showNotification("WARNING", self, "Set as unavailable");
                         self.popover('destroy');
@@ -1183,13 +1191,14 @@
                     //TA Sign Up Button
                     $('.timeslotCell').off('click', '#signupTimeslotBtn');
                     $('.timeslotCell').on('click', '#signupTimeslotBtn', function(e) {
-                        e.stopPropagation();
+                        if (uatMode) recordHumanInteraction(e);
                         changeSignup(self, true);
                         showNotification("WARNING", self, "Signed up for filming");
                         self.popover('destroy');
                         appendChangeSignupPopover(self);
 						var timeslot = scheduleData.timeslots[self.attr('value')];
 						timeslot.taId = loggedInTa;
+						timeslot.TA = "<%= user.getFullName() %>";
 						if (timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1) {
 							subscribeBooking(self, false);
 							timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
@@ -1202,7 +1211,7 @@
                     //TA Cancel Sign Up Button
                     $('.timeslotCell').off('click', '#unsignupTimeslotBtn');
                     $('.timeslotCell').on('click', '#unsignupTimeslotBtn', function(e) {
-                        e.stopPropagation();
+                        if (uatMode) recordHumanInteraction(e);
 						var timeslot = scheduleData.timeslots[self.attr('value')];
                         changeSignup(self, false);
                         showNotification("WARNING", self, "Cancelled for filming");
@@ -1210,16 +1219,17 @@
                         appendChangeSignupPopover(self);
 						var timeslot = scheduleData.timeslots[self.attr('value')];
 						delete timeslot.taId;
-						self.children('.booking').popover('destroy');
-						if (self.children('.booking').length) appendViewBookingPopover(self);
+						timeslot.TA = ' - ';
+						self.closest('.timeslotCell').children('.booking').popover('destroy');
+						if (self.closest('.timeslotCell').children('.booking').length) appendViewBookingPopover(self.closest('.timeslotCell'));
                         return false;
                     });
                     
                     //Subscribe Button
                     $('.timeslotCell').off('click', '#subscribeBtn');
                     $('.timeslotCell').on('click', '#subscribeBtn', function(e) {
-                        e.stopPropagation();
-						self = self.is('div') ? self.parent('.timeslotCell') : self;
+                        if (uatMode) recordHumanInteraction(e);
+						self = self.is('.booking') ? self.parent('.timeslotCell') : self;
 						var timeslot = scheduleData.timeslots[self.attr('value')];
                         var returnData = subscribeBooking(self, true);
 						if (returnData && returnData.success) {
@@ -1243,8 +1253,8 @@
                     //Unsubscribe Button
                     $('.timeslotCell').off('click', '#unsubscribeBtn');
                     $('.timeslotCell').on('click', '#unsubscribeBtn', function(e) {
-                        e.stopPropagation();
-						self = self.is('div') ? self.parent('.timeslotCell') : self;
+                        if (uatMode) recordHumanInteraction(e);
+						self = self.is('.booking') ? self.parent('.timeslotCell') : self;
 						var timeslot = scheduleData.timeslots[self.attr('value')];
                         var returnData = subscribeBooking(self, false);
 						if (returnData && returnData.success) {
@@ -1272,6 +1282,7 @@
                     $('body').on('click', '#updateFormDate', function(e){
                         //Add date and timepickers
                         if (e.target === this) {
+							if (uatMode) recordHumanInteraction(e);
                             $(this)
 								.datepicker({
 									dateFormat: "yy-mm-dd"
@@ -1287,6 +1298,7 @@
                     $('body').on('click', '#updateFormStartTime', function(e){
                         //Add timepicker
                         if (e.target === this) {
+							if (uatMode) recordHumanInteraction(e);
                             $(this)
 								.timepicker({
 									minTime: Date.parse(scheduleData.dayStartTime + ":00").toString("HH:mm"),
@@ -1361,6 +1373,7 @@
 					$("#weekView").off('switch-change');
                     $("#weekView").on('switch-change', function(e, data){
 						setTimeout(function(){
+							if (uatMode) recordHumanInteraction(e);
 							if (data.value) {
 								//Full View
 								weekView = null;
@@ -1383,6 +1396,7 @@
 					$("#nextWeek").off('click');
                     $("#nextWeek").on('click', function(){
 						$(".traverseWeek").css('opacity', '100');
+						if (uatMode) recordHumanInteraction(e);
                         if (weekView + 1 < maxWeekView) {
                             ++weekView;
                             $(".weekNum").remove();
@@ -1395,6 +1409,7 @@
 					$("#previousWeek").off('click');
                     $("#previousWeek").on('click', function(){
 						$(".traverseWeek").css('opacity', '100');
+						if (uatMode) recordHumanInteraction(e);
                         if (weekView <= 0) {
                             return false;
                         } else {
@@ -1790,6 +1805,72 @@
 							return $trCollection;
 						});
                 }
+				
+				function renderTimeslots() {
+					var timeslots = scheduleData.timeslots;
+					var datesArray = weekView !== null?getDateArrayBetween(scheduleData.startDate, scheduleData.endDate, weekView):null;
+					for (var key in timeslots) {
+						if (timeslots.hasOwnProperty(key)) {
+							var timeslot = timeslots[key];
+							if (datesArray && (Date.parse(timeslot.datetime) < Date.parse(datesArray[0]) || Date.parse(timeslot.datetime) > Date.parse(datesArray[datesArray.length - 1]))) continue;
+							var $tdCell = $('body').find('td.tdCell[value="' + timeslot.datetime + '"]');
+							var $timeslot = $(document.createElement('div'))
+								.addClass('timeslotCell')
+								.attr('id', 'timeslot_' + timeslot.id)
+								.attr('align', 'center')
+								.attr('value', timeslot.datetime)
+								.css ({
+									height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
+									width: $tdCell.outerWidth() / 1.1,
+									position: 'absolute'
+								})
+								.offset({
+									top: $tdCell.offset().top,
+									left: $tdCell.offset().left
+								})
+								.addClass(timeslot.team?'bookedTimeslot':'unbookedTimeslot')
+								.addClass(<%= activeRole.equals(Role.STUDENT) || activeRole.equals(Role.FACULTY)%> && !timeslot.available?'unavailableTimeslot':false)
+								.addClass(<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined?loggedInTa === timeslot.taId?'taChosenTimeslot':'otherTATimeslot':false)
+								.append(timeslot.team?
+									$(document.createElement('div'))
+										.addClass('booking pendingBooking')
+										.addClass(timeslot.status.toLowerCase() + 'Booking')
+										.addClass(
+											(<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam)
+											|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)
+											|| (<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined && loggedInTa === timeslot.taId)
+											|| (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>)
+											|| timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1
+											?'myTeamBooking':false)
+										.css ({
+											height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
+											width: $tdCell.outerWidth() / 1.1
+										})
+										.html(timeslot.team)
+								:false)
+								.append(!timeslot.team && timeslot.lastBookingWasRemoved?
+									function(){
+										var $removedDiv = $(document.createElement('div'));
+										if (timeslot.lastBookingWasRemoved && timeslot.lastBookingStatus === 'rejected') {
+											$removedDiv
+													.addClass('rejectedBooking')
+													.css ({
+														height: ($tdCell.innerHeight() / 1.1 * (scheduleData.duration / 30)),
+														width: $tdCell.outerWidth() / 1.1
+													});
+											makeTooltip($tdCell, 'Removed by ' + timeslot.lastBookingEditedBy);
+										} else if (timeslot.lastBookingWasRemoved) {
+											$removedDiv.addClass('deletedBookingOnTimeslot').addClass('fa fa-info-circle');
+											makeTooltip($removedDiv, 'Removed by ' + timeslot.lastBookingEditedBy);
+										}
+										return $removedDiv;
+									}
+									:false
+								);
+							$('body').append($timeslot);
+						}
+					}
+				}
                 
                 //Get dates between startDate and stopDate
                 function getDateArrayBetween(startDate, stopDate, weekNum) {
@@ -1811,7 +1892,6 @@
                 }
 				
 				function initDragNDrop() {
-					var originalTimeslots = {};
 					$(".unbookedTimeslot").each(function(){
 						if ($(this).data('droppable')) $(this).droppable('destroy');
 					});
@@ -1876,18 +1956,6 @@
 								}
 							});
 						},
-						out: function(event, ui) {
-							ui.draggable.draggable('option', 'revert', function(){
-								//Return to original position
-								var datetime = $(this).closest('.timeslotCell').attr('value');
-								if (!originalTimeslots[datetime]) return true;
-								$(this).animate({
-									top: '+=' + (originalTimeslots[datetime].start.top - $(this).offset().top),
-									left: '+=' + (originalTimeslots[datetime].start.left - $(this).offset().left)
-								});
-								return false;
-							});
-						},
 						accept: '.booking',
 						hoverClass: 'bookingTimeslotHover'
 					});
@@ -1898,30 +1966,14 @@
 						$(this).append($(document.createElement('i')).addClass('moveIcon fa fa-move fa-black'));
 					});
 					$(".booking").draggable({
+						scroll: true,
 						start: function(event, ui) {
 							if ($(this).children('.popover').length) $(this).popover('hide');
-							//Register original position
-							var datetime = $(this).closest('.timeslotCell').attr('value');
-							if (originalTimeslots[datetime] && originalTimeslots[datetime].start) return true;
-							originalTimeslots[datetime] = {
-								start: {
-									top: $(this).offset().top,
-									left: $(this).offset().left
-								}
-							};
 						},
-						stop: function(event, ui) {
-							//Register stop position
-							var datetime = $(this).closest('.timeslotCell').attr('value');
-							originalTimeslots[datetime] = {
-								stop: {
-									top: $(this).offset().top,
-									left: $(this).offset().left
-								}
-							};
-							initDragNDrop();
+						drag: function(event, ui){
+							var st = parseInt($(this).data("startingScrollTop"));
+							if (!(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase()))) ui.position.top -= $(window).scrollTop();
 						},
-						revert: true,
 						helper: function() {
 							return $(this).clone().empty()
 									.append(
@@ -1932,7 +1984,7 @@
 									);
 						},
 						appendTo: 'body',
-						scroll: false
+						containment: 'window'
 					});
 				}
 				

@@ -16,7 +16,7 @@ import model.Timeslot;
 import model.User;
 import model.role.Faculty;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import static systemAction.ManageActiveTermsAction.logger;
+import static systemAction.PrepareActiveTermsAction.logger;
 import util.MiscUtil;
 
 /**

@@ -236,6 +236,7 @@
                 }
                 
                 $("#milestoneTimeslotsSelect").on('change', function(e){
+					if (uatMode) recordHumanInteraction(e);
                     $(".timeslotsTable").empty();
                     selectedMilestone = $(this).val();
                     scheduleData = getScheduleData(selectedMilestone, activeAcademicYearStr, activeSemesterStr);
@@ -502,6 +503,7 @@
                 }
 
                 $('body').on('click', 'td.chosen , td.unavailable', function(e){
+					if (uatMode) recordHumanInteraction(e);
                     triggerTimeslot($(this));
                 });
 				
@@ -605,6 +607,7 @@
 
                 //Update Timeslots AJAX Call            
                 $("#editTimeslotsSubmitBtn").on('click', function() {
+					if (uatMode) recordHumanInteraction(e);
                     $("#editTimeslotsSubmitBtn").button('loading');
                     //SerializeArray not functional for timeslots
                     var timeslotsData = {};

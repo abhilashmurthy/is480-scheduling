@@ -48,6 +48,8 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 		Calendar nowCal = Calendar.getInstance();
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 		
+		Term currentTerm = (Term) session.getAttribute("currentActiveTerm");
+		
 		SystemActivityLog logItem = new SystemActivityLog();
 		logItem.setActivity("Administrator: Update Active Term Settings");
 		logItem.setRunTime(now);
@@ -63,7 +65,6 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 
 			if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) {
 				Settings activeTerms = SettingsManager.getByName(em, "activeTerms");
-				Settings defaultTerm = SettingsManager.getByName(em, "defaultTerm");
 				
 				//Getting input data from url
 				JSONObject activeTermsObject = (JSONObject) new JSONObject (request.getParameter("jsonData"));
@@ -88,38 +89,23 @@ public class UpdateActiveTermsAction extends ActionSupport implements ServletReq
 					activeTermIds.add(activeTermsArray.getLong(i));
 				}
 				
-				//Now setting the default active term
-				long defaultActiveTermId = Long.valueOf(activeTermsObject.getString("defaultTerm"));
-				
-				if (activeTermIds.size() > 0) {
-					if (!activeTermIds.contains(defaultActiveTermId)) {
-						json.put("message", "Error! Incorrect semesters selected!");
-						json.put("success", false);
-						return SUCCESS;
-					}
+				if (activeTermIds.indexOf(currentTerm.getId()) == -1) {
+					json.put("message", "Error! Cannot set current active term as inactive!");
+					json.put("success", false);
+					return SUCCESS;
 				}
 				
 				//Storing the active terms list in settings table in db
 				em.getTransaction().begin();
 				activeTerms.setValue(new Gson().toJson(activeTermIds));
-				defaultTerm.setValue(String.valueOf(defaultActiveTermId));
 				em.persist(activeTerms);
-				em.persist(defaultTerm);
-				em.getTransaction().commit();
-				
-				//Getting the term object and updating the active term object in the session
-				Term defaultActiveTerm = em.find(Term.class, defaultActiveTermId);
-				session.setAttribute("currentActiveTerm", defaultActiveTerm);
-				//Refreshing the user object in the session based on the new term selected
-				new UserManager().initializeUser(em, request.getSession(), user.getUsername(), user.getFullName(), defaultActiveTerm);
-				
+				em.getTransaction().commit();				
 				json.put("success", true);
 				json.put("message", "Your settings have been updated!");
-				MiscUtil.logActivity(logger, user, "Active and default terms updated");
+				MiscUtil.logActivity(logger, user, "Active terms updated");
 				
 				StringBuilder logMessage = new StringBuilder();
 				logMessage.append("Active Term settings were updated successfully. ");
-				logMessage.append("Default Active Term: " + defaultActiveTerm.toString());
 				logItem.setMessage(logMessage.toString());
 			} else {
 				request.setAttribute("error", "Oops. You're not authorized to access this page!");

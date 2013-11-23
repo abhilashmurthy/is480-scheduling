@@ -494,4 +494,15 @@ public class UserManager {
 		
 		return rsvps;
 	}
+	
+	public static List<User> getUserObjectsForAllTerms(EntityManager em, String smu_username) throws Exception {
+		logger.trace("Getting User Objects: " + smu_username);
+		List<User> userList = null;
+		Query q = em.createQuery("SELECT u FROM User u WHERE u.username = :username")
+				.setParameter("username", smu_username);
+		userList = q.getResultList();
+		if (userList.isEmpty()) throw new Exception();
+		return userList;
+	}
+	
 }
