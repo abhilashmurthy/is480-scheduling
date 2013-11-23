@@ -1308,6 +1308,7 @@
                         else appendChangeSignupPopover(self);
 						var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 						timeslot.taId = loggedInTa;
+						timeslot.TA = "<%= user.getFullName() %>";
 						if (timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1) {
 							subscribeBooking(self.closest('.timeslotCell'), false);
 							timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
@@ -1329,6 +1330,7 @@
                         else appendChangeSignupPopover(self);
 						var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
 						delete timeslot.taId;
+						timeslot.TA = ' - ';
 						self.closest('.timeslotCell').children('.booking').popover('destroy');
 						if (self.closest('.timeslotCell').children('.booking').length) appendViewBookingPopover(self.closest('.timeslotCell'));
                         return false;
