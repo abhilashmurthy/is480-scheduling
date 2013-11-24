@@ -468,34 +468,32 @@
 						);
                     } else if (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team !== teamName || <%= activeRole.equals(Role.FACULTY) %> && !timeslot.isMyTeam || <%= activeRole.equals(Role.TA) %> && loggedInTa !== timeslot.taId || <%= activeRole.equals(Role.GUEST) %>) {
 						//Subscribe and Unscribe buttons
-						if (timeslot.status === 'APPROVED') {
-							var subscribe = true;
-							if (timeslot.subscribedUsers) {
-								for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
-									if (myEmail === timeslot.subscribedUsers[i]) {
-										subscribe = false;
-											outputData[""] += (
-												$(document.createElement('button'))
-													.attr('id', 'unsubscribeBtn')
-													.addClass('popoverBtn btn btn-small')
-													.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
-													.append("Cancel RSVP")
-													.outerHTML()
-											);
-										break;
-									}
+						var subscribe = true;
+						if (timeslot.subscribedUsers) {
+							for (var i = 0; i < timeslot.subscribedUsers.length; i++) {
+								if (myEmail === timeslot.subscribedUsers[i]) {
+									subscribe = false;
+										outputData[""] = (
+											$(document.createElement('button'))
+												.attr('id', 'unsubscribeBtn')
+												.addClass('popoverBtn btn')
+												.append($(document.createElement('i')).addClass('fa fa-calendar-o fa-black'))
+												.append("Cancel RSVP")
+												.outerHTML()
+										);
+									break;
 								}
 							}
-							if (subscribe) {
-								outputData[""] += (
-									$(document.createElement('button'))
-										.attr('id', 'subscribeBtn')
-										.addClass('popoverBtn btn btn-small')
-										.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
-										.append("RSVP")
-										.outerHTML()
-								);
-							}
+						}
+						if (subscribe) {
+							outputData[""] = (
+								$(document.createElement('button'))
+									.attr('id', 'subscribeBtn')
+									.addClass('popoverBtn btn')
+									.append($(document.createElement('i')).addClass('fa fa-calendar fa-black'))
+									.append("RSVP")
+									.outerHTML()
+							);
 						}
 					}
 
@@ -1055,20 +1053,20 @@
 								}
 							}
 						});
-						$('.modal-footer button:not(:first)').attr('disabled', true);
+						$('button[data-bb-handler="confirm"').attr('disabled', true);
 						$('.modal-body').prepend(
 							$(document.createElement('div'))
 								.addClass('customPrompt')
-								.append('Reason to delete booking (max 55 chars)')
+								.append('Reason to delete booking')
 						);
 						$('input.bootbox-input').on('keyup', function(){
 							if ($(this).val() && $(this).val().length > 55) {
-								$('.modal-footer button:not(:first)').attr('disabled', true);
+								$('button[data-bb-handler="confirm"').attr('disabled', true);
 								showNotification("WARNING", $timeslot, "Please enter max 55 chars");
 							} else if ($(this).val()) {
-								$('.modal-footer button:not(:first)').attr('disabled', false);
+								$('button[data-bb-handler="confirm"').attr('disabled', false);
 							} else {
-								$('.modal-footer button:not(:first)').attr('disabled', true);
+								$('button[data-bb-handler="confirm"').attr('disabled', true);
 							}
 							return false;
 						});
@@ -1270,7 +1268,7 @@
 									.append("RSVP")
 							);
 							self.find('#unsubscribeBtn').remove();
-							if (timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1) timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
+							if (timeslot.subscribedUsers.indexOf(myEmail) !== -1) timeslot.subscribedUsers.splice(timeslot.subscribedUsers.indexOf(myEmail), 1);
 						} else {
 							showNotification("ERROR", self, returnData.message);
 						}
@@ -1776,7 +1774,7 @@
 																	|| (<%= activeRole.equals(Role.STUDENT) %> && timeslot.team === teamName)
 																	|| (<%= activeRole.equals(Role.TA) %> && timeslot.taId !== undefined && loggedInTa === timeslot.taId)
 																	|| (<%= activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR) %>)
-																	|| timeslot.subscribedUsers && timeslot.subscribedUsers.indexOf(myEmail) !== -1
+																	|| timeslot.subscribedUsers.indexOf(myEmail) !== -1
 																	?'myTeamBooking':false)
 																.html(timeslot.team)
 														:false)
