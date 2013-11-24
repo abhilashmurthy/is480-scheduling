@@ -35,6 +35,16 @@
 				margin-left: 90px !important;
 			}
 			
+			#otherFacultySelect {
+				margin-top: 10px;
+				margin-bottom: 10px;
+				clear: both;
+			}
+			
+			#otherFacultySelect button {
+				margin-left: 10px;
+			}
+			
 			.timeslotsTable td, .timeslotsTable th {
 				text-align: center;
 			}
@@ -107,16 +117,21 @@
             
             .availabilityLegend {
 				float: right;
-/*                position: absolute;
-                left: 70%;
-                top: 12%;*/
-/*                left: 7%;
-                top: 35%;*/
+				margin-top: 10px;
+				clear: both;
             }
 			
-			.availabilityLegend td {
-				height: 10px;
+			.availabilityLegend td.legendBox {
+				max-height: 10px;
+				max-width: 10px;
 				line-height: 10px;
+			}
+			
+			.availabilityLegend td {
+				font-size: 12px;
+				max-height: 10px;
+				line-height: 10px;
+				margin-top: 10px;
 			}
 			
 			.border-top {
@@ -170,15 +185,18 @@
         <div id="availabilityPanel" class="container">
             <div id="editTimeslotsPanel">
                 <h3>My Availability</h3>
-					<table class='availabilityLegend'>
-						<tr>
-							<td style="background-color:#B8F79E;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available</td><td style="background-color:#00C918;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm available & there's a team</td> 
-						</tr>
-						<tr><td style='height: 2px'></td></tr>
-						<tr>
-							<td style="background-color:#F7A8A8;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;I'm unavailable</td><td style="background-color:#F56753;border:1px solid #1E647C;width:17px;"></td><td>&nbsp;Oh dear, I'm unavailable & there's a team!</td> 
-						</tr>
-					</table>
+				<div id="otherFacultySelect" class="pull-right">
+					View Other Faculty's Availability
+					<select name="otherFaculty" class="otherFacultyMultiselect multiselect" multiple="multiple">
+						<option value="benjamingan">Benjamin Gan</option>
+						<option value="Youngsoo Kim">Youngsoo Kim</option>
+					</select>
+				</div>
+				<table class='availabilityLegend'>
+					<tr>
+						<td class="legendBox" style="background-color:#B8F79E;border:1px solid #1E647C;"></td><td>I'm available</td><td class="legendBox" style="background-color:#F7A8A8;border:1px solid #1E647C;"></td><td>I'm unavailable</td>
+					</tr>
+				</table>
                 <div id="timeslotsTableSection">
                     <table>
                         <tr>
@@ -206,25 +224,21 @@
                 //Default milestoneStr is ACCEPTANCE
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
-                var unavailableTimeslots = new Array();
+                var unavailableTimeslots = JSON.parse('<s:property escape= "false" value= "myUnavailableJson"/>');
+				var othersUnavailableData = JSON.parse('<s:property escape= "false" value= "othersUnavailableJson"/>');
+				console.log('Others: ' + JSON.stringify(othersUnavailableData));
                 var scheduleData = null;
                 var selectedMilestone = null;
                 var milestones = new Array();
 				var defaultLoadMilestone = null;
                 
                 loadMilestones();
-                loadUnavailableTimeslots();
                 loadSelectDropdown();
+				initOtherFaculty();
   
                 function loadMilestones() {
                     milestones = getScheduleData(null, activeAcademicYearStr, activeSemesterStr).milestones;
                 };
-
-                function loadUnavailableTimeslots() {
-                    <s:iterator value="unavailableTimeslotIds">
-                    unavailableTimeslots.push("timeslot_<s:property/>");
-                    </s:iterator>
-                }
                 
                 function loadSelectDropdown() {
 					var now = new Date();
@@ -279,7 +293,6 @@
                     if (milestone) {
                         data["milestone"] = milestone;
                     }
-                    console.log("Submitting data: " + JSON.stringify(data));
                     //Get schedule action
                     $.ajax({
                         type: 'GET',
@@ -646,15 +659,9 @@
                     return false;
                 });
 
-                //Display termMessage
-                function displayMessage(id, msg, fade) {
-                    //Dislay result
-                    $("#" + id).fadeTo('slow', 100);
-                    $("#" + id).css('color', 'darkgreen').html(msg);
-                    if (fade) {
-                        $("#" + id).css('color', 'darkred').html(msg).fadeTo('slow', 0);
-                    }
-                }
+                function initOtherFaculty(){
+					$('.otherFacultyMultiselect').multiselect();
+				}
                 
                  function showNotification(action, message) {
                      var opts = {

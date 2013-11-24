@@ -505,4 +505,15 @@ public class UserManager {
 		return userList;
 	}
 	
+	
+	public static List<User> getUsersByRoleAndTerm(EntityManager em, Role role, Term term) throws Exception {
+		logger.trace("Getting User Objects: " + role + ", term: " + term);
+		List<User> userList = null;
+		Query q = em.createQuery("SELECT u FROM User u WHERE u.role = :role AND u.term = :term")
+				.setParameter("role", role)
+				.setParameter("term", term);
+		userList = q.getResultList();
+		if (userList.isEmpty()) throw new Exception("No users found!");
+		return userList;
+	}
 }
