@@ -166,7 +166,7 @@
         });
         
         //Hide all popovers on page click
-        $('body').on('click', function(e) {
+        $('html').on('click', function(e) {
             //Hide all popovers
 			if ($(e.target).closest('.ui-datepicker').length || $(e.target).closest('.ui-timepicker-wrapper').length) return false;
             $('.popover.in').each(function(e){
@@ -176,6 +176,7 @@
 				self.parent().find('#updateTimeslotBtn').attr('disabled', true);
 				self.parent().popover('hide');
 				$(".hasDatepicker").datepicker('destroy');
+				$(".token-input-dropdown-facebook").remove();
             });
             //Hide all notifications
             $.pnotify_remove_all();

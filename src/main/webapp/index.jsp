@@ -2576,7 +2576,7 @@
                         allowTabOut: true,
                         propertyToSearch: "name",
                         resultsLimit: 4,
-                        hintText: "Enter email address...",
+                        hintText: "Enter name or email",
                         noResultsText: "Press [TAB] to add as email",
                         tokenFormatter: function(item) {
                             if (item && item.id) {
