@@ -706,6 +706,7 @@
 							return false;
 						}
 					});
+					if (otherFacultyData.length === 0) $('#otherFacultySelect').css('opacity', '0');
 				}
 				
 				function showOtherFacultyUnavailable(username) {
