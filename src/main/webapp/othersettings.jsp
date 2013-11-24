@@ -114,6 +114,11 @@
 				<button id="passwordChangeSubmitButton" class="btn btn-primary" data-loading-text="Saving...">Save</button>
 			</div>
 			<!-- END OF ADMINISTRATOR PASSWORD SECTION -->
+			<div class='passwordSettings'>
+				<h4 class='pull-left' style="margin-bottom: 10px">Database Restore</h4><a style='margin-left: 30px;' href='restoreDB'><button class="btn btn-danger">Restore Database to Earlier Time</button></a>
+			</div>
+			
+			
 		</div>
 			<%@include file="footer.jsp" %>
 			<script type="text/javascript">

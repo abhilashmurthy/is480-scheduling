@@ -23,7 +23,7 @@
             }
          %>
         <div class="container">
-			<h3>Active Terms</h3>
+			<h3>Terms</h3>
 			<s:if test="%{allTerms != null && allTerms.size() > 0}">
 			<div style="float: left; margin-right: 50px;">
 			<table id="termTable" class="table table-hover">
