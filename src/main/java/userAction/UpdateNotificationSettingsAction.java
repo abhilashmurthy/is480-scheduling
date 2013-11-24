@@ -66,6 +66,7 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 
 				//convert settingsDetails into an array
 				String[] setArr = settingDetails.split(",");
+				logger.info("GOT " + settingDetails);
 
 				JSONArray notificationArray = new JSONArray(currentSettings.getValue());
 
@@ -91,7 +92,6 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 					em.getTransaction().commit();
 
 					//if the settings have been saved
-
 					json.put("success",true);
 					json.put("message", "Settings saved successfully!");
 					MiscUtil.logActivity(logger, user, "Notification settings updated");
@@ -122,9 +122,9 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
 			User userForLog = (User) session.getAttribute("user");
 			logItem.setUser(userForLog);
 			logItem.setMessage("Error: " + e.getMessage());
-			
             if (MiscUtil.DEV_MODE) {
                 for (StackTraceElement s : e.getStackTrace()) {
+					logger.debug(s.toString());
                 }
             }
             json.put("success", false);

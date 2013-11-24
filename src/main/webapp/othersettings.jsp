@@ -15,12 +15,6 @@
 		<meta charset=”utf-8”> 
         <%@include file="header.jsp" %>
         <title>IS480 Scheduling System | Other Settings </title>
-
-        <%@include file="footer.jsp"%>
-		<link type="text/css" rel="stylsheet" hred="css/bootstrap.css">
-
-
-
     </head>
     <body>
 		<%@include file="navbar.jsp" %>
@@ -33,331 +27,151 @@
 				%>
         
         <div class="container">
-			
 			<!-- REMINDER SETTINGS SECTION -->
-			
-			<div>
-				<h3>Manage Reminder Settings</h3>
-
-				<s:iterator value="data"> 
-
-					<div style="float: left; margin-right: 50px;">
-					<table class="table ">
-
-						<% String eStatus = (String) request.getAttribute("emailStatus");%> 
-						<% String eStatusClear = (String) request.getAttribute("emailClearStatus");%>
-						<thead>
-						<tr style="color:blue">
-							<th style="float:left;border:none"><i class="fa fa-white fa-envelope"></i>Email Reminders:</td></th>
-						</thead>
-						<tr><td style="float:left;">
-
-								<div id="emailStatusBlock">
-									Remind pending bookings (days):&nbsp&nbsp;
-
-									<form>
-
-										<% if (eStatus.equalsIgnoreCase("On")) {%>
-										<input type="radio" id="onPrefa" class="pref" name="pref" value="On" onchange="onOption(onPrefa)" checked>&nbsp; On 
-										<input type="radio" id="offPrefb" class="pref" name="pref" value="Off" onchange="onOption(offPrefb)">&nbsp; Off
-										<% } else {%>
-										<input type="radio" id="onPref1" class="pref" name="pref" value="On" onchange="onOption(onPref1)">&nbsp; On 
-										<input type="radio" id="offPref2" class="pref" name="pref" value="Off" onchange="onOption(offPref2)" checked>&nbsp; Off
-										<% }%>
-									</form></div></td>
-
-							<td id="emailFrequencyRow" style="float:left;border:none">
-
-								<div id="emailFrequencyBlock">
-
-									<div class="input-append">
-
-										<input id="emailFrequency" style="width: 18px;height: 20px" type="text" value="<s:property value="emailFrequency"/>" disabled />
-										<div class="btn-group">
-											<button class="btn" type="button" onclick="upOne(emailFrequency);" >&#9650;</button>
-											<button class="btn" type="button" onclick="downOne(emailFrequency);" >&#9660;</button>
-										</div>
-									</div>
+			<div class='reminderSettings fuelux'>
+				<h3>Settings</h3>
+				<table class='otherSettingsTable'>
+					<tr><td colspan="4"><h4>Schedule</h4></td></tr>
+					<tr class='reminderItem'>
+						<td>Delete <b>booking</b> if pending for</td>
+						<td class='spinnerTd'>
+							<div id='clear_reminder' class="clearPendingSpinner reminderSpinner spinner">
+								<input class="durationInput spinner-input" type="text" style='width: 50px !important'/>
+								<div class="spinner-buttons btn-group btn-group-vertical">
+									<button class="btn spinner-up" type="button">
+										<i class="fa fa-chevron-up"></i>
+									</button>
+									<button class="btn spinner-down" type="button">
+										<i class="fa fa-chevron-down"></i>
+									</button>
 								</div>
-						</td></tr>
-
-
-
-						<!-- to do for clear pending bookings --> <tr><td style="float:left;border:none">
-								<form>
-									Remove pending bookings (days):
-									<br/>
-									<% if (eStatusClear.equalsIgnoreCase("On")) {%>
-									<input type="radio" id="onPrefe" class="pref" name="pref" value="On" onchange="onOption3(onPrefe)" checked>&nbsp; On 
-									<input type="radio" id="offPreff" class="pref" name="pref" value="Off" onchange="onOption3(offPreff)">&nbsp; Off
-									<% } else {%>
-									<input type="radio" id="onPref5" class="pref" name="pref" value="On" onchange="onOption3(onPref5)">&nbsp; On 
-									<input type="radio" id="offPref6" class="pref" name="pref" value="Off" onchange="onOption3(offPref6)" checked>&nbsp; Off
-									<% }%>
-								</form>
-
-								</div></td>
-
-						<td id="emailClearPendingRow" style="float:left;border:none">
-								<div id="emailClearPending">
-
-									<div class="input-append">
-
-										<input id="emailClear" style="width: 18px;height: 20px" type="text" value="<s:property value="emailClearFrequency"/>" disabled />
-										<div class="btn-group">
-											<button class="btn" type="button" onclick="upOne(emailClear);" >&#9650;</button>
-											<button class="btn" type="button" onclick="downOne(emailClear);" >&#9660;</button>
-										</div>
-									</div>
-								</div>
-							</td>
-						</tr>
-					</table>
-			</div>
-	<!--					<tr>
-							<td style="border:none"></td>
-						</tr>-->
-				<div style="float: right;margin-right:200px">
-					<table class="table">
-						<thead>
-						<tr>
-							<th style="color:blue;">
-								<i class="fa fa-white fa-comment"></i>SMS Reminders:
-							</th>
-						</tr>
-						</thead>
-
-						<!-- SMS part -->
-						<tr><td style="float:left;">
-
-								<% String sStatus = (String) request.getAttribute("smsStatus");%> 
-
-								Remind confirmed bookings (hours):&nbsp;
-								<div id="smsStatusBlock">
-									<form>
-
-										<% if (sStatus.equalsIgnoreCase("On")) {%>
-										<input type="radio" id="onPrefc" class="pref" name="pref" value="On" onchange="onOption2(onPrefc)" checked>&nbsp; On 
-										<input type="radio" id="offPrefd" class="pref" name="pref" value="Off" onchange="onOption2(offPrefd)">&nbsp; Off
-										<% } else {%>
-										<input type="radio" id="onPref3" class="pref" name="pref" value="On" onchange="onOption2(onPref3)">&nbsp; On 
-										<input type="radio" id="offPref4" class="pref" name="pref" value="Off" onchange="onOption2(offPref4)" checked>&nbsp; Off
-										<% }%>
-									</form>
-								</div>
-						</td>
-
-						<td style="border:none;float:left">
-
-							<div id="smsFrequencyBlock">
-								<div class="input-append">	
-									<input id="smsFrequency" style="width: 18px;height: 20px" type="text" value="<s:property value="smsFrequency"/>" disabled />
-									<div class="btn-group">
-										<button class="btn" type="button" onclick="upOne(smsFrequency);" >&#9650;</button>
-										<button class="btn" type="button" onclick="downOne(smsFrequency);" >&#9660;</button>
-									</div>
-								</div>
-
 							</div>
-
 						</td>
-						</tr>
-					</table>
-				</div>
-				</s:iterator>
-
-				<div style="clear: both;">
-					<button type="button" id="saveButton" class="btn btn-primary" data-loading-text="Saving..."
-							style="width:80px; height:30px;">
-						<strong>Save</strong>
-					</button>
-				</div>
+						<td>days</td>
+						<td class='reminderInfo muted'>(0 = disabled)</td>
+					</tr>
+					<tr><td colspan="4"><h4>Email</h4></td></tr>
+					<tr class='reminderItem'>
+						<td>Remind <b>faculty</b> to approve booking in advance of</td>
+						<td class='spinnerTd'>
+							<div id='approve_reminder' class="approveReminderSpinner reminderSpinner spinner">
+								<input class="durationInput spinner-input" type="text" style='width: 50px !important'/>
+								<div class="spinner-buttons btn-group btn-group-vertical">
+									<button class="btn spinner-up" type="button">
+										<i class="fa fa-chevron-up"></i>
+									</button>
+									<button class="btn spinner-down" type="button">
+										<i class="fa fa-chevron-down"></i>
+									</button>
+								</div>
+							</div>
+						</td>
+						<td>days</td>
+						<td class='reminderInfo muted'>(0 = disabled)</td>
+					</tr>
+					<tr><td colspan="4"><h4>SMS</h4></td></tr>
+					<tr class='reminderItem'>
+						<td>Remind <b>user</b> to attend presentation in advance of </td>
+						<td class='spinnerTd'>
+							<div id='attend_reminder' class="attendReminderSpinner reminderSpinner spinner">
+								<input class="durationInput spinner-input" type="text" style='width: 50px !important'/>
+								<div class="spinner-buttons btn-group btn-group-vertical">
+									<button class="btn spinner-up" type="button">
+										<i class="fa fa-chevron-up"></i>
+									</button>
+									<button class="btn spinner-down" type="button">
+										<i class="fa fa-chevron-down"></i>
+									</button>
+								</div>
+							</div>
+						</td>
+						<td>hours</td>
+						<td class='reminderInfo muted'>(0 = disabled)</td>
+					</tr>
+					<tr class='reminderItem'><td colspan="4"><button id="remindersSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button></td></tr>
+				</table>
 			</div>
 			
 			<!-- END OF REMINDER SETTINGS SECTION -->
-			<br />
 			<!-- ADMINISTRATOR PASSWORD SECTION -->
 			
-			<div>
-				<h3>Change Administrator Password</h3>
-				<table>
+			<div class='passwordSettings'>
+				<h4>Administrator Password</h4>
+				<table id='passwordChangeTable'>
 					<tr>
-						<td>Current Password: </td>
+						<td>Current Password </td>
 						<td><input type="password" id="currentPassword"/></td>
 					</tr>
 					<tr>
-						<td>New Password: </td>
+						<td>New Password </td>
 						<td><input type="password" id="newPassword"/></td>
 					</tr>
 					<tr>
-						<td>Confirm New Password: </td>
+						<td>Confirm New Password </td>
 						<td><input type="password" id="verifyPassword"/></td>
 					</tr>
 				</table> <br />
 				<button id="passwordChangeSubmitButton" class="btn btn-primary" data-loading-text="Saving...">Save</button>
 			</div>
-			
 			<!-- END OF ADMINISTRATOR PASSWORD SECTION -->
-			
+		</div>
+			<%@include file="footer.jsp" %>
 			<script type="text/javascript">
-
-				var loadForm = function() {
-						//if it is off don't show
-						var values = $('input:checked').map(function() {
-							return this.value;
-						}).get();
-
-						var splitArray = new Array();
-						splitArray = values.slice(',');
-						//alert(splitArray[0] + splitArray[1]);
-
-						var ons = "On";
-						//this is for email
-						if (splitArray[0] !== ons) {
-
-							onOption("offPrefb");
-							onOption("offPref2");
-
-						}
-
-						if (splitArray[2] !== ons) {
-
-							onOption2("offPrefd");
-							onOption2("offPref4");
-
-						}
-
-						if (splitArray[1] !== ons) {
-
-							onOption3("offPreff");
-							onOption3("offPref6");
-
-						}
-						
-						$("#passwordChangeSubmitButton").on("click", changePassword);
-					};
-
-
-				function upOne(id) {
-					id.value++;
-				}
-
-				function downOne(id) {
-					if (parseInt(id.value, 0) > 1) {
-						id.value--;
-					}
-				}
-
-				function onOption(id) {
-
-					var status = id.value;
-
-					var ons = "On";
-					if (status !== ons) {
-						//if it is on show the  frequency
-						jQuery(emailFrequencyRow).hide();
+				var otherSettingsLoad = function() {
+				var remindersJson = JSON.parse('<s:property escape="false" value="remindersJson"/>');
+				console.log(JSON.stringify(remindersJson));
+				readCrappyJson();
+				
+				function readCrappyJson(){
+					//Remind faculty
+					if (remindersJson[0].emailStatus === "On") {
+						$('.approveReminderSpinner').spinner({
+							min: 0,
+							max: 7
+						});
+						$('.approveReminderSpinner').spinner('value', remindersJson[0].emailFrequency);
 					} else {
-						jQuery(emailFrequencyRow).show();
-
+						$('.approveReminderSpinner').spinner('value', 0);
 					}
-
-				}
-
-				function onOption2(id) {
-
-					var status = id.value;
-
-					var ons = "On";
-					if (status !== ons) {
-						//if it is on show the  frequency
-						jQuery(smsFrequencyBlock).hide();
+					
+					//SMS attend
+					if (remindersJson[1].smsStatus === "On") {
+						$('.attendReminderSpinner').spinner({
+							min: 0,
+							max: 72
+						});
+						$('.attendReminderSpinner').spinner('value', remindersJson[1].smsFrequency);
 					} else {
-						jQuery(smsFrequencyBlock).show();
+						$('.attendReminderSpinner').spinner('value', 0);
 					}
-
-				}
-
-				function onOption3(id) {
-
-					var status = id.value;
-
-					var ons = "On";
-					if (status !== ons) {
-						//if it is on show the  frequency
-						jQuery(emailClearPendingRow).hide();
+					
+					//Clear booking
+					if (remindersJson[2].emailClearStatus === "On") {
+						$('.clearPendingSpinner').spinner({
+							min: 0,
+							max: 7
+						});
+						$('.clearPendingSpinner').spinner('value', remindersJson[2].emailClearFrequency);
 					} else {
-						jQuery(emailClearPendingRow).show();
+						$('.clearPendingSpinner').spinner('value', 0);
 					}
-
 				}
-
-				$("#saveButton").on('click', function(e) {
-					//$(this).button('loading');
+				
+				$('body').on('click', '#remindersSubmitBtn', function(e){
 					if (uatMode) recordHumanInteraction(e);
-					var values = $('input:checked').map(function() {
-						return this.value;
-					}).get();
-
-					var splitArray = new Array();
-					splitArray = values.slice(',');
-					
-
-					var ons = "On";
-
-					var toSend = "email,";
-					//this is for email frequency
-					if (splitArray[0] === ons) {
-
-						//if on get the frequency
-						var eFrq = document.getElementById("emailFrequency").value;
-						toSend += "On," + eFrq + ",";
-
-					} else {
-
-						//if off, then set frequency to nothing
-						toSend += "Off," + "0,";
-
-					}
-					
-					toSend += "sms,";
-
-					//this is for sms
-					if (splitArray[2] === ons) {
-
-						//if on get the frequency
-						var eFrq = document.getElementById("smsFrequency").value;
-						toSend += "On," + eFrq;
-
-					} else {
-
-						//if off, then set frequency to nothing
-						toSend += "Off," + "0";
-
-					}
-					
-					//this is for clear email
-					toSend += ",toClear,";
-					if (splitArray[1] === ons) {
-
-						//if on get the frequency
-						var eFrq = document.getElementById("emailClear").value;
-						toSend += "On," + eFrq + ",";
-
-					} else {
-
-						//if off, then set frequency to nothing
-						toSend += "Off," + "0,";
-
-					}
-					
-					console.log('Submitting: ' + toSend);
-
-					//send data to store information
+					var crappyInputJson = '';
+					if ($('.approveReminderSpinner').spinner('value')) crappyInputJson += 'email,On,' + $('.approveReminderSpinner').spinner('value') + ',';
+					else crappyInputJson += 'email,Off,0,';
+					if ($('.attendReminderSpinner').spinner('value')) crappyInputJson += 'sms,On,' + $('.attendReminderSpinner').spinner('value') + ',';
+					else crappyInputJson += 'sms,Off,0,';
+					if ($('.clearPendingSpinner').spinner('value')) crappyInputJson += 'toClear,On,' + $('.clearPendingSpinner').spinner('value');
+					else crappyInputJson += 'toClear,Off,0';
+					console.log('Submitting ' + crappyInputJson);
 					$.ajax({
 						type: 'POST',
 						async: false,
 						url: 'updateNotificationSettings',
-						data: {settingDetails: toSend}
+						data: {settingDetails: crappyInputJson}
 					}).done(function(response) {
 						if (!response.exception) {
 							if (response.success) {
@@ -365,21 +179,18 @@
 							} else {
 								showNotification("INFO", response.message);
 							}
-							//timedRefresh(2000);
 						} else {
 							var eid = btoa(response.message);
 							window.location = "error.jsp?eid=" + eid;
 						}
 					}).fail(function(response) {
-						//$("#saveButton").button('reset');
-						//$("#addRowBtn").button('reset');
 						showNotification("WARNING", "Oops.. something went wrong");
 					});
-
 					return false;
 				});
 				
-				function changePassword() {
+				$('body').on('click', '#passwordChangeSubmitButton', function(){
+					if (uatMode) recordHumanInteraction(e);
 					$("#passwordChangeSubmitButton").button('loading');
 					var currentPasswordStr = $("#currentPassword").val();
 					var newPasswordStr = $("#newPassword").val();
@@ -396,7 +207,7 @@
 						newPassword: newPasswordStr,
 						verifyPassword: verifyPasswordStr
 					};
-					console.log('Submitting: ' + testingInput);
+					console.log('Submitting: ' + JSON.stringify(testingInput));
 					$.ajax({
 						type: 'POST',
 						async: false,
@@ -406,60 +217,60 @@
 						$("#passwordChangeSubmitButton").button('reset');
 						var success = response.success;
 						var notificationType = (success) ? "SUCCESS" : "ERROR";
-						var message = (response.message) ? response.message : "Password changed successfully" ;
-						showNotification(notificationType, message);
-					}).fail(function(response) {
-						$("#passwordChangeSubmitButton").button('reset');
-						showNotification("ERROR", "Error in contacting the server. Please try again.");
-					});
-					
-					return false;
-				}
-
-				//Notification-------------
-				function showNotification(action, notificationMessage) {
-					var opts = {
-						title: "Note",
-						text: notificationMessage,
-						type: "warning",
-						icon: false,
-						sticker: false,
-						mouse_reset: false,
-						animation: "fade",
-						animate_speed: "fast",
-						before_open: function(pnotify) {
-							pnotify.css({
-								top: "52px",
-								left: ($(window).width() / 2) - (pnotify.width() / 2)
+						var message = (response.message) ? response.message : "Password changed successfully";
+								showNotification(notificationType, message);
+							}).fail(function(response) {
+								$("#passwordChangeSubmitButton").button('reset');
+								showNotification("ERROR", "Error in contacting the server. Please try again.");
 							});
+						return false;
+					});					
+
+						//Notification-------------
+						function showNotification(action, notificationMessage) {
+							var opts = {
+								title: "Note",
+								text: notificationMessage,
+								type: "warning",
+								icon: false,
+								sticker: false,
+								mouse_reset: false,
+								animation: "fade",
+								animate_speed: "fast",
+								before_open: function(pnotify) {
+									pnotify.css({
+										top: "52px",
+										left: ($(window).width() / 2) - (pnotify.width() / 2)
+									});
+								}
+							};
+							switch (action) {
+								case "SUCCESS":
+									opts.title = "Updated";
+									opts.type = "success";
+									break;
+								case "ERROR":
+									opts.title = "Error";
+									opts.type = "error";
+									break;
+								case "INFO":
+									opts.title = "Error";
+									opts.type = "info";
+									break;
+								case "WARNING":
+									$.pnotify_remove_all();
+									opts.title = "Note";
+									opts.type = "warning";
+									break;
+								default:
+									alert("Something went wrong");
+							}
+							$.pnotify(opts);
 						}
 					};
-					switch (action) {
-						case "SUCCESS":
-							opts.title = "Updated";
-							opts.type = "success";
-							break;
-						case "ERROR":
-							opts.title = "Error";
-							opts.type = "error";
-							break;
-						case "INFO":
-							opts.title = "Error";
-							opts.type = "info";
-							break;
-						case "WARNING":
-							$.pnotify_remove_all();
-							opts.title = "Note";
-							opts.type = "warning";
-							break;
-						default:
-							alert("Something went wrong");
-					}
-					$.pnotify(opts);
-				}
 
-				//Append page load functions
-				addLoadEvent(loadForm);
+					//Append page load functions
+					addLoadEvent(otherSettingsLoad);
 			</script>
     </body>
 </html>

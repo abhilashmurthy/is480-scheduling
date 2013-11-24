@@ -2262,7 +2262,11 @@
 						},
 						drag: function(event, ui){
 							var st = parseInt($(this).data("startingScrollTop"));
-							if (!(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase()))) ui.position.top -= $(window).scrollTop();
+							if (
+								!(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())) //Detects chrome
+								||(/safari/.test(navigator.userAgent.toLowerCase())) //Detects safari
+							) 
+								ui.position.top -= $(window).scrollTop();
 						},
 						helper: function() {
 							return $(this).clone().empty()
