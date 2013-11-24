@@ -57,13 +57,13 @@
 						<li class="dropdown">
 							<a href="#" id="adminConfigDropDown" class="dropdown-toggle navbar-title" data-toggle="dropdown"><b>Admin Config</b><span class="caret white-caret"></span></a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">CSV Upload</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Active Terms</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="uploadFile">CSV</a></li>
 								<li role="presentation"><a role="menuitem" tabindex="-1" href="restoreDB">Database Restore</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewGenerateReport">Generate Reports</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Manage Milestones</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="manageActiveTerms">Manage Terms</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="users">Manage Users/Teams</a></li>
-								<li role="presentation"><a role="menuitem" tabindex="-1" href="getOtherSettings">Other Settings</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="getMilestoneSettings">Milestones</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="viewGenerateReport">Reports</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="users">Users</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" href="getOtherSettings">Settings</a></li>
 								<!--<li role="presentation"><a role="menuitem" tabindex="-1" href=""></a></li>-->
 							</ul>
 						</li>

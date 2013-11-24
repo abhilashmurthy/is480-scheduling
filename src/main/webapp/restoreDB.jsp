@@ -25,7 +25,7 @@
          %>
 		 
         <div class="container">
-			<h3>Restore Database</h3>
+			<h3>Database Restore</h3>
 			<h5 style="color: green;">BACKUP_DIR in General.properties: <s:property value= "backupPath"/></h5>
 			<table id='filesTable' class='usersTable table table-hover zebra-striped' style="margin-top: 20px">
 				<thead>
