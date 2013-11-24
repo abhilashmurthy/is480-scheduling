@@ -138,6 +138,7 @@
                     }
 					milestones.sort(compare);
 					var setAsActive = true;
+					var now = new Date();
                     for (var i = 0; i < milestones.length; i++) {
                         var thisMilestone = milestones[i];
 						if (!thisMilestone.bookable) continue;
@@ -165,7 +166,8 @@
 											.addClass('scheduleTable table-condensed table-hover table-bordered')
 									)
 							);
-						milestone = setAsActive?thisMilestone.name.toUpperCase():milestone;
+						if (now >= Date.parse(thisMilestone.startDate) && now <= Date.parse(thisMilestone.endDate)) milestone = thisMilestone.name.toUpperCase();
+						else milestone = setAsActive?thisMilestone.name.toUpperCase():milestone;
 						setAsActive = false;
                     }
                 }
@@ -501,6 +503,8 @@
 					$("#weekView").bootstrapSwitch('setState', true);
                     return false;
                 });
+				//Select active milestone
+				$('.nav-tabs a#' + milestone.toLowerCase()).trigger('click');
 
 				$(".testBtn").click(function(e) {
 					if (uatMode) recordHumanInteraction(e);

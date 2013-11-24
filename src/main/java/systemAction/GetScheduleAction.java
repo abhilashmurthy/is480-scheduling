@@ -277,6 +277,8 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
 					map.put("name", m.getName());
 					map.put("slotDuration", m.getSlotDuration());
 					map.put("bookable", s.isBookable());
+					map.put("startDate", dateFormat.format(s.getStartDate()));
+					map.put("endDate", dateFormat.format(s.getEndDate()));
 					mapList.add(map);
 				}
                 json.put("milestones", mapList);

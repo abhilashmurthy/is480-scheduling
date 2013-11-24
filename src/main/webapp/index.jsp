@@ -191,7 +191,6 @@
                 var users = JSON.parse('<s:property escape= "false" value= "allUsersJson"/>');
                 
                 populateMilestones();
-                populateSchedule(milestone, year, semester);
                 
                 //Build the base of the page (Milestone tabs and tables)
                 function populateMilestones() {
@@ -208,6 +207,7 @@
                     }
 					milestones.sort(compare);
 					var setAsActive = true;
+					var now = new Date();
                     for (var i = 0; i < milestones.length; i++) {
                         var thisMilestone = milestones[i];
 						if (!thisMilestone.bookable) continue;
@@ -235,7 +235,8 @@
 											.addClass('scheduleTable table-condensed table-hover table-bordered')
 									)
 							);
-						milestone = setAsActive?thisMilestone.name.toUpperCase():milestone;
+						if (now >= Date.parse(thisMilestone.startDate) && now <= Date.parse(thisMilestone.endDate)) milestone = thisMilestone.name.toUpperCase();
+						else milestone = setAsActive?thisMilestone.name.toUpperCase():milestone;
 						setAsActive = false;
                     }
                 }
@@ -252,6 +253,8 @@
 					$("#weekView").bootstrapSwitch('setState', true);
                     return false;
                 });
+				//Select active milestone
+				$('.nav-tabs a#' + milestone.toLowerCase()).trigger('click');
                 
                 //GetScheduleAction data
                 function getScheduleData(milestone, year, semester) {

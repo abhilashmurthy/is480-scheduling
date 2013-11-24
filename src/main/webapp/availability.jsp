@@ -210,11 +210,12 @@
                 var scheduleData = null;
                 var selectedMilestone = null;
                 var milestones = new Array();
+				var defaultLoadMilestone = null;
                 
                 loadMilestones();
                 loadUnavailableTimeslots();
                 loadSelectDropdown();
-                
+  
                 function loadMilestones() {
                     milestones = getScheduleData(null, activeAcademicYearStr, activeSemesterStr).milestones;
                 };
@@ -226,15 +227,17 @@
                 }
                 
                 function loadSelectDropdown() {
+					var now = new Date();
                     for (var i = 0; i < milestones.length; i++) {
 						if (!milestones[i].bookable) continue;
-							var milestoneOption = $(document.createElement('option'));
-							milestoneOption.attr('value', milestones[i].name);
-							milestoneOption.html(milestones[i].name);
-							$("#milestoneTimeslotsSelect").append(milestoneOption);
+						var milestoneOption = $(document.createElement('option'));
+						milestoneOption.attr('value', milestones[i].name);
+						milestoneOption.html(milestones[i].name);
+						$("#milestoneTimeslotsSelect").append(milestoneOption);
+						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i].name;
                     }
                 }
-                
+				
                 $("#milestoneTimeslotsSelect").on('change', function(e){
 					if (uatMode) recordHumanInteraction(e);
                     $(".timeslotsTable").empty();
@@ -243,8 +246,9 @@
                     loadScheduleTimeslots(selectedMilestone, scheduleData);
                     return false; 
                 });
-                
-                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).change(); //Select first milestone
+				
+				if (defaultLoadMilestone) $("#milestoneTimeslotsSelect").val(defaultLoadMilestone).change();
+				else $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).change(); //Select first milestone
 
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableClass = "timeslotsTable";

@@ -223,6 +223,7 @@
                 var scheduleData = null;
                 var selectedMilestone = null;
                 var milestones = new Array();
+				var defaultLoadMilestone = null;
 				var taData = JSON.parse('<s:property escape= "false" value= "taJson"/>');
 
                 loadMilestones();
@@ -233,12 +234,14 @@
                 };
                 
                 function loadSelectDropdown() {
-                    for (var i = 0; i < milestones.length; i++) {
+                    var now = new Date();
+					for (var i = 0; i < milestones.length; i++) {
 						if (!milestones[i].bookable) continue;
-							var milestoneOption = $(document.createElement('option'));
-							milestoneOption.attr('value', milestones[i].name);
-							milestoneOption.html(milestones[i].name);
-							$("#milestoneTimeslotsSelect").append(milestoneOption);
+						var milestoneOption = $(document.createElement('option'));
+						milestoneOption.attr('value', milestones[i].name);
+						milestoneOption.html(milestones[i].name);
+						$("#milestoneTimeslotsSelect").append(milestoneOption);
+						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i].name;
                     }
                 }
                 
@@ -252,7 +255,8 @@
                     return false;
                 });
                 
-                $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).trigger('change');
+				if (defaultLoadMilestone) $("#milestoneTimeslotsSelect").val(defaultLoadMilestone).change();
+				else $("#milestoneTimeslotsSelect").val($("#milestoneTimeslotsSelect option:first").attr('value')).change(); //Select first milestone
 				
                 function loadScheduleTimeslots(milestoneStr, scheduleData) {
                     var tableClass = "timeslotsTable";
