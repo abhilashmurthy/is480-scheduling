@@ -31,14 +31,19 @@
             }
 			
 			.timeslotsTable {
-				margin-top: 60px;
-				margin-left: 90px !important;
+				float: left;
+				margin-top: 20px;
+			}
+			
+			#editTimeslotsPanel {
+				margin-left: 40px;
+				padding-top: 20px;
 			}
 			
 			#otherFacultySelect {
 				margin-top: 10px;
 				margin-bottom: 10px;
-				clear: both;
+				margin-right: 10%;
 			}
 			
 			#otherFacultySelect button {
@@ -50,6 +55,7 @@
 			}
             
 			#milestoneTimeslotsSelect {
+				margin-left: 10px;
 				margin-bottom: 0px !important;
 			}
 			
@@ -118,7 +124,8 @@
             .availabilityLegend {
 				float: right;
 				margin-top: 10px;
-				clear: both;
+				margin-right: 10%;
+				clear: right;
             }
 			
 			.availabilityLegend td.legendBox {
@@ -161,6 +168,12 @@
 			.dateHeader {
 				font-size: 15px;
 			}
+			
+			.otherFacultyName {
+				color: red;
+				font-weight: bold;
+				font-style: italic;
+			}
 
         </style>
     </head>
@@ -183,13 +196,15 @@
 
         <!-- Edit Availability -->
         <div id="availabilityPanel" class="container">
-            <div id="editTimeslotsPanel">
-                <h3>My Availability</h3>
+			<h3>My Availability</h3>
+			<div id="editTimeslotsPanel">
+				<div id="selectTerm" class='pull-left'>
+					Milestone
+					<select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button>
+				</div>
 				<div id="otherFacultySelect" class="pull-right">
-					View Other Faculty's Availability
+					View Other Faculty's <span class='otherFacultyName'>Unavailable</span> Timeslots
 					<select name="otherFaculty" class="otherFacultyMultiselect multiselect" multiple="multiple">
-						<option value="benjamingan">Benjamin Gan</option>
-						<option value="Youngsoo Kim">Youngsoo Kim</option>
 					</select>
 				</div>
 				<table class='availabilityLegend'>
@@ -197,15 +212,7 @@
 						<td class="legendBox" style="background-color:#B8F79E;border:1px solid #1E647C;"></td><td>I'm available</td><td class="legendBox" style="background-color:#F7A8A8;border:1px solid #1E647C;"></td><td>I'm unavailable</td>
 					</tr>
 				</table>
-                <div id="timeslotsTableSection">
-                    <table>
-                        <tr>
-                            <td>Milestone</td>
-                            <td><select name="milestoneTimeslots" id="milestoneTimeslotsSelect"></select> <button id="editTimeslotsSubmitBtn" class="btn btn-primary" data-loading-text="Saving...">Save</button></td>
-                        </tr>
-					</table>
-					<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
-                </div>
+				<table class="timeslotsTable table-condensed table-hover table-bordered table-striped" style='cursor: pointer'></table>
                 <h4 id="timeslotsResultMessage" class="resultMessage"/></h4>
                 <br/><br/>
             </div>
@@ -225,8 +232,7 @@
                 var activeAcademicYearStr = "<%= activeTerm.getAcademicYear()%>";
                 var activeSemesterStr = "<%= activeTerm.getSemester()%>";
                 var unavailableTimeslots = JSON.parse('<s:property escape= "false" value= "myUnavailableJson"/>');
-				var othersUnavailableData = JSON.parse('<s:property escape= "false" value= "othersUnavailableJson"/>');
-				console.log('Others: ' + JSON.stringify(othersUnavailableData));
+				var otherFacultyData = JSON.parse('<s:property escape= "false" value= "othersUnavailableJson"/>');
                 var scheduleData = null;
                 var selectedMilestone = null;
                 var milestones = new Array();
@@ -258,6 +264,12 @@
                     selectedMilestone = $(this).val();
                     scheduleData = getScheduleData(selectedMilestone, activeAcademicYearStr, activeSemesterStr);
                     loadScheduleTimeslots(selectedMilestone, scheduleData);
+					if ($('.otherFacultyMultiselect').val()) {
+						var selectedOtherFacultyArray = $('.otherFacultyMultiselect').val();
+						for (var i = 0; i < selectedOtherFacultyArray.length; i++) {
+							$('.otherFacultyMultiselect').multiselect('deselect', selectedOtherFacultyArray[i]);
+						}
+					}
                     return false; 
                 });
 				
@@ -660,7 +672,61 @@
                 });
 
                 function initOtherFaculty(){
-					$('.otherFacultyMultiselect').multiselect();
+					for (var i = 0; i < otherFacultyData.length; i++) {
+						var faculty = otherFacultyData[i];
+						$('.otherFacultyMultiselect')
+							.append(
+								$(document.createElement('option'))
+									.attr('value', faculty.username)
+									.html(faculty.fullName)
+							);
+					}
+					$('.otherFacultyMultiselect').multiselect({
+						buttonText: function(options, select) {
+							if (options.length === 0) {
+								return 'Select Faculty <b class= "caret"></b>';
+							} else {
+								var selected = '';
+								options.each(function(){
+									selected += 
+											$(document.createElement('div'))
+												.addClass('selectedMember')
+												.append($(this).attr('value'))
+												.outerHTML()
+								});
+								return selected + ' <b class= "caret"></b>';
+							}
+						},
+						onChange: function($option, checked){
+							if (checked) {
+								showOtherFacultyUnavailable($option.attr('value'));
+							} else {
+								$('.' + $option.attr('value')).remove();
+							}
+							return false;
+						}
+					});
+				}
+				
+				function showOtherFacultyUnavailable(username) {
+					for (var i = 0; i < otherFacultyData.length; i++) {
+						var faculty = otherFacultyData[i];
+						if (faculty.username !== username) continue;
+						$(".timeslotcell").each(function() {
+							var self = $(this);
+							var otherUnavailableTimeslots = faculty.unavailableTimeslots;
+							for (var i = 0; i < otherUnavailableTimeslots.length; i++) {
+								if (self.attr('value') === otherUnavailableTimeslots[i]) {
+									self.append(
+										$(document.createElement('div'))
+											.addClass('otherFacultyName')
+											.addClass(faculty.username)
+											.append(faculty.username)
+									);
+								}
+							}
+						});
+					}
 				}
                 
                  function showNotification(action, message) {
