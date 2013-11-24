@@ -168,6 +168,7 @@
                 var weekView = null;
 				var maxWeekView = null;
 				var myEmail = "<%= user.getUsername() %>" + "@smu.edu.sg"; //TODO: Cater to public audience
+				var myFullName = "<%= user.getFullName() %>";
                 
                 //Student-specific variables
                 var teamName = "<%= team != null ? team.getTeamName() : null%>"; //Student's active team name
@@ -420,6 +421,57 @@
 						);
                     }
 					
+                    //Allow supervisor to update booking and approve/reject/cancel booking
+                    if (<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam) {
+						for (var i = 0; i < timeslot.faculties.length; i++) {
+							if (timeslot.faculties[i].name === myFullName) {
+								if (timeslot.faculties[i].status === "PENDING") {
+									outputData[""] += (
+										$(document.createElement('button'))
+											.attr('id', 'rejectBookingBtn')
+											.addClass('popoverBtn btn btn-small btn-danger')
+											.append($(document.createElement('i')).addClass('fa fa-times-circle fa-white'))
+											.append('Reject')
+											.css('float', 'right')
+											.outerHTML()
+									);
+									outputData[""] += (
+										$(document.createElement('button'))
+											.attr('id', 'approveBookingBtn')
+											.addClass('popoverBtn btn btn-small btn-success')
+											.append($(document.createElement('i')).addClass('fa fa-check-circle fa-white'))
+											.append('Approve')
+											.css('float', 'right')
+											.outerHTML()
+									);
+								} else {
+									outputData[""] += (
+										$(document.createElement('button'))
+											.attr('id', 'cancelBookingBtn')
+											.addClass('popoverBtn btn btn-small btn-danger')
+											.append($(document.createElement('i')).addClass('fa fa-times-circle fa-white'))
+											.append('Cancel')
+											.css('float', 'right')
+											.outerHTML()
+									);
+								} ////
+								break;
+							}
+						}
+						if (timeslot.status === "APPROVED") {
+							outputData[""] += (
+								$(document.createElement('button'))
+									.attr('id', 'updateBookingBtn')
+									.addClass('popoverBtn btn btn-small btn-info')
+									.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
+									.append('Save')
+									.css('float', 'right')
+									.attr('disabled', true)
+									.outerHTML()
+							);
+						}
+                    }
+					
 					//Allow faculty to change availability on view booking popover
                     if (<%= activeRole.equals(Role.FACULTY) %>) {
 						if ($td.closest('.timeslotCell').is('.unavailableTimeslot')) {
@@ -468,20 +520,6 @@
 										.outerHTML()
 							);
 						}
-                    }
-					
-                    //Allow supervisor to update booking
-                    if (<%= activeRole.equals(Role.FACULTY) %> && timeslot.isMyTeam) {
-                        outputData[""] += (
-							$(document.createElement('button'))
-								.attr('id', 'updateBookingBtn')
-								.addClass('popoverBtn btn btn-small btn-info')
-								.append($(document.createElement('i')).addClass('fa fa-pencil fa-white'))
-								.append('Save')
-								.css('float', 'right')
-								.attr('disabled', true)
-								.outerHTML()
-						);
                     }
 
                     //Allow admin to edit fields
@@ -794,7 +832,7 @@
                         $teamDropDownSelect = $(document.createElement('select'))
 							.attr('name', 'team')
 							.attr('id', 'createTeamSelect')
-							.addClass('popoverInput');
+							.addClass('popoverSelect');
                         outerTeams: 
                         for (var t = 0; t < teams.length; t++) { //Append only teams without bookings
                             var adminTeamName = teams[t].teamName;
@@ -1308,6 +1346,136 @@
                         return false;
                     });
 					
+					//Faculty Approve Button
+                    $('.timeslotCell').off('click', '#approveBookingBtn');
+                    $('.timeslotCell').on('click', '#approveBookingBtn', function(e) {
+                        if (uatMode) recordHumanInteraction(e);
+						var $timeslot = self.closest('.timeslotCell');
+						var timeslot = scheduleData.timeslots[$timeslot.attr('value')];
+                        var returnData = updateBookingStatus(self, "approve");
+						if (returnData && returnData.success) {
+							var approveCount = 0;
+							for (var i = 0; i < timeslot.faculties.length; i++) {
+								if (timeslot.faculties[i].name === myFullName) {
+									timeslot.faculties[i].status = "APPROVED";
+									++approveCount;
+									break;
+								}
+								if (timeslot.faculties[i].status === "APPROVED") ++approveCount;
+							}
+							if (approveCount === timeslot.faculties.length) {
+								timeslot.status = "APPROVED";
+								self.removeClass('pendingBooking');
+								self.addClass('approvedBooking');
+								//Update teams JSON
+								for (var i = 0; i < teams.length; i++) {
+									if (parseInt(teams[i].teamId) === parseInt(timeslot.teamId)) {
+										var team = teams[i];
+										for (var j = 0; j < team.bookings.length; j++) {
+											if (Date.parse(team.bookings[j].datetime).toString('yyyy-MM-dd HH:mm') === Date.parse($timeslot.attr('value')).toString('yyyy-MM-dd HH:mm')) {
+												team.bookings[j].bookingStatus = "approved";
+												break;
+											}
+										}
+										break;
+									}
+								}
+							}
+							var pendingBookingCount = $('.pendingBookings u').text().split(" ")[2];
+							if (--pendingBookingCount === 0) {
+								$('.pendingBookings').css('opacity', '0');
+							} else {
+								$('.pendingBookings u').html('You have ' + pendingBookingCount + ' pending ' + (pendingBookingCount === 1?'booking':'bookings'));
+							}
+							showNotification("SUCCESS", self.closest('.timeslotCell'), "Booking approved");
+							self.popover('destroy');
+							appendViewBookingPopover(self.closest('.timeslotCell'));
+						}
+                        return false;
+                    });
+					
+					//Faculty Reject Button
+                    $('.timeslotCell').off('click', '#rejectBookingBtn, #cancelBookingBtn');
+                    $('.timeslotCell').on('click', '#rejectBookingBtn, #cancelBookingBtn', function(e) {
+                        if (uatMode) recordHumanInteraction(e);
+						var $timeslot = self.closest('.timeslotCell');
+						var $booking = self.closest('.booking');
+						var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
+						var action = $(this).is('#rejectBookingBtn')?"Reject":"Cancel";
+						bootbox.prompt({
+							className : "bootbox-width",
+							title: action + ' Booking',
+							callback: function(result) {
+								if (result) {
+									var returnData = updateBookingStatus(self, "reject", result);
+									if (returnData && returnData.success) {
+										$timeslot.removeClass('bookedTimeslot');
+										$timeslot.addClass('unbookedTimeslot');
+										$booking.popover('destroy');
+										$booking.effect('clip', 'slow', function(){
+											$booking.remove();
+										});
+										var team = null;
+										for (var i = 0; i < teams.length; i++) {
+											if (teams[i].teamName === timeslot.team) {
+												team = teams[i];
+												break;
+											}
+										}
+										for (var i = 0; i < team.bookings.length; i++) {
+											if (parseInt(team.bookings[i].scheduleId) === parseInt(scheduleData.id)) {
+												team.bookings.splice(team.bookings.indexOf(team.bookings[i]), 1);
+												break;
+											}
+										}
+										delete timeslot.team;
+										setTimeout(function(){showNotification("ERROR", $timeslot, null);},500);
+										if (action === 'Reject') {
+											var pendingBookingCount = $('.pendingBookings u').text().split(" ")[2];
+											if (--pendingBookingCount === 0) {
+												$('.pendingBookings').effect('clip', 'slow', function(){
+													$(this).remove();
+												});
+											} else {
+												$('.pendingBookings u').html('You have ' + pendingBookingCount + ' pending ' + (pendingBookingCount === 1?'booking':'bookings'));
+											}
+										}
+									}
+								}
+							}
+						});
+						$('.modal-footer button:not(:first)').attr('disabled', true);
+						$('.modal-body').prepend(
+							$(document.createElement('div'))
+								.addClass('customPrompt')
+								.append('Reason to ' + action.toLowerCase() + ' booking (max 55 chars)')
+						);
+						$('input.bootbox-input').on('keyup', function(){
+							if ($(this).val() && $(this).val().length > 55) {
+								$('.modal-footer button:not(:first)').attr('disabled', true);
+								showNotification("WARNING", $timeslot, "Please enter max 55 chars");
+							} else if ($(this).val()) {
+								$('.modal-footer button:not(:first)').attr('disabled', false);
+							} else {
+								$('.modal-footer button:not(:first)').attr('disabled', true);
+							}
+							return false;
+						});
+                        return false;
+                    });
+					
+					//Faculty Cancel Button
+                    $('.timeslotCell').off('click', '#availableTimeslotBtn');
+                    $('.timeslotCell').on('click', '#availableTimeslotBtn', function(e) {
+                        if (uatMode) recordHumanInteraction(e);
+                        changeAvailability(self, true);
+                        showNotification("WARNING", self.closest('.timeslotCell'), "Set as available");
+                        self.popover('destroy');
+						if (self.is('.booking')) appendViewBookingPopover(self.closest('.timeslotCell'));
+                        else appendChangeAvailabilityPopover(self);
+                        return false;
+                    });
+					
                     //TA Sign Up Button
                     $('.timeslotCell').off('click', '#signupTimeslotBtn');
                     $('.timeslotCell').on('click', '#signupTimeslotBtn', function(e) {
@@ -1736,6 +1904,39 @@
                     });
                     return false;
                 }
+				
+				//Update Booking Status AJAX Call
+				function updateBookingStatus(self, action, comment) {
+					var toReturn = null;
+					var timeslot = scheduleData.timeslots[self.closest('.timeslotCell').attr('value')];
+					var data = {
+						bookingId: timeslot.bookingId,
+						status: action
+					};
+					if (comment) data["comment"] = comment;
+					console.log('Submitting: ' + JSON.stringify(data));
+					$.ajax({
+						type: 'POST',
+						async: false,
+						url: 'updateBookingStatus',
+						data: {jsonData: JSON.stringify(data)}
+					})
+					.done(function(response) {
+						if (!response.exception) {
+							if (response.success) {
+								toReturn = response;
+							} else {
+								showNotification("ERROR", response.message);
+							}
+						} else {
+							var eid = btoa(response.message);
+							window.location = "error.jsp?eid=" + eid;
+						}
+					}).fail(function(error) {
+						   showNotification("WARNING", "Oops.. something went wrong");
+					});
+					return toReturn;
+				}
 				
                 //Update TA Signup AJAX Call            
                 function changeSignup(bodyTd, taChosen) {

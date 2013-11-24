@@ -153,7 +153,6 @@ input, button, select, textarea {
 
 .popover {
 	min-width: 300px;
-    max-width: 500px !important;
     font-weight: normal;
     z-index: 1031 !important;
 	opacity: 1.0;
@@ -193,8 +192,13 @@ input, button, select, textarea {
     border-radius: 4px;
 }
 
+.popoverSelect {
+    width: 100%;
+	margin-bottom: 0 !important;
+}
+
 .popoverInput {
-    width: 200px;
+    width: 92%;
 	margin-bottom: 0 !important;
 }
 

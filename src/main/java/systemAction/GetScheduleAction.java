@@ -142,6 +142,7 @@ public class GetScheduleAction extends ActionSupport implements ServletRequestAw
                         Date endDate = new Date(t.getEndTime().getTime());
 						map.put("bookingId", b.getId());
                         map.put("team", b.getTeam().getTeamName());
+						map.put("teamId", b.getTeam().getId());
 						map.put("wiki", b.getTeam().getWiki());
 
                         //View start date (DDD, dd MMM YYYY)
