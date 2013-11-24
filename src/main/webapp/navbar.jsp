@@ -194,16 +194,16 @@
 		//Datatables datetime sorting
 		$.fn.dataTableExt.oSort['datetime-asc']  = function(a,b) {
 			if ($(a).length !== 0) {
-				a = $(a).text();
-				b = $(b).text();
+				a = $(a).text().split("(")[0];
+				b = $(b).text().split("(")[0];
 			}
 			if (a.length === 0) return -1; else if (b.length === 0) return 1; else
 			return Date.parse(a).compareTo(Date.parse(b));
 		};
 		$.fn.dataTableExt.oSort['datetime-desc']  = function(a,b) {
 			if ($(a).length !== 0) {
-				a = $(a).text();
-				b = $(b).text();
+				a = $(a).text().split("(")[0];
+				b = $(b).text().split("(")[0];
 			}
 			if (a.length === 0) return 1; else if (b.length === 0) return -1; else
 			return Date.parse(a).compareTo(Date.parse(b)) * -1;

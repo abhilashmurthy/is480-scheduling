@@ -2388,7 +2388,7 @@
 														.addClass('memberName')
 														.append(team.bookings[j].datetime + ' ')
 														.append(team.bookings[j].bookingStatus === 'pending'?
-															$(document.createElement('i')).addClass('fa fa-cog fa-spin muted')
+															$(document.createElement('span')).html('(pending)')
 															:$(document.createElement('i')).addClass('fa fa-check').css('color', '#A9DBA9'));
 												}
 											}
