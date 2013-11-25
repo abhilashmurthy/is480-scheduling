@@ -222,48 +222,6 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 		}
 		return SUCCESS;
     }
-	
-	//Method to schedule a job to send an SMS reminder 24 hrs before the presentation
-	private void scheduleSMSReminder(Booking b) throws Exception {
-		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
-				.getServletContext()
-				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
-		Scheduler scheduler = factory.getScheduler();
-		
-		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
-				.usingJobData("bookingId", b.getId())
-				.withIdentity(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS).build();
-		
-		//Calculating the time to trigger the job
-		Calendar scheduledTime = Calendar.getInstance();
-//		Timestamp presentationStartTime = b.getTimeslot().getStartTime();
-//		scheduledTime.setTime(presentationStartTime);
-		
-		//get the number of days for sms reminder
-//		EntityManager em = MiscUtil.getEntityManagerInstance();
-//		Settings currentSettings = SettingsManager.getByName(em, "manageNotifications");
-//		String value = currentSettings.getValue();
-
-		//convert settingsDetails into an array
-//		String[] setArr = value.split(",");
-
-		//get the number of days in hours
-//		int noOfDaysToRespond = Integer.parseInt(setArr[5]);
-//		noOfDaysToRespond = noOfDaysToRespond/24;
-
-		//see if the email functionality is set as on
-//		boolean isOn = Boolean.parseBoolean(setArr[4]);
-		
-//		scheduledTime.add(Calendar.DAY_OF_MONTH, -noOfDaysToRespond); //Subtracting a day from the presentation start time
-		scheduledTime.add(Calendar.SECOND, 10); //For testing
-		
-		//if sms reminders are on
-		
-                Trigger tr = TriggerBuilder.newTrigger().withIdentity(b.getId().toString(), MiscUtil.SMS_REMINDER_JOBS)
-                                .startAt(scheduledTime.getTime()).build();
-
-                scheduler.scheduleJob(jd, tr);
-	}
 
     //Getters and Setters
     public void setServletRequest(HttpServletRequest hsr) {
