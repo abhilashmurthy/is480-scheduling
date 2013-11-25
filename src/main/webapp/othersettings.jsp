@@ -94,7 +94,7 @@
 			
 			<!-- END OF REMINDER SETTINGS SECTION -->
 			<!-- ADMINISTRATOR PASSWORD SECTION -->
-			
+			<hr>
 			<div class='passwordSettings'>
 				<h4>Administrator Password</h4>
 				<table id='passwordChangeTable'>
@@ -115,6 +115,7 @@
 			</div>
 			<!-- END OF ADMINISTRATOR PASSWORD SECTION -->
 			<div class='passwordSettings'>
+				<hr>
 				<h4 class='pull-left' style="margin-bottom: 10px">Database Restore</h4><a style='margin-left: 30px;' href='restoreDB'><button class="btn btn-danger">Restore Database to Earlier Time</button></a>
 			</div>
 			
