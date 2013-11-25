@@ -240,6 +240,7 @@ public class TermManager {
 				for (Schedule s : termSchedules) {
 					for (Timeslot t : s.getTimeslots()) {
 						if (t.getCurrentBooking() != null && t.getCurrentBooking().getBookingStatus().equals(BookingStatus.PENDING)) pendingBookingCount++;
+						//Check if there are pending bookings for each schedule
 					}
 				}
 				if (pendingBookingCount > 0) pendingBookingsMap.put(userTerm, pendingBookingCount);
@@ -269,36 +270,7 @@ public class TermManager {
 			} else if (currentTermsMap.size() > 0) {
 				return currentTermsMap.keySet().iterator().next();
 			}
-			List<Schedule> allSchedules = new ArrayList<Schedule>();
-			for (User userObject : userObjects) {
-				Term userTerm = userObject.getTerm();
-				List<Schedule> termSchedules = ScheduleManager.findByTerm(em, userTerm);
-				allSchedules.addAll(termSchedules);
-			}
-			//Get nearest future or past term
-			Collections.sort(allSchedules, new Comparator<Schedule>(){
-				public int compare(Schedule o1, Schedule o2) {
-					return o1.getStartDate().compareTo(o2.getStartDate());
-				}
-			});
-			//Get earliest future term
-			for (Schedule s : allSchedules) {
-				if (!isActive(em, s.getMilestone().getTerm())) continue;
-				if (s.getStartDate().after(now)) {
-					return s.getMilestone().getTerm();
-				}
-			}
-			//Get earliest past term
-			Collections.sort(allSchedules, new Comparator<Schedule>(){
-				public int compare(Schedule o1, Schedule o2) {
-					return o1.getStartDate().compareTo(o2.getStartDate()) * -1;
-				}
-			});
-			for (Schedule s : allSchedules) {
-				if (!isActive(em, s.getMilestone().getTerm())) continue;
-				return s.getMilestone().getTerm();
-			}
-			return null;
+			return getDefaultActiveTerm(em);
 		} catch (Exception e) {
             logger.error("User " + username + " not found. Must be guest. Retrieving latest term instead.");
             if (MiscUtil.DEV_MODE) {

@@ -161,7 +161,7 @@
                 ******************************/
                
                 //Default milestone is ACCEPTANCE
-                var milestone = "ACCEPTANCE";
+                var milestone = null;
                 var year = "<%= activeTerm.getAcademicYear()%>";
                 var semester = "<%= activeTerm.getSemester()%>";
                 var scheduleData = null; //This state shall be stored here
@@ -210,34 +210,34 @@
 					var setAsActive = true;
 					var now = new Date();
                     for (var i = 0; i < milestones.length; i++) {
-                        var thisMilestone = milestones[i];
-						if (!thisMilestone.bookable) continue;
+						if (!milestones[i].bookable) continue;
 						$('ul#milestoneTab') //Add the milestone tab
 							.append(
 								$(document.createElement('li'))
 									.addClass(setAsActive?'active':'')
 									.append(
 										$(document.createElement('a'))
-											.attr('id', thisMilestone.name.toLowerCase())
-											.attr('href', '#' + thisMilestone.name.toLowerCase())
+											.attr('id', milestones[i].name.toLowerCase())
+											.attr('href', '#' + milestones[i].name.toLowerCase())
 											.attr('data-toggle', 'tab')
-											.html(thisMilestone.name)
+											.html(milestones[i].name)
 									)
 							);
 						$('div#milestoneTabContent') //Add the milestone table
 							.append(
 								$(document.createElement('div'))
-									.attr('id', thisMilestone.name.toLowerCase() + "Content")
+									.attr('id', milestones[i].name.toLowerCase() + "Content")
 									.addClass('tab-pane fade')
 									.addClass(setAsActive?'active in':'')
 									.append(
 										$(document.createElement('table'))
-											.attr('id', thisMilestone.name.toLowerCase() + "ScheduleTable")
+											.attr('id', milestones[i].name.toLowerCase() + "ScheduleTable")
 											.addClass('scheduleTable table-condensed table-hover table-bordered')
 									)
 							);
-						if (now >= Date.parse(thisMilestone.startDate) && now <= Date.parse(thisMilestone.endDate)) milestone = thisMilestone.name.toUpperCase();
-						else milestone = setAsActive?thisMilestone.name.toUpperCase():milestone;
+						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) milestone = milestones[i].name.toUpperCase();
+						else if (milestones[i + 1] && now >= Date.parse(milestones[i].endDate)) milestone = milestones[i + 1].name.toUpperCase();
+						else if (setAsActive) milestone = milestones[i].name.toUpperCase();
 						setAsActive = false;
                     }
                 }
