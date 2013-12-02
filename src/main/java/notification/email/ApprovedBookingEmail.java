@@ -42,9 +42,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		Set<String> emails = new HashSet<String>();
-		emails.add(approver.getEmail());
-		return emails;
+		return null;
 	}
 
 	@Override
