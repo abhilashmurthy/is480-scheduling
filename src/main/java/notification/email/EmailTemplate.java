@@ -81,7 +81,7 @@ public abstract class EmailTemplate {
 	}
 	
 	public String generateBookingSubjectTitle(Booking b, String content) {
-		return content + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
+		return "IS480: " + content + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
 	}
 	
 	/**
