@@ -27,7 +27,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return b.getTeam().getTeamName() + " - Booking Approved";
+		return generateBookingSubjectTitle(b, "Approved by " + approver.getFullName() + " ");
 	}
 
 	@Override
