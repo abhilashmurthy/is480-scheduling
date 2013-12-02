@@ -60,6 +60,10 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 			for (String s : b.getOptionalAttendees()) {
 				emails.add(s);
 			}
+			
+			//Adding the TA
+			emails.add(b.getTimeslot().getTA().getEmail());
+			
 			return emails;
 		} finally {
 			if (em != null && em.isOpen()) em.close();
