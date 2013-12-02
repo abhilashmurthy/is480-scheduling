@@ -22,6 +22,7 @@ import manager.SettingsManager;
 import model.Booking;
 import model.Settings;
 import model.User;
+import model.role.TA;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +139,10 @@ public abstract class EmailTemplate {
 			}
 		}
 		map.put("[OPTIONAL_ATTENDEES]", optionalEmailsString.toString());
+		
+		TA ta = b.getTimeslot().getTA();
+		String taString = (ta != null) ? ta.getFullName() : "-" ;
+		map.put("[TA]", taString);
 		
 		return map;
 	}
