@@ -32,16 +32,8 @@ import notification.email.RejectedBookingEmail;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.json.JSONObject;
 import org.hibernate.Hibernate;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.ee.servlet.QuartzInitializerListener;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import systemAction.quartz.SMSReminderJob;
 import util.MiscUtil;
 
 /**
@@ -78,7 +70,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 			String status = inputObject.getString("status");
 
 			String comment = null;
-			Response response = null;
+			Response response;
 			if (status.equalsIgnoreCase("approve")) {
 				response = Response.APPROVED;
 			} else if (status.equalsIgnoreCase("reject")) {
@@ -100,18 +92,12 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				logger.error("User is not a faculty member");
 				return SUCCESS;
 			}
-
-			//The list of slots to update in db
-			List<Booking> bookingsToUpdate = new ArrayList<Booking>();
+			
+			em.getTransaction().begin();
 
 			if (bookingId != 0) {
 				//Retrieving the timeslot to update
 				Booking booking = em.find(Booking.class, bookingId);
-				
-				//Forcing initialization for sending email
-				Hibernate.initialize(booking.getTeam().getMembers());
-				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
-				Hibernate.initialize(booking.getRequiredAttendees());
 				
 				//Retrieving the status list of the timeslot
 				HashMap<User, Response> responseList = booking.getResponseList();
@@ -144,14 +130,17 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 						// Check if everyone has approved the booking
 						if (total == values.size()) {
 							booking.setBookingStatus(BookingStatus.APPROVED);
-							break;
 						}
 					}
 				}
 
 				//Setting the new status
 				booking.setResponseList(responseList);
-				bookingsToUpdate.add(booking);
+				
+				//Forcing initialization for sending email
+				Hibernate.initialize(booking.getTeam().getMembers());
+				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				Hibernate.initialize(booking.getRequiredAttendees());
 
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
@@ -168,22 +157,18 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				booking.setLastEditedBy(user.getFullName());
 				booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			
-				//Updating the time slot 
-				EntityTransaction transaction = em.getTransaction();
-				boolean result = BookingManager.updateBookings(em, bookingsToUpdate, transaction);
-				if (result == true) {
-					//em.close();
-					//Setting the updated user object in session
-					em.clear();
-					Faculty newF = em.find(Faculty.class, f.getId());
-					session.setAttribute("user", newF);
-					
-					json.put("success", true);
-					if (response == Response.APPROVED) {
-						json.put("message", "Your booking has been approved!");
-					} else if (response == Response.REJECTED) {
-						json.put("message", "Your booking has been rejected!");
-					}
+				em.getTransaction().commit();
+				
+				//Setting the updated user object in session
+				em.clear();
+				Faculty newF = em.find(Faculty.class, f.getId());
+				session.setAttribute("user", newF);
+
+				json.put("success", true);
+				if (response == Response.APPROVED) {
+					json.put("message", "Your booking has been approved!");
+				} else if (response == Response.REJECTED) {
+					json.put("message", "Your booking has been rejected!");
 				}
 				
 				MiscUtil.logActivity(logger, user, booking.toString() + " " + response.toString());

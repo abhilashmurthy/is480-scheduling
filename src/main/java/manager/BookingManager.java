@@ -87,29 +87,6 @@ public class BookingManager {
 		return list;
 	}
 	
-	public static boolean updateBookings(EntityManager em, List<Booking> bookingsToUpdate, EntityTransaction transaction) {
-        logger.trace("Updating bookings");
-        try {
-            transaction.begin();
-            for (Booking booking : bookingsToUpdate) {
-                em.persist(booking);
-            }
-            transaction.commit();
-            return true;
-        } catch (PersistenceException ex) {
-            //Rolling back data transactions
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            logger.error("Error making database call for update bookings");
-            ex.printStackTrace();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-        return false;
-    }
-	
 	/* To get all bookings for active term */
 	public static ArrayList<Booking> getBookingsByTerm (EntityManager em, Term term) {
 		logger.trace("Getting all bookings by active term");
