@@ -33,8 +33,9 @@ import util.MiscUtil;
  */
 public abstract class EmailTemplate {
 	private static final String BASE_PATH;
-	public String body;
+	protected String body;
 	private static Logger logger = LoggerFactory.getLogger(EmailTemplate.class);
+	protected EntityManager em = null;
 	
 	static {
 		BASE_PATH = MiscUtil.getProperty("General", "EMAIL_TEMPLATE_PATH");
@@ -62,9 +63,14 @@ public abstract class EmailTemplate {
 	public void sendEmail() {
 		Runnable r = new Runnable() {
 			public void run() {
-				MailSender.sendEmail(generateToAddressList(), generateCCAddressList(),
-				generateEmailSubject(), generateEmailBody(),
-				getFileAttachment(), getFileAttachmentName());
+				try {
+					em = MiscUtil.getEntityManagerInstance();
+					MailSender.sendEmail(generateToAddressList(), generateCCAddressList(),
+					generateEmailSubject(), generateEmailBody(),
+					getFileAttachment(), getFileAttachmentName());	
+				} finally {
+					if (em != null && em.isOpen()) em.close();
+				}
 			}
 		};
 		Thread t = new Thread(r, "Mail Sender");

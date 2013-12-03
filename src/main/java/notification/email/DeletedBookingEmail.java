@@ -9,12 +9,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.EntityManager;
 import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
 import model.User;
-import util.MiscUtil;
 
 /**
  *
@@ -47,41 +45,35 @@ public class DeletedBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		EntityManager em = null;
-		try {
-			em = MiscUtil.getEntityManagerInstance();
-			HashSet<String> emails = new HashSet<String>();
-			
-			//Adding the person who perform the delete action
-			emails.add(deletor.getEmail());
+		HashSet<String> emails = new HashSet<String>();
 
-			//Adding required attendees
-			for (User u : b.getResponseList().keySet()) {
-				emails.add(u.getEmail());
-			}
+		//Adding the person who perform the delete action
+		emails.add(deletor.getEmail());
 
-			//Check if the booking was previously confirmed
-			boolean confirmed = true;
-			for (Response r : b.getResponseList().values()) {
-				if (r == Response.PENDING || r == Response.REJECTED) {
-					confirmed = false;
-					break;
-				}
-			}
-			//Adding the course coordinator and optional attendees if this is a previously confirmed booking
-			if (confirmed) {
-				//Adding the course coordinator
-				emails.add(UserManager.getCourseCoordinator(em).getEmail());
-
-				//Adding the optional attendees
-				for (String s : b.getOptionalAttendees()) {
-					emails.add(s);
-				}
-			}
-			return emails;
-		} finally {
-			if (em != null && em.isOpen()) em.close();
+		//Adding required attendees
+		for (User u : b.getResponseList().keySet()) {
+			emails.add(u.getEmail());
 		}
+
+		//Check if the booking was previously confirmed
+		boolean confirmed = true;
+		for (Response r : b.getResponseList().values()) {
+			if (r == Response.PENDING || r == Response.REJECTED) {
+				confirmed = false;
+				break;
+			}
+		}
+		//Adding the course coordinator and optional attendees if this is a previously confirmed booking
+		if (confirmed) {
+			//Adding the course coordinator
+			emails.add(UserManager.getCourseCoordinator(em).getEmail());
+
+			//Adding the optional attendees
+			for (String s : b.getOptionalAttendees()) {
+				emails.add(s);
+			}
+		}
+		return emails;
 	}
 
 	@Override

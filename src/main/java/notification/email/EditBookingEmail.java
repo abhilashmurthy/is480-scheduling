@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.EntityManager;
 import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
@@ -18,7 +17,6 @@ import model.User;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import util.MiscUtil;
 
 /**
  *
@@ -72,18 +70,12 @@ public class EditBookingEmail extends EmailTemplate {
 
 			//Adding the course coordinator and optional attendees if this is a previously confirmed booking
 			if (confirmed) {
-				EntityManager em = null;
-				try {
-					em = MiscUtil.getEntityManagerInstance();
-					//Adding the course coordinator
-					emails.add(UserManager.getCourseCoordinator(em).getEmail());
+				//Adding the course coordinator
+				emails.add(UserManager.getCourseCoordinator(em).getEmail());
 
-					//Adding the optional attendees
-					for (String s : b.getOptionalAttendees()) {
-						emails.add(s);
-					}
-				} finally {
-					if (em != null && em.isOpen()) em.close();
+				//Adding the optional attendees
+				for (String s : b.getOptionalAttendees()) {
+					emails.add(s);
 				}
 			}	
 		}

@@ -8,12 +8,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.EntityManager;
 import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
 import model.User;
-import util.MiscUtil;
 
 /**
  *
@@ -44,26 +42,20 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		EntityManager em = null;
-		try {
-			em = MiscUtil.getEntityManagerInstance();
-			HashSet<String> emails = new HashSet<String>();
+		HashSet<String> emails = new HashSet<String>();
 
-			//Adding required attendees
-			for (User u : b.getResponseList().keySet()) {
-				emails.add(u.getEmail());
-			}
-			//Adding the course coordinator
-			emails.add(UserManager.getCourseCoordinator(em).getEmail());
-
-			//Adding the optional attendees
-			for (String s : b.getOptionalAttendees()) {
-				emails.add(s);
-			}
-			return emails;
-		} finally {
-			if (em != null && em.isOpen()) em.close();
+		//Adding required attendees
+		for (User u : b.getResponseList().keySet()) {
+			emails.add(u.getEmail());
 		}
+		//Adding the course coordinator
+		emails.add(UserManager.getCourseCoordinator(em).getEmail());
+
+		//Adding the optional attendees
+		for (String s : b.getOptionalAttendees()) {
+			emails.add(s);
+		}
+		return emails;
 	}
 
 	@Override
