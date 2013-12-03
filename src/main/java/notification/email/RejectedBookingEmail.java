@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import manager.ICSFileManager;
+import manager.UserManager;
 import model.Booking;
 import model.User;
 
@@ -19,11 +20,13 @@ import model.User;
 public class RejectedBookingEmail extends EmailTemplate{
 	Booking b;
 	User rejector;
+	boolean previouslyConfirmed;
 	
-	public RejectedBookingEmail(Booking b, User rejector) {
+	public RejectedBookingEmail(Booking b, User rejector, boolean previouslyConfirmed) {
 		super("rejected_booking.html");
 		this.b = b;
 		this.rejector = rejector;
+		this.previouslyConfirmed = previouslyConfirmed;
 	}
 
 	@Override
@@ -49,6 +52,21 @@ public class RejectedBookingEmail extends EmailTemplate{
 		for (User u : b.getResponseList().keySet()) {
 			emails.add(u.getEmail());
 		}
+		
+		//Adding others if this is a previously confirmed booking
+		if (previouslyConfirmed) {
+			//Adding the course coordinator
+			emails.add(UserManager.getCourseCoordinator(em).getEmail());
+
+			//Adding the optional attendees
+			for (String s : b.getOptionalAttendees()) {
+				emails.add(s);
+			}
+			
+			//Adding the TA
+			emails.add(b.getTimeslot().getTA().getEmail());
+		}
+		
 		return emails;
 	}
 

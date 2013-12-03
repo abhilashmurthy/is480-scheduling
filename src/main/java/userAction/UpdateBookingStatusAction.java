@@ -99,6 +99,9 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				//Retrieving the timeslot to update
 				Booking booking = em.find(Booking.class, bookingId);
 				
+				//Checking if the booking was previously confirmed by all required attendees
+				boolean previouslyConfirmed = booking.getBookingStatus() == BookingStatus.APPROVED;
+				
 				//Retrieving the status list of the timeslot
 				HashMap<User, Response> responseList = booking.getResponseList();
 				if (responseList.containsKey(user)) { //Checking if the faculty is part of the response list for required attendees
@@ -150,7 +153,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 					ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(booking, user);
 					approvedEmail.sendEmail();
 				} else if (response == Response.REJECTED) {
-					RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(booking, user);
+					RejectedBookingEmail rejectedEmail = new RejectedBookingEmail(booking, user, previouslyConfirmed);
 					rejectedEmail.sendEmail();
 				}
                                 
