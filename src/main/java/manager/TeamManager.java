@@ -5,6 +5,7 @@
 package manager;
 
 import constant.BookingStatus;
+import constant.PresentationType;
 import constant.Response;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class TeamManager {
 	private static Logger logger = LoggerFactory.getLogger(TeamManager.class);
 	
 	public static HashMap<String, Object> addEditTeam
-			(EntityManager em, User doer, String teamName, String wiki, long termId,
+			(EntityManager em, User doer, String teamName, String wiki, PresentationType presentationType, long termId,
 			List<Long> memberIds, long supervisorId, long reviewer1Id, long reviewer2Id, long existingTeamId,
 			ServletContext ctx)
 			throws Exception
@@ -111,6 +112,7 @@ public class TeamManager {
 		//Common steps for ADD and EDIT
 		team.setTeamName(teamName);
 		team.setWiki(wiki);
+		team.setPresentationType(presentationType);
 		team.setTerm(term);
 		Faculty oldSup = team.getSupervisor();
 		team.setSupervisor(supervisor);

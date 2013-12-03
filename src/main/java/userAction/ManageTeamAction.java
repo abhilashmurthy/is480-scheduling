@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.PresentationType;
 import constant.Role;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -96,6 +97,16 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			String teamName = dataObj.get("name").getAsString();
 			String wiki = dataObj.get("wiki").getAsString();
 			
+			//Getting the presentation type of the team that is being added/edited
+			JsonElement typeInfo = dataObj.get("presentationType");
+			if (typeInfo == null) throw new CustomException("Please specify the presentation type!");
+			PresentationType presentationType;
+			try {
+				presentationType = PresentationType.valueOf(typeInfo.getAsString());
+			} catch (IllegalArgumentException e) {
+				throw new CustomException("Specified presentation type not found");
+			}
+			
 			long supervisorId = 0;
 			JsonElement supervisorInfo = dataObj.get("supervisor");
 			if (supervisorInfo != null && supervisorInfo.getAsLong() != -1L) supervisorId = supervisorInfo.getAsLong();
@@ -114,7 +125,7 @@ public class ManageTeamAction extends ActionSupport implements ServletRequestAwa
 			ArrayList<Long> memberIds = new Gson().fromJson(dataObj.get("members"), collectionType);
 			if (memberIds == null) memberIds = new ArrayList<Long>();
 		
-			json = TeamManager.addEditTeam(em, user, teamName, wiki, termId, memberIds, supervisorId, reviewer1Id, reviewer2Id, existingTeamId, ctx);
+			json = TeamManager.addEditTeam(em, user, teamName, wiki, presentationType, termId, memberIds, supervisorId, reviewer1Id, reviewer2Id, existingTeamId, ctx);
 			return true;
 		} catch (CustomException e) {
 			json.put("success", false);
