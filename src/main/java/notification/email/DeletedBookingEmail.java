@@ -74,7 +74,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 			}
 			
 			//Adding the TA
-			emails.add(b.getTimeslot().getTA().getEmail());
+			if (b.getTimeslot().getTA() != null) emails.add(b.getTimeslot().getTA().getEmail());
 		}
 		return emails;
 	}
