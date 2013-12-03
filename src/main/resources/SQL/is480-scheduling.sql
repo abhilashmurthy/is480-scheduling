@@ -218,7 +218,13 @@ CREATE TABLE `Settings` (
 
 LOCK TABLES `Settings` WRITE;
 /*!40000 ALTER TABLE `Settings` DISABLE KEYS */;
-INSERT INTO `Settings` VALUES (1,'activeTerms','[2,3]'),(2,'defaultTerm','3'),(3,'milestones','[{\"milestone\":\"Acceptance\",\"attendees\":[\"Supervisor\"],\"duration\":60,\"order\":1},{\"milestone\":\"Midterm\",\"attendees\":[\"Reviewer1\",\"Reviewer2\"],\"duration\":90,\"order\":2},{\"milestone\":\"Final\",\"attendees\":[\"Supervisor\",\"Reviewer1\"],\"duration\":90,\"order\":3}]'),(4,'manageNotifications','[{\"emailFrequency\":\"1\",\"emailStatus\":\"On\"},{\"smsStatus\":\"On\",\"smsFrequency\":\"24\"},{\"emailClearStatus\":\"On\",\"emailClearFrequency\":\"2\"}]');
+INSERT INTO `Settings` (`id`, `name`, `value`) VALUES
+(1, 'activeTerms', '[2,3]'),
+(2, 'defaultTerm', '3'),
+(3, 'milestones', '[{"milestone":"Acceptance","attendees":["Supervisor"],"duration":60,"order":1},{"milestone":"Midterm","attendees":["Reviewer1","Reviewer2"],"duration":90,"order":2},{"milestone":"Final","attendees":["Supervisor","Reviewer1"],"duration":90,"order":3}]'),
+(4, 'manageNotifications', '[{"emailFrequency":"1","emailStatus":"On"},{"smsStatus":"On","smsFrequency":"24"},{"emailClearStatus":"On","emailClearFrequency":"2"}]'),
+(5, 'bypassPassword', 'default'),
+(6, 'emailURL', 'http://202.161.45.167/is480-scheduling/');
 /*!40000 ALTER TABLE `Settings` ENABLE KEYS */;
 UNLOCK TABLES;
 

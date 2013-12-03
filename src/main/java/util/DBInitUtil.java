@@ -849,11 +849,15 @@ public class DBInitUtil {
 			
 		manageNotifications.setValue(notificationArray.toString());
 		
+		Settings emailURL = new Settings();
+		emailURL.setName("emailURL");
+		emailURL.setValue("http://202.161.45.167/is480-scheduling/");
 		
         //Persistence
 		em.persist(bypassPassword);
         em.persist(activeTerms);
         em.persist(milestones);
 		em.persist(manageNotifications);
+		em.persist(emailURL);
     }
 }
