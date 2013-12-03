@@ -429,9 +429,6 @@ CREATE TABLE IF NOT EXISTS `SystemActivityLog` (
   CONSTRAINT `FK_2r0jl7pto3a67xypgxracp28p` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- Adding bypassPassword to settings table
-INSERT INTO `Settings` VALUES (NULL,'bypassPassword','default');
-
 -- Adding presentationType column
 ALTER TABLE `Team` ADD `presentationType` int(11) DEFAULT NULL;
 
