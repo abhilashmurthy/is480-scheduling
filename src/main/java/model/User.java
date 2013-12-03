@@ -6,15 +6,11 @@ package model;
 
 import constant.Role;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -47,6 +43,8 @@ public class User implements Serializable {
 	private Long id;
 	
 	private String username;
+	
+	private String email;
 	
 	private String fullName;
 	
@@ -98,7 +96,11 @@ public class User implements Serializable {
 	}
 
 	public String getEmail() {
-		return username + "@smu.edu.sg";
+		return email;
+	}
+	
+	public void setEmail(String email) {
+		this.email = email;
 	}
 		
 	public Long getId() {
