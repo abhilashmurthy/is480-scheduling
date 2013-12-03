@@ -55,5 +55,8 @@ public class SettingsManager {
 		return getByName(em, "manageNotifications");
 	}
 	
+	public static String getEmailURLFromSetting (EntityManager em) {
+		return getByName(em, "emailURL").getValue();
+	}	
 	
 }

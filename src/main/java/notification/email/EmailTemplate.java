@@ -96,7 +96,7 @@ public abstract class EmailTemplate {
 	/**
 	 * Injects standard booking information. Covers the following tags:
 	 * [TEAM_NAME], [MILESTONE], [DATE], [START_TIME], [END_TIME]
-	 * [VENUE], [REQUIRED_ATTENDEES]
+	 * [VENUE], [REQUIRED_ATTENDEES], [OPTIONAL_ATTENDEES], [TA], [URL]
 	 * @param b
 	 * @param map
 	 * @return 
@@ -149,9 +149,13 @@ public abstract class EmailTemplate {
 		}
 		map.put("[OPTIONAL_ATTENDEES]", optionalEmailsString.toString());
 		
+		//Insert TA (if any)
 		TA ta = b.getTimeslot().getTA();
 		String taString = (ta != null) ? ta.getFullName() : "-" ;
 		map.put("[TA]", taString);
+		
+		//Insert URL to server
+		map.put("[URL]", SettingsManager.getEmailURLFromSetting(em));
 		
 		return map;
 	}
