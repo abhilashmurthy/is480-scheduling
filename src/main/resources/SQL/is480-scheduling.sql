@@ -374,6 +374,7 @@ CREATE TABLE `User` (
   `username` varchar(255) DEFAULT NULL,
   `term_id` bigint(20) DEFAULT NULL,
   `team_id` bigint(20) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `User_unique_constraint` (`username`,`role`,`term_id`),
   KEY `FK_hv9jmx9bi1vceqhftsbebo1yy` (`term_id`),
