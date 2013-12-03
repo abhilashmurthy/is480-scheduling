@@ -81,7 +81,10 @@ public abstract class EmailTemplate {
 	}
 	
 	public String generateBookingSubjectTitle(Booking b, String content) {
-		return "IS480: " + content + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM dd");
+		return "IS480: " + content + b.getTimeslot().getSchedule().getMilestone().getName()
+				+ " - " + b.getTeam().getTeamName()
+				+ " (" + sdf.format(b.getTimeslot().getStartTime()) + ")";
 	}
 	
 	/**
