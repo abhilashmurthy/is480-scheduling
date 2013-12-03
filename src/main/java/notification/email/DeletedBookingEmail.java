@@ -63,7 +63,7 @@ public class DeletedBookingEmail extends EmailTemplate{
 				break;
 			}
 		}
-		//Adding the course coordinator and optional attendees if this is a previously confirmed booking
+		//Adding others if this is a previously confirmed booking
 		if (confirmed) {
 			//Adding the course coordinator
 			emails.add(UserManager.getCourseCoordinator(em).getEmail());
@@ -72,6 +72,9 @@ public class DeletedBookingEmail extends EmailTemplate{
 			for (String s : b.getOptionalAttendees()) {
 				emails.add(s);
 			}
+			
+			//Adding the TA
+			emails.add(b.getTimeslot().getTA().getEmail());
 		}
 		return emails;
 	}
