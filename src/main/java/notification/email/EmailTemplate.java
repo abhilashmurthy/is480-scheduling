@@ -22,6 +22,7 @@ import manager.SettingsManager;
 import model.Booking;
 import model.Settings;
 import model.User;
+import model.role.TA;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,10 @@ public abstract class EmailTemplate {
 	}
 	
 	public String generateBookingSubjectTitle(Booking b, String content) {
-		return content + b.getTimeslot().getSchedule().getMilestone().getName() + " - " + b.getTeam().getTeamName();
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM dd");
+		return "IS480: " + content + b.getTimeslot().getSchedule().getMilestone().getName()
+				+ " - " + b.getTeam().getTeamName()
+				+ " (" + sdf.format(b.getTimeslot().getStartTime()) + ")";
 	}
 	
 	/**
@@ -144,6 +148,10 @@ public abstract class EmailTemplate {
 			}
 		}
 		map.put("[OPTIONAL_ATTENDEES]", optionalEmailsString.toString());
+		
+		TA ta = b.getTimeslot().getTA();
+		String taString = (ta != null) ? ta.getFullName() : "-" ;
+		map.put("[TA]", taString);
 		
 		return map;
 	}

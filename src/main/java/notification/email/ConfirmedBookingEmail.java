@@ -48,13 +48,18 @@ public class ConfirmedBookingEmail extends EmailTemplate{
 		for (User u : b.getResponseList().keySet()) {
 			emails.add(u.getEmail());
 		}
+		
 		//Adding the course coordinator
 		emails.add(UserManager.getCourseCoordinator(em).getEmail());
-
+		
 		//Adding the optional attendees
 		for (String s : b.getOptionalAttendees()) {
 			emails.add(s);
 		}
+
+		//Adding the TA
+		emails.add(b.getTimeslot().getTA().getEmail());
+
 		return emails;
 	}
 
