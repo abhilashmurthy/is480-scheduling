@@ -151,7 +151,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 				if (serverSignature.equals(generatedSignature)) {
 					initializeUser(em);
 					User userForLog = (User) session.getAttribute("user");
-					logItem.setUser(userForLog);
+					if (userForLog != null && userForLog.getId() != null) logItem.setUser(userForLog);
 					logItem.setMessage("Login successful. " + userForLog.toString());
 				} else {
 					//Login unsuccessful
