@@ -4,9 +4,7 @@
  */
 package userAction;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -21,15 +19,13 @@ import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.CustomException;
 import util.MiscUtil;
 
 /**
  *
  * @author suresh
  */
-public class ChangePasswordAction extends ActionSupport implements ServletRequestAware {
-	
+public class ChangeEmailURLAction extends ActionSupport implements ServletRequestAware{
 	private HttpServletRequest request;
 	private Logger logger = LoggerFactory.getLogger(ChangePasswordAction.class);
 	private HashMap<String, Object> json = new HashMap<String, Object>();
@@ -42,7 +38,7 @@ public class ChangePasswordAction extends ActionSupport implements ServletReques
 		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
 		
 		SystemActivityLog logItem = new SystemActivityLog();
-		logItem.setActivity("Administrator: Change Administrator Password");
+		logItem.setActivity("Administrator: Change Email URL");
 		logItem.setRunTime(now);
 		if (user.getId() != null) logItem.setUser(user);
 		logItem.setMessage("Error with validation / No changes made");
@@ -52,41 +48,19 @@ public class ChangePasswordAction extends ActionSupport implements ServletReques
         try {
 			em = MiscUtil.getEntityManagerInstance();
 			
-			JsonObject inputData = new Gson().fromJson(request.getParameter("jsonData"), JsonObject.class);
-			
-			JsonElement currPassElem = inputData.get("currentPassword");
-			if (currPassElem == null) throw new CustomException("Please specify the current password");
-			String currentPassword = currPassElem.getAsString();
-			
-			JsonElement newPassElem = inputData.get("newPassword");
-			if (newPassElem == null) throw new CustomException("Please specify the new password");
-			String newPassword = newPassElem.getAsString();
-			
-			JsonElement verifyPassElem = inputData.get("verifyPassword");
-			if (verifyPassElem == null) throw new CustomException("Please specify the verified new password");
-			String verifyPassword = verifyPassElem.getAsString();
-			
-			//Checking if the new password matches the confirmation/verification
-			if (!newPassword.equals(verifyPassword)) throw new CustomException("New password doesn't match the confirmation. Please try again!");
-			
-			//Checking if the new password is blank
-			if (newPassword.trim().equals("")) throw new CustomException("New password cannot be blank. Please try again!");
+			String inputString = request.getParameter("emailURL");
+			inputString = inputString.trim();
 			
 			em.getTransaction().begin();
 			
-			Settings bypassPassword = SettingsManager.getByName(em, "bypassPassword");
-			if (!bypassPassword.getValue().equals(currentPassword)) throw new CustomException("Current password does not match. Please try again!");
-			
-			bypassPassword.setValue(newPassword.trim());
+			Settings emailURL = SettingsManager.getEmailURLSettings(em);
+			emailURL.setValue(inputString);
 			
 			em.getTransaction().commit();
 			
 			json.put("success", true);
-			logItem.setMessage("Password changed successfully");
-			
-        } catch (CustomException e) {
-			json.put("success", false);
-            json.put("message", e.getMessage());
+			logItem.setMessage("Email URL changed successfully");
+		
 		} catch (Exception e) {
 			logItem.setSuccess(false);
 			if (user.getId() != null) logItem.setUser(user);
@@ -100,22 +74,23 @@ public class ChangePasswordAction extends ActionSupport implements ServletReques
             }
 			json.put("success", false);
             json.put("exception", true);
-            json.put("message", "Error with ChangePasswordAction: Escalate to developers!");
+            json.put("message", "Error with ChangeEmailURLAction: Escalate to developers!");
         } finally {
 			 if (em != null) {
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+				
 				//Saving job log in database
 				if (!em.getTransaction().isActive()) em.getTransaction().begin();
 				em.persist(logItem);
 				em.getTransaction().commit();
 				
-				if (em.getTransaction().isActive()) em.getTransaction().rollback();
 				if (em.isOpen()) em.close();
 			}
 		}
 		
 		return SUCCESS;
 	}
-
+	
 	public void setServletRequest(HttpServletRequest hsr) {
 		this.request = hsr;
 	}
@@ -127,5 +102,4 @@ public class ChangePasswordAction extends ActionSupport implements ServletReques
 	public void setJson(HashMap<String, Object> json) {
 		this.json = json;
 	}
-
 }

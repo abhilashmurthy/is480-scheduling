@@ -155,7 +155,7 @@ public abstract class EmailTemplate {
 		map.put("[TA]", taString);
 		
 		//Insert URL to server
-		map.put("[URL]", SettingsManager.getEmailURLFromSetting(em));
+		map.put("[URL]", SettingsManager.getEmailURLSettings(em).getValue());
 		
 		return map;
 	}

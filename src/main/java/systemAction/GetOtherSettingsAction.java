@@ -4,21 +4,15 @@
  */
 package systemAction;
 
-import com.google.gson.Gson;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.Role;
-import java.util.ArrayList;
-import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.SettingsManager;
-import model.Settings;
 import model.User;
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.MiscUtil;
@@ -31,7 +25,8 @@ public class GetOtherSettingsAction extends ActionSupport implements ServletRequ
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(GetMilestoneSettingsAction.class);
 	private String remindersJson;
-	
+	private String emailURL;
+
 	@Override
     public String execute() {
 		EntityManager em = null;
@@ -43,6 +38,7 @@ public class GetOtherSettingsAction extends ActionSupport implements ServletRequ
 			User user = (User) session.getAttribute("user");
 			if (user.getRole().equals(Role.ADMINISTRATOR) || user.getRole().equals(Role.COURSE_COORDINATOR)) {
 				remindersJson = SettingsManager.getNotificationSettings(em).getValue();
+				emailURL = SettingsManager.getEmailURLSettings(em).getValue();
 			}
 		} catch (Exception e) {
 			logger.error("Exception caught: " + e.getMessage());
@@ -78,6 +74,14 @@ public class GetOtherSettingsAction extends ActionSupport implements ServletRequ
 		this.remindersJson = remindersJson;
 	}
 
+	public String getEmailURL() {
+		return emailURL;
+	}
+
+	public void setEmailURL(String emailURL) {
+		this.emailURL = emailURL;
+	}
+	
 }  // end of class
 
 

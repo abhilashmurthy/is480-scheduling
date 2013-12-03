@@ -29,7 +29,7 @@
         <div class="container">
 			<!-- REMINDER SETTINGS SECTION -->
 			<div class='reminderSettings fuelux'>
-				<h3>Settings</h3>
+				<h3>Trigger Timings</h3>
 				<table class='otherSettingsTable'>
 					<tr><td colspan="4"><h4>Schedule</h4></td></tr>
 					<tr class='reminderItem'>
@@ -93,6 +93,17 @@
 			</div>
 			
 			<!-- END OF REMINDER SETTINGS SECTION -->
+			
+			<!-- EMAIL URL SECTION -->
+			
+			<div class='passwordSettings'>
+				<h4>Email URL</h4>
+				<input type="text" id="emailURLInput" style="width: 400px;" value="<s:property value='emailURL'/>"/> <br /><br />
+				<button id="emailURLChangeSubmitButton" class="btn btn-primary" data-loading-text="Saving...">Save</button>
+			</div>
+			
+			<!-- END OF EMAIL URL SECTION -->
+			
 			<!-- ADMINISTRATOR PASSWORD SECTION -->
 			<hr>
 			<div class='passwordSettings'>
@@ -195,6 +206,26 @@
 					return false;
 				});
 				
+				$('body').on('click', '#emailURLChangeSubmitButton', function(){
+					$("#emailURLChangeSubmitButton").button('loading');
+					$.ajax({
+						type: 'POST',
+						async: false,
+						url: 'changeEmailURL',
+						data: {emailURL: $("#emailURLInput").val()}
+					}).done(function(response) {
+						$("#emailURLChangeSubmitButton").button('reset');
+						var success = response.success;
+						var notificationType = (success) ? "SUCCESS" : "ERROR";
+						var message = (response.message) ? response.message : "Email URL changed successfully";
+							showNotification(notificationType, message);
+					}).fail(function(response) {
+						$("#emailURLChangeSubmitButton").button('reset');
+						showNotification("ERROR", "Error in contacting the server. Please try again.");
+					});
+					return false;
+				});
+				
 				$('body').on('click', '#passwordChangeSubmitButton', function(){
 					if (uatMode) recordHumanInteraction(e);
 					$("#passwordChangeSubmitButton").button('loading');
@@ -208,29 +239,28 @@
 						$("#passwordChangeSubmitButton").button('reset');
 						return false;
 					}
-					var testingInput = {
+					var passwordFormData = {
 						currentPassword: currentPasswordStr,
 						newPassword: newPasswordStr,
 						verifyPassword: verifyPasswordStr
 					};
-					console.log('Submitting: ' + JSON.stringify(testingInput));
 					$.ajax({
 						type: 'POST',
 						async: false,
 						url: 'changePassword',
-						data: {jsonData: JSON.stringify(testingInput)}
+						data: {jsonData: JSON.stringify(passwordFormData)}
 					}).done(function(response) {
 						$("#passwordChangeSubmitButton").button('reset');
 						var success = response.success;
 						var notificationType = (success) ? "SUCCESS" : "ERROR";
 						var message = (response.message) ? response.message : "Password changed successfully";
-								showNotification(notificationType, message);
-							}).fail(function(response) {
-								$("#passwordChangeSubmitButton").button('reset');
-								showNotification("ERROR", "Error in contacting the server. Please try again.");
-							});
-						return false;
-					});					
+							showNotification(notificationType, message);
+					}).fail(function(response) {
+						$("#passwordChangeSubmitButton").button('reset');
+						showNotification("ERROR", "Error in contacting the server. Please try again.");
+					});
+					return false;
+				});					
 
 					//Notification-------------
 					function showNotification(action, notificationMessage) {
