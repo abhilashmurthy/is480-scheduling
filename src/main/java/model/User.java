@@ -30,7 +30,12 @@ public class User implements Serializable {
 	protected User() {}
 	
 	public User(String username, String fullName, String mobileNumber, Role role, Term term) {
+		this(username, username + "@smu.edu.sg", fullName, mobileNumber, role, term);
+	}
+	
+	public User(String username, String email, String fullName, String mobileNumber, Role role, Term term) {
 		this.username = username;
+		this.email = email;
 		this.fullName = fullName;
 		this.mobileNumber = mobileNumber;
 		this.role = role;
