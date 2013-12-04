@@ -256,7 +256,7 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 								String startDateTimeCompare = "";
 								startDateTimeCompare = tCompare.getStartTime().toString();
 								String startDateCompare = startDateTimeCompare.substring(0, 10);
-								String startTimeEach = startDateTimeCompare.substring(11, 13);
+								String startTimeEach = startDateTimeCompare.substring(11, 16);
 
 								if (startDateCompare.equals(startDate)) {
 									//if there is a booking
@@ -292,7 +292,7 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 										//print out stuff for this section
 										out.write("|-");
 										out.newLine();
-										out.write("|width=\"160pt\"|" + startTimeEach + ":00hrs");
+										out.write("|width=\"160pt\"|" + startTimeEach + " hrs");
 										out.newLine();
 
 										Team team = tCompare.getCurrentBooking().getTeam();
