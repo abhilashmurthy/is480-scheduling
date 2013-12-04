@@ -43,3 +43,39 @@
 <script type="text/javascript" src="js/jquery/jqplot/jqplot.dateAxisRenderer.min.js"></script>
 <!-- Session timeout -->
 <script type="text/javascript" src="js/jquery/jquery.sessionTimeout.min.js"></script>
+
+<!-- Footer -->
+<script type="text/javascript">	
+	var footerLoad = function() {		
+		$(window).scroll(function() {
+			if ($('#footer').length > 0) return false;
+			if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+				appendFooter();
+			}
+		});
+
+		function appendFooter() {
+			$('body')
+				.append(
+					$(document.createElement('div'))
+						.attr('id', 'footer')
+						.css({
+							position: "absolute",
+							top: $(document).height(),
+							display: "none"
+						})
+						.append(
+							$(document.createElement('div'))
+								.addClass('container')
+								.append(
+									$(document.createElement('p'))
+										.addClass('muted credit')
+										.append('Hello there!')
+								)
+						)
+						.show('fade', 'slow')
+				);
+		}
+	};
+	addLoadEvent(footerLoad);
+</script>
