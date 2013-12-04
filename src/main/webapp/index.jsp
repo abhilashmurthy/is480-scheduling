@@ -2362,7 +2362,7 @@
 					});
 					
 					function showMyTeamsModal() {
-						var bookedTeamsPie = {"Teams with Bookings": 0, "Teams without Bookings": 0};
+						var bookedTeamsPie = {"Teams with Bookings": 0, "Teams without Bookings": 0, "Teams with Pending Bookings": 0};
 						bootbox.alert({
 							title: <%=activeRole.equals(Role.FACULTY)%>?'My Teams' : 'Teams',
 							message: function() {
@@ -2383,7 +2383,7 @@
 										var $trs = new Array();
 										for (var i = 0; i < teams.length; i++) {
 											var team = teams[i];
-											var $milestoneBooking = $(document.createElement('i')).addClass('fa fa-times').css('color', 'red');
+											var $milestoneBooking = $(document.createElement('i')).addClass('fa fa-times').css('color', 'red').data('status', 'unbooked');
 											for (var j = 0; j < team.bookings.length; j++) {
 												if (parseInt(team.bookings[j].scheduleId) === parseInt(scheduleData.id)) {
 													$milestoneBooking = $(document.createElement('span'))
@@ -2391,10 +2391,14 @@
 														.append(team.bookings[j].datetime + ' ')
 														.append(team.bookings[j].bookingStatus === 'pending'?
 															$(document.createElement('span')).html('(pending)')
-															:$(document.createElement('i')).addClass('fa fa-check').css('color', '#A9DBA9'));
+															:$(document.createElement('i')).addClass('fa fa-check').css('color', '#A9DBA9')
+														)
+														.data('status', team.bookings[j].bookingStatus === 'pending'?'pending':'booked');
 												}
 											}
-											if ($milestoneBooking.is('.fa-times')) bookedTeamsPie["Teams without Bookings"]++; else bookedTeamsPie["Teams with Bookings"]++;
+											if ($milestoneBooking.data('status') === 'unbooked') bookedTeamsPie["Teams without Bookings"]++; 
+											else if ($milestoneBooking.data('status') === 'pending') bookedTeamsPie["Teams with Pending Bookings"]++;
+											else bookedTeamsPie["Teams with Bookings"]++;
 											$trs.push(
 												$(document.createElement('tr'))
 													.append(
@@ -2468,7 +2472,7 @@
 						var data = convertJsonToData(bookedTeamsPie);
 						var piePlot = $.jqplot('bookedTeamsPieDiv', [data], 
 							{
-								seriesColors: ["#B8F79E", "#F7A8A8"],
+								seriesColors: ["#B8F79E", "#F7A8A8", "#F7F2A8"],
 								seriesDefaults: {
 									renderer: $.jqplot.PieRenderer,
 									shadow: true,
@@ -2476,7 +2480,7 @@
 									rendererOptions: {
 										showDataLabels: true,
 										dataLabels: 'value',
-//										dataLabelPositionFactor: 1.0,
+										dataLabelPositionFactor: 0.8,
 										lineWidth: 5,
 										highlightMouseOver: false
 									}
