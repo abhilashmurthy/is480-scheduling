@@ -222,6 +222,9 @@ public class BookingManager {
 			booking.setRequiredAttendees(reqAttendees);
 			booking.setLastEditedBy(user.getFullName());
 			booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+			
+			em.persist(booking);
+			
 			if (!overrideApproval) { //Emails to be sent if normal process is followed
 				NewBookingEmail newEmail = new NewBookingEmail(booking, user);
 				RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking, user);
@@ -233,9 +236,7 @@ public class BookingManager {
 				ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 				confirmationEmail.sendEmail();
 			}
-
-			em.persist(booking);
-
+			
 			//Setting the current active booking in the timeslot object
 			timeslot.setCurrentBooking(booking);
 			em.persist(timeslot);

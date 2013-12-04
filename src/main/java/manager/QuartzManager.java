@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import model.Booking;
 import model.Settings;
 import org.quartz.JobBuilder;
@@ -44,12 +43,22 @@ public class QuartzManager {
 				.withIdentity(String.valueOf(booking.getId()), MiscUtil.SMS_REMINDER_JOBS).build();
 		//Calculating the time to trigger the job
 		Calendar scheduledTime = Calendar.getInstance();
-		scheduledTime.setTimeInMillis(booking.getTimeslot().getStartTime().getTime());
-		scheduledTime.add(Calendar.HOUR, smsHours);
-		if (scheduledTime.getTime().before(new Date())) {
-			scheduledTime.setTimeInMillis(new Date().getTime());
-			scheduledTime.add(Calendar.SECOND, 10);
+		if (MiscUtil.DEV_MODE) { //TESTING CODE
+			scheduledTime.setTimeInMillis(booking.getTimeslot().getStartTime().getTime());
+			scheduledTime.add(Calendar.HOUR, smsHours);
+			if (scheduledTime.getTime().before(new Date())) {
+				scheduledTime.setTimeInMillis(new Date().getTime());
+				scheduledTime.add(Calendar.SECOND, 10);
+			}
+		} else { //LIVE CODE
+			scheduledTime.setTimeInMillis(booking.getTimeslot().getStartTime().getTime());
+			scheduledTime.add(Calendar.HOUR, smsHours);
+			if (scheduledTime.getTime().before(new Date())) {
+				scheduledTime.setTimeInMillis(new Date().getTime());
+				scheduledTime.add(Calendar.SECOND, 10);
+			}	
 		}
+		
 		logger.debug("Scheduled SMS at: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(scheduledTime.getTimeInMillis()));
 		Trigger tr = TriggerBuilder.newTrigger().withIdentity(String.valueOf(booking.getId()), MiscUtil.SMS_REMINDER_JOBS)
 						.startAt(scheduledTime.getTime()).build();

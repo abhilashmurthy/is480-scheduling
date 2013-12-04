@@ -18,6 +18,7 @@ import model.Booking;
 import model.SystemActivityLog;
 import model.User;
 import notification.email.PresentationReminderEmail;
+import org.hibernate.Hibernate;
 import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -68,6 +69,11 @@ public class SMSReminderJob implements Job {
 
             //Check if the booking was found
             if (booking != null) {
+				//Forcing initialization for sending email
+				Hibernate.initialize(booking.getTeam().getMembers());
+				Hibernate.initialize(booking.getTimeslot().getSchedule().getMilestone());
+				Hibernate.initialize(booking.getRequiredAttendees());
+				
 				//Sending email reminder
 				PresentationReminderEmail email = new PresentationReminderEmail(booking);
 				email.sendEmail();
