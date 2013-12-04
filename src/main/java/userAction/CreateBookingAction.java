@@ -96,7 +96,7 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
                 timeslot = em.find(Timeslot.class, timeslotId);
             }
 			em.getTransaction().begin();
-			json = BookingManager.createBooking(em, timeslot, user, team, overrideApproval);
+			json = BookingManager.createBooking(em, timeslot, user, team, request.getSession().getServletContext(), overrideApproval);
 			
 			json.put("overrideApproval", overrideApproval);
 			

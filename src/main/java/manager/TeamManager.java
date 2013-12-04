@@ -246,7 +246,7 @@ public class TeamManager {
 					throw new CustomException("Oops. Could not update faculty. Please try again!");
 				}
 				
-				HashMap<String, Object> createResult = BookingManager.createBooking(em, b.getTimeslot(), doer, team, false);
+				HashMap<String, Object> createResult = BookingManager.createBooking(em, b.getTimeslot(), doer, team, ctx, false);
 				if (!createResult.containsKey("success") && Boolean.parseBoolean(createResult.get("success").toString()) == false) {
 					throw new CustomException("Oops. Could not update faculty. Please try again!");
 				}
