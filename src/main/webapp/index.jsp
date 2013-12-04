@@ -81,35 +81,6 @@
 				<i id='nextWeek' class='traverseWeek fa fa-arrow-circle-o-right' style='color: #5bc0de; display: none; cursor: pointer'></i>
             </div>
 			<br/><br/>
-			
-<!--             To display the list of active terms 
-            <div class="activeTerms">
-                <table>
-                    <tr>
-                        <td style="padding-right:10px"><b>Select Term</b></td>
-                        <td><form id="activeTermForm" action="index" method="post">
-                                <select name="termId" style="float:right" onchange="this.form.submit()"> 
-                                    <option value=""><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
-                                    <s:iterator value="data">
-                                        <option value="<s:property value="termId"/>"><s:property value="termName"/></option>
-                                    </s:iterator>
-                                </select>
-                            </form></td>
-                    </tr>
-                </table>
-            </div>-->
-
-			<!-- To display a banner for filling survey. Remove later -->
-<!--			<div class="banner alert">
-				<button type="button" class="close" data-dismiss="alert">×</button>
-				Hi <%= user.getFullName()%>, <br/><br/>
-				We have spent a lot of time building this system. We will really appreciate
-				if you could give us <a href="https://docs.google.com/forms/d/1dZvPHlAV5VhJjupRCHiYT52hHZ2nIDD4IoLNeX98ogM/viewform" 
-										target="_blank">feedback</a> 
-				on your experience with our system!<br/><br/>
-				Thanking you,<br/>
-				IS480 Scheduling Team
-			</div>-->
 
             <!-- To display legend for the calendar -->
             <table class="legend">
