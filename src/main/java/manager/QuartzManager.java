@@ -34,12 +34,10 @@ import util.MiscUtil;
 public class QuartzManager {
 	private static Logger logger = LoggerFactory.getLogger(QuartzManager.class);
 	
-	public static void scheduleSMSReminder(Booking booking, EntityManager em, HttpServletRequest request) throws Exception {
+	public static void scheduleSMSReminder(Booking booking, EntityManager em, ServletContext ctx) throws Exception {
 		Settings reminderSettings = SettingsManager.getNotificationSettings(em);
 		int smsHours = -1 * new Gson().fromJson(reminderSettings.getValue(), JsonArray.class).get(1).getAsJsonObject().get("smsFrequency").getAsInt();
-		StdSchedulerFactory factory = (StdSchedulerFactory) request.getSession()
-				.getServletContext()
-				.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
+		StdSchedulerFactory factory = (StdSchedulerFactory) ctx.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
 		Scheduler scheduler = factory.getScheduler();
 		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
 				.usingJobData("bookingId", booking.getId())
