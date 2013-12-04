@@ -17,6 +17,7 @@ import javax.xml.bind.DatatypeConverter;
 import model.Booking;
 import model.SystemActivityLog;
 import model.User;
+import notification.email.PresentationReminderEmail;
 import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -67,6 +68,11 @@ public class SMSReminderJob implements Job {
 
             //Check if the booking was found
             if (booking != null) {
+				//Sending email reminder
+				PresentationReminderEmail email = new PresentationReminderEmail(booking);
+				email.sendEmail();
+				
+				//Sending SMS reminder
                 logger.debug("Booking: " + booking + ". SMS sending..");
                 StringBuilder msg = new StringBuilder();
                 msg
