@@ -10,13 +10,13 @@
 <html>
     <head>
         <%@include file="header.jsp" %>
-        <title>IS480 Scheduling System | Preferences </title>
+        <title>IS480 Scheduling System | Settings </title>
     </head>
     <body>
         <%@include file="navbar.jsp" %>
 		
         <div class="container">
-			<h3>Manage Preferences</h3>
+			<h3>Settings</h3>
 			<br>
 			<table id="smsTable" class="table">
 				<tbody>
