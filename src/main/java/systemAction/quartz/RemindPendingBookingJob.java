@@ -68,6 +68,7 @@ public class RemindPendingBookingJob implements Job {
 			JsonObject clearBookingSetting = notifArray.get(2).getAsJsonObject();
 			String durationStr = clearBookingSetting.get("emailClearFrequency").getAsString();
 			int duration = Integer.parseInt(durationStr); //Duration for faculty to respond to booking
+			if (duration == 0) return; //0 means the feature is disabled
 			Calendar tomorrow = Calendar.getInstance();
 			if (MiscUtil.DEV_MODE) {
 				tomorrow.add(Calendar.DAY_OF_MONTH, 1); //Tomorrow 3AM
