@@ -129,7 +129,7 @@
 					}).done(function(response) {
 						$("#downloadICSBtn").button('reset');
 						if (response.success) {
-							window.open(response.downloadPath);
+							window.location = response.downloadPath;
 						} else {
 							showNotification("ERROR", response.message);
 						}
@@ -137,6 +137,7 @@
 						$("#downloadICSBtn").button('reset');
 						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
 					});
+					return false;
 				});
 
 				//Tooltip
