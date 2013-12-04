@@ -85,7 +85,7 @@ public class ICSFileManager {
 		try {
 			StringBuilder path = new StringBuilder();
 			path.append("ICS/").append(u.getUsername());
-			if (u.getTerm() != null) path.append("-").append(u.getTerm().getDisplayName());
+			if (u.getTerm() != null) path.append(" (").append(u.getTerm().getDisplayName()).append(")");
 			path.append(".ics");
 			String pathToReturn = path.toString();
 			path.insert(0, ctx.getRealPath("/"));
