@@ -36,6 +36,7 @@ public class QuartzManager {
 	public static void scheduleSMSReminder(Booking booking, EntityManager em, ServletContext ctx) throws Exception {
 		Settings reminderSettings = SettingsManager.getNotificationSettings(em);
 		int smsHours = -1 * new Gson().fromJson(reminderSettings.getValue(), JsonArray.class).get(1).getAsJsonObject().get("smsFrequency").getAsInt();
+		if (smsHours == 0) return; //0 means the feature is disabled
 		StdSchedulerFactory factory = (StdSchedulerFactory) ctx.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
 		Scheduler scheduler = factory.getScheduler();
 		JobDetail jd = JobBuilder.newJob(SMSReminderJob.class)
