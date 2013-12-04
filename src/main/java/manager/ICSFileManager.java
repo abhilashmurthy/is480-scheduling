@@ -89,7 +89,6 @@ public class ICSFileManager {
 			String pathToReturn = path.toString();
 			path.insert(0, ctx.getRealPath("/"));
 			File icsFile = new File(path.toString());
-			icsFile.mkdirs();
 			fs = new FileOutputStream(icsFile);
 			CalendarOutputter calOut = new CalendarOutputter();
 			calOut.output(calendar, fs);
