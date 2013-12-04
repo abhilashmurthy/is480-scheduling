@@ -87,7 +87,7 @@ public class RejectedBookingEmail extends EmailTemplate{
 	
 	@Override
 	public File getFileAttachment() {
-		return ICSFileManager.createICSFile(b);
+		return ICSFileManager.createICSFile(b, previouslyConfirmed);
 	}
 
 	@Override

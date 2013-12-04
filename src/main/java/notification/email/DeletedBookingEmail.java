@@ -8,6 +8,7 @@ import constant.Response;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 import manager.ICSFileManager;
 import manager.UserManager;
@@ -94,7 +95,14 @@ public class DeletedBookingEmail extends EmailTemplate{
 
 	@Override
 	public File getFileAttachment() {
-		return ICSFileManager.createICSFile(b);
+		boolean previouslyConfirmed = true;
+		for (Entry e : b.getResponseList().entrySet()) {
+			if (e.getValue() != Response.APPROVED) {
+				previouslyConfirmed = false;
+				 break;
+			}
+		}
+		return ICSFileManager.createICSFile(b, previouslyConfirmed);
 	}
 
 	@Override

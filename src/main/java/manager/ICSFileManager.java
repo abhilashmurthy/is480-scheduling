@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
@@ -46,11 +45,13 @@ public class ICSFileManager {
 	private static Logger logger = (Logger) LoggerFactory.getLogger(ICSFileManager.class);
 	
 	public synchronized static File createICSFile(Booking b) {
+		return createICSFile(b, false);
+	}
+	
+	public synchronized static File createICSFile(Booking b, boolean previouslyConfirmed) {
 		FileOutputStream fs = null;
 		try {
-			ArrayList<Booking> bookings = new ArrayList<Booking>();
-			bookings.add(b);
-			net.fortuna.ical4j.model.Calendar icsCal = createICSCalendar(bookings);
+			net.fortuna.ical4j.model.Calendar icsCal = createICSCalendarForBooking(b, previouslyConfirmed);
 			File icsFile = new File("BID-" + b.getId() + ".ics");
 			fs = new FileOutputStream(icsFile);
 			CalendarOutputter calOut = new CalendarOutputter();
@@ -79,7 +80,29 @@ public class ICSFileManager {
 		return calendar;
 	}
 	
+	private static net.fortuna.ical4j.model.Calendar createICSCalendarForBooking(Booking b, boolean previouslyConfirmed) throws Exception {
+		net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
+		calendar.getProperties().add(Version.VERSION_2_0);
+		calendar.getProperties().add(new ProdId("-//Events Calendar//iCal4j 1.0//EN"));
+		
+		//CODE TO SUPPORT MS OUTLOOK
+		if (b.getBookingStatus() == BookingStatus.DELETED || b.getBookingStatus() == BookingStatus.REJECTED) {
+			calendar.getProperties().add(Method.CANCEL);
+		} else {
+			calendar.getProperties().add(Method.REQUEST);
+		}
+		
+		calendar.getProperties().add(CalScale.GREGORIAN);
+		calendar.getComponents().add(createVEvent(b, previouslyConfirmed));	
+		
+		return calendar;
+	}
+	
 	private static VEvent createVEvent(Booking b) throws Exception {
+		return createVEvent(b, false);
+	}
+	
+	private static VEvent createVEvent(Booking b, boolean previouslyConfirmed) throws Exception {
 		//Initializing timezone settings (GMT +08:00)
 		TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 		TimeZone timezone = registry.getTimeZone("Asia/Kuala_Lumpur");
@@ -97,7 +120,7 @@ public class ICSFileManager {
 
 		//Creating the calendar event (VEvent file)
 		StringBuilder eventName = new StringBuilder();
-		if (b.getBookingStatus() == BookingStatus.PENDING) eventName.append("(Tentative) ");
+		if (!previouslyConfirmed || b.getBookingStatus() == BookingStatus.PENDING) eventName.append("(Tentative) ");
 		eventName.append(b.getTeam().getTeamName()).append(" - ");
 		eventName.append(b.getTimeslot().getSchedule().getMilestone().getName());
 		eventName.append(" Presentation");
