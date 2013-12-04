@@ -18,10 +18,13 @@ import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import manager.ICSFileManager;
+import manager.UserManager;
 import model.Booking;
 import model.SystemActivityLog;
 import model.User;
+import model.role.Faculty;
 import model.role.Student;
+import model.role.TA;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +64,26 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
             Role role = user.getRole();
 			if (role == Role.STUDENT) {
 				Student student = em.find(Student.class, user.getId());
-				Query studentSearch = em.createQuery("SELECT b FROM Booking b WHERE :student MEMBER OF b.requiredAttendees and b.bookingStatus IN (:status)");
+				Query studentSearch = em.createQuery("SELECT b FROM Booking b WHERE :student MEMBER OF b.requiredAttendees AND b.bookingStatus IN (:status)");
 				studentSearch.setParameter("student", student);
 				studentSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
 				allBookings.addAll(studentSearch.getResultList());
+			} else if (role == Role.FACULTY) {
+				Faculty faculty = em.find(Faculty.class, user.getId());
+				Query facultySearch = em.createQuery("SELECT b FROM Booking b WHERE :faculty MEMBER OF b.requiredAttendees AND b.bookingStatus IN (:status)");
+				facultySearch.setParameter("faculty", faculty);
+				facultySearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
+				allBookings.addAll(facultySearch.getResultList());
+			} else if (role == Role.TA) {
+				TA ta = em.find(TA.class, user.getId());
+				Query taSearch = em.createQuery("SELECT b FROM Booking b WHERE b.timeslot.TA = :ta AND b.bookingStatus IN (:status)");
+				taSearch.setParameter("ta", ta);
+				taSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
+				allBookings.addAll(taSearch.getResultList());
 			}
+			
+			//Adding all RSVPs
+			allBookings.addAll(UserManager.getSubscribedBookings(em, user.getEmail()));
 			
 			String downloadPath = ICSFileManager.createICSCalendar(allBookings, user, request.getSession().getServletContext());
 			
