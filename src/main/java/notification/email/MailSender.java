@@ -71,59 +71,54 @@ public class MailSender {
 	public synchronized static void sendEmail
 			(Set<String> toEmails, Set<String> ccEmails,
 			String subject, String body,
-			File attachFile, String filename) {
+			File attachFile, String filename) throws Exception {
+		
+		MimeMessage message = new MimeMessage(session);
+		message.setSubject(subject);
+		message.setFrom(new InternetAddress("is480.scheduling@gmail.com",
+				"IS480 Scheduling"));
 
-		try {
-			MimeMessage message = new MimeMessage(session);
-			message.setSubject(subject);
-			message.setFrom(new InternetAddress("is480.scheduling@gmail.com",
-					"IS480 Scheduling"));
-			
-			//Setting TO emails
+		//Setting TO emails
+		if (!TRUE_RECIPIENTS) {
+			message.setRecipients(Message.RecipientType.TO,
+					InternetAddress.parse(
+					MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
+//				body += "Sent from: " + InetAddress.getLocalHost().getHostName();
+		} else {
+			message.setRecipients(Message.RecipientType.TO,
+				InternetAddress.parse(parseRecipientArray(toEmails)));	
+		}
+
+		//Setting CC emails
+		if (ccEmails != null) {
 			if (!TRUE_RECIPIENTS) {
-				message.setRecipients(Message.RecipientType.TO,
+				message.setRecipients(Message.RecipientType.CC,
 						InternetAddress.parse(
 						MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
-//				body += "Sent from: " + InetAddress.getLocalHost().getHostName();
 			} else {
-				message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse(parseRecipientArray(toEmails)));	
+				message.setRecipients(Message.RecipientType.CC,
+					InternetAddress.parse(parseRecipientArray(ccEmails)));	
 			}
-			
-			//Setting CC emails
-			if (ccEmails != null) {
-				if (!TRUE_RECIPIENTS) {
-					message.setRecipients(Message.RecipientType.CC,
-							InternetAddress.parse(
-							MiscUtil.getProperty("General", "TEST_EMAIL_ID")));
-				} else {
-					message.setRecipients(Message.RecipientType.CC,
-						InternetAddress.parse(parseRecipientArray(ccEmails)));	
-				}
-			}
-			
-			//Adding the message body (HTML text)
-			MimeMultipart multipart = new MimeMultipart();
-			MimeBodyPart msgBody = new MimeBodyPart();
-			msgBody.setContent(body, "text/html");
-			multipart.addBodyPart(msgBody);
-			
-			//Adding the file attachment (if any)
-			if (attachFile != null && filename != null) {
-				MimeBodyPart attachment = new MimeBodyPart();
-				DataSource file = new FileDataSource(attachFile);
-				attachment.setDataHandler(new DataHandler(file));
-				attachment.setFileName(filename);
-				multipart.addBodyPart(attachment);
-			}
-			
-			message.setContent(multipart);
-			Transport.send(message);
-			logger.info("Email sent successfully");
-		} catch (Exception e) {
-			logger.error("Send Mail Error");
-			logger.error(e.getMessage());
 		}
+
+		//Adding the message body (HTML text)
+		MimeMultipart multipart = new MimeMultipart();
+		MimeBodyPart msgBody = new MimeBodyPart();
+		msgBody.setContent(body, "text/html");
+		multipart.addBodyPart(msgBody);
+
+		//Adding the file attachment (if any)
+		if (attachFile != null && filename != null) {
+			MimeBodyPart attachment = new MimeBodyPart();
+			DataSource file = new FileDataSource(attachFile);
+			attachment.setDataHandler(new DataHandler(file));
+			attachment.setFileName(filename);
+			multipart.addBodyPart(attachment);
+		}
+
+		message.setContent(multipart);
+		Transport.send(message);
+		logger.info("Email sent successfully");
 	}
 	
 	/**
