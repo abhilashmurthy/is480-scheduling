@@ -142,13 +142,12 @@ public class RemindPendingBookingJob implements Job {
             }
         } finally {
             if (em != null) {
-				//Saving job log in database
-				if (!em.getTransaction().isActive()) em.getTransaction().begin();
-				em.persist(logItem);
-				em.getTransaction().commit();
-				
 				if (em.getTransaction().isActive()) em.getTransaction().rollback();
-				if (em.isOpen()) em.close();
+                //Saving job log in database
+                if (!em.getTransaction().isActive()) em.getTransaction().begin();
+                em.persist(logItem);
+                em.getTransaction().commit();
+                if (em.isOpen()) em.close();
 			}
         }
         logger.debug("Finished reminding faculty");

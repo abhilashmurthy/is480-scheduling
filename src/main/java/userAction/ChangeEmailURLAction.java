@@ -78,13 +78,11 @@ public class ChangeEmailURLAction extends ActionSupport implements ServletReques
         } finally {
 			 if (em != null) {
 				if (em.getTransaction().isActive()) em.getTransaction().rollback();
-				
-				//Saving job log in database
-				if (!em.getTransaction().isActive()) em.getTransaction().begin();
-				em.persist(logItem);
-				em.getTransaction().commit();
-				
-				if (em.isOpen()) em.close();
+                //Saving job log in database
+                if (!em.getTransaction().isActive()) em.getTransaction().begin();
+                em.persist(logItem);
+                em.getTransaction().commit();
+                if (em.isOpen()) em.close();
 			}
 		}
 		

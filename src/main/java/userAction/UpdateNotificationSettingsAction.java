@@ -132,13 +132,12 @@ public class UpdateNotificationSettingsAction extends ActionSupport implements S
             json.put("message", "Error with changing notification settings");
         } finally {
 			if (em != null) {
-				//Saving job log in database
-				if (!em.getTransaction().isActive()) em.getTransaction().begin();
-				em.persist(logItem);
-				em.getTransaction().commit();
-				
 				if (em.getTransaction().isActive()) em.getTransaction().rollback();
-				if (em.isOpen()) em.close();
+                //Saving job log in database
+                if (!em.getTransaction().isActive()) em.getTransaction().begin();
+                em.persist(logItem);
+                em.getTransaction().commit();
+                if (em.isOpen()) em.close();
 			}
 		}
         return SUCCESS;

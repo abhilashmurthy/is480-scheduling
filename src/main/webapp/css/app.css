@@ -114,9 +114,9 @@ input, button, select, textarea {
 }
 
 .scheduleTable {
-    /*margin: auto;*/
-    display: table;
-    table-layout: fixed;
+    display: inline-table;
+    margin-right: 50px;
+	margin-bottom: 50px;
 	z-index: 0;
 }
 
@@ -677,4 +677,8 @@ select, input {
 
 #passwordChangeTable td:nth-child(2) {
 	padding-left: 20px;
+}
+
+.publicTable {
+	background-color: #fafafa;
 }
