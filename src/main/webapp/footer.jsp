@@ -46,7 +46,14 @@
 
 <!-- Footer -->
 <script type="text/javascript">	
-	var footerLoad = function() {		
+	var footerLoad = function() {
+		
+		setTimeout(function(){
+			if ($(document).height() === $(window).height()) {
+				appendFooter(58);
+			}
+		}, 0);
+		
 		$(window).scroll(function() {
 			if ($('#footer').length > 0) return false;
 			if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
@@ -54,14 +61,14 @@
 			}
 		});
 
-		function appendFooter() {
+		function appendFooter(initHeight) {
 			$('body')
 				.append(
 					$(document.createElement('div'))
 						.attr('id', 'footer')
 						.css({
 							position: "absolute",
-							top: $(document).height(),
+							top: initHeight?$(document).height() - initHeight:$(document).height(),
 							display: "none"
 						})
 						.append(
@@ -69,8 +76,44 @@
 								.addClass('container')
 								.append(
 									$(document.createElement('p'))
-										.addClass('muted credit')
-										.append('Hello there!')
+										.css('margin-bottom', '2px')
+										.addClass('credit')
+										.append(
+											//Created By
+											$(document.createElement('span'))
+												.addClass('muted')
+												.append('Created By')
+												.append(
+													$(document.createElement('a'))
+														.attr('href', 'https://wiki.smu.edu.sg/is480/IS480_Team_wiki:_2013T1_ThunderBolt')
+														.attr('target', '_blank')
+														.append(
+															$(document.createElement('img'))
+																.attr('src', 'img/thunderbolt.png')
+																.css('margin-left', '5px')
+														)
+												)
+										)
+										.append(
+											//About Us
+											$(document.createElement('span'))
+												.addClass('footerLink')
+												.append(
+													$(document.createElement('a'))
+														.attr('href', 'about')
+														.append('About Us')
+												)
+										)
+										.append(
+											//Help
+											$(document.createElement('span'))
+												.addClass('footerLink')
+												.append(
+													$(document.createElement('a'))
+														.attr('href', 'help')
+														.append('Help')
+												)
+										)
 								)
 						)
 						.show('fade', 'slow')

@@ -54,7 +54,6 @@
 					</ul>
 				</div>
 			</div>
-					<button id ="downloadICSBtn" class="btn btn-warning" style="vertical-align: middle; margin-left: 20px; margin-top: 6px; float: left;">Import to Calendar</button>
 					
 			<!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
@@ -70,10 +69,11 @@
                     </a>
                 </div>
             </s:if>
-            <% }%>
+            <% } %>
 			
 			<br/>
 			<div class="settingsView">
+				<button id="downloadICSBtn" class="btn btn-primary btn-link" style="margin-right: 20px; text-align: left"><span class="fa-stack" style="vertical-align: 0"><i class="fa fa-calendar fa-stack-2x"></i><i class="fa fa-download fa-stack-2x text-success" style="margin-left: -20px; margin-top: 15px"></i></span></button>
 				<span id="settingsViewLabel">Select View: </span>
 				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
 					<input type="checkbox" checked>
@@ -1410,6 +1410,7 @@
 												$('.pendingBookings u').html('You have ' + pendingBookingCount + ' pending ' + (pendingBookingCount === 1?'booking':'bookings'));
 											}
 										}
+										setTimeout(function(){repositionTimeslots();},1000);
 									}
 								}
 							}
@@ -2475,8 +2476,12 @@
 					}
 				}
 				
-				//Page zoom fix
+				//Positioning fix
 				$(window).resize(function(){
+					repositionTimeslots();
+				});
+				
+				function repositionTimeslots() {
 					$('.timeslotCell').each(function(){
 						var $timeslot = $(this);
 						var $tdCell = $('.tdCell[value="' + $timeslot.attr('value') + '"]');
@@ -2485,7 +2490,7 @@
 							left: $tdCell.offset().left
 						});
 					});
-				});
+				}
                 
                 /*****************************
                  PLUGINS AND COMPONENTS
@@ -2632,7 +2637,7 @@
 				/*****************************
                  ICS FILE DOWNLOAD AJAX CALL
                  ****************************/
-				 $('#downloadICSBtn').click(function(e) {
+				 $('#downloadICSBtn').click(function(e){
 					$.ajax({
 						type: 'POST',
 						async: false,

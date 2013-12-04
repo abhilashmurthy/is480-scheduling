@@ -416,7 +416,7 @@ input, button, select, textarea {
     position: absolute;
 	width: 100%;
 	margin-top: 10px;
-    padding-top: 14px;
+    padding-top: 5px;
     font-size: 14px;
     line-height: 8px;
     background-color: black;
@@ -679,4 +679,17 @@ select, input {
 
 .publicTable {
 	background-color: #fafafa;
+}
+
+.footerLink {
+	float: right;
+	margin-right: 40px;
+	line-height: 40px;
+}
+
+.footerLink a:link, a:visited {
+	color: white;
+}
+.footerLink a:hover {
+	color: #dddddd;
 }
