@@ -44,15 +44,6 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 	public String execute() throws Exception {
 		HttpSession session = request.getSession();
 		User user = (User)session.getAttribute("user");
-		Calendar nowCal = Calendar.getInstance();
-		Timestamp now = new Timestamp(nowCal.getTimeInMillis());
-		
-		SystemActivityLog logItem = new SystemActivityLog();
-		logItem.setActivity("User: Download ICS File");
-		logItem.setRunTime(now);
-		if (user.getId() != null) logItem.setUser(user);
-		logItem.setMessage("Error with download ICS file");
-		logItem.setSuccess(true);
 		
 		EntityManager em = null;
         try {
@@ -93,13 +84,7 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 				json.put("success", false);
 				json.put("message", "You don't have any presentations for this term!");
 			}
-			
-			logItem.setMessage("ICS file downloaded by " + user.toString());
         } catch (Exception e) {
-			logItem.setSuccess(false);
-			User userForLog = (User) session.getAttribute("user");
-			logItem.setUser(userForLog);
-			logItem.setMessage("Error: " + e.getMessage());
 			
             logger.error("Exception caught: " + e.getMessage());
             if (MiscUtil.DEV_MODE) {
@@ -112,10 +97,6 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
         } finally {
 			if (em != null) {
 				if (em.getTransaction().isActive()) em.getTransaction().rollback();
-				//Saving job log in database
-				if (!em.getTransaction().isActive()) em.getTransaction().begin();
-				em.persist(logItem);
-				em.getTransaction().commit();
 				if (em.isOpen()) em.close();
 			}
 		}
