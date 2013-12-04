@@ -376,7 +376,7 @@
                     $bookingDetailsTable.attr('id', 'viewTimeslotTable');
                     $bookingDetailsTable.addClass('table-condensed table-hover table-bordered');
 					var outputData = {
-						Team: timeslot.wiki ? '<a id="wikiLink" href="' + timeslot.wiki + '">' + timeslot.team + '</a>':timeslot.team,
+						Team: timeslot.wiki ? '<u><a id="wikiLink" href="' + timeslot.wiki + '">' + timeslot.team + '</a></u>':timeslot.team,
 						Status: timeslot.status,
 						Date: timeslot.startDate,
 						Time: timeslot.time,
