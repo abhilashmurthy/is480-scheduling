@@ -223,8 +223,8 @@ public class BookingManager {
 			booking.setLastEditedBy(user.getFullName());
 			booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			if (!overrideApproval) { //Emails to be sent if normal process is followed
-				NewBookingEmail newEmail = new NewBookingEmail(booking);
-				RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
+				NewBookingEmail newEmail = new NewBookingEmail(booking, user);
+				RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking, user);
 				newEmail.sendEmail();
 				responseEmail.sendEmail();
 			} else { //Booking is automatically approved if process is bypassed

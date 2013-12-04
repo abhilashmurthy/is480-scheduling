@@ -19,10 +19,12 @@ import model.User;
 public class NewBookingEmail extends EmailTemplate{
 	
 	private Booking b;
+	private User creator;
 	
-	public NewBookingEmail(Booking b) {
+	public NewBookingEmail(Booking b, User creator) {
 		super("new_booking.html");
 		this.b = b;
+		this.creator = creator;
 	}
 
 	@Override
@@ -36,6 +38,9 @@ public class NewBookingEmail extends EmailTemplate{
 		for (User u : b.getTeam().getMembers()) {
 			emails.add(u.getEmail());
 		}
+		
+		//Removing the person who created the booking from the TO address list
+		emails.remove(creator.getEmail());
 		
 		return emails;
 	}
@@ -51,7 +56,9 @@ public class NewBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		return null;
+		Set<String> emails = new HashSet<String>();
+		emails.add(creator.getEmail());
+		return emails;
 	}
 
 	@Override
