@@ -47,7 +47,7 @@
 							</div>
 						</td>
 						<td>days</td>
-						<td class='reminderInfo muted'>(0 = disabled)</td>
+						<td></td>
 					</tr>
 					<tr hidden><td colspan="4"><h4>Email</h4></td></tr>
 					<tr class='reminderItem' hidden>
@@ -163,7 +163,7 @@
 					//Clear booking
 					if (remindersJson[2].emailClearStatus === "On") {
 						$('.clearPendingSpinner').spinner({
-							min: 0,
+							min: 1,
 							max: 7
 						});
 						$('.clearPendingSpinner').spinner('value', remindersJson[2].emailClearFrequency);
@@ -171,6 +171,13 @@
 						$('.clearPendingSpinner').spinner('value', 0);
 					}
 				}
+				//Disallow 0's
+				$('.spinner').on('focusout', function(){
+					var value = $(this).spinner('value');
+					if (value <= 0) {
+						$(this).spinner('value', 1);
+					}
+				});
 				
 				$('body').on('click', '#remindersSubmitBtn', function(e){
 					if (uatMode) recordHumanInteraction(e);
