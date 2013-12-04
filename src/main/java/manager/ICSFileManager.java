@@ -70,7 +70,7 @@ public class ICSFileManager {
 		return null;
 	}
 	
-	public synchronized static File createICSCalendar(List<Booking> bookings, User u, ServletContext ctx) throws Exception {
+	public synchronized static String createICSCalendar(List<Booking> bookings, User u, ServletContext ctx) throws Exception {
 		net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
 		calendar.getProperties().add(Version.VERSION_2_0);
 		calendar.getProperties().add(new ProdId("-//Events Calendar//iCal4j 1.0//EN"));
@@ -84,13 +84,16 @@ public class ICSFileManager {
 		FileOutputStream fs = null;
 		try {
 			StringBuilder path = new StringBuilder();
-			path.append(ctx.getRealPath("/ICS/"));
+			path.append("ICS/");
 			path.append("UID-").append(u.getId()).append(".ics");
+			String pathToReturn = path.toString();
+			path.insert(0, ctx.getRealPath("/"));
 			File icsFile = new File(path.toString());
+			icsFile.mkdirs();
 			fs = new FileOutputStream(icsFile);
 			CalendarOutputter calOut = new CalendarOutputter();
 			calOut.output(calendar, fs);
-			return icsFile;
+			return pathToReturn;
 		} catch (Exception e) {
 			logger.error("ICS File error");
 			logger.error(e.getMessage());

@@ -6,14 +6,22 @@ package userAction;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
+import constant.BookingStatus;
+import constant.Role;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import manager.ICSFileManager;
+import model.Booking;
 import model.SystemActivityLog;
 import model.User;
+import model.role.Student;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +53,25 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 		
 		EntityManager em = null;
         try {
-            
+			em = MiscUtil.getEntityManagerInstance();
+			
+			//List of all the bookings that will be included in the ICS file
+			ArrayList<Booking> allBookings = new ArrayList<Booking>();
+			
+            Role role = user.getRole();
+			if (role == Role.STUDENT) {
+				Student student = em.find(Student.class, user.getId());
+				Query studentSearch = em.createQuery("SELECT b FROM Booking b WHERE :student MEMBER OF b.requiredAttendees and b.bookingStatus IN (:status)");
+				studentSearch.setParameter("student", student);
+				studentSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
+				allBookings.addAll(studentSearch.getResultList());
+			}
+			
+			String downloadPath = ICSFileManager.createICSCalendar(allBookings, user, request.getSession().getServletContext());
+			
+			json.put("success", true);
+			json.put("downloadPath", downloadPath);
+			
 			logItem.setMessage("ICS file downloaded by " + user.toString());
         } catch (Exception e) {
 			logItem.setSuccess(false);
@@ -60,7 +86,7 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
                 }
             }
             json.put("success", false);
-            json.put("message", "Error with CreateSchedule: Escalate to developers!");
+            json.put("message", "Oops, something went wrong. Please contact the administrator!");
         } finally {
 			if (em != null) {
 				if (em.getTransaction().isActive()) em.getTransaction().rollback();
@@ -72,6 +98,14 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 			}
 		}
 		return SUCCESS;
+	}
+
+	public HashMap<String, Object> getJson() {
+		return json;
+	}
+
+	public void setJson(HashMap<String, Object> json) {
+		this.json = json;
 	}
 
 	public void setServletRequest(HttpServletRequest hsr) {
