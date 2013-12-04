@@ -53,8 +53,8 @@
 						</form>
 					</ul>
 				</div>
-				<button id ="downloadICSBtn" class="btn btn-warning" style="vertical-align: middle; margin-left: 20px; margin-top: 6px; float: left;">Import to Calendar</button>
-			</div>	
+			</div>
+					<button id ="downloadICSBtn" class="btn btn-warning" style="vertical-align: middle; margin-left: 20px; margin-top: 6px; float: left;">Import to Calendar</button>
 					
 			<!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
