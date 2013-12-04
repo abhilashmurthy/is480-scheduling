@@ -43,7 +43,6 @@
             <a class="brand" href="index">
 				<img src="img/IS480-navbar.png" style="height:25px; width:120px; display:inline-block;"/>
 			</a>
-            <div class="nav-collapse collapse">
                 <ul class="nav navbar-nav">
 				<%  if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<li class="dropdown">
@@ -90,8 +89,7 @@
 						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
 				<% } %>
 				</ul>
-			</div>
-				<ul class="nav pull-right">
+				<ul class="nav navbar-nav pull-right">
 				<!-- To display the user information -->
 				<li id="userInfo">
 					<a class='navbar-username'>
@@ -138,6 +136,9 @@
     navbarLoad = function(){
         //Dropdown menu from bootstrap
         $(".dropdown-toggle").dropdown();
+		
+		//Fix navbar width
+		$('.navbar').width($(window).width());	
         
         //Logout link
         $("#logoutLink").on('click', function(e) {

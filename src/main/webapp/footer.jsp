@@ -50,7 +50,7 @@
 		
 		setTimeout(function(){
 			if ($(document).height() === $(window).height()) {
-				appendFooter(58);
+				appendFooter(58, null);
 			}
 		}, 0);
 		
@@ -60,8 +60,14 @@
 				appendFooter();
 			}
 		});
+		
+		$(window).resize(function(){
+			var width = $('#footer').width();
+			$('#footer').remove();
+			appendFooter(null, width);
+		});
 
-		function appendFooter(initHeight) {
+		function appendFooter(initHeight, initWidth) {
 			$('body')
 				.append(
 					$(document.createElement('div'))
@@ -71,6 +77,7 @@
 							top: initHeight?$(document).height() - initHeight:$(document).height(),
 							display: "none"
 						})
+						.width(initWidth?initWidth:$(window).width())
 						.append(
 							$(document.createElement('div'))
 								.addClass('container')

@@ -34,7 +34,7 @@
         <div class="container page">
             <!--<h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>-->
 			<br/>
-			<div class='termPicker'>
+			<div class='indexDropdown termPicker'>
 				<div class="btn-group" style="float: left;">
 					<a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#" >
 						<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
@@ -2278,7 +2278,7 @@
 					if ($('body').find('.dashboardPicker').length) return false;
 					$('div.termPicker').after(
 						$(document.createElement('div'))
-							.addClass('dashboardPicker')
+							.addClass('indexDropdown dashboardPicker')
 							.append(
 								$(document.createElement('select'))
 									.addClass('dashboardMultiselect multiselect')
