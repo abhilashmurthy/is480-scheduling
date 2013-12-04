@@ -4,9 +4,12 @@
  */
 package notification.email;
 
+import constant.Response;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 import model.Booking;
 import model.User;
@@ -27,7 +30,7 @@ public class ApprovedBookingEmail extends EmailTemplate{
 
 	@Override
 	public String generateEmailSubject() {
-		return generateBookingSubjectTitle(b, "Approved by " + approver.getFullName() + " ");
+		return generateBookingSubjectTitle(b, "Approved by " + approver.getFullName() + " for ");
 	}
 
 	@Override
@@ -53,6 +56,24 @@ public class ApprovedBookingEmail extends EmailTemplate{
 		
 		//Inserting approver name
 		map.put("[APPROVER_NAME]", approver.getFullName());
+		
+		//Getting the list of people who are yet to respond
+		HashSet<User> remainingPeople = new HashSet<User>();
+		Iterator<Entry<User, Response>> responseIter = b.getResponseList().entrySet().iterator();
+		while (responseIter.hasNext()) {
+			Entry<User, Response> e = responseIter.next();
+			if (e.getValue() == Response.PENDING) remainingPeople.add(e.getKey());
+		}
+		//Inserting the names of the people who are yet to respond
+		StringBuilder remainingStr = new StringBuilder();
+		Iterator<User> remainingIter = remainingPeople.iterator();
+		while (remainingIter.hasNext()) {
+			remainingStr.append(remainingIter.next().getFullName());
+			if (remainingIter.hasNext()) {
+				remainingStr.append(",&nbsp;");
+			}
+		}
+		map.put("[REMAINING_RESPONDENTS]", remainingStr.toString());
 		
 		return map;
 	}

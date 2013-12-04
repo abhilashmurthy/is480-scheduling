@@ -19,10 +19,12 @@ import model.User;
 public class RespondToBookingEmail extends EmailTemplate{
 	
 	private Booking b;
+	private User creator;
 	
-	public RespondToBookingEmail(Booking b) {
+	public RespondToBookingEmail(Booking b, User creator) {
 		super("respond_to_booking.html");
 		this.b = b;
+		this.creator = creator;
 	}
 
 	@Override
@@ -51,7 +53,9 @@ public class RespondToBookingEmail extends EmailTemplate{
 
 	@Override
 	public Set<String> generateCCAddressList() {
-		return null;
+		Set<String> emails = new HashSet<String>();
+		emails.add(creator.getEmail());
+		return emails;
 	}
 	
 	@Override

@@ -508,7 +508,7 @@
 
 				$(".testBtn").click(function(e) {
 					if (uatMode) recordHumanInteraction(e);
-					window.location = "adminlogin.jsp";
+					window.location = "ssobypasslogin.jsp";
 					return false;
 				});
 

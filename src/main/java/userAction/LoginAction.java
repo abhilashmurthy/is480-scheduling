@@ -173,7 +173,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
 			
 			//Construct callback URL
 			StringBuilder sb = new StringBuilder();
-			if (request.getParameter("bypass") != null) sb.append("admin");
+			if (request.getParameter("bypass") != null) sb.append("ssobypass");
 			sb.append("login.jsp").append("?error=").append(e.getMessage());
 			responseURL = sb.toString();
 			return ERROR;

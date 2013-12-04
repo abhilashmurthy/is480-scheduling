@@ -10,16 +10,12 @@ import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import manager.BookingManager;
 import manager.QuartzManager;
 import model.Booking;
 import model.SystemActivityLog;
@@ -148,7 +144,7 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 				if (booking.getBookingStatus() == BookingStatus.APPROVED) {
 					ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 					confirmationEmail.sendEmail();
-					QuartzManager.scheduleSMSReminder(booking, em, request);
+					QuartzManager.scheduleSMSReminder(booking, em, request.getSession().getServletContext());
 				} else if (response == Response.APPROVED) {
 					ApprovedBookingEmail approvedEmail = new ApprovedBookingEmail(booking, user);
 					approvedEmail.sendEmail();

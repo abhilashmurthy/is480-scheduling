@@ -4,8 +4,6 @@
  */
 package manager;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import constant.BookingStatus;
 import constant.Response;
 import constant.Role;
@@ -21,15 +19,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import model.Booking;
 import model.Milestone;
 import model.Schedule;
-import model.Settings;
 import model.Team;
 import model.Term;
 import model.Timeslot;
@@ -179,7 +174,7 @@ public class BookingManager {
 	
 	public synchronized static HashMap<String, Object> createBooking
 			(EntityManager em, Timeslot timeslot, User user,
-			Team team, boolean overrideApproval)
+			Team team, ServletContext ctx, boolean overrideApproval)
 	{
 		HashMap<String, Object> json = new HashMap<String, Object>();
 		try {
@@ -228,11 +223,13 @@ public class BookingManager {
 			booking.setLastEditedBy(user.getFullName());
 			booking.setLastEditedAt(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			if (!overrideApproval) { //Emails to be sent if normal process is followed
-				NewBookingEmail newEmail = new NewBookingEmail(booking);
-				RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking);
+				NewBookingEmail newEmail = new NewBookingEmail(booking, user);
+				RespondToBookingEmail responseEmail = new RespondToBookingEmail(booking, user);
 				newEmail.sendEmail();
 				responseEmail.sendEmail();
 			} else { //Booking is automatically approved if process is bypassed
+				//Scheduling SMS reminder
+				QuartzManager.scheduleSMSReminder(booking, em, ctx);
 				ConfirmedBookingEmail confirmationEmail = new ConfirmedBookingEmail(booking);
 				confirmationEmail.sendEmail();
 			}
