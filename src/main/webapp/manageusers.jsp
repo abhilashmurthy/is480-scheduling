@@ -852,6 +852,23 @@
 												)
 											)
 									);
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-tachometer fa-black'))
+												.append(' Type'))
+											.append(
+												$(document.createElement('td'))
+												.addClass('presentationType')
+												.append(
+													$(document.createElement('select'))
+														.addClass('presentationTypeMultiselect multiselect multiselect-search')
+														.attr('multiple', 'multiple')
+														.attr('id', 'presentationType')
+														.attr('name', 'presentationType')
+												)
+											)
+									);
 									return $trs;
 								})
 							);
@@ -895,6 +912,17 @@
 					});
 					//Multiselect options
 					initializeMultiselect(action, team);
+					//Team data validation
+					$('.modal-footer').find('button:last').attr('disabled', true);
+					$('.modal-body').find('input').on('change', function(){
+						console.log('Team Name: ' + $('.modal-body').find('#teamName').length);
+						console.log('Members: ' + $('.modal-body').find('.membersMultiselect').length);
+						console.log('Presentation Type ' +  $('.modal-body').find('.presentationTypeMultiselect').length);
+						if ($('.modal-body').find('#teamName').val() 
+								&& $('.modal-body').find('.membersMultiselect').val()
+								&& $('.modal-body').find('.presentationTypeMultiselect').val()) $('.modal-footer').find('button:last').attr('disabled', false);
+						else $('.modal-footer').find('button:last').attr('disabled', true);
+					});
 					return false;
 				});
 				
@@ -1720,6 +1748,37 @@
 										return false;
 								}
 							}
+						} else if ($this.parent().hasClass('presentationType')) {
+							$this.multiselect({
+								buttonText: function(options, select) {
+									if (options.length === 0) {
+										return 'Select Type <b class= "caret"></b>';
+									} else {
+										var selected = '';
+										options.each(function(){
+											selected += $(this).text();
+										});
+										return selected + ' <b class= "caret"></b>';
+									}
+								},
+								onChange: function($option, checked) {
+									if ($this.val() !== null && checked) {
+										var vals = $this.val();
+										if (vals.length > 1) {
+											for (var i = 0; i < vals.length; i++) {
+												if (vals[i] !== $option.attr('value')) $this.multiselect('deselect', vals[i]);
+											}
+										}
+									}
+								},
+								buttonClass: 'btn userSelectBtn facultyUserSelectBtn'
+							});
+							$this.multiselect('dataprovider', [
+								{label: 'Private', value: 'PRIVATE'},
+								{label: 'Public', value: 'PUBLIC'},
+								{label: 'Internal', value: 'INTERNAL'}
+							]);
+							if (action === 'edit') $this.multiselect('select', team.presentationType);
 						} else {
 							showNotification('ERROR', 'Multiselect error');
 							return false;

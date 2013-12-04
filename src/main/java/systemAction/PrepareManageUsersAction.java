@@ -128,6 +128,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					teamMap.put("id", team.getId());
 					teamMap.put("teamName", team.getTeamName());
 					teamMap.put("wiki", team.getWiki());
+					teamMap.put("presentationType", team.getPresentationType());
 					Set<Student> students = team.getMembers();
 					List<HashMap<String, Object>> memberList = new ArrayList<HashMap<String, Object>>();
 					for (Student student : students) {
