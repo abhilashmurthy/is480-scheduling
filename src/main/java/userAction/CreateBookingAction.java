@@ -136,60 +136,6 @@ public class CreateBookingAction extends ActionSupport implements ServletRequest
         }
         return SUCCESS;
     }
-
-    private boolean validateInformation(EntityManager em, Team team, Timeslot timeslot, User user) {
-        // Checking if team information is found
-        if (team == null) {
-            logger.error("Team information not found or unauthorized user role");
-            json.put("success", false);
-            json.put("message", "Team unidentified or you may not have the required"
-                    + " permissions to make a booking.");
-            return false;
-        }
-
-        //Check if the timeslot is found
-        if (timeslot == null) {
-            logger.error("Timeslot not found");
-            json.put("success", false);
-            json.put("message", "Timeslot not found. Please check the ID provided!");
-            return false;
-        }
-		
-		if (!timeslot.getSchedule().isBookable()) {
-			logger.error("Schedule not open for booking");
-            json.put("success", false);
-            json.put("message", "This milestone is currently not available for booking");
-            return false;
-		}
-		
-		//Check if the timeslot has already passed (Not applicable for Administrator and Course Coordinator)
-		if (user.getRole() != Role.ADMINISTRATOR && user.getRole() != Role.COURSE_COORDINATOR) {
-			Calendar now = Calendar.getInstance();
-			if (timeslot.getStartTime().before(now.getTime())) {
-				json.put("success", false);
-				json.put("message", "You cannot book a timeslot that has already passed!");
-				return false;
-			}	
-		}
-		
-        //Check if the timeslot is free
-        if (timeslot.getCurrentBooking() != null) { //Slot is full
-            json.put("success", false);
-            json.put("message", "Oops. This timeslot is already taken."
-                    + " Please book another slot!");
-            return false;
-        }
-
-        //Check if the team has already made a booking for the current schedule
-        ArrayList<Booking> activeBookings = BookingManager.getActiveByTeamAndSchedule(em, team, timeslot.getSchedule());
-        if (!activeBookings.isEmpty()) {
-            json.put("success", false);
-            json.put("message", "Team already has an active booking in the current schedule");
-            return false;
-        }
-
-        return true;
-    }
 	
     public Long getTeamId() {
         return teamId;
