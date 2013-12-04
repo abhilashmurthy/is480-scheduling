@@ -28,10 +28,9 @@
         
         <div class="container">
 			<!-- REMINDER SETTINGS SECTION -->
-			<div class='reminderSettings fuelux'>
-				<h3>Trigger Timings</h3>
+			<div class='reminderSettings passwordSettings fuelux'>
+				<h4>Triggers <span class="muted" style="font-style: italic; font-size: 14px;">(Affects only future triggers)</span></h4>
 				<table class='otherSettingsTable'>
-					<tr><td colspan="4"><h4>Schedule</h4></td></tr>
 					<tr class='reminderItem'>
 						<td>Delete <b>booking</b> if pending for</td>
 						<td class='spinnerTd'>
@@ -50,8 +49,8 @@
 						<td>days</td>
 						<td class='reminderInfo muted'>(0 = disabled)</td>
 					</tr>
-					<tr><td colspan="4"><h4>Email</h4></td></tr>
-					<tr class='reminderItem'>
+					<tr hidden><td colspan="4"><h4>Email</h4></td></tr>
+					<tr class='reminderItem' hidden>
 						<td>Remind <b>faculty</b> to approve booking in advance of</td>
 						<td class='spinnerTd'>
 							<div id='approve_reminder' class="approveReminderSpinner reminderSpinner spinner">
@@ -69,9 +68,8 @@
 						<td>days</td>
 						<td class='reminderInfo muted'>(0 = disabled)</td>
 					</tr>
-					<tr><td colspan="4"><h4>SMS</h4></td></tr>
 					<tr class='reminderItem'>
-						<td>Remind <b>user</b> to attend presentation in advance of </td>
+						<td>SMS and Email - Remind <b>user</b> to attend presentation in advance of </td>
 						<td class='spinnerTd'>
 							<div id='attend_reminder' class="attendReminderSpinner reminderSpinner spinner">
 								<input class="durationInput spinner-input" type="text" style='width: 50px !important'/>
@@ -95,7 +93,7 @@
 			<!-- END OF REMINDER SETTINGS SECTION -->
 			
 			<!-- EMAIL URL SECTION -->
-			
+			<hr>
 			<div class='passwordSettings'>
 				<h4>Email URL</h4>
 				<input type="text" id="emailURLInput" style="width: 400px;" value="<s:property value='emailURL'/>"/> <br /><br />
