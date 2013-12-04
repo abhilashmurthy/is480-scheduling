@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
+import javax.servlet.ServletContext;
 import model.Booking;
 import model.User;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -60,13 +61,16 @@ public class ICSFileManager {
 		} catch (Exception e) {
 			logger.error("ICS File error");
 			logger.error(e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				logger.error(s.toString());
+			}
 		} finally {
 			if (fs != null) try { fs.close(); } catch (IOException ignore) {}
 		}
 		return null;
 	}
 	
-	private static net.fortuna.ical4j.model.Calendar createICSCalendar(List<Booking> bookings) throws Exception {
+	public synchronized static File createICSCalendar(List<Booking> bookings, User u, ServletContext ctx) throws Exception {
 		net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
 		calendar.getProperties().add(Version.VERSION_2_0);
 		calendar.getProperties().add(new ProdId("-//Events Calendar//iCal4j 1.0//EN"));
@@ -77,7 +81,26 @@ public class ICSFileManager {
 			calendar.getComponents().add(createVEvent(b));	
 		}
 		
-		return calendar;
+		FileOutputStream fs = null;
+		try {
+			StringBuilder path = new StringBuilder();
+			path.append(ctx.getRealPath("/ICS/"));
+			path.append("UID-").append(u.getId()).append(".ics");
+			File icsFile = new File(path.toString());
+			fs = new FileOutputStream(icsFile);
+			CalendarOutputter calOut = new CalendarOutputter();
+			calOut.output(calendar, fs);
+			return icsFile;
+		} catch (Exception e) {
+			logger.error("ICS File error");
+			logger.error(e.getMessage());
+			for (StackTraceElement s : e.getStackTrace()) {
+				logger.error(s.toString());
+			}
+		} finally {
+			if (fs != null) try { fs.close(); } catch (IOException ignore) {}
+		}
+		return null;
 	}
 	
 	private static net.fortuna.ical4j.model.Calendar createICSCalendarForBooking(Booking b, boolean previouslyConfirmed) throws Exception {
