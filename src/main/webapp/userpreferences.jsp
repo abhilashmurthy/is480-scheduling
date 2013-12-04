@@ -16,40 +16,45 @@
         <%@include file="navbar.jsp" %>
 		
         <div class="container">
-			<h3>Settings</h3>
-			<br>
-			<table id="smsTable" class="table">
-				<tbody>
-					<tr align="center">
-						<td style="width:250px">Subscribe to SMS Notification:</td>
-<!--						<td style="width:50px"> 
-							<input type="radio" id="onPref" class="pref" name="pref" value="on">&nbsp; On 
-						</td>
-						<td>
-							<input type="radio" id="offPref" class="pref" name="pref" value="off">&nbsp; Off 
-						</td>-->
-						<td style="width:70px"> 
-							<div id="switchButton" class="make-switch switch-small" data-on="success" data-off="danger">
-								<input type="checkbox">
-							</div>
-						</td>
-						<td></td>
-					</tr>
-					<tr id="setMobileNumber" hidden>
-						<td>SMS Notification will be sent to:</td>
-						<td style="width:70px">
-							<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px"/>
-							<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
-						</td>
-						<td>
-						<form>
-							<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd" placeholder="e.g. 81256296" rel="tooltip" data-placement="right" title="Enter Singapore No." />
-						</form>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
+			
+			<!-- SMS SETTINGS SECTION -->
+			<div>
+				<h3>Settings</h3>
+				<br>
+				<table id="smsTable" class="table">
+					<tbody>
+						<tr align="center">
+							<td style="width:250px">Subscribe to SMS Notification:</td>
+	<!--						<td style="width:50px"> 
+								<input type="radio" id="onPref" class="pref" name="pref" value="on">&nbsp; On 
+							</td>
+							<td>
+								<input type="radio" id="offPref" class="pref" name="pref" value="off">&nbsp; Off 
+							</td>-->
+							<td style="width:70px"> 
+								<div id="switchButton" class="make-switch switch-small" data-on="success" data-off="danger">
+									<input type="checkbox">
+								</div>
+							</td>
+							<td></td>
+						</tr>
+						<tr id="setMobileNumber" hidden>
+							<td>SMS Notification will be sent to:</td>
+							<td style="width:70px">
+								<input type="image" src="img/singaporeFlag.png" style="height:20px; width:20px"/>
+								<input type="text" name="countryCode" value="+65" style="width:30px" disabled/>
+							</td>
+							<td>
+							<form>
+								<input type="text" id="mobileNumber" class="input-medium bfh-phone" data-format="dddddddd" placeholder="e.g. 81256296" rel="tooltip" data-placement="right" title="Enter Singapore No." />
+							</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
+			</div>
+			<!-- END OF SMS SETTINGS SECTION -->
         </div>
 		
 		<%@include file="footer.jsp"%>

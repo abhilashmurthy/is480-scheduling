@@ -69,6 +69,11 @@ public abstract class EmailTemplate {
 					MailSender.sendEmail(generateToAddressList(), generateCCAddressList(),
 					generateEmailSubject(), generateEmailBody(),
 					getFileAttachment(), getFileAttachmentName());	
+				} catch (Exception e) {
+					logger.error("Exception caught: " + e.getMessage());
+					for (StackTraceElement s : e.getStackTrace()) {
+						logger.error(s.toString());
+					}
 				} finally {
 					if (em != null && em.isOpen()) em.close();
 				}

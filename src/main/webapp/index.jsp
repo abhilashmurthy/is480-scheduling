@@ -54,6 +54,7 @@
 					</ul>
 				</div>
 			</div>
+					<button id ="downloadICSBtn" class="btn btn-warning" style="vertical-align: middle; margin-left: 20px; margin-top: 6px; float: left;">Import to Calendar</button>
 					
 			<!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
@@ -81,35 +82,6 @@
 				<i id='nextWeek' class='traverseWeek fa fa-arrow-circle-o-right' style='color: #5bc0de; display: none; cursor: pointer'></i>
             </div>
 			<br/><br/>
-			
-<!--             To display the list of active terms 
-            <div class="activeTerms">
-                <table>
-                    <tr>
-                        <td style="padding-right:10px"><b>Select Term</b></td>
-                        <td><form id="activeTermForm" action="index" method="post">
-                                <select name="termId" style="float:right" onchange="this.form.submit()"> 
-                                    <option value=""><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></option>
-                                    <s:iterator value="data">
-                                        <option value="<s:property value="termId"/>"><s:property value="termName"/></option>
-                                    </s:iterator>
-                                </select>
-                            </form></td>
-                    </tr>
-                </table>
-            </div>-->
-
-			<!-- To display a banner for filling survey. Remove later -->
-<!--			<div class="banner alert">
-				<button type="button" class="close" data-dismiss="alert">×</button>
-				Hi <%= user.getFullName()%>, <br/><br/>
-				We have spent a lot of time building this system. We will really appreciate
-				if you could give us <a href="https://docs.google.com/forms/d/1dZvPHlAV5VhJjupRCHiYT52hHZ2nIDD4IoLNeX98ogM/viewform" 
-										target="_blank">feedback</a> 
-				on your experience with our system!<br/><br/>
-				Thanking you,<br/>
-				IS480 Scheduling Team
-			</div>-->
 
             <!-- To display legend for the calendar -->
             <table class="legend">
@@ -2583,6 +2555,48 @@
                     }
                     $.pnotify(opts);
                 }
+				
+				/* GENERIC PINES NOTIFY */
+				function showBasicNotification(action, notificationMessage) {
+					var opts = {
+						title: "Note",
+						text: notificationMessage,
+						type: "warning",
+						icon: false,
+						sticker: false,
+						mouse_reset: false,
+						animation: "fade",
+						animate_speed: "fast",
+						before_open: function(pnotify) {
+							pnotify.css({
+								top: "52px",
+								left: ($(window).width() / 2) - (pnotify.width() / 2)
+							});
+						}
+					};
+					switch (action) {
+						case "SUCCESS":
+							opts.title = "Updated";
+							opts.type = "success";
+							break;
+						case "ERROR":
+							opts.title = "Error";
+							opts.type = "error";
+							break;
+						case "INFO":
+							opts.title = "Error";
+							opts.type = "info";
+							break;
+						case "WARNING":
+							$.pnotify_remove_all();
+							opts.title = "Note";
+							opts.type = "warning";
+							break;
+						default:
+							alert("Something went wrong");
+					}
+					$.pnotify(opts);
+				}
                 
                 /* TOKEN INPUT */
                 function appendTokenInput(booking){
@@ -2614,6 +2628,28 @@
                     }	
                     booking.find('.optionalAttendees').tokenInput(users, opts);
                 }
+				
+				/*****************************
+                 ICS FILE DOWNLOAD AJAX CALL
+                 ****************************/
+				 $('#downloadICSBtn').click(function(e) {
+					$.ajax({
+						type: 'POST',
+						async: false,
+						url: 'downloadICSFile'
+					}).done(function(response) {
+						$("#downloadICSBtn").button('reset');
+						if (response.success) {
+							window.location = response.downloadPath;
+						} else {
+							showBasicNotification("ERROR", response.message);
+						}
+					}).fail(function(response) {
+						$("#downloadICSBtn").button('reset');
+						showBasicNotification("WARNING", "Oops. Something went wrong. Please try again!");
+					});
+					return false;
+				});
             };
             
             /* POPOVER */
