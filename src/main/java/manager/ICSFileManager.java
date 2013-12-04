@@ -84,8 +84,9 @@ public class ICSFileManager {
 		FileOutputStream fs = null;
 		try {
 			StringBuilder path = new StringBuilder();
-			path.append("ICS/");
-			path.append("UID-").append(u.getId()).append(".ics");
+			path.append("ICS/").append(u.getUsername());
+			if (u.getTerm() != null) path.append("-").append(u.getTerm().getDisplayName());
+			path.append(".ics");
 			String pathToReturn = path.toString();
 			path.insert(0, ctx.getRealPath("/"));
 			File icsFile = new File(path.toString());
@@ -145,7 +146,11 @@ public class ICSFileManager {
 
 		//Creating the calendar event (VEvent file)
 		StringBuilder eventName = new StringBuilder();
-		if (!previouslyConfirmed || b.getBookingStatus() == BookingStatus.PENDING) eventName.append("(Tentative) ");
+		if (b.getBookingStatus() == BookingStatus.PENDING
+			|| (b.getBookingStatus() == BookingStatus.REJECTED && previouslyConfirmed)
+			|| (b.getBookingStatus() == BookingStatus.DELETED && !previouslyConfirmed)) {
+			eventName.append("(Tentative) ");
+		}
 		eventName.append(b.getTeam().getTeamName()).append(" - ");
 		eventName.append(b.getTimeslot().getSchedule().getMilestone().getName());
 		eventName.append(" Presentation");
