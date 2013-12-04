@@ -1623,8 +1623,8 @@
 							$('tr#user_' + user.id).fadeOut('slow', function(){
 								$(this).remove();
 								updateRowCount(userType.toLowerCase() + 'UsersTable');
-								$('body').find('.user_' + user.username).remove();
 							});
+							window.location.reload();
 							break;
 						default:
 							console.log('Action: ' + submitData.action);
