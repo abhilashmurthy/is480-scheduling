@@ -2234,8 +2234,8 @@
 						drag: function(event, ui){
 							var st = parseInt($(this).data("startingScrollTop"));
 							if (
-								!(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())) //Detects chrome
-								||(/safari/.test(navigator.userAgent.toLowerCase())) //Detects safari
+								!(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase()) //Detects chrome
+								|| (/safari/.test(navigator.userAgent.toLowerCase()))) //Detects safari
 							) 
 								ui.position.top -= $(window).scrollTop();
 						},
