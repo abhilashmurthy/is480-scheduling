@@ -323,19 +323,12 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 			json.put("message", "Error with changing notification settings");
 		} finally {
 			if (em != null) {
-				//Saving job log in database
-				if (!em.getTransaction().isActive()) {
-					em.getTransaction().begin();
-				}
-				em.persist(logItem);
-				em.getTransaction().commit();
-
-				if (em.getTransaction().isActive()) {
-					em.getTransaction().rollback();
-				}
-				if (em.isOpen()) {
-					em.close();
-				}
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
+                //Saving job log in database
+                if (!em.getTransaction().isActive()) em.getTransaction().begin();
+                em.persist(logItem);
+                em.getTransaction().commit();
+                if (em.isOpen()) em.close();
 			}
 		}
 		return SUCCESS;

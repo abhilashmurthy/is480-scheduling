@@ -113,13 +113,12 @@ public class UpdateTimeslotAction extends ActionSupport implements ServletReques
             json.put("message", "Error with UpdateTimeslot: Escalate to developers!");
             return ERROR;
         } finally {
-           if (em != null) {
+			if (em != null) {
+				if (em.getTransaction().isActive()) em.getTransaction().rollback();
 				//Saving job log in database
 				if (!em.getTransaction().isActive()) em.getTransaction().begin();
 				em.persist(logItem);
 				em.getTransaction().commit();
-				
-				if (em.getTransaction().isActive()) em.getTransaction().rollback();
 				if (em.isOpen()) em.close();
 			}
         }
