@@ -50,7 +50,7 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 		SystemActivityLog logItem = new SystemActivityLog();
 		logItem.setActivity("User: Download ICS File");
 		logItem.setRunTime(now);
-		logItem.setUser(user);
+		if (user.getId() != null) logItem.setUser(user);
 		logItem.setMessage("Error with download ICS file");
 		logItem.setSuccess(true);
 		
@@ -85,10 +85,14 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 			//Adding all RSVPs
 			allBookings.addAll(UserManager.getSubscribedBookings(em, user.getEmail()));
 			
-			String downloadPath = ICSFileManager.createICSCalendar(allBookings, user, request.getSession().getServletContext());
-			
-			json.put("success", true);
-			json.put("downloadPath", downloadPath);
+			if (allBookings.size() > 0) {
+				String downloadPath = ICSFileManager.createICSCalendar(allBookings, user, request.getSession().getServletContext());
+				json.put("success", true);
+				json.put("downloadPath", downloadPath);
+			} else {
+				json.put("success", false);
+				json.put("message", "You don't have any presentations for this term!");
+			}
 			
 			logItem.setMessage("ICS file downloaded by " + user.toString());
         } catch (Exception e) {
