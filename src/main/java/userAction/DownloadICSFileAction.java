@@ -8,10 +8,8 @@ import static com.opensymphony.xwork2.Action.SUCCESS;
 import com.opensymphony.xwork2.ActionSupport;
 import constant.BookingStatus;
 import constant.Role;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -20,7 +18,7 @@ import javax.servlet.http.HttpSession;
 import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
-import model.SystemActivityLog;
+import model.Term;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
@@ -71,6 +69,12 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 				taSearch.setParameter("ta", ta);
 				taSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
 				allBookings.addAll(taSearch.getResultList());
+			} else if (role == Role.ADMINISTRATOR || role == Role.COURSE_COORDINATOR) {
+				Term currentTerm = (Term) session.getAttribute("currentActiveTerm");
+				Query termSearch = em.createQuery("SELECT b FROM Booking b WHERE b.timeslot.schedule.milestone.term = :term AND b.bookingStatus IN (:status)");
+				termSearch.setParameter("term", currentTerm);
+				termSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
+				allBookings.addAll(termSearch.getResultList());
 			}
 			
 			//Adding all RSVPs
