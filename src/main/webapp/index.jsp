@@ -146,8 +146,6 @@
                 <div class="bar" style="width: 100%;"></div>
             </div>
         </div>
-		
-		<br />
 
         <%@include file="footer.jsp"%>
         <!-- View Schedule Javascript -->
@@ -2500,6 +2498,18 @@
 						);
 					}
 				}
+				
+				//Page zoom fix
+				$(window).resize(function(){
+					$('.timeslotCell').each(function(){
+						var $timeslot = $(this);
+						var $tdCell = $('.tdCell[value="' + $timeslot.attr('value') + '"]');
+						$timeslot.offset({
+							top: $tdCell.offset().top,
+							left: $tdCell.offset().left
+						});
+					});
+				});
                 
                 /*****************************
                  PLUGINS AND COMPONENTS
