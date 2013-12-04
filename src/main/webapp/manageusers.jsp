@@ -87,7 +87,7 @@
 												<div class='memberList'>
 													<s:iterator var= "member" value= "members">
 														<span id='member_<s:property value= "#member.id"/>' class='memberName'>
-															<a class='teamStudentLink' id='teamStudent_<s:property value= "#member.id"/>' href='member_<s:property value= "#member.username"/>'><s:property value= "#member.name"/></a>
+															<a class='teamStudentLink user_<s:property value= "#member.username"/>' href='member_<s:property value= "#member.username"/>'><s:property value= "#member.name"/></a>
 														</span>
 													</s:iterator>
 												</div>
@@ -693,7 +693,7 @@
 						case 'student':
 							user = studentData[id];
 							if ($this.hasClass('editBtn')) {
-								editableFields.push({order: 3, key: "Team", name:"teamId", value: user.teamId});
+								editableFields.push({order: 4, key: "Team", name:"teamId", value: user.teamId});
 							}
 							break;
 						case 'faculty':
@@ -712,8 +712,9 @@
 							showNotification("ERROR", 'Usertype not found!');
 							return false;
 					}
-					editableFields.push({order: 1, key: "Username", name:"username", value: user.username});
-					editableFields.push({order: 2, key: "Full Name", name:"fullName", value: user.name});
+					editableFields.push({order: 2, key: "Username", name:"username", value: user.username});
+					editableFields.push({order: 1, key: "Full Name", name:"fullName", value: user.name});
+					editableFields.push({order: 3, key: "Email", name:"email", value: user.email});
 					editableFields.sort(compare);
 					if ($this.hasClass('editBtn')) editUser(user, userType, editableFields);
 					else if ($this.hasClass('delBtn')) {
@@ -725,10 +726,14 @@
 				$('body').on('click', '.addBtn', function(e){
 					if (uatMode) recordHumanInteraction(e);
 					var userType = $(this).attr('id').split('_')[1];
-					var addableFields = [{key: "Username", name:"username", order: 1}, {key: "Full Name", name: "fullName", order: 2}];
+					var addableFields = [{key: "Username", name:"username", order: 2}, {key: "Full Name", name: "fullName", order: 1}, {key: "Email", name:"email", order: 3}];
 					if (userType === 'student') addableFields.push({key: "Team", name: "teamId", order: 3});
 					addableFields.sort(compare);
 					addUser(userType, addableFields);
+					$('input[name="username"]').on('focusout', function(){
+						if ($(this).val().length === 0 || $('input[name="email"]').val().length > 0) return false;
+						else $('input[name="email"]').val($(this).val() + (userType === 'student'?'@sis.smu.edu.sg':'@smu.edu.sg')).change();
+					});
 					return false;
 				});
 				
@@ -1276,6 +1281,7 @@
 								id: user.id,
 								name: submitData.fullName, 
 								username: submitData.username,
+								email: submitData.email,
 								teamId: submitData.teamId?submitData.teamId:false,
 								teamName: submitData.teamName?submitData.teamName:false,
 								supervisorTeams: [],
@@ -1321,6 +1327,7 @@
 								id: user.id,
 								name: submitData.fullName,
 								username: submitData.username,
+								email: submitData.email,
 								teamId: submitData.teamId?submitData.teamId:false,
 								teamName: submitData.teamName?submitData.teamName:false
 							};
@@ -1530,7 +1537,7 @@
 										.attr('id', 'member_' + user.id)
 										.append(
 											$(document.createElement('a'))
-												.addClass('teamStudentLink')
+												.addClass('teamStudentLink user_' + submitData.username)
 												.attr('id', 'teamStudent_' + user.id)
 												.attr('href', 'member_' + submitData.username)
 												.html(submitData.fullName)
@@ -1571,7 +1578,7 @@
 										.attr('id', 'member_' + submitData.userId)
 										.append(
 											$(document.createElement('a'))
-												.addClass('teamStudentLink')
+												.addClass('teamStudentLink user_' + submitData.username)
 												.attr('id', 'teamStudent_' + submitData.userId)
 												.attr('href', 'member_' + submitData.username)
 												.html(submitData.fullName)
@@ -1616,6 +1623,7 @@
 							$('tr#user_' + user.id).fadeOut('slow', function(){
 								$(this).remove();
 								updateRowCount(userType.toLowerCase() + 'UsersTable');
+								$('body').find('.user_' + user.username).remove();
 							});
 							break;
 						default:
