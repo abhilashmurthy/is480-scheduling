@@ -53,7 +53,8 @@
 						</form>
 					</ul>
 				</div>
-			</div>
+				<button id ="downloadICSBtn" class="btn btn-warning" style="vertical-align: middle; margin-left: 20px; margin-top: 6px; float: left;">Import to Calendar</button>
+			</div>	
 					
 			<!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
@@ -2571,6 +2572,28 @@
                     }	
                     booking.find('.optionalAttendees').tokenInput(users, opts);
                 }
+				
+				/*****************************
+                 ICS FILE DOWNLOAD AJAX CALL
+                 ****************************/
+				 $('#downloadICSBtn').click(function(e) {
+					$.ajax({
+						type: 'POST',
+						async: false,
+						url: 'downloadICSFile'
+					}).done(function(response) {
+						$("#downloadICSBtn").button('reset');
+						if (response.success) {
+							window.location = response.downloadPath;
+						} else {
+							showNotification("ERROR", response.message);
+						}
+					}).fail(function(response) {
+						$("#downloadICSBtn").button('reset');
+						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
+					});
+					return false;
+				});
             };
             
             /* POPOVER */
