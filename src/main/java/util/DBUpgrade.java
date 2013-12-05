@@ -6,13 +6,14 @@ package util;
 
 import java.util.List;
 import javax.persistence.EntityManager;
+import model.Settings;
 import model.User;
 
 /**
  *
  * @author suresh
  */
-public class UserEmailSetupScript {
+public class DBUpgrade {
 	
 	public static void main(String[] args) {
 		EntityManager em = MiscUtil.getEntityManagerInstance();
@@ -23,6 +24,12 @@ public class UserEmailSetupScript {
 		for (User u : users) {
 			u.setEmail(u.getUsername() + "@smu.edu.sg");
 		}
+		
+		Settings emailURL = new Settings();
+		emailURL.setName("emailURL");
+		emailURL.setValue("http://202.161.45.167/is480-scheduling/");
+		
+		em.persist(emailURL);
 		
 		em.getTransaction().commit();
 	}
