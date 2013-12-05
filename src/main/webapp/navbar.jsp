@@ -43,7 +43,6 @@
             <a class="brand" href="index">
 				<img src="img/IS480-navbar.png" style="height:25px; width:120px; display:inline-block;"/>
 			</a>
-            <div class="nav-collapse collapse">
                 <ul class="nav navbar-nav">
 				<%  if (activeRole.equals(Role.ADMINISTRATOR) || activeRole.equals(Role.COURSE_COORDINATOR)) { %>
 						<li class="dropdown">
@@ -69,7 +68,6 @@
 						<!--<li id="Report"><a href="#"><b>Report</b></a></li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>All Bookings</b></a></li>
 <!--						<li id="users"><a href="users" class="navbar-title"><b>Users</b></a></li>-->
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.FACULTY)) { %>
 						<!--<li class="dropdown">   
 							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a> -->
@@ -80,27 +78,18 @@
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Bookings</b></a></li>
 						<li id="bookingHistory"><a href="yourAvailability" class="navbar-title"><b>My Availability</b></a></li>
 						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.STUDENT)) { %>
-<!--						<li class="dropdown">
-							<a id="bookingDropDown" role="button" class="dropdown-toggle" data-toggle="dropdown">Booking<b class="caret"></b></a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">-->
-							<!--</ul>-->
-						<!--</li>-->
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Bookings</b></a></li>
 						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.TA)) { %>	
 						<li id="bookingHistory"><a href="bookingHistory" class="navbar-title"><b>My Bookings</b></a></li>
 						<li id="bookingHistory"><a href="taAvailability" class="navbar-title"><b>Sign Up for Filming!</b></a></li>
 						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
-						<li id="help"><a href="help.jsp" class="navbar-title"><i class="fa fa-question-circle"></i>&nbsp;<b>Help</b></a></li>
 				<% } else if (activeRole.equals(Role.GUEST)) { %>
 						<li id="mySubscriptions"><a href="mySubscriptions" class="navbar-title"><b>My RSVPs</b></a></li>
 				<% } %>
 				</ul>
-			</div>
-				<ul class="nav pull-right">
+				<ul class="nav navbar-nav pull-right">
 				<!-- To display the user information -->
 				<li id="userInfo">
 					<a class='navbar-username'>
@@ -131,7 +120,7 @@
 						</li>
 						<% } %>
 						<% if (activeRole != Role.GUEST) { %>	
-						<li><a tabindex="-1" href="getUserPreferences"><i class="fa fa-wrench"></i>&nbsp;Manage settings</a></li>
+						<li><a tabindex="-1" href="getUserPreferences"><i class="fa fa-wrench"></i>&nbsp;Settings</a></li>
 						<% } %>
 						<li><a id="logoutLink" tabindex="-1" href="#"><i class="fa fa-power-off"></i>&nbsp;Logout</a></li>
 					</ul>
@@ -147,6 +136,9 @@
     navbarLoad = function(){
         //Dropdown menu from bootstrap
         $(".dropdown-toggle").dropdown();
+		
+		//Fix navbar width
+		$('.navbar').width($(window).width());	
         
         //Logout link
         $("#logoutLink").on('click', function(e) {

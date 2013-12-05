@@ -162,7 +162,7 @@
 									.append(
 										$(document.createElement('table'))
 											.attr('id', milestones[i].name.toLowerCase() + "ScheduleTable")
-											.addClass('scheduleTable table-condensed table-hover table-bordered')
+											.addClass('scheduleTable publicTable table-condensed table-hover table-bordered')
 									)
 							);
 						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) milestone = milestones[i].name.toUpperCase();
@@ -534,10 +534,21 @@
 						self.parent().popover('hide');
 						$(".hasDatepicker").datepicker('destroy');
 					});
-				});    
+				});
+				
+				//Page zoom fix
+				$(window).resize(function(){
+					$('.timeslotCell').each(function(){
+						var $timeslot = $(this);
+						var $tdCell = $('.tdCell[value="' + $timeslot.attr('value') + '"]');
+						$timeslot.offset({
+							top: $tdCell.offset().top,
+							left: $tdCell.offset().left
+						});
+					});
+				});
 				
 				/* PLUGINS */
-				
 				/* POPOVER */
 				function makePopover(container, title, content) {
 					container.popover({
@@ -559,7 +570,6 @@
 						}
 					});
 				}
-				
 			};
 			
 			addLoadEvent(welcomeLoad);

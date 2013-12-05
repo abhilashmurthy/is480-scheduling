@@ -15,7 +15,7 @@
     <body>
         <%@include file="navbar.jsp" %>
         <div class="container">
-            <h3>Milestone Configuration</h3>
+            <h3>Milestone Configuration <span class="muted" style="font-style: italic; font-size: 14px;">(Affects only future schedules)</span></h3>
             <!-- Kick unauthorized user -->
             <% if (!activeRole.equals(Role.ADMINISTRATOR) && !activeRole.equals(Role.COURSE_COORDINATOR)) {
                     request.setAttribute("error", "Oops. You are not authorized to access this page!");
