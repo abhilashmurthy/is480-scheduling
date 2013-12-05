@@ -123,6 +123,9 @@ public class UpdateBookingStatusAction extends ActionSupport implements ServletR
 						Timeslot t = booking.getTimeslot();
 						t.setCurrentBooking(null);
 						em.persist(t);
+						if (previouslyConfirmed) {
+							QuartzManager.deleteSMSReminder(booking, request.getSession().getServletContext());
+						} 
 						break;
 					} else if (r == Response.APPROVED) {
 						total++;
