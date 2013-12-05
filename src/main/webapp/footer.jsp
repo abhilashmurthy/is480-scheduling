@@ -61,7 +61,7 @@
 			}
 		});
 		
-		$(window).resize(function(){
+		$(window, document).resize(function(){
 			var width = $('#footer').width();
 			$('#footer').remove();
 			appendFooter(null, width);
