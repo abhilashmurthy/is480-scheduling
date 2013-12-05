@@ -2623,7 +2623,7 @@
 				 $('#downloadICSBtn').click(function(e){
 					$.ajax({
 						type: 'POST',
-						data: {jsonData: JSON.stringify({scheduleId: scheduleData.id})},
+						data: {jsonData: JSON.stringify({scheduleId: scheduleData.id})}, 
 						async: false,
 						url: 'downloadICSFile'
 					}).done(function(response) {
