@@ -253,6 +253,7 @@
                     loadScheduleTimeslots(selectedMilestone, scheduleData);
 					taData = JSON.parse('<s:property escape= "false" value= "taJson"/>');
 					loadTAStatistics();
+					$(window).trigger('resize');
                     return false;
                 });
                 
@@ -623,6 +624,10 @@
 					}
 					return false;
                 });
+				
+				$('.taChartBtn').click(function(e){
+					$('#footer').remove();
+				});
 				
 				//Hover glow effect
                 $('body').on('mouseenter', '.timeslotsTable tr:not(:has(table, th)) td:not(:first-child)', function(e) {

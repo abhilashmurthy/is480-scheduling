@@ -270,6 +270,7 @@
 							$('.otherFacultyMultiselect').multiselect('deselect', selectedOtherFacultyArray[i]);
 						}
 					}
+					$(window).trigger('resize');
                     return false; 
                 });
 				
@@ -703,6 +704,7 @@
 							} else {
 								$('.' + $option.attr('value')).remove();
 							}
+							$('#footer').remove();
 							return false;
 						}
 					});
