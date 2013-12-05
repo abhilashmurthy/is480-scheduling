@@ -249,13 +249,12 @@
                 function loadSelectDropdown() {
 					var now = new Date();
                     for (var i = 0; i < milestones.length; i++) {
-						if (!milestones[i].bookable) continue;
 						var milestoneOption = $(document.createElement('option'));
 						milestoneOption.attr('value', milestones[i].name);
 						milestoneOption.html(milestones[i].name);
 						$("#milestoneTimeslotsSelect").append(milestoneOption);
 						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i].name;
-						else if (milestones[i + 1] && milestones[i + 1].bookable && now >= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i + 1].name;
+						else if (milestones[i + 1] && now >= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i + 1].name;
                     }
                 }
 				

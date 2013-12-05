@@ -102,6 +102,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 			if (termIdInfo != null) termId = termIdInfo.getAsLong();
 			
 			String username = dataObj.get("username").getAsString();
+			String email = dataObj.get("email").getAsString();
 			String fullName = dataObj.get("fullName").getAsString();
 			
 			long teamId = 0;
@@ -115,7 +116,7 @@ public class ManageUserAction extends ActionSupport implements ServletRequestAwa
 				else existingUserId = userIdInfo.getAsLong();
 			}
 			
-			json = UserManager.addEditUser(em, user, role, termId, username, fullName, teamId, existingUserId);
+			json = UserManager.addEditUser(em, user, role, termId, username, email, fullName, teamId, existingUserId);
 			return true;
 		} catch (CustomException e) {
 			json.put("success", false);

@@ -55,13 +55,6 @@
 				<button id="submitFormBtn" class="btn btn-primary" data-loading-text="Saving..." style="margin-bottom: 20px;">Save</button>
 			</div>
 			<!-- END OF SMS SETTINGS SECTION -->
-			
-			<!-- ICS FILE DOWNLOAD SECTION -->
-			<div>
-				<h3>Import to Personal Calendar</h3>
-				<button id="downloadICSBtn" class="btn btn-primary" data-loading-text="Downloading..." style="margin-bottom: 20px;">Download</button>
-			</div>
-			<!-- END OF ICS FILE DOWNLOAD SECTION -->
         </div>
 		
 		<%@include file="footer.jsp"%>
@@ -116,25 +109,6 @@
 						}
 					}).fail(function(response) {
 						$("#submitFormBtn").button('reset');
-						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
-					});
-					return false;
-				});
-				
-				$('#downloadICSBtn').click(function(e) {
-					$.ajax({
-						type: 'POST',
-						async: false,
-						url: 'downloadICSFile'
-					}).done(function(response) {
-						$("#downloadICSBtn").button('reset');
-						if (response.success) {
-							window.location = response.downloadPath;
-						} else {
-							showNotification("ERROR", response.message);
-						}
-					}).fail(function(response) {
-						$("#downloadICSBtn").button('reset');
 						showNotification("WARNING", "Oops. Something went wrong. Please try again!");
 					});
 					return false;

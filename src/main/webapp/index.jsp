@@ -33,33 +33,29 @@
         <!-- Welcome Text -->
         <div class="container page">
             <!--<h3 id="activeTermName"><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></h3>-->
-			<br/>
-			<div class='termPicker'>
-				<div class="btn-group" style="float: left;">
-					<a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#" >
-						<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<form id="activeTermForm" action="index" method="post">
-							<!--<select name="termId" style="float:right" onchange="this.form.submit()">--> 
-								<s:iterator value="data">
-									<li>
-										<button type="submit" class="btn btn-link" name="termId" value="<s:property value="termId"/>">
-											<s:property value="termName"/>
-										</button>
-									</li>
-								</s:iterator>
-							<!--</select>-->
-						</form>
-					</ul>
+				<div class='indexItem pull-left termPicker'>
+					<div class="btn-group" style="float: left;">
+						<a class="btn btn-large dropdown-toggle" data-toggle="dropdown" href="#" >
+							<b><%= ((Term)session.getAttribute("currentActiveTerm")).getDisplayName() %></b> <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<form id="activeTermForm" action="index" method="post">
+									<s:iterator value="data">
+										<li>
+											<button type="submit" class="btn btn-link" name="termId" value="<s:property value="termId"/>">
+												<s:property value="termName"/>
+											</button>
+										</li>
+									</s:iterator>
+							</form>
+						</ul>
+					</div>
 				</div>
-			</div>
-					<button id ="downloadICSBtn" class="btn btn-warning" style="vertical-align: middle; margin-left: 20px; margin-top: 6px; float: left;">Import to Calendar</button>
 					
 			<!-- To display number of pending bookings for supervisor/reviewer -->
             <% if (activeRole.equals(Role.FACULTY)) {%>
             <s:if test="%{pendingBookingCount > 0}">
-                <div class="pendingBookings alert">
+                <div class="indexItem pendingBookings alert">
                     <button type="button" class="close" data-dismiss="alert">×</button>
                     <a href="approveReject" style="color:#B88A00;">
                         <s:if test="%{pendingBookingCount > 1}">
@@ -70,10 +66,10 @@
                     </a>
                 </div>
             </s:if>
-            <% }%>
+            <% } %>
 			
-			<br/>
-			<div class="settingsView">
+			<div class="settingsView indexItem">
+				<button id="downloadICSBtn" class="btn btn-primary" style="margin-right: 10px; text-align: left">Download Calendar</button>
 				<span id="settingsViewLabel">Select View: </span>
 				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
 					<input type="checkbox" checked>
@@ -81,10 +77,9 @@
 				<i id='previousWeek' class='traverseWeek fa fa-arrow-circle-o-left' style='color: #5bc0de; display: none; cursor: pointer'></i>
 				<i id='nextWeek' class='traverseWeek fa fa-arrow-circle-o-right' style='color: #5bc0de; display: none; cursor: pointer'></i>
             </div>
-			<br/><br/>
 
             <!-- To display legend for the calendar -->
-            <table class="legend">
+            <table class="indexItem legend">
                 <tr>
                     <td class="legendBox unbookedTimeslot" style="border-width:1px!important;width:17px;"></td><td>&nbsp;Available</td> 
                     <td style="width:15px"></td>
@@ -180,7 +175,6 @@
 					var setAsActive = true;
 					var now = new Date();
                     for (var i = 0; i < milestones.length; i++) {
-						if (!milestones[i].bookable) continue;
 						$('ul#milestoneTab') //Add the milestone tab
 							.append(
 								$(document.createElement('li'))
@@ -205,8 +199,8 @@
 											.addClass('scheduleTable table-condensed table-hover table-bordered')
 									)
 							);
-						if (setAsActive && now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) milestone = milestones[i].name.toUpperCase();
-						else if (milestones[i + 1] && milestones[i + 1].bookable && now >= Date.parse(milestones[i].endDate)) milestone = milestones[i + 1].name.toUpperCase();
+						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) milestone = milestones[i].name.toUpperCase();
+						else if (milestones[i + 1] && now >= Date.parse(milestones[i].endDate)) milestone = milestones[i + 1].name.toUpperCase();
 						else if (setAsActive) milestone = milestones[i].name.toUpperCase();
 						setAsActive = false;
                     }
@@ -1410,6 +1404,7 @@
 												$('.pendingBookings u').html('You have ' + pendingBookingCount + ' pending ' + (pendingBookingCount === 1?'booking':'bookings'));
 											}
 										}
+										setTimeout(function(){repositionTimeslots();},1000);
 									}
 								}
 							}
@@ -2233,8 +2228,8 @@
 						drag: function(event, ui){
 							var st = parseInt($(this).data("startingScrollTop"));
 							if (
-								!(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())) //Detects chrome
-								||(/safari/.test(navigator.userAgent.toLowerCase())) //Detects safari
+								!(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase()) //Detects chrome
+								|| (/safari/.test(navigator.userAgent.toLowerCase()))) //Detects safari
 							) 
 								ui.position.top -= $(window).scrollTop();
 						},
@@ -2277,60 +2272,49 @@
 					if ($('body').find('.dashboardPicker').length) return false;
 					$('div.termPicker').after(
 						$(document.createElement('div'))
-							.addClass('dashboardPicker')
+							.addClass('indexItem pull-left dashboardPicker')
 							.append(
-								$(document.createElement('select'))
-									.addClass('dashboardMultiselect multiselect')
-									.attr('id', 'dashboard')
-									.attr('multiple', 'multiple')
-									.append(function(){
-										var $optionArray = new Array();
-										$optionArray.push(
-											$(document.createElement('option'))
-												.attr('value', 'teams')
-												.attr('id', 'teams')
-												.append($(document.createElement('i')).addClass('fa fa-group fa-black'))
-												.append(' Teams')
-										);
-										if (<%= activeRole.equals(Role.ADMINISTRATOR)%>) {
-											$optionArray.push(
-												$(document.createElement('option'))
-													.attr('value', 'tas')
-													.attr('id', 'tas')
-													.append($(document.createElement('i')).addClass('fa fa-video-camera fa-black'))
-													.append(' TA Video Signups')
-											);
-										}
-										return $optionArray;
-									})
+								$(document.createElement('div'))
+									.addClass('btn-group')
+									.append(	
+										$(document.createElement('a'))
+											.addClass('btn btn-large dropdown-toggle')
+											.attr('data-toggle', 'dropdown')
+											.attr('href', '#')
+											.append('<b>My Dashboard</b> <b class= "caret"></b>')
+									)
+									.append(
+										$(document.createElement('ul'))
+											.addClass('dropdown-menu')
+											.append(
+												$(document.createElement('li'))
+													.append(
+														$(document.createElement('a'))
+															.attr('href', '#')
+															.addClass('dashboardTeams')
+															.append('Teams')
+													)
+											)
+											.append(function() {
+													if (<%= activeRole.equals(Role.ADMINISTRATOR)%>) {
+														return $(document.createElement('li'))
+															.append(
+																$(document.createElement('a'))
+																	.attr('href', 'taAvailability')
+																	.addClass('dashboardSignups')
+																	.append('TA Video Signups')
+															);
+													} else {
+														return false;
+													}
+											})
+									)
 							)
 					);
-					$('.dashboardMultiselect').each(function(){
-						var $this = $(this);
-						$this.multiselect({
-							buttonText: function(options, select) {
-								if (options.length === 0) {
-									return '<b>My Dashboard</b> <b class= "caret"></b>';
-								} else {
-									var selected = '';
-									options.each(function(){
-										selected += $(this).text();
-									});
-									return selected + ' <b class= "caret"></b>';
-								}
-							},
-							onChange: function($option, checked) {
-								if (checked) {
-									if ($option.attr('value') === 'tas') {
-										window.location = 'taAvailability'
-									} else if ($option.attr('value') === 'teams') {
-										showMyTeamsModal();
-									}
-									setTimeout(function(){$this.multiselect('deselect', $option.attr('value'));}, 50);
-								}
-							},
-							buttonClass: 'btn btn-large'
-						});
+					
+					$('.dashboardTeams').on('click', function(){
+						showMyTeamsModal();
+						return false;
 					});
 					
 					function showMyTeamsModal() {
@@ -2475,8 +2459,12 @@
 					}
 				}
 				
-				//Page zoom fix
+				//Positioning fix
 				$(window).resize(function(){
+					repositionTimeslots();
+				});
+				
+				function repositionTimeslots() {
 					$('.timeslotCell').each(function(){
 						var $timeslot = $(this);
 						var $tdCell = $('.tdCell[value="' + $timeslot.attr('value') + '"]');
@@ -2485,7 +2473,7 @@
 							left: $tdCell.offset().left
 						});
 					});
-				});
+				}
                 
                 /*****************************
                  PLUGINS AND COMPONENTS
@@ -2632,9 +2620,10 @@
 				/*****************************
                  ICS FILE DOWNLOAD AJAX CALL
                  ****************************/
-				 $('#downloadICSBtn').click(function(e) {
+				 $('#downloadICSBtn').click(function(e){
 					$.ajax({
 						type: 'POST',
+						data: {jsonData: JSON.stringify({scheduleId: scheduleData.id})}, 
 						async: false,
 						url: 'downloadICSFile'
 					}).done(function(response) {

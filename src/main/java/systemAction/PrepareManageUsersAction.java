@@ -104,6 +104,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					adminMap.put("id", adminUser.getId());
 					adminMap.put("name", adminUser.getFullName());
 					adminMap.put("username", adminUser.getUsername());
+					adminMap.put("email", adminUser.getEmail());
 					adminMap.put("mobileNumber", (adminUser.getMobileNumber() != null?adminUser.getMobileNumber():"-"));
 					adminData.add(adminMap);
 				}
@@ -115,6 +116,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					ccMap.put("id", ccUser.getId());
 					ccMap.put("name", ccUser.getFullName());
 					ccMap.put("username", ccUser.getUsername());
+					ccMap.put("email", ccUser.getEmail());
 					ccMap.put("mobileNumber", (ccUser.getMobileNumber() != null?ccUser.getMobileNumber():"-"));
 					ccData.add(ccMap);
 				}
@@ -126,6 +128,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					teamMap.put("id", team.getId());
 					teamMap.put("teamName", team.getTeamName());
 					teamMap.put("wiki", team.getWiki());
+					teamMap.put("presentationType", team.getPresentationType());
 					Set<Student> students = team.getMembers();
 					List<HashMap<String, Object>> memberList = new ArrayList<HashMap<String, Object>>();
 					for (Student student : students) {
@@ -133,6 +136,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 						memberMap.put("id", student.getId());
 						memberMap.put("name", student.getFullName());
 						memberMap.put("username", student.getUsername());
+						memberMap.put("email", student.getEmail());
 						memberList.add(memberMap);
 					}
 					Collections.sort(memberList, new Comparator<HashMap<String, Object>>(){
@@ -145,16 +149,19 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					supervisorMap.put("id", team.getSupervisor().getId());
 					supervisorMap.put("name", team.getSupervisor().getFullName());
 					supervisorMap.put("username", team.getSupervisor().getUsername());
+					supervisorMap.put("email", team.getSupervisor().getEmail());
 					teamMap.put("supervisor", supervisorMap);
 					HashMap<String, Object> reviewer1Map = new HashMap<String, Object>();
 					reviewer1Map.put("id", team.getReviewer1().getId());
 					reviewer1Map.put("name", team.getReviewer1().getFullName());
 					reviewer1Map.put("username", team.getReviewer1().getUsername());
+					reviewer1Map.put("email", team.getReviewer1().getEmail());
 					teamMap.put("reviewer1", reviewer1Map);
 					HashMap<String, Object> reviewer2Map = new HashMap<String, Object>();
 					reviewer2Map.put("id", team.getReviewer2().getId());
 					reviewer2Map.put("name", team.getReviewer2().getFullName());
 					reviewer2Map.put("username", team.getReviewer2().getUsername());
+					reviewer2Map.put("email", team.getReviewer2().getEmail());
 					teamMap.put("reviewer2", reviewer2Map);
 					teamData.add(teamMap);
 				}
@@ -167,6 +174,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					studentMap.put("id", student.getId());
 					studentMap.put("name", student.getFullName());
 					studentMap.put("username", student.getUsername());
+					studentMap.put("email", student.getEmail());
 					studentMap.put("mobileNumber", (student.getMobileNumber() != null?student.getMobileNumber():"-"));
 					if (student.getTeam() != null) {
 						studentMap.put("teamId", student.getTeam().getId());
@@ -183,6 +191,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					facultyMap.put("id", faculty.getId());
 					facultyMap.put("name", faculty.getFullName());
 					facultyMap.put("username", faculty.getUsername());
+					facultyMap.put("email", faculty.getEmail());
 					facultyMap.put("mobileNumber", (faculty.getMobileNumber() != null?faculty.getMobileNumber():"-"));
 					List<HashMap<String, Object>> supervisorTeamsList = new ArrayList<HashMap<String, Object>>();
 					List<HashMap<String, Object>> reviewer1TeamsList = new ArrayList<HashMap<String, Object>>();
@@ -209,6 +218,7 @@ public class PrepareManageUsersAction extends ActionSupport implements ServletRe
 					taMap.put("id", ta.getId());
 					taMap.put("name", ta.getFullName());
 					taMap.put("username", ta.getUsername());
+					taMap.put("email", ta.getEmail());
 					taMap.put("mobileNumber", (ta.getMobileNumber() != null?ta.getMobileNumber():"-"));
 					List<Schedule> schedules = ScheduleManager.findByTerm(em, term);
 					List<HashMap<String, Object>> mySignupList = new ArrayList<HashMap<String, Object>>();

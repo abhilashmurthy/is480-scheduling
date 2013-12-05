@@ -87,7 +87,7 @@
 												<div class='memberList'>
 													<s:iterator var= "member" value= "members">
 														<span id='member_<s:property value= "#member.id"/>' class='memberName'>
-															<a class='teamStudentLink' id='teamStudent_<s:property value= "#member.id"/>' href='member_<s:property value= "#member.username"/>'><s:property value= "#member.name"/></a>
+															<a class='teamStudentLink user_<s:property value= "#member.username"/>' href='member_<s:property value= "#member.username"/>'><s:property value= "#member.name"/></a>
 														</span>
 													</s:iterator>
 												</div>
@@ -693,7 +693,7 @@
 						case 'student':
 							user = studentData[id];
 							if ($this.hasClass('editBtn')) {
-								editableFields.push({order: 3, key: "Team", name:"teamId", value: user.teamId});
+								editableFields.push({order: 4, key: "Team", name:"teamId", value: user.teamId});
 							}
 							break;
 						case 'faculty':
@@ -712,8 +712,9 @@
 							showNotification("ERROR", 'Usertype not found!');
 							return false;
 					}
-					editableFields.push({order: 1, key: "Username", name:"username", value: user.username});
-					editableFields.push({order: 2, key: "Full Name", name:"fullName", value: user.name});
+					editableFields.push({order: 2, key: "Username", name:"username", value: user.username});
+					editableFields.push({order: 1, key: "Full Name", name:"fullName", value: user.name});
+					editableFields.push({order: 3, key: "Email", name:"email", value: user.email});
 					editableFields.sort(compare);
 					if ($this.hasClass('editBtn')) editUser(user, userType, editableFields);
 					else if ($this.hasClass('delBtn')) {
@@ -725,10 +726,14 @@
 				$('body').on('click', '.addBtn', function(e){
 					if (uatMode) recordHumanInteraction(e);
 					var userType = $(this).attr('id').split('_')[1];
-					var addableFields = [{key: "Username", name:"username", order: 1}, {key: "Full Name", name: "fullName", order: 2}];
+					var addableFields = [{key: "Username", name:"username", order: 2}, {key: "Full Name", name: "fullName", order: 1}, {key: "Email", name:"email", order: 3}];
 					if (userType === 'student') addableFields.push({key: "Team", name: "teamId", order: 3});
 					addableFields.sort(compare);
 					addUser(userType, addableFields);
+					$('input[name="username"]').on('focusout', function(){
+						if ($(this).val().length === 0 || $('input[name="email"]').val().length > 0) return false;
+						else $('input[name="email"]').val($(this).val() + (userType === 'student'?'@sis.smu.edu.sg':'@smu.edu.sg')).change();
+					});
 					return false;
 				});
 				
@@ -847,6 +852,23 @@
 												)
 											)
 									);
+									$trs.push(
+										$(document.createElement('tr'))
+											.append($(document.createElement('th'))
+												.append($(document.createElement('i')).addClass('fa fa-tachometer fa-black'))
+												.append(' Type'))
+											.append(
+												$(document.createElement('td'))
+												.addClass('presentationType')
+												.append(
+													$(document.createElement('select'))
+														.addClass('presentationTypeMultiselect multiselect multiselect-search')
+														.attr('multiple', 'multiple')
+														.attr('id', 'presentationType')
+														.attr('name', 'presentationType')
+												)
+											)
+									);
 									return $trs;
 								})
 							);
@@ -890,6 +912,17 @@
 					});
 					//Multiselect options
 					initializeMultiselect(action, team);
+					//Team data validation
+					$('.modal-footer').find('button:last').attr('disabled', true);
+					$('.modal-body').find('input').on('change', function(){
+						console.log('Team Name: ' + $('.modal-body').find('#teamName').length);
+						console.log('Members: ' + $('.modal-body').find('.membersMultiselect').length);
+						console.log('Presentation Type ' +  $('.modal-body').find('.presentationTypeMultiselect').length);
+						if ($('.modal-body').find('#teamName').val() 
+								&& $('.modal-body').find('.membersMultiselect').val()
+								&& $('.modal-body').find('.presentationTypeMultiselect').val()) $('.modal-footer').find('button:last').attr('disabled', false);
+						else $('.modal-footer').find('button:last').attr('disabled', true);
+					});
 					return false;
 				});
 				
@@ -1276,6 +1309,7 @@
 								id: user.id,
 								name: submitData.fullName, 
 								username: submitData.username,
+								email: submitData.email,
 								teamId: submitData.teamId?submitData.teamId:false,
 								teamName: submitData.teamName?submitData.teamName:false,
 								supervisorTeams: [],
@@ -1321,6 +1355,7 @@
 								id: user.id,
 								name: submitData.fullName,
 								username: submitData.username,
+								email: submitData.email,
 								teamId: submitData.teamId?submitData.teamId:false,
 								teamName: submitData.teamName?submitData.teamName:false
 							};
@@ -1530,7 +1565,7 @@
 										.attr('id', 'member_' + user.id)
 										.append(
 											$(document.createElement('a'))
-												.addClass('teamStudentLink')
+												.addClass('teamStudentLink user_' + submitData.username)
 												.attr('id', 'teamStudent_' + user.id)
 												.attr('href', 'member_' + submitData.username)
 												.html(submitData.fullName)
@@ -1571,7 +1606,7 @@
 										.attr('id', 'member_' + submitData.userId)
 										.append(
 											$(document.createElement('a'))
-												.addClass('teamStudentLink')
+												.addClass('teamStudentLink user_' + submitData.username)
 												.attr('id', 'teamStudent_' + submitData.userId)
 												.attr('href', 'member_' + submitData.username)
 												.html(submitData.fullName)
@@ -1617,6 +1652,7 @@
 								$(this).remove();
 								updateRowCount(userType.toLowerCase() + 'UsersTable');
 							});
+							window.location.reload();
 							break;
 						default:
 							console.log('Action: ' + submitData.action);
@@ -1712,6 +1748,37 @@
 										return false;
 								}
 							}
+						} else if ($this.parent().hasClass('presentationType')) {
+							$this.multiselect({
+								buttonText: function(options, select) {
+									if (options.length === 0) {
+										return 'Select Type <b class= "caret"></b>';
+									} else {
+										var selected = '';
+										options.each(function(){
+											selected += $(this).text();
+										});
+										return selected + ' <b class= "caret"></b>';
+									}
+								},
+								onChange: function($option, checked) {
+									if ($this.val() !== null && checked) {
+										var vals = $this.val();
+										if (vals.length > 1) {
+											for (var i = 0; i < vals.length; i++) {
+												if (vals[i] !== $option.attr('value')) $this.multiselect('deselect', vals[i]);
+											}
+										}
+									}
+								},
+								buttonClass: 'btn userSelectBtn facultyUserSelectBtn'
+							});
+							$this.multiselect('dataprovider', [
+								{label: 'Private', value: 'PRIVATE'},
+								{label: 'Public', value: 'PUBLIC'},
+								{label: 'Internal', value: 'INTERNAL'}
+							]);
+							if (action === 'edit') $this.multiselect('select', team.presentationType);
 						} else {
 							showNotification('ERROR', 'Multiselect error');
 							return false;

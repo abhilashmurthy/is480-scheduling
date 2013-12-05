@@ -44,6 +44,7 @@
 				margin-left: 20px !important;
 				max-width: 100%;
 				height: 500px;
+				width: 600px;
 			}
             
 			#milestoneTimeslotsSelect {
@@ -236,13 +237,12 @@
                 function loadSelectDropdown() {
                     var now = new Date();
 					for (var i = 0; i < milestones.length; i++) {
-						if (!milestones[i].bookable) continue;
 						var milestoneOption = $(document.createElement('option'));
 						milestoneOption.attr('value', milestones[i].name);
 						milestoneOption.html(milestones[i].name);
 						$("#milestoneTimeslotsSelect").append(milestoneOption);
 						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i].name;
-						else if (milestones[i + 1] && milestones[i + 1].bookable && now >= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i + 1].name;
+						else if (milestones[i + 1] && now >= Date.parse(milestones[i].endDate)) defaultLoadMilestone = milestones[i + 1].name;
                     }
                 }
                 
@@ -847,8 +847,11 @@
 				var barGraph = null;
 				function loadTAStatistics() {
 					var taNames = getSeriesArray("name", false);
-					var signups = getSeriesArray("mySignups", true);
-					barGraph = $.jqplot('taStatisticsChart', [signups], {
+					var signupsWithBookings = getSeriesArray("mySignups", true, true);
+					var signupsWithoutBookings = getSeriesArray("mySignups", true, false);
+					var y_max = Math.max.apply(Math, signupsWithBookings) + Math.max.apply(Math, signupsWithoutBookings);
+					barGraph = $.jqplot('taStatisticsChart', [signupsWithBookings, signupsWithoutBookings], {
+						stackSeries: true,
 						seriesDefaults: {
 							renderer: $.jqplot.BarRenderer,
 							shadow: false,
@@ -856,10 +859,13 @@
 								highlightMouseOver: false,
 								lineWidth: 5
 							},
-							pointLabels: {show: false,}
+							pointLabels: {show: false}
 						},
 						title: 'TA Signup Count',
-						series: [{label: 'Signups'}],
+						series: [
+							{label: "Signups with Bookings", color: "#B8F79E"},
+							{label: "Signups without Bookings", color: "#F7A8A8"}
+						],
 						axesDefaults: {
 							tickRenderer: $.jqplot.CanvasAxisTickRenderer
 						},
@@ -874,17 +880,17 @@
 								}
 							},
 							yaxis: {
-								padMin: 0
+								min: 0,
+								max: y_max > 1?y_max + 1:10,
+								tickInterval: 1,
+								tickOptions: {formatString: '%d'}
 							}
 						},
 						legend: {
-							show: false,
-							location: 'e',
-							fontSize: 12,
-							border: "none",
-							marginRight: 30
+							show: true,
+							location: 'ne',
+							placement: 'outsideGrid'
 						},
-						seriesColors: ["#B8F79E"],
 						grid: {
 							drawGridLines: false,
 							background: "#ffffff",
@@ -894,18 +900,19 @@
 					}).replot();
 				}
 				
-				function getSeriesArray(key, getLength) {
+				function getSeriesArray(key, getLength, withBookings) {
 				   var data = [];
 				   for (var i = 0; i < taData.length; i++) {
 					   var ta = taData[i];
 					   if (getLength) {
+						   var count = 0;
 						   for (var j = 0; j < ta[key].length; j++) {
-							   if (parseInt(ta[key][j].scheduleId) !== parseInt(scheduleData.id)) {
-								   ta[key].splice(ta[key][j], 1);
-								   --j;
+							   if (parseInt(ta[key][j].scheduleId) === parseInt(scheduleData.id)) {
+								   if (withBookings && ta[key][j].hasBooking) ++count;
+								   else if (!withBookings && !ta[key][j].hasBooking) ++count;
 							   }
 						   }
-						   data.push(ta[key].length);
+						   data.push(count);
 					   } else {
 						   data.push(ta[key]);
 					   }

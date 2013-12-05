@@ -351,18 +351,25 @@ public class UserManager {
 	 */
 	public static HashMap<String, Object> addEditUser
 			(EntityManager em, User doer, Role role, long termId,
-			String username, String fullName, long teamId, long existingUserId)
+			String username, String email, String fullName,
+			long teamId, long existingUserId)
 			throws Exception
 	{
 		HashMap<String, Object> json = new HashMap<String, Object>();
 		User user = null;
 		
-		//Basic validation for username and fullName
+		//Basic validation for username, email and fullName
 		if (username == null) {
 			throw new CustomException("Please specify the username!");
 		} else {
 			username = username.trim();
 			if (username.isEmpty()) throw new CustomException("Please specify the username!");
+		}
+		if (email == null) {
+			throw new CustomException("Please specify the email!");
+		} else {
+			email = email.trim();
+			if (email.isEmpty()) throw new CustomException("Please specify the email!");
 		}
 		if (fullName == null) {
 			throw new CustomException("Please specify the full name!");
@@ -415,12 +422,16 @@ public class UserManager {
 			} else if (role == Role.ADMINISTRATOR || role == Role.COURSE_COORDINATOR) {
 				user = new User(username, fullName, null, role, term);
 			} //TODO Store guest roles if needed
+			
+			//Setting the email
+			user.setEmail(email);
 
 			em.persist(user);
 			json.put("success", true);
 			json.put("userId", user.getId());
 		} else { //EDIT operation
 			user.setUsername(username);
+			user.setEmail(email);
 			user.setFullName(fullName);
 			user.setTerm(term);
 			if (role == Role.STUDENT) ((Student)user).setTeam(team);

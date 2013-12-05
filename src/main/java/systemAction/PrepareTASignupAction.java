@@ -81,6 +81,7 @@ public class PrepareTASignupAction extends ActionSupport implements ServletReque
 								HashMap<String, Object> signupMap = new HashMap<String, Object>();
 								signupMap.put("datetime", sdf.format(timeslot.getStartTime()));
 								signupMap.put("milestone", schedule.getMilestone().getName());
+								signupMap.put("hasBooking", (timeslot.getCurrentBooking() != null));
 								signupMap.put("timeslotId", timeslot.getId());
 								signupMap.put("scheduleId", schedule.getId());
 								mySignups.add(signupMap);
