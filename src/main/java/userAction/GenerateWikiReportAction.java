@@ -27,6 +27,8 @@ import util.MiscUtil;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.ServletContext;
@@ -138,56 +140,14 @@ public class GenerateWikiReportAction extends ActionSupport implements ServletRe
 				ArrayList<String> isAdded = new ArrayList<String>();
 
 				//new array sorted
-				ArrayList<Timeslot> sortTimes = new ArrayList<Timeslot>();
+				ArrayList<Timeslot> sortTimes = timeArr;
 
-				//loop through list
-				for (int i = 0; i < timeArr.size(); i++) {
-					Timeslot t = timeArr.get(i);
-					String date = t.getStartTime().toString();
-					String startDate = date.substring(0, 10);
-
-					boolean foundFirst = false;
-
-					//see if startDate already exists in the added list
-					for (String eachString : isAdded) {
-						if (eachString.equals(startDate)) {
-							foundFirst = true;
-						}
+				//to sort (sortTimes array)
+				Collections.sort(sortTimes, new Comparator<Timeslot>() {
+					public int compare(Timeslot t, Timeslot t1) {
+						return t.getStartTime().compareTo(t1.getStartTime());
 					}
-
-					//if not found add this to the sorted list
-					if (!foundFirst) {
-						sortTimes.add(t);
-					}
-
-					if (i != timeArr.size() - 1) {
-						for (int j = i + 1; j < timeArr.size(); j++) {
-							Timeslot tCompare = timeArr.get(j);
-							String dateCompare = tCompare.getStartTime().toString();
-							String startDateCompare = dateCompare.substring(0, 10);
-
-							//compare the first timeslot with the next few to see if same starting date	
-							if (startDateCompare.equals(startDate)) {
-								boolean found = false;
-
-								//see if startDate already exists in the added list
-								for (String eachString : isAdded) {
-									if (eachString.equals(startDateCompare)) {
-										found = true;
-									}
-								}
-
-								//if not found add this to the sorted list
-								if (!found) {
-									sortTimes.add(tCompare);
-								}
-							}
-						}
-
-						//add this slot to the added slot, so that will never add again
-						isAdded.add(startDate);
-					}
-				}
+				});
 
 				//to see if already added
 				ArrayList<String> alreadyAdded = new ArrayList<String>();

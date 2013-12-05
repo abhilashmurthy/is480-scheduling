@@ -28,6 +28,9 @@ import au.com.bytecode.opencsv.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +38,6 @@ import javax.servlet.ServletContext;
 import manager.MilestoneManager;
 import manager.ScheduleManager;
 import manager.TermManager;
-import manager.TimeslotManager;
 import model.Milestone;
 import model.Schedule;
 import model.Term;
@@ -132,20 +134,16 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 				Schedule s = ScheduleManager.findByMilestone(em, milestoneSelected);
 				
 				//get all slots for this schedule
-				Set<Timeslot> allSlots = s.getTimeslots();
+				ArrayList<Timeslot> allSlots = new ArrayList<Timeslot>();
+				allSlots.addAll(s.getTimeslots());
 				
-				//get schedules for this term
-				/*List<Schedule> thisSchedules = ScheduleManager.getAllSchedules(em);
-				Schedule thisSchedule = new Schedule();
-
-				for (Schedule sch : thisSchedules) {
-					if (sch.getMilestone().getName().equals(milestone.toString())) {
-						thisSchedule = sch;
-						break;
+				//to sort (allSlots array)
+				//to sort (sortTimes array)
+				Collections.sort(allSlots, new Comparator<Timeslot>() {
+					public int compare(Timeslot t, Timeslot t1) {
+						return t.getStartTime().compareTo(t1.getStartTime());
 					}
-				}
-				//get the timeslots for this schedule
-				List<Timeslot> allSlots = TimeslotManager.findBySchedule(em, thisSchedule);*/
+				});
 
 				//for each timeslot, get the information for each column
 				for (Timeslot t : allSlots) {
@@ -156,23 +154,7 @@ public class GenerateScheduleReportAction extends ActionSupport implements Servl
 //					String startTime = "";
 					String endDate = "";
 					endDate = sdf.format(t.getEndTime());
-//					String endTime ="";
 
-//					String starting = t.getStartTime().toString();
-
-//					String[] startArray = starting.split("\\s+");
-//					
-//					startDate = startArray[0].toString();
-//					
-//					startTime = startArray[1].toString() + " " + startArray[2].toString();
-
-//					String ending = t.getEndTime().toString();
-//					
-//					String[] endArray = ending.split("\\s+");
-//					
-//					endDate = endArray[0].toString();
-//					
-//					endTime = endArray[1].toString() + " " + endArray[2].toString();
 					String venue = "-";
 					if (t.getVenue() != null) {
 						venue = t.getVenue();
