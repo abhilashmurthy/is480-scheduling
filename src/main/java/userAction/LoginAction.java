@@ -57,7 +57,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware {
         "smu_fullname",
         "smu_groups",
         "smu_username"};
-    private static final String SECRET_KEY = "psastest2012";
+    private static final String SECRET_KEY = MiscUtil.getProperty("General", "SSO_SECRET_KEY");
 
     public static String encode(String plain) {
         try {

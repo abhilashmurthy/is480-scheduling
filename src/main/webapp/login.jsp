@@ -504,7 +504,8 @@
                 });
 				//Select active milestone
 				$('.nav-tabs a#' + milestone.toLowerCase()).trigger('click');
-
+				
+				if (!<s:property value="devMode"/>) $('.testBtn').remove();
 				$(".testBtn").click(function(e) {
 					if (uatMode) recordHumanInteraction(e);
 					window.location = "ssobypasslogin.jsp";
@@ -515,7 +516,7 @@
 					if (uatMode) recordHumanInteraction(e);
 					if ($(this).is('button')) $(this).button('loading');
 					//blink(this);
-					window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=IS480PSAS';
+					window.location = 'https://elearntools.smu.edu.sg/Tools/SSO/login.ashx?id=' + "<s:property value="appId"/>";
 					return false;
 				});
 

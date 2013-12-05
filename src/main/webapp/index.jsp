@@ -69,7 +69,7 @@
             <% } %>
 			
 			<div class="settingsView indexItem">
-				<button id="downloadICSBtn" class="btn btn-primary" style="margin-right: 10px; text-align: left">Download Calendar</button>
+				<button id="downloadICSBtn" class="btn btn-primary" style="margin-right: 10px; text-align: left">Import Calendar</button>
 				<span id="settingsViewLabel">Select View: </span>
 				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
 					<input type="checkbox" checked>

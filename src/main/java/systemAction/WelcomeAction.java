@@ -31,6 +31,8 @@ public class WelcomeAction extends ActionSupport implements ServletRequestAware 
 
     private long selectedTermId;   //To get the active term id user chooses
 	private String t;
+	private boolean devMode;
+	private String appId;
     private ArrayList<HashMap<String, Object>> termData = new ArrayList<HashMap<String, Object>>();
     private HttpServletRequest request;
     private static Logger logger = LoggerFactory.getLogger(WelcomeAction.class);
@@ -43,11 +45,14 @@ public class WelcomeAction extends ActionSupport implements ServletRequestAware 
 			em.getTransaction().begin();
             HttpSession session = request.getSession();
 			
+			//DEVMODE SETTINGS
+			devMode = MiscUtil.DEV_MODE;
+			appId = MiscUtil.getProperty("General", "SSO_APP_ID");
+			
+			//TERM MANAGEMENT
 			if (t != null) {
 				selectedTermId = Long.parseLong(new String(DatatypeConverter.parseBase64Binary(t)));
 			}
-
-			//TERM MANAGEMENT
 			Term term = null;
 			if (selectedTermId != 0) {
 				term = TermManager.findTermById(em, selectedTermId);
@@ -121,6 +126,22 @@ public class WelcomeAction extends ActionSupport implements ServletRequestAware 
 
 	public void setT(String t) {
 		this.t = t;
+	}
+	
+	public boolean isDevMode() {
+		return devMode;
+	}
+
+	public void setDevMode(boolean devMode) {
+		this.devMode = devMode;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 	
 }
