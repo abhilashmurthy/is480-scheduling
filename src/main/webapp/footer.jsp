@@ -101,16 +101,16 @@
 														)
 												)
 										)
-										.append(
-											//About Us
-											$(document.createElement('span'))
-												.addClass('footerLink')
-												.append(
-													$(document.createElement('a'))
-														.attr('href', 'about')
-														.append('About Us')
-												)
-										)
+//										.append(
+//											//About Us
+//											$(document.createElement('span'))
+//												.addClass('footerLink')
+//												.append(
+//													$(document.createElement('a'))
+//														.attr('href', 'about')
+//														.append('About Us')
+//												)
+//										)
 										.append(
 											//Help
 											$(document.createElement('span'))
