@@ -687,7 +687,7 @@ select, input {
 	line-height: 40px;
 }
 
-.footerLink a:link, a:visited {
+.footerLink a:link, .footerLink a:visited {
 	color: white;
 }
 .footerLink a:hover {
