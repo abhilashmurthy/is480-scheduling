@@ -339,7 +339,6 @@ input, button, select, textarea {
 .pendingBookings {
 	margin: 0 auto 0 auto;
 	line-height: 27px;
-	width: 220px;
 	text-align: left;
 }
 
@@ -616,11 +615,10 @@ select, input {
 	margin-left: 7px;
 }
 
-.indexDropdown {
-	float: left;
+.indexItem {
 	display: inline-block;
 	margin-right: 20px;
-	margin-top: 5px;
+	margin-top: 20px;
 	margin-bottom: 10px;
 }
 
