@@ -57,7 +57,7 @@
 						<img src="img/IS480-navbar.png" style="height:25px; width:120px; display:inline-block;"/>
 					</a>
 					<button class="ssoBtn btn btn-primary pull-right" data-loading-text="Logging in..." type="submit">SMU Login</button>
-					<button class="testBtn btn btn-inverse pull-right muted" data-loading-text="Logging in..." type="submit">Administrator Login</button>
+					<s:if test="%{devMode == true}"><button class="testBtn btn btn-inverse pull-right muted" data-loading-text="Logging in..." type="submit">Administrator Login</button></s:if>
                 </div>
             </div>
         </div>
@@ -505,7 +505,6 @@
 				//Select active milestone
 				$('.nav-tabs a#' + milestone.toLowerCase()).trigger('click');
 				
-				if (!<s:property value="devMode"/>) $('.testBtn').remove();
 				$(".testBtn").click(function(e) {
 					if (uatMode) recordHumanInteraction(e);
 					window.location = "ssobypasslogin.jsp";
