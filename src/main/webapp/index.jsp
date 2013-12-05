@@ -175,7 +175,6 @@
 					var setAsActive = true;
 					var now = new Date();
                     for (var i = 0; i < milestones.length; i++) {
-						if (!milestones[i].bookable) continue;
 						$('ul#milestoneTab') //Add the milestone tab
 							.append(
 								$(document.createElement('li'))
@@ -200,8 +199,8 @@
 											.addClass('scheduleTable table-condensed table-hover table-bordered')
 									)
 							);
-						if (setAsActive && now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) milestone = milestones[i].name.toUpperCase();
-						else if (milestones[i + 1] && milestones[i + 1].bookable && now >= Date.parse(milestones[i].endDate)) milestone = milestones[i + 1].name.toUpperCase();
+						if (now >= Date.parse(milestones[i].startDate) && now <= Date.parse(milestones[i].endDate)) milestone = milestones[i].name.toUpperCase();
+						else if (milestones[i + 1] && now >= Date.parse(milestones[i].endDate)) milestone = milestones[i + 1].name.toUpperCase();
 						else if (setAsActive) milestone = milestones[i].name.toUpperCase();
 						setAsActive = false;
                     }
