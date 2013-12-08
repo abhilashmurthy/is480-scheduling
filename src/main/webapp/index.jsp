@@ -69,7 +69,7 @@
             <% } %>
 			
 			<div class="settingsView indexItem">
-				<button id="downloadICSBtn" class="btn btn-primary" style="margin-right: 10px; text-align: left">Import Calendar</button>
+				<button id="downloadICSBtn" class="btn btn-primary" style="margin-right: 10px; text-align: left"><i class="fa fa-calendar" style="margin-right: 4px"></i>Download Calendar</button>
 				<span id="settingsViewLabel">Select View: </span>
 				<div id="weekView" data-on="primary" data-off="info" data-on-label="Full" data-off-label="Week" class="make-switch switch-small">
 					<input type="checkbox" checked>
@@ -2623,7 +2623,7 @@
 				 $('#downloadICSBtn').click(function(e){
 					$.ajax({
 						type: 'POST',
-						data: {jsonData: JSON.stringify({scheduleId: scheduleData.id})}, 
+						data: {scheduleId: scheduleData.id}, 
 						async: false,
 						url: 'downloadICSFile'
 					}).done(function(response) {

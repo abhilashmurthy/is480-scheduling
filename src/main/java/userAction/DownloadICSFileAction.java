@@ -11,6 +11,7 @@ import constant.Role;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpSession;
 import manager.ICSFileManager;
 import manager.UserManager;
 import model.Booking;
-import model.Term;
+import model.Schedule;
 import model.User;
 import model.role.Faculty;
 import model.role.Student;
@@ -37,6 +38,7 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 	private HttpServletRequest request;
 	private static Logger logger = LoggerFactory.getLogger(DownloadICSFileAction.class);
 	private HashMap<String, Object> json = new HashMap<String, Object>();
+	private int scheduleId;
 
 	@Override
 	public String execute() throws Exception {
@@ -47,34 +49,39 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
         try {
 			em = MiscUtil.getEntityManagerInstance();
 			
+			Schedule schedule = em.find(Schedule.class, scheduleId * 1L);
+			List<BookingStatus> statuses = Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING);
+			
 			//List of all the bookings that will be included in the ICS file
 			ArrayList<Booking> allBookings = new ArrayList<Booking>();
 			
             Role role = user.getRole();
 			if (role == Role.STUDENT) {
 				Student student = em.find(Student.class, user.getId());
-				Query studentSearch = em.createQuery("SELECT b FROM Booking b WHERE :student MEMBER OF b.requiredAttendees AND b.bookingStatus IN (:status)");
+				Query studentSearch = em.createQuery("SELECT b FROM Booking b WHERE :student MEMBER OF b.requiredAttendees AND b.bookingStatus IN (:status) AND b.timeslot.schedule = :schedule");
 				studentSearch.setParameter("student", student);
-				studentSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
+				studentSearch.setParameter("status", statuses);
+				studentSearch.setParameter("schedule", schedule);
 				allBookings.addAll(studentSearch.getResultList());
 			} else if (role == Role.FACULTY) {
 				Faculty faculty = em.find(Faculty.class, user.getId());
-				Query facultySearch = em.createQuery("SELECT b FROM Booking b WHERE :faculty MEMBER OF b.requiredAttendees AND b.bookingStatus IN (:status)");
+				Query facultySearch = em.createQuery("SELECT b FROM Booking b WHERE :faculty MEMBER OF b.requiredAttendees AND b.bookingStatus IN (:status) AND b.timeslot.schedule = :schedule");
 				facultySearch.setParameter("faculty", faculty);
-				facultySearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
+				facultySearch.setParameter("status", statuses);
+				facultySearch.setParameter("schedule", schedule);
 				allBookings.addAll(facultySearch.getResultList());
 			} else if (role == Role.TA) {
 				TA ta = em.find(TA.class, user.getId());
-				Query taSearch = em.createQuery("SELECT b FROM Booking b WHERE b.timeslot.TA = :ta AND b.bookingStatus IN (:status)");
+				Query taSearch = em.createQuery("SELECT b FROM Booking b WHERE b.timeslot.TA = :ta AND b.bookingStatus IN (:status) AND b.timeslot.schedule = :schedule");
 				taSearch.setParameter("ta", ta);
-				taSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
+				taSearch.setParameter("status", statuses);
+				taSearch.setParameter("schedule", schedule);
 				allBookings.addAll(taSearch.getResultList());
 			} else if (role == Role.ADMINISTRATOR || role == Role.COURSE_COORDINATOR) {
-				Term currentTerm = (Term) session.getAttribute("currentActiveTerm");
-				Query termSearch = em.createQuery("SELECT b FROM Booking b WHERE b.timeslot.schedule.milestone.term = :term AND b.bookingStatus IN (:status)");
-				termSearch.setParameter("term", currentTerm);
-				termSearch.setParameter("status", Arrays.asList(BookingStatus.APPROVED, BookingStatus.PENDING));
-				allBookings.addAll(termSearch.getResultList());
+				Query adminSearch = em.createQuery("SELECT b FROM Booking b WHERE b.bookingStatus IN (:status) AND b.timeslot.schedule = :schedule");
+				adminSearch.setParameter("status", statuses);
+				adminSearch.setParameter("schedule", schedule);
+				allBookings.addAll(adminSearch.getResultList());
 			}
 			
 			//Adding all RSVPs
@@ -105,6 +112,14 @@ public class DownloadICSFileAction extends ActionSupport implements ServletReque
 			}
 		}
 		return SUCCESS;
+	}
+
+	public int getScheduleId() {
+		return scheduleId;
+	}
+
+	public void setScheduleId(int scheduleId) {
+		this.scheduleId = scheduleId;
 	}
 
 	public HashMap<String, Object> getJson() {
