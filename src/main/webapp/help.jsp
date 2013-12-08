@@ -22,16 +22,16 @@
 				<p>
 				Hi <% out.print(user.getFullName()); %>, <br/><br/>
 				Having trouble with the system?
-				Please <a href="mailto:xuling.dai.2010@sis.smu.edu.sg?cc=is480.scheduling@gmail.com&Subject=Problem%20-%20IS480%20Scheduling%20System">click here</a> to send us an email.
-				<i>(Do attach screenshots where appropriate)</i>
-				<br/><br/>
+				Please drop any one of us an email: <i>(Do attach screenshots where appropriate)</i> <br />
+				<ul>
+				<s:iterator value="adminEmails">
+					<li><a href="mailto:<s:property />"><s:property /></a></li>
+				</s:iterator>
+				</ul>
 				We will contact you as soon as possible!<br/><br/>
 				Regards, <br/>
 				IS480 Scheduling Team
 				</p>
-			</div>
-			<div class="well well-large">
-				If the above link does not work, please email your issue to <a>xuling.dai.2010@sis.smu.edu.sg</a>
 			</div>
         </div>
 		
