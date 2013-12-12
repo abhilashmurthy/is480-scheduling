@@ -668,14 +668,14 @@
 						body += 'IS480 ';
 						for (var key in roleData) {
 							if (roleData.hasOwnProperty(key)) {
-								to += roleData[key].username + '@smu.edu.sg; ';
+								to += roleData[key].email;
 							}
 						}
 						body += (userType === 'ta'?userType.toUpperCase()
 										:userType === 'faculty'?'Facultie'
 										:userType.charAt(0).toUpperCase() + userType.slice(1)) + 's';
 					} else {
-						to += roleData[id].username + '@smu.edu.sg; ';
+						to += roleData[id].email;
 						body += roleData[id].name;
 					}
 					body += ',%0D%0A%0D%0A';
@@ -937,13 +937,13 @@
 						if (teamData.hasOwnProperty(key)) {
 							var team = teamData[key];
 							for (var i = 0; i < team.members.length; i++) {
-								to += team.members[i].username + '@smu.edu.sg; ';
+								to += team.members[i].email;
 							}
 						}
 					}
 					for (var key in facultyData) {
 						if (facultyData.hasOwnProperty(key)) {
-							cc += facultyData[key].username + '@smu.edu.sg; ';
+							cc += facultyData[key].email;
 						}
 					}
 					body += ',%0D%0A%0D%0A';
@@ -959,9 +959,9 @@
 					var team = teamData[id];
 					var mailto = '';
 					for (var i = 0 ; i < team.members.length; i++) {
-						mailto += team.members[i].username + '@smu.edu.sg; ';
+						mailto += team.members[i].email;
 					}
-					mailto += '?cc=' + team.supervisor.username + '@smu.edu.sg';
+					mailto += '?cc=' + team.supervisor.email;
 					mailto += '&body=Hi ' + team.teamName + ',%0D%0A%0D%0A';
 					window.location.href = 'mailto:' + mailto;
 					return false;

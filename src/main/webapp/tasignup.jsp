@@ -576,7 +576,7 @@
 							if ($availableTd.children('.timeslotTeam').length && !$availableTd.children('.timeslotTA').length) {
 								var mailto = 'mailto:';
 								for (var j = 0; j < taData.length; j++) {
-									mailto += taData[j].username + '@smu.edu.sg; ';
+									mailto += taData[j].email;
 								}
 								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
 								mailto += 'Team ' 
@@ -591,7 +591,7 @@
 							} else if (!$availableTd.children('.timeslotTA').length) {
 								var mailto = 'mailto:';
 								for (var j = 0; j < taData.length; j++) {
-									mailto += taData[j].username + '@smu.edu.sg; ';
+									mailto += taData[j].email;
 								}
 								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
 								mailto += 'Please sign up for timeslot ' 
@@ -610,7 +610,7 @@
 										break;
 									}
 								}
-								mailto += ta.username + '@smu.edu.sg;?' + 'body=Hi ' + ta.name + ',%0D%0A%0D%0A';
+								mailto += ta.email + ';?' + 'body=Hi ' + ta.name + ',%0D%0A%0D%0A';
 								window.location.href = mailto;
 							}
 							break;

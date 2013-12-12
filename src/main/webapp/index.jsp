@@ -132,7 +132,7 @@
                 var scheduleData = null; //This state shall be stored here
                 var weekView = null;
 				var maxWeekView = null;
-				var myEmail = "<%= user.getUsername() %>" + "@smu.edu.sg"; //TODO: Cater to public audience
+				var myEmail = "<%= user.getEmail() %>";
 				var myFullName = "<%= user.getFullName() %>";
                 
                 //Student-specific variables

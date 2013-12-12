@@ -73,6 +73,7 @@ public class PrepareTASignupAction extends ActionSupport implements ServletReque
 					taMap.put("id", ta.getId());
 					taMap.put("name", ta.getFullName());
 					taMap.put("username", ta.getUsername());
+					taMap.put("email", ta.getEmail());
 					List<Schedule> schedules = ScheduleManager.findByTerm(em, term);
 					List<HashMap<String, Object>> mySignups = new ArrayList<HashMap<String, Object>>();
 					for (Schedule schedule : schedules) {
