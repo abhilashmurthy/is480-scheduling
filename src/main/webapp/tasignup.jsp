@@ -23,6 +23,11 @@
         <%@include file="header.jsp" %>
         <title>IS480 Scheduling System | TA Video Signup </title>
         <style type="text/css">
+			.timeslotsTable {
+				margin-right: 50px;
+				margin-bottom: 50px;
+			}
+			
             .timeslotsTable tr:first-child {
                 font-size: 16px !important;
                 height: 25px;
@@ -626,7 +631,7 @@
                 });
 				
 				$('.taChartBtn').click(function(e){
-					$('#footer').remove();
+					setTimeout(testFooter, 300);
 				});
 				
 				//Hover glow effect

@@ -370,6 +370,7 @@
 											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 											checkPickedDates(date, order);
 											updatePillbox();
+											testFooter();
 										}
 									})
 									.multiDatesPicker(dates.length > 0?'addDates':'resetDates', dates.length > 0?dates:'picked')

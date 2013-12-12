@@ -33,6 +33,8 @@
 			.timeslotsTable {
 				float: left;
 				margin-top: 20px;
+				margin-right: 50px;
+				margin-bottom: 50px;
 			}
 			
 			#editTimeslotsPanel {
@@ -704,7 +706,7 @@
 							} else {
 								$('.' + $option.attr('value')).remove();
 							}
-							$('#footer').remove();
+							testFooter();
 							return false;
 						}
 					});

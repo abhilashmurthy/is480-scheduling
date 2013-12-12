@@ -45,8 +45,29 @@
 <script type="text/javascript" src="js/jquery/jquery.sessionTimeout.min.js"></script>
 
 <!-- Footer -->
-<script type="text/javascript">	
-	var footerLoad = function() {
+<script type="text/javascript">
+		var $lowestElem = $(document.createElement('div')).offset({top: 0, left: 0});
+		
+		$('*[data-toggle="tab"]').click(function(){
+			setTimeout(testFooter, 0);
+		});
+		
+		findPageLowestElement();
+		function findPageLowestElement() {
+			$('body').find('*').each(function(){
+				var $this = $(this);
+				if ($this && $this.offset().top > $lowestElem.offset().top && !$this.children().length) {
+					$lowestElem = $this;
+				}
+			});
+		}
+		
+		function testFooter() {
+			findPageLowestElement();
+			if ($('#footer').length > 0 && $lowestElem.offset().top > $('#footer').offset().top) {
+				resetFooter();
+			}
+		}
 		
 		setTimeout(function(){
 			if ($(document).height() === $(window).height()) {
@@ -62,10 +83,14 @@
 		});
 		
 		$(window, document).resize(function(){
+			resetFooter();
+		});
+		
+		function resetFooter() {
 			var width = $('#footer').width();
 			$('#footer').remove();
 			appendFooter(null, width);
-		});
+		}
 
 		function appendFooter(initHeight, initWidth) {
 			$('body')
@@ -126,6 +151,4 @@
 						.show('fade', 'slow')
 				);
 		}
-	};
-	addLoadEvent(footerLoad);
 </script>

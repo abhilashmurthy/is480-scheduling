@@ -268,7 +268,6 @@
 										<tr><th>Milestone</th><th colspan="2">Dates</th><th class="dayHours">Day Hours</th><th class="scheduleBookable">Bookable</th></tr>
 										<tr id="createScheduleSubmitRow"><td></td><td><input id="createScheduleSubmitBtn" type="submit" value="Create" data-loading-text="Done" class="btn btn-primary"/></td></tr>
 									</table>
-								<h4 id="scheduleResultMessage"></h4>
 							</div>
 						</form>
                     </div>
@@ -390,6 +389,7 @@
 								var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 								resetDisabledDates(date, order);
 								updatePillbox();
+								testFooter();
 							}
 						});
 						if (dates.length > 0) {
@@ -450,6 +450,7 @@
 											var order = parseInt($(this).attr('class').split(" ")[0].split("_")[1]);
 											resetDisabledDates(date, order);
 											updatePillbox();
+											testFooter();
 										}
 									})
 							);
