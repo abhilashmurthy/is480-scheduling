@@ -469,6 +469,7 @@
 						$('.emailAllBtn').hide();
 					}
 					window.location = '#' + userType;
+					testFooter();
 					return false;
 				});
 				
