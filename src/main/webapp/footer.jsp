@@ -69,12 +69,6 @@
 			}
 		}
 		
-		setTimeout(function(){
-			if ($(document).height() === $(window).height()) {
-				appendFooter(58, null);
-			}
-		}, 0);
-		
 		$(window).scroll(function() {
 			if ($('#footer').length > 0) return false;
 			if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
@@ -151,4 +145,17 @@
 						.show('fade', 'slow')
 				);
 		}
+		
+		var footerLoad = function(){
+			noScrollBar();
+			function noScrollBar() {
+				setTimeout(function(){
+					if ($(document).height() === $(window).height()) {
+						appendFooter(58, null);
+					}
+				}, 1000);
+			}
+		};
+		
+		addLoadEvent(footerLoad);
 </script>
