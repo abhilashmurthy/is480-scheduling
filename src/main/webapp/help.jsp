@@ -20,7 +20,7 @@
 			<% if (user.getRole() != Role.GUEST) { %>
 			<!-- USER GUIDE -->
 			<div>
-				User Guide: <a href="user-guide/
+				User Guide: &nbsp; <a class="btn btn-inverse" href="user-guide/
 					<% if (user.getRole() == Role.ADMINISTRATOR || user.getRole() == Role.COURSE_COORDINATOR) { %>
 					IS480 Scheduling System User Guide for Admin & Course Coordinator.pdf
 					<% } else if (user.getRole() == Role.STUDENT) { %>
