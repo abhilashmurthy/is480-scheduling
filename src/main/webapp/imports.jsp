@@ -8,8 +8,8 @@
 <link href="css/jquery/token-input.css" rel="stylesheet">
 <link href="css/jquery/token-input-facebook.css" rel="stylesheet">
 <link href="css/bootstrap/bootstrap-formhelpers.css" rel="stylesheet">
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="css/bootstrap/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+<link href="css/font-awesome-4.0.3/css/font-awesome.min.css" rel="stylesheet">
 <link href="css/bootstrap/bootstrap-switch.css" rel="stylesheet">
 <link href="css/jquery/jquery.dataTables.css" rel="stylesheet">
 <link href="css/bootstrap/bootstrap-multiselect.css" rel="stylesheet">
