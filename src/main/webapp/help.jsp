@@ -17,7 +17,23 @@
         <%@include file="navbar.jsp" %>
         <div class="container">
 			<h3>Help</h3>
+			<% if (user.getRole() != Role.GUEST) { %>
+			<!-- USER GUIDE -->
+			<div>
+				User Guide: <a href="user-guide/
+					<% if (user.getRole() == Role.ADMINISTRATOR || user.getRole() == Role.COURSE_COORDINATOR) { %>
+					IS480 Scheduling System User Guide for Admin & Course Coordinator.pdf
+					<% } else if (user.getRole() == Role.STUDENT) { %>
+					IS480 Scheduling System User Guide for Student.pdf
+					<% } else if (user.getRole() == Role.FACULTY) { %>
+					IS480 Scheduling System User Guide for Faculty.pdf
+					<% } else if (user.getRole() == Role.TA) { %>
+					IS480 Scheduling System User Guide for TA.pdf
+					<% } %>">Download</a>
+			</div>
 			<br>
+			<% } %>
+			<!-- USER FEEDBACK -->
 			<div class="well well-large">
 				<p>
 				Hi <% out.print(user.getFullName()); %>, <br/><br/>
