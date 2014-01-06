@@ -8,7 +8,9 @@ import constant.BookingStatus;
 import constant.PresentationType;
 import constant.Response;
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -240,8 +242,12 @@ public class TeamManager {
 				//Affected faculty member is not part of the required attendees for this booking. Move onto next booking.
 				continue;
 			}
-			if (b.getBookingStatus() == BookingStatus.PENDING 
-					|| b.getBookingStatus() == BookingStatus.APPROVED) {
+			
+			//Current Time
+			Timestamp now = new Timestamp(Calendar.getInstance().getTimeInMillis());
+			
+			if (b.getTimeslot().getStartTime().after(now) && (b.getBookingStatus() == BookingStatus.PENDING 
+					|| b.getBookingStatus() == BookingStatus.APPROVED)) {
 				//Active booking. Delete and recreate at the same spot
 				HashMap<String, Object> deleteResult = BookingManager.deleteBooking(em, b.getTimeslot(), "Faculty member changed. Please contact administrator!", doer, ctx);
 				if (!deleteResult.containsKey("success") && Boolean.parseBoolean(deleteResult.get("success").toString()) == false) {
