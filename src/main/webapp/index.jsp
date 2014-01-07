@@ -2324,7 +2324,7 @@
 							message: function() {
 								var $table =  $(document.createElement('table')).attr('id', 'myTeamsModalTable').addClass('modalTable').append(function(){
 									if ($.isEmptyObject(teams)) {
-										return $(document.createElement('tr')).append($(document.createElement('td')).html('You do not have any teams for this term'));
+										return $(document.createElement('tr')).append($(document.createElement('td')).html('You do not have any teams for this milestone'));
 									}
 									var $tParts = new Array();
 									$tParts.push(
@@ -2408,6 +2408,7 @@
 								return $modalDiv;
 							}
 						});
+						if ($.isEmptyObject(teams)) return false; //No teams for this milestone. Do not start datatables.
 						
 						var aoColumnsArray = (<%=activeRole.equals(Role.FACULTY)%>)? [null, null, {sType: 'datetime'}] : [null, {sType: 'datetime'}];
 						var aaSortingArray = (<%=activeRole.equals(Role.FACULTY)%>)? [[2, 'asc']] : [[1, 'asc']];
