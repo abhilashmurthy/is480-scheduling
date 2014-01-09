@@ -2324,7 +2324,7 @@
 							message: function() {
 								var $table =  $(document.createElement('table')).attr('id', 'myTeamsModalTable').addClass('modalTable').append(function(){
 									if ($.isEmptyObject(teams)) {
-										return $(document.createElement('tr')).append($(document.createElement('td')).html('You do not have any teams for this milestone'));
+										return $(document.createElement('tr')).append($(document.createElement('td')).html('You have no presentations to attend for this milestone'));
 									}
 									var $tParts = new Array();
 									$tParts.push(
