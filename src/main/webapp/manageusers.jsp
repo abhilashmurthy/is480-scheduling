@@ -1846,6 +1846,16 @@
 						);
 					}
 				});
+				
+				//Setting default sort on Teams table (Sort ascending by supervisor first and then by team name)
+				for (var i = 0; i < oTables.length; i++) {
+					console.log();
+					if ($(oTables[i]).attr('id') === "teamsTable") {
+						var teamsDataTable = oTables[i];
+						teamsDataTable.fnSort([[3,'asc'], [1,'asc']]);
+					}
+				}
+				
 				$('section').show();
 				$('#usersProgressBar').hide();
 				
