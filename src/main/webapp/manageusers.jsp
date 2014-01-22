@@ -668,7 +668,7 @@
 						body += 'IS480 ';
 						for (var key in roleData) {
 							if (roleData.hasOwnProperty(key)) {
-								to += roleData[key].email;
+								to += roleData[key].email + ';';
 							}
 						}
 						body += (userType === 'ta'?userType.toUpperCase()
