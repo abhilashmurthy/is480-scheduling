@@ -102,6 +102,7 @@ public class BackupDatabaseJob implements Job {
 					.append(" --host=").append(host)
 					.append(" --port=").append(port)
 					.append(" --user=").append(user)
+					.append(" --password=").append(password)
 					.append(" ").append(dbName)
 					.append(" --hex-blob");
 
