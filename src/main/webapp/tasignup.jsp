@@ -576,9 +576,9 @@
 							if ($availableTd.children('.timeslotTeam').length && !$availableTd.children('.timeslotTA').length) {
 								var mailto = 'mailto:';
 								for (var j = 0; j < taData.length; j++) {
-									mailto += taData[j].email;
+									mailto += taData[j].email + ';';
 								}
-								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
+								mailto += '?body=Hi IS480 TAs,%0D%0A%0D%0A';
 								mailto += 'Team ' 
 										+ $availableTd.children('.timeslotTeam').text() + ' is presenting on ' 
 										+ Date.parse($availableTd.attr('id').split('_')[1]).toString('ddd, dd-MMM') 
@@ -591,9 +591,9 @@
 							} else if (!$availableTd.children('.timeslotTA').length) {
 								var mailto = 'mailto:';
 								for (var j = 0; j < taData.length; j++) {
-									mailto += taData[j].email;
+									mailto += taData[j].email + ';';
 								}
-								mailto += '&body=Hi IS480 TAs,%0D%0A%0D%0A';
+								mailto += '?body=Hi IS480 TAs,%0D%0A%0D%0A';
 								mailto += 'Please sign up for timeslot ' 
 										+ Date.parse($availableTd.attr('id').split('_')[1]).toString('ddd, dd-MMM') 
 										+ ' at ' +  Date.parse($availableTd.attr('id').split('_')[1]).toString('HH:mm') 
