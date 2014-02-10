@@ -2640,6 +2640,11 @@
 					});
 					return false;
 				});
+				//Initializing tool-tip for ICS Download Button due to limited support
+				$('#downloadICSBtn').tooltip({
+					title: 'Supported on Google Calendar',
+					placement: 'bottom'
+				});
             };
             
             /* POPOVER */
