@@ -77,6 +77,9 @@ public class EditBookingEmail extends EmailTemplate {
 				for (String s : b.getOptionalAttendees()) {
 					emails.add(s);
 				}
+				
+				//Adding the TA
+				if (b.getTimeslot().getTA() != null) emails.add(b.getTimeslot().getTA().getEmail());
 			}	
 		}
 		return emails;
