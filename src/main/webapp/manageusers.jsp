@@ -243,7 +243,7 @@
 											<td class='username'><s:property value= "username"/></td>
 											<td class='mobileNumber'><s:property value= "mobileNumber"/></td>
 											<td>
-												<a class='taSignupsLink' id='signups_<s:property value= "id"/>' href='ta_<s:property value= "username"/>'><s:property value= "%{#ta.mySignups.size()}"/></a>
+												<a class='taSignupsLink' id='signups_<s:property value= "id"/>' href='#ta_<s:property value= "username"/>'><s:property value= "%{#ta.mySignups.size()}"/></a>
 											</td>
 											<td>
 												<button type='button' title= "Email" class='emailBtn btn btn-small'>
