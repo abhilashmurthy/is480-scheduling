@@ -674,7 +674,7 @@
 						body += (userType === 'ta'?userType.toUpperCase()
 										:userType === 'faculty'?'Facultie'
 										:userType.charAt(0).toUpperCase() + userType.slice(1)) + 's';
-					} else {
+					} else { //Emailing a single person
 						to += roleData[id].email;
 						body += roleData[id].name;
 					}
@@ -937,13 +937,13 @@
 						if (teamData.hasOwnProperty(key)) {
 							var team = teamData[key];
 							for (var i = 0; i < team.members.length; i++) {
-								to += team.members[i].email;
+								to += team.members[i].email + ';';
 							}
 						}
 					}
 					for (var key in facultyData) {
 						if (facultyData.hasOwnProperty(key)) {
-							cc += facultyData[key].email;
+							cc += facultyData[key].email + ';';
 						}
 					}
 					body += ',%0D%0A%0D%0A';
@@ -959,10 +959,10 @@
 					var team = teamData[id];
 					var mailto = '';
 					for (var i = 0 ; i < team.members.length; i++) {
-						mailto += team.members[i].email;
+						mailto += team.members[i].email + ';';
 					}
 					mailto += '?cc=' + team.supervisor.email;
-					mailto += '&body=Hi ' + team.teamName + ',%0D%0A%0D%0A';
+					mailto += '&body=Hi ' + escape(team.teamName) + ',%0D%0A%0D%0A';
 					window.location.href = 'mailto:' + mailto;
 					return false;
 				});
