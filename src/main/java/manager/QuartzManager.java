@@ -45,12 +45,7 @@ public class QuartzManager {
 		//Calculating the time to trigger the job
 		Calendar scheduledTime = Calendar.getInstance();
 		if (MiscUtil.DEV_MODE) { //TESTING CODE
-			scheduledTime.setTimeInMillis(booking.getTimeslot().getStartTime().getTime());
-			scheduledTime.add(Calendar.HOUR, smsHours);
-			if (scheduledTime.getTime().before(new Date())) {
-				scheduledTime.setTimeInMillis(new Date().getTime());
-				scheduledTime.add(Calendar.SECOND, 10);
-			}
+			scheduledTime.add(Calendar.MINUTE, 1);
 		} else { //LIVE CODE
 			scheduledTime.setTimeInMillis(booking.getTimeslot().getStartTime().getTime());
 			scheduledTime.add(Calendar.HOUR, smsHours);
