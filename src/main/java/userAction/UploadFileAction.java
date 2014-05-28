@@ -936,20 +936,12 @@ public class UploadFileAction extends ActionSupport implements ServletContextAwa
 			String[] nextLine;
 			while ((nextLine = reader.readNext()) != null) {
 				lineNo++;
-				if (lineNo != 1) {
-					if (nextLine[3].equalsIgnoreCase("TA")) {
-						if (!nextLine[4].equalsIgnoreCase("-")) {
-							errorInPresentationType[0] = "true";
-							errorInPresentationType[1] = String.valueOf(lineNo);
-							return errorInPresentationType;
-						}
-					} else {
-						if (!nextLine[4].equalsIgnoreCase("Private") && !nextLine[4].equalsIgnoreCase("Internal") &&
-								!nextLine[4].equalsIgnoreCase("Public")) {
-							errorInPresentationType[0] = "true";
-							errorInPresentationType[1] = String.valueOf(lineNo);
-							return errorInPresentationType;
-						}
+				if (lineNo != 1 && !(nextLine[3].equalsIgnoreCase("TA"))) {
+					if (!nextLine[4].equalsIgnoreCase("Private") && !nextLine[4].equalsIgnoreCase("Internal") &&
+							!nextLine[4].equalsIgnoreCase("Public")) {
+						errorInPresentationType[0] = "true";
+						errorInPresentationType[1] = String.valueOf(lineNo);
+						return errorInPresentationType;
 					}
 				}
 			}
