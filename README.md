@@ -16,6 +16,7 @@ The system is currently live [here](http://202.161.45.168/is480-scheduling/welco
 - Integration with Gmail to send emails to users
 
 ## Team
+This system was built in AY 2013-14 Term 1. It was the final year project for the following students:
 - Abhilash Murthy
 - Dai Xuling
 - Prakhar Agarwal
