@@ -5,6 +5,9 @@ Teams need to present at different stages of their project to a panel of faculty
 
 The system is currently live [here](http://202.161.45.168/is480-scheduling/welcome) and has around ~160 active users per semester. Key stakeholders/users of the system include the course coordinators, faculty members supervising/reviewing teams, teaching assistants, and students undertaking projects in that semester.
 
+Preview:
+![alt tag](http://i.imgur.com/KGfPJhd.png)
+
 ## Stack
 - Web application running on an Apache Tomcat instance
 - MySQL database running on WAMP
